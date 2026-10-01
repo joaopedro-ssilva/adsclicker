@@ -31,7 +31,6 @@
 @import '../ui/game/panel/panel.css';
 
 /* Pages */
-@import './home.css';
 @import './kit/kit.css';
 
 @theme inline {

@@ -1,0 +1,232 @@
+/* Config tab. */
+
+.settings {
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-group {
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 56px;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--border);
+}
+
+.setting-row:last-child {
+  border-bottom: 0;
+}
+
+.setting-row[data-disabled='true'] {
+  opacity: 0.5;
+}
+
+.setting-row-stack {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.setting-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.setting-row input[type='range'] {
+  flex: 1.4;
+  min-width: 0;
+}
+
+.setting-row .setting-text:has(+ input[type='range']) {
+  flex: 0 0 38%;
+}
+
+.setting-label {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.setting-hint {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.setting-value {
+  width: 44px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.setting-choice {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-1);
+}
+
+.setting-choice .ui-button {
+  min-width: 0;
+  min-height: 40px;
+  padding: 4px 6px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+}
+
+.stats-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 2px solid var(--border);
+}
+
+.stats-grid > div:nth-child(odd) {
+  border-right: 2px solid var(--border);
+}
+
+.stats-grid > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.stats-grid dt {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.stats-grid dd {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.save-tools {
+  display: flex;
+  flex-direction: column;
+}
+
+.save-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.save-block + .save-block {
+  border-top: 2px solid var(--border);
+}
+
+.save-block h3 {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.save-text,
+.text-input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 2px solid var(--border);
+  color: var(--text);
+  font: inherit;
+}
+
+.save-text {
+  min-height: 72px;
+  resize: vertical;
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  word-break: break-all;
+}
+
+.text-input {
+  min-height: 44px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.save-text:focus-visible,
+.text-input:focus-visible {
+  outline-offset: 0;
+  border-color: var(--accent);
+}
+
+.save-warning {
+  color: var(--warn);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.save-warning[data-tone='bad'] {
+  color: var(--bad);
+}
+
+.danger-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-color: color-mix(in srgb, var(--bad) 50%, var(--border));
+}
+
+.reset-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  line-height: 1.5;
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+  font-size: 13px;
+}
+
+.about-name {
+  color: var(--accent-text);
+  font-size: 16px;
+}
+
+@container panel (max-width: 440px) {
+  .setting-row .setting-text:has(+ input[type='range']) {
+    flex: 0 0 34%;
+  }
+}

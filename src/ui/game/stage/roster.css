@@ -1,0 +1,231 @@
+/* Roster along the bottom of the stage. */
+
+.roster {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+  background: linear-gradient(transparent, rgb(5 7 13 / 0.78) 38%);
+}
+
+.roster::-webkit-scrollbar {
+  display: none;
+}
+
+/* Keeps the row centred when everything fits, and still scrollable from the start when it does not. */
+.roster > :first-child {
+  margin-left: auto;
+}
+
+.roster > :last-child {
+  margin-right: auto;
+}
+
+.roster-slot {
+  --prof: var(--border);
+
+  display: grid;
+  flex: 0 0 auto;
+  align-content: start;
+  justify-items: center;
+  gap: 4px;
+  width: 78px;
+  padding: 6px 4px 5px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 2px solid var(--border);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+button.roster-slot {
+  transition:
+    transform 90ms steps(2),
+    border-color 90ms;
+}
+
+button.roster-slot:hover {
+  border-color: var(--prof);
+  transform: translateY(-3px);
+}
+
+button.roster-slot:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.roster-slot[data-state='active'] {
+  border-color: var(--prof);
+  background: color-mix(in srgb, var(--prof) 20%, var(--surface));
+  box-shadow:
+    0 0 0 2px var(--prof),
+    3px 3px 0 2px var(--shadow-color);
+}
+
+.roster-face {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--prof) 24%, var(--bg));
+}
+
+.roster-portrait {
+  display: block;
+  flex-shrink: 0;
+  image-rendering: pixelated;
+}
+
+.roster-portrait-fallback {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text-muted);
+}
+
+.roster-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.roster-slot[data-state='locked'] {
+  opacity: 0.7;
+  border-style: dashed;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.roster-slot[data-state='locked'] .roster-name {
+  color: var(--text-muted);
+}
+
+.roster-face[data-silhouette] {
+  background: color-mix(in srgb, var(--bg) 70%, #000);
+}
+
+.roster-face[data-silhouette] .roster-portrait {
+  filter: brightness(0);
+  opacity: 0.55;
+}
+
+.roster-face[data-dim] .roster-portrait {
+  filter: brightness(0.75) saturate(0.7);
+}
+
+/* The next professor to hire: a wider card with cost, progress and the hire button. */
+
+.roster-next {
+  grid-auto-flow: column;
+  align-items: center;
+  justify-items: start;
+  gap: var(--space-3);
+  width: auto;
+  min-width: 250px;
+  padding: 6px 10px 6px 6px;
+  border-style: dashed;
+  border-color: var(--prof);
+}
+
+.roster-next[data-affordable='true'] {
+  border-style: solid;
+  animation: hire-ready 1.1s steps(2) infinite;
+}
+
+.roster-offer {
+  display: grid;
+  gap: 4px;
+  min-width: 130px;
+  justify-items: start;
+}
+
+.roster-offer .ui-progress {
+  width: 100%;
+}
+
+.roster-cost {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.roster-cost svg {
+  color: #f0b43c;
+}
+
+.roster-lock {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  max-width: 190px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.roster-offer .ui-button {
+  min-height: 30px;
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
+@keyframes hire-ready {
+  50% {
+    box-shadow:
+      3px 3px 0 var(--shadow-color),
+      0 0 0 3px color-mix(in srgb, var(--prof) 50%, transparent);
+  }
+}
+
+@container stage (max-width: 639px) {
+  .roster {
+    align-items: flex-end;
+    gap: 6px;
+    padding: 6px var(--space-2) 6px;
+  }
+
+  .roster-slot {
+    width: 46px;
+    padding: 3px;
+  }
+
+  .roster-face {
+    width: 38px;
+    height: 38px;
+  }
+
+  .roster-slot:not(.roster-next) .roster-name {
+    display: none;
+  }
+
+  .roster-slot.roster-next {
+    width: auto;
+    min-width: 0;
+    gap: var(--space-2);
+    padding: 4px 8px 4px 4px;
+  }
+
+  .roster-offer {
+    min-width: 96px;
+  }
+
+  .roster-offer .ui-progress {
+    display: none;
+  }
+
+  .roster-next .roster-name {
+    display: none;
+  }
+}

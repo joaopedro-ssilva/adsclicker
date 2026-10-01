@@ -20,3 +20,6 @@ npm-debug.log*
 
 # art pipeline: raw generations are kept out of git, processed sprites are committed
 /art/raw/
+
+# QA screenshots and scratch saves
+/art/preview/

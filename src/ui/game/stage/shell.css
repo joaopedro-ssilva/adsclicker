@@ -1,0 +1,91 @@
+/* Screen layout: the stage takes what the panel leaves. The page itself never scrolls. */
+
+.game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(440px, 34vw, 500px);
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.game-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.game-panel {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border-left: 2px solid var(--border);
+}
+
+@media (max-width: 1023px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: max(48dvh, 400px) minmax(0, 1fr);
+  }
+
+  .game-panel {
+    border-left: 0;
+    border-top: 2px solid var(--border);
+  }
+}
+
+/* Loading */
+
+.loading {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  min-height: 100dvh;
+}
+
+.loading-blocks {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.loading-blocks i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  animation: loading-hop 900ms steps(4) infinite;
+}
+
+.loading-blocks i:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.loading-blocks i:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+.loading-text {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+@keyframes loading-hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+
+  30% {
+    transform: translateY(-14px);
+  }
+}

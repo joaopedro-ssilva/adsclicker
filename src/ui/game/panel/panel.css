@@ -1,1 +1,7 @@
-/* Side panel styles. Owned by the panel engineer; import further panel CSS files from here. */
+/* Side panel styles. Owned by the panel engineer; one CSS file per tab, imported here. */
+@import './panel-shell.css';
+@import './aulas/aulas.css';
+@import './pesquisas/pesquisas.css';
+@import './album/album.css';
+@import './formatura/formatura.css';
+@import './config/config.css';

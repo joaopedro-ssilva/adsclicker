@@ -1,0 +1,325 @@
+/* Full-screen scenes: hire, graduation, epic and legendary unlocks. Below the toasts and the effects layer. */
+
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  overflow: hidden;
+  color: var(--text);
+  background:
+    conic-gradient(rgb(0 0 0 / 0.2) 25%, transparent 0 50%, rgb(0 0 0 / 0.2) 0 75%, transparent 0) 0 0 / 4px 4px,
+    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--scene) 34%, rgb(6 8 16 / 0.92)), rgb(4 6 12 / 0.96) 72%);
+  animation: scene-in 320ms steps(5) both;
+}
+
+.scene-rays {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 240vmax;
+  height: 240vmax;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--scene) 24%, transparent) 0 7deg,
+    transparent 7deg 20deg
+  );
+  mask-image: radial-gradient(circle closest-side, #000 8%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: scene-spin 60s linear infinite;
+  pointer-events: none;
+}
+
+.scene[data-variant='legendary'] .scene-rays {
+  animation-duration: 28s;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in srgb, var(--scene) 38%, transparent) 0 6deg,
+    transparent 6deg 16deg
+  );
+}
+
+.scene-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  max-width: min(920px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: var(--space-2);
+}
+
+.scene-kicker {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--scene);
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.5);
+}
+
+.scene-title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 6vw, 60px);
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--scene);
+  text-shadow:
+    0 4px 0 rgb(0 0 0 / 0.55),
+    0 0 24px color-mix(in srgb, var(--scene) 55%, transparent);
+}
+
+.scene-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+@keyframes scene-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Hire */
+
+.hire {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}
+
+.hire-stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-6);
+}
+
+.hire-actor {
+  flex-shrink: 0;
+  animation: hire-walk 760ms steps(9) both;
+}
+
+.hire-card {
+  display: grid;
+  gap: var(--space-3);
+  width: min(420px, 100%);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+  background: var(--surface);
+  border: 2px solid var(--scene);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+  animation: hire-card-in 520ms steps(6) 380ms both;
+}
+
+.hire-card .scene-title {
+  font-size: clamp(30px, 4.4vw, 46px);
+}
+
+.hire-subject {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.hire-quote {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg);
+  border-left: 4px solid var(--scene);
+  font-size: 16px;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.hire-gain ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hire-tagline {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@keyframes hire-walk {
+  from {
+    opacity: 0;
+    transform: translateX(160px) scale(0.9);
+  }
+
+  60% {
+    opacity: 1;
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes hire-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (max-width: 760px) {
+  .hire-stage {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .hire-card {
+    margin-bottom: 0;
+    padding: var(--space-4);
+  }
+}
+
+/* Epic and legendary unlock */
+
+.unlock-big {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.unlock-stage {
+  display: grid;
+  place-items: end center;
+  min-height: 200px;
+  padding: var(--space-4) var(--space-6) 0;
+  animation: unlock-rise 700ms steps(8) both;
+}
+
+.unlock-stage[data-item='scenery'] {
+  padding: var(--space-4);
+}
+
+.unlock-big[data-rarity='legendary'] .unlock-stage {
+  animation-duration: 1000ms;
+  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--scene) 70%, transparent));
+}
+
+.unlock-scenery {
+  width: min(440px, 80vw);
+  height: 248px;
+  border: 2px solid var(--scene);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+}
+
+.unlock-theme {
+  display: grid;
+  grid-template-columns: repeat(6, 44px);
+  border: 2px solid var(--scene);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+}
+
+.unlock-theme i {
+  display: block;
+  height: 88px;
+}
+
+.unlock-caption {
+  max-width: 460px;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+@keyframes unlock-rise {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.6);
+  }
+
+  70% {
+    transform: translateY(-8px) scale(1.06);
+  }
+}
+
+/* Graduation */
+
+.gradscene {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.gradscene-diploma {
+  color: var(--scene);
+  filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.5));
+  animation: unlock-rise 800ms steps(8) both;
+}
+
+.gradscene-count {
+  font-family: var(--font-display);
+  font-size: clamp(64px, 14vw, 128px);
+  line-height: 1;
+  color: var(--text);
+  text-shadow:
+    0 6px 0 rgb(0 0 0 / 0.55),
+    0 0 36px color-mix(in srgb, var(--scene) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+
+.gradscene-note {
+  max-width: 440px;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.gradscene-note b {
+  color: var(--scene);
+}
+
+/* Offline report (inside the kit modal) */
+
+.offline {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.offline-amount {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.offline-coin {
+  color: #f0b43c;
+}
+
+.offline-note {
+  font-size: 13px;
+}

@@ -1,0 +1,634 @@
+/* Layers that unlock with the faculty: buffs, abilities, sprints, invasions. And the first-time flourish. */
+
+.stage-left {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+  width: min(300px, 36%);
+  z-index: 2;
+}
+
+.stage-right {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-4);
+  z-index: 2;
+}
+
+/* First appearance of a layer */
+
+[data-reveal='wait'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-reveal='play'] {
+  animation: layer-pop 800ms steps(8) both;
+}
+
+@keyframes layer-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  45% {
+    opacity: 1;
+    transform: scale(1.14);
+    filter: brightness(1.8);
+  }
+
+  70% {
+    transform: scale(0.96);
+    filter: brightness(1.3);
+  }
+
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Buffs */
+
+.buffs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.buff {
+  --buff: var(--accent);
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 7px 8px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  border: 2px solid var(--buff);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+  font-size: 12px;
+  font-weight: 800;
+  animation: buff-in 260ms steps(4) both;
+}
+
+.buff[data-source='invasion'] {
+  --buff: var(--good);
+}
+
+.buff[data-source='sprint'] {
+  --buff: var(--epic);
+}
+
+.buff::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--left);
+  height: 3px;
+  background: var(--buff);
+  transition: width 110ms linear;
+}
+
+.buff-emoji {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.buff-time {
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--buff);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes buff-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Abilities */
+
+.abilities {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: end;
+}
+
+.ability {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'ring name'
+    'ring caption';
+  align-items: center;
+  column-gap: var(--space-3);
+  width: 176px;
+  padding: 6px 12px 6px 6px;
+  text-align: left;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.ability .ui-meter {
+  grid-area: ring;
+}
+
+.ability-name {
+  grid-area: name;
+  align-self: end;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.ability-caption {
+  grid-area: caption;
+  align-self: start;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ability-key {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  transform: scale(0.8);
+}
+
+.ability[data-state='ready'] {
+  border-color: var(--accent);
+  animation: ability-ready 1.2s steps(2) infinite;
+}
+
+.ability[data-state='ready'] .ability-caption {
+  color: var(--accent-text);
+}
+
+.ability[data-state='ready']:hover {
+  transform: translate(-1px, -1px);
+  filter: brightness(1.15);
+}
+
+.ability[data-state='ready']:active {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+.ability[data-state='running'] {
+  --accent: var(--good);
+
+  border-color: var(--good);
+}
+
+.ability[data-state='running'] .ability-caption {
+  color: var(--good);
+}
+
+.ability[data-state='cooldown'] {
+  opacity: 0.8;
+  cursor: default;
+}
+
+.ability:disabled {
+  filter: none;
+}
+
+@keyframes ability-ready {
+  50% {
+    box-shadow:
+      var(--shadow),
+      0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+  }
+}
+
+/* Sprint card */
+
+.sprint {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  font-size: 13px;
+}
+
+.sprint-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sprint-emoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.sprint-title {
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.sprint-sub,
+.sprint-reward {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.sprint-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.sprint-time[data-urgent='true'] {
+  color: var(--bad);
+}
+
+.sprint-wait {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sprint-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.sprint-toggle .sprint-title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sprint-offers ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sprint-offers li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+/* Invasion */
+
+.invasion-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.invasion {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  animation: invasion-in 420ms steps(7) both;
+}
+
+.invasion:focus-visible {
+  outline-offset: 6px;
+}
+
+.invasion-body {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  background: color-mix(in srgb, var(--bad) 24%, var(--bg));
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+  animation: invasion-hit 220ms steps(3);
+}
+
+.invasion-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.invasion-ring path {
+  fill: none;
+  stroke-width: 6;
+  stroke-linejoin: miter;
+}
+
+.invasion-track {
+  stroke: color-mix(in srgb, var(--border) 80%, transparent);
+}
+
+.invasion-drain {
+  stroke: var(--good);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  animation:
+    invasion-drain var(--window) linear var(--elapsed) forwards,
+    invasion-heat var(--window) linear var(--elapsed) forwards;
+}
+
+.invasion-emoji {
+  position: relative;
+  font-size: 46px;
+  line-height: 1;
+  animation: invasion-wobble 700ms steps(2) infinite;
+}
+
+.invasion-clicks {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  padding: 1px 5px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--on-bad);
+  background: var(--bad);
+}
+
+.invasion-label {
+  padding: 3px 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--bg);
+  border: 2px solid var(--bad);
+  font-variant-numeric: tabular-nums;
+}
+
+.invasion-ghost {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  font-size: 56px;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  animation: ghost-defended 900ms steps(9) both;
+}
+
+.invasion-ghost::after {
+  content: '✔';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 40px;
+  color: var(--good);
+  text-shadow: 0 3px 0 rgb(0 0 0 / 0.5);
+}
+
+.invasion-ghost[data-kind='missed'] {
+  animation-name: ghost-missed;
+  filter: grayscale(1);
+}
+
+.invasion-ghost[data-kind='missed']::after {
+  content: '✖';
+  color: var(--bad);
+}
+
+@keyframes invasion-in {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2) rotate(-12deg);
+  }
+
+  60% {
+    transform: translate(-50%, -50%) scale(1.18) rotate(4deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes invasion-hit {
+  0% {
+    transform: scale(0.84);
+    filter: brightness(2.2);
+  }
+
+  60% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes invasion-drain {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+@keyframes invasion-heat {
+  0% {
+    stroke: var(--good);
+  }
+
+  55% {
+    stroke: var(--warn);
+  }
+
+  80%,
+  100% {
+    stroke: var(--bad);
+  }
+}
+
+@keyframes invasion-wobble {
+  50% {
+    transform: translateY(-4px) rotate(-5deg);
+  }
+}
+
+@keyframes ghost-defended {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -120%) scale(1.5);
+  }
+}
+
+@keyframes ghost-missed {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 20%) rotate(24deg) scale(0.7);
+  }
+}
+
+/* Compact stage */
+@container stage (max-width: 639px) {
+  /* Narrow column on the left: it must never reach the professor in the middle. */
+  .stage-left {
+    left: var(--space-2);
+    width: 116px;
+    gap: var(--space-2);
+  }
+
+  .buffs {
+    gap: 4px;
+  }
+
+  .buff {
+    padding: 3px 6px 6px;
+  }
+
+  .buff-name {
+    display: none;
+  }
+
+  .sprint-head {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px var(--space-2);
+  }
+
+  .sprint-head .sprint-sub,
+  .sprint-reward {
+    display: none;
+  }
+
+  .sprint-time {
+    grid-column: 1 / -1;
+  }
+
+  .sprint-title {
+    font-size: 12px;
+  }
+
+  .sprint-toggle .sprint-title {
+    font-size: 9px;
+  }
+
+  .sprint-slot {
+    position: relative;
+  }
+
+  /* Opened by the player: the list floats over the stage instead of pushing everything down. */
+  .sprint-offers[data-open='true'] ul {
+    position: absolute;
+    left: 0;
+    top: calc(100% + 6px);
+    z-index: 6;
+    width: min(300px, calc(100cqw - 16px));
+    padding: var(--space-2);
+    background: var(--surface);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .stage-right {
+    right: var(--space-2);
+  }
+
+  .abilities {
+    gap: var(--space-2);
+  }
+
+  .ability {
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-areas:
+      'ring'
+      'caption';
+    justify-items: center;
+    width: 64px;
+    padding: 4px;
+    row-gap: 0;
+  }
+
+  .ability-name {
+    display: none;
+  }
+
+  .ability .ui-meter {
+    --meter-size: 48px;
+  }
+
+  .ability-caption {
+    font-size: 9px;
+  }
+
+  .sprint {
+    padding: var(--space-2);
+  }
+
+  .invasion-body {
+    width: 80px;
+    height: 80px;
+  }
+
+  .invasion-emoji {
+    font-size: 38px;
+  }
+}

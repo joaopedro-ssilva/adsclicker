@@ -1,1 +1,6 @@
-/* Game shell and stage styles. Owned by the stage engineer; import further stage CSS files from here. */
+/* Game shell and stage styles. Owned by the stage engineer. */
+@import './shell.css';
+@import './hud.css';
+@import './actor.css';
+@import './layers.css';
+@import './roster.css';

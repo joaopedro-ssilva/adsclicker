@@ -1,0 +1,109 @@
+/* Quick unlock cards (common and rare): bottom left, away from the toasts on the right. */
+
+.unlock-cards {
+  position: fixed;
+  /* Centred on the stage (the viewport minus the side panel), under the balance. */
+  left: calc((100vw - clamp(440px, 34vw, 500px)) / 2);
+  top: 196px;
+  z-index: var(--z-toast);
+  display: grid;
+  gap: var(--space-3);
+  width: min(400px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.unlock-card {
+  --card: var(--common);
+
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  border-left: 6px solid var(--card);
+  pointer-events: auto;
+  animation: card-in 300ms steps(6) both;
+}
+
+.unlock-card[data-rarity='rare'] {
+  --card: var(--rare);
+}
+
+.unlock-card-art {
+  display: grid;
+  place-items: end center;
+  height: 84px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.unlock-card[data-item='skin'] .unlock-card-art {
+  place-items: end center;
+}
+
+.unlock-card-art .unlock-scenery {
+  width: 72px;
+  height: 84px;
+  border: 0;
+  box-shadow: none;
+}
+
+.unlock-card-art .unlock-theme {
+  grid-template-columns: repeat(2, 36px);
+  border: 0;
+  box-shadow: none;
+}
+
+.unlock-card-art .unlock-theme i {
+  height: 28px;
+}
+
+.unlock-card-body {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+  min-width: 0;
+  align-self: stretch;
+  align-content: center;
+}
+
+.unlock-card-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.unlock-card-caption {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.unlock-card > .ui-icon-button {
+  align-self: start;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+
+@media (max-width: 1023px) {
+  .unlock-cards {
+    left: 50%;
+    top: auto;
+    bottom: 72px;
+  }
+}
