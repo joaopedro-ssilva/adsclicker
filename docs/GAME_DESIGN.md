@@ -114,9 +114,9 @@ Toda skin não padrão, todo cenário não padrão e todo tema não padrão é r
 
 ## 6. Skins e cenários (lista fechada: os ids valem para conteúdo e arte)
 
-Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camadas separadas.** A skin é o corpo (sem cabeça, termina num toco de pescoço); a cabeça pertence ao professor (`heads/<professorId>`). Skins podem ter um chapéu opcional (`hats/<skinId>`) desenhado sobre a cabeça.
+Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camadas separadas.** A skin é o corpo (sem cabeça, termina num toco de pescoço); a cabeça pertence ao professor (`heads/<professorId>`). Uma skin com chapéu ou capacete tem a própria cabeça, o professor desenhado já usando o acessório (`heads/<skinId>`); enquanto essa arte não existe, vale a cabeça normal do professor.
 
-Arquivos em `public/assets/`: `skins/<skinId>.png`, `hats/<skinId>.png`, `heads/<professorId>.png`, `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
+Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
 ### Skins (48)
 
@@ -137,8 +137,8 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `hats/<skinId>.png`, `heads/
 | gladimir | `gladimir-dba` | DBA de Plantão | common | colete, cabo de rede no ombro, caneca "SELECT *" | |
 | gladimir | `gladimir-maker` | Maker IoT | rare | jaleco com sensores e LEDs, protoboard na mão | óculos de proteção |
 | gladimir | `gladimir-piloto` | Piloto Rebelde | epic | macacão laranja de piloto espacial, colete branco | capacete de piloto |
-| gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
 | gladimir | `gladimir-stormtrooper` | Stormtrooper | epic | armadura branca de soldado imperial, blaster | |
+| gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
 | gladimir | `gladimir-vader` | Darth Gladimir | legendary | armadura negra, capa, sabre de luz vermelho, capacete debaixo do braço | |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |

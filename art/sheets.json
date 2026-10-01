@@ -179,6 +179,37 @@
       ]
     },
     {
+      "file": "skins-starwars.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-stormtrooper",
+        "gladimir-vader"
+      ]
+    },
+    {
+      "file": "heads-skin-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-cria",
+        "edecio-full-dima",
+        "edecio-gladiador",
+        "edecio-samurai"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-maker",
+        "gladimir-piloto",
+        "gladimir-mestre"
+      ],
+      "calibrate": true
+    },
+    {
       "file": "skins-more-5.png",
       "kind": "skin",
       "keys": [
@@ -233,9 +264,7 @@
       "kind": "skin",
       "keys": [
         "pablo-mago",
-        "pablo-galactico",
-        "gladimir-stormtrooper",
-        "gladimir-vader"
+        "pablo-galactico"
       ]
     },
     {
@@ -247,33 +276,52 @@
       ]
     },
     {
-      "file": "hats-1.png",
-      "kind": "hat",
+      "file": "heads-skin-wagner.png",
+      "kind": "head",
       "keys": [
-        "edecio-cria",
-        "guto-pagodeiro",
-        "b1-rainha",
-        "angelo-rei"
-      ]
-    },
-    {
-      "file": "hats-2.png",
-      "kind": "hat",
-      "keys": [
-        "angelo-paraninfo",
-        "pablo-mago",
-        "edecio-gladiador",
-        "edecio-samurai"
-      ]
-    },
-    {
-      "file": "hats-3.png",
-      "kind": "hat",
-      "keys": [
-        "edecio-full-dima",
-        "gladimir-piloto",
+        "_ref",
+        "wagner-agente",
         "wagner-cripto"
-      ]
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-pagodeiro",
+        "guto-astronauta"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-b1.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b1-rainha"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-paraninfo",
+        "angelo-rei"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-mago"
+      ],
+      "calibrate": true
     }
   ]
 }

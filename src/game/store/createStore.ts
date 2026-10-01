@@ -1,3 +1,4 @@
+import { MAX_DEV_MULTIPLIER, MIN_DEV_MULTIPLIER } from '../engine/state';
 import { create } from 'zustand';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import type { GameContent } from '../content/types';
@@ -233,6 +234,9 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
           const next = { ...state.settings, ...patch };
           next.sfxVolume = clamp01(next.sfxVolume);
           next.musicVolume = clamp01(next.musicVolume);
+          next.devMultiplier = Number.isFinite(next.devMultiplier)
+            ? Math.min(MAX_DEV_MULTIPLIER, Math.max(MIN_DEV_MULTIPLIER, next.devMultiplier))
+            : 1;
           state.settings = next;
         }, true);
       },

@@ -29,8 +29,8 @@ const EXPECTED_SKIN_IDS = [
   'gladimir-dba',
   'gladimir-maker',
   'gladimir-piloto',
-  'gladimir-mestre',
   'gladimir-stormtrooper',
+  'gladimir-mestre',
   'gladimir-vader',
   'b2-default',
   'b2-postit',
@@ -115,7 +115,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'pablo-galactico': 'legendary',
 };
 
-const SKINS_WITH_HAT = [
+const SKINS_WITH_HEADGEAR = [
   'edecio-cria',
   'edecio-full-dima',
   'edecio-gladiador',
@@ -580,11 +580,11 @@ describe('content: skins, sceneries and themes', () => {
     expect(content.skins.filter((skin) => skin.default === true)).toHaveLength(8);
   });
 
-  it('builds body and hat asset keys from the skin id, with a hat only where the design lists one', () => {
+  it('builds body and head asset keys from the skin id, with its own head only where the design lists headgear', () => {
     for (const skin of content.skins) {
       expect(skin.body).toBe(`skins/${skin.id}`);
-      if (SKINS_WITH_HAT.includes(skin.id)) expect(skin.hat).toBe(`hats/${skin.id}`);
-      else expect(skin.hat).toBeUndefined();
+      if (SKINS_WITH_HEADGEAR.includes(skin.id)) expect(skin.head).toBe(`heads/${skin.id}`);
+      else expect(skin.head).toBeUndefined();
       for (const colour of Object.values(skin.palette)) expect(colour).toMatch(/^#[0-9a-f]{6}$/i);
       expect(skin.artPrompt.length).toBeGreaterThan(10);
       expect(skin.artPrompt).toMatch(/^[\x20-\x7e]+$/);

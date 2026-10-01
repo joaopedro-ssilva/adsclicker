@@ -33,6 +33,7 @@ export function defaultSettings(): Settings {
     musicEnabled: false,
     reducedMotion: 'system',
     floatingNumbers: true,
+    devMultiplier: 1,
   };
 }
 

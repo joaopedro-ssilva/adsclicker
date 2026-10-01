@@ -46,7 +46,6 @@ export function FallbackSection() {
               <figure key={`procedural-${scale}`}>
                 <Character
                   body={sample.body}
-                  hat={sample.hat}
                   palette={sample.palette}
                   seed={sample.id}
                   scale={scale}

@@ -4,9 +4,12 @@
 // Then run the queue with: bash art/run-queue.sh   (sequential, stops at the first usage-limit error)
 import fs from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 import { ROOT, SHEETS_FILE, readJson, writeJson } from './lib.mjs';
 
 const QUEUE_DIR = path.join(ROOT, 'art', 'queue');
+const RAW_DIR = path.join(ROOT, 'art', 'raw');
+const HEADS_DIR = path.join(ROOT, 'public', 'assets', 'heads');
 
 const BASE =
   'a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it';
@@ -61,7 +64,9 @@ const SKINS = [
   ['pablo-enxadrista', 'chess-pattern vest, holding a chess king piece'],
   ['pablo-mago', 'blue robe with stars, holding a staff topped with a binary tree'],
   ['pablo-galactico', 'shimmering cosmic outfit with a star aura'],
-  // Added after the first batches: kept at the end so the sheets already generated keep their grouping.
+];
+
+const STAR_WARS = [
   ['gladimir-stormtrooper', 'white imperial stormtrooper armor with black joints and a black belt, holding a blaster rifle'],
   ['gladimir-vader', 'black Darth Vader armor with a long black cape and a chest control panel, a glowing red lightsaber in one hand, a black helmet tucked under the other arm'],
 ];
@@ -83,19 +88,34 @@ const SCENERIES = [
   ['formatura', 'a graduation auditorium with a stage, a curtain and a banner'],
 ];
 
-const HATS = [
-  ['edecio-cria', 'a flat-brim baseball cap'],
-  ['guto-pagodeiro', 'a panama straw hat'],
-  ['b1-rainha', 'a golden crown with jewels'],
-  ['angelo-rei', 'a royal golden crown with red velvet'],
-  ['angelo-paraninfo', 'a black graduation mortarboard cap with a tassel'],
-  ['pablo-mago', 'a tall blue wizard hat with stars'],
-  ['edecio-gladiador', 'a Roman helmet with a red crest'],
-  ['edecio-samurai', 'a samurai kabuto helmet with horns'],
-  ['edecio-full-dima', 'a blocky voxel-style diamond-blue helmet'],
-  ['gladimir-piloto', 'a pilot helmet with goggles'],
-  ['wagner-cripto', 'a silver knight helmet'],
-];
+/** Skins whose head wears something: the professor's head is redrawn with the headgear on, per skin. */
+const HEAD_VARIANTS = {
+  edecio: [
+    ['edecio-cria', 'a flat-brim baseball cap'],
+    ['edecio-full-dima', 'a blocky voxel-style diamond-blue helmet that leaves the face open'],
+    ['edecio-gladiador', 'a Roman gladiator helmet with a red crest, face open'],
+    ['edecio-samurai', 'a dark teal samurai kabuto helmet with golden horns, face open'],
+  ],
+  gladimir: [
+    ['gladimir-maker', 'clear safety goggles pushed up on the forehead'],
+    ['gladimir-piloto', 'a white and orange space-pilot helmet with the visor up, face open'],
+    ['gladimir-mestre', 'a brown cloth hood up over the hair'],
+  ],
+  wagner: [
+    ['wagner-agente', 'dark sunglasses and a spiral earpiece'],
+    ['wagner-cripto', 'an open-face silver knight helmet'],
+  ],
+  guto: [
+    ['guto-pagodeiro', 'a panama straw hat'],
+    ['guto-astronauta', 'a white astronaut helmet with a clear glass visor, face visible through it'],
+  ],
+  b1: [['b1-rainha', 'a golden crown with purple jewels']],
+  angelo: [
+    ['angelo-paraninfo', 'a black graduation mortarboard cap with an amber tassel'],
+    ['angelo-rei', 'a royal golden crown with red velvet'],
+  ],
+  pablo: [['pablo-mago', 'a tall blue wizard hat with yellow stars']],
+};
 
 // ---- builders -----------------------------------------------------------------------------
 
@@ -109,9 +129,6 @@ function skinSheet(file, items) {
     keys: items.map((i) => i[0]),
     text: `${BASE}. It shows ${items.length} separate HEADLESS chibi character bodies in a single row. ${BODY_RULES} Outfits left to right: ${list(items.map((i) => i[1]))}.`,
   };
-}
-function sheetAfter(file, kind, keys, text) {
-  return { file, kind, keys, text };
 }
 
 // 1) heads: already generated (heads-1.png, heads-2.png) -> only registered
@@ -136,40 +153,73 @@ for (let i = 0; i < SCENERIES.length; i += 2) {
   });
 }
 
-// 4) the other 38 skins, 4 per sheet, 2 sheets per call, professor order
+// 4) the other skins, 4 per sheet, 2 sheets per call, professor order
 const skinSheets = [];
 for (let i = 0; i < SKINS.length; i += 4) skinSheets.push(SKINS.slice(i, i + 4));
+const skinCalls = [];
 for (let i = 0; i < skinSheets.length; i += 2) {
-  const n = i / 2 + 1;
-  calls.push({
-    label: `skins-more-${n}`,
+  skinCalls.push({
+    label: `skins-more-${i / 2 + 1}`,
     images: skinSheets.slice(i, i + 2).map((items, k) => skinSheet(`skins-more-${i + k + 1}.png`, items)),
   });
 }
 
-// 5) icons (1 image) + first hat sheet, 6) other hat sheets
-const hatSheets = [];
-for (let i = 0; i < HATS.length; i += 4) hatSheets.push(HATS.slice(i, i + 4));
-const hatText = (items) =>
-  `${BASE}. It shows ${items.length} separate pieces of headgear alone (no head, no face, no hair, nothing inside them), front view, each a simple shape that rests on top of a head, drawn at roughly the same width, in a single row, well spaced, not touching. Left to right: ${list(items.map((i) => i[1]))}.`;
-const hatImg = (items, n) => ({ file: `hats-${n}.png`, kind: 'hat', keys: items.map((i) => i[0]), text: hatText(items) });
-calls.push({
-  label: 'icons-hats-1',
+// 5) heads wearing each skin's headgear. The row starts with the plain head as a size reference
+//    ("_ref", used by process.mjs to keep the pixel scale and then discarded).
+function headVariantSheet(professor) {
+  const items = HEAD_VARIANTS[professor];
+  return {
+    file: `heads-skin-${professor}.png`,
+    kind: 'head',
+    keys: ['_ref', ...items.map((i) => i[0])],
+    calibrate: true,
+    text: `${BASE}. First open the reference image ref-head-${professor}.png in the current directory: it is this character's head. Draw that SAME character's head ${items.length + 1} times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: ${list(items.map((i) => i[1]))}.`,
+  };
+}
+const headCall = (...professors) => ({ label: `heads-skin-${professors.join('-')}`, images: professors.map(headVariantSheet) });
+
+const iconsCall = {
+  label: 'icons',
   images: [
     {
       file: 'icons.png',
       kind: 'icon',
       keys: ['coin', 'diploma'],
-      text: `${BASE}. It shows 2 separate chunky game icons in a single row, well spaced, not touching, front view, bold simple shapes with a thick dark outline: (a) a shiny gold coin with a large letter "E" on it; (b) a rolled diploma scroll tied with a red ribbon.`,
+      text: `${BASE}. It shows 2 separate chunky game icons in a single row, well spaced, not touching, front view, bold simple shapes with a thick dark outline: (a) a shiny gold coin with a large letter "A" on it; (b) a rolled diploma scroll tied with a red ribbon.`,
     },
-    hatImg(hatSheets[0], 1),
   ],
-});
-for (let i = 1; i < hatSheets.length; i++) calls.push({ label: `hats-${i + 1}`, images: [hatImg(hatSheets[i], i + 1)] });
+};
+
+// Order = priority: what the owner asked for first, then what completes art that already exists.
+calls.push(
+  ...skinCalls.slice(0, 2),
+  { label: 'skins-starwars', images: [skinSheet('skins-starwars.png', STAR_WARS)] },
+  headCall('edecio', 'gladimir'),
+  ...skinCalls.slice(2),
+  iconsCall,
+  headCall('wagner', 'guto'),
+  headCall('b1', 'angelo'),
+  headCall('pablo'),
+);
+
+// Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
+fs.mkdirSync(RAW_DIR, { recursive: true });
+for (const professor of Object.keys(HEAD_VARIANTS)) {
+  const source = path.join(HEADS_DIR, `${professor}.png`);
+  if (!fs.existsSync(source)) continue;
+  const { width = 48, height = 56 } = await sharp(source).metadata();
+  await sharp(source)
+    .resize(width * 10, height * 10, { kernel: 'nearest' })
+    .extend({ top: 60, bottom: 60, left: 60, right: 60, background: '#ff00ff' })
+    .flatten({ background: '#ff00ff' })
+    .png()
+    .toFile(path.join(RAW_DIR, `ref-head-${professor}.png`));
+}
 
 // ---- write --------------------------------------------------------------------------------
 
 fs.mkdirSync(QUEUE_DIR, { recursive: true });
+for (const stale of fs.readdirSync(QUEUE_DIR)) fs.unlinkSync(path.join(QUEUE_DIR, stale));
 calls.forEach((c, idx) => {
   const n = c.images.length;
   const head = PREFIX.replace('{N}', String(n)).replace('{S}', n > 1 ? 's' : '').replace('{THEM}', n > 1 ? 'them' : 'it');
@@ -177,7 +227,7 @@ calls.forEach((c, idx) => {
   const prompt = `${head} ${body} ${SUFFIX}`;
   const file = path.join(QUEUE_DIR, `${String(idx + 1).padStart(2, '0')}-${c.label}.txt`);
   fs.writeFileSync(file, prompt + '\n');
-  for (const im of c.images) sheets.push({ file: im.file, kind: im.kind, keys: im.keys });
+  for (const im of c.images) sheets.push({ file: im.file, kind: im.kind, keys: im.keys, ...(im.calibrate ? { calibrate: true } : {}) });
 });
 
 // keep hand-added entries (e.g. real-photo heads) that this script does not generate

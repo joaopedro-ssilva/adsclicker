@@ -28,7 +28,6 @@ export function Lineup({ skins, realHeads }: LineupProps) {
             <Character
               body={skin.body}
               head={realHeads ? `heads/${skin.professor}` : undefined}
-              hat={skin.hat}
               palette={skin.palette}
               seed={skin.id}
               scale={2}

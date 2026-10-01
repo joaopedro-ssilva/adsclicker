@@ -4,7 +4,7 @@ import { grantAchievementRewards } from './achievements';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
 import { createInitialState } from './init';
-import { SAVE_VERSION } from './state';
+import { MAX_DEV_MULTIPLIER, MIN_DEV_MULTIPLIER, SAVE_VERSION } from './state';
 import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, GameState, Settings } from './state';
 
 export type RawSave = Record<string, unknown>;
@@ -148,6 +148,7 @@ function readSettings(value: unknown, fallback: Settings): Settings {
     musicEnabled: typeof value.musicEnabled === 'boolean' ? value.musicEnabled : fallback.musicEnabled,
     reducedMotion: motion === 'on' || motion === 'off' || motion === 'system' ? motion : fallback.reducedMotion,
     floatingNumbers: typeof value.floatingNumbers === 'boolean' ? value.floatingNumbers : fallback.floatingNumbers,
+    devMultiplier: readNumber(value.devMultiplier, fallback.devMultiplier, MIN_DEV_MULTIPLIER, MAX_DEV_MULTIPLIER),
   };
 }
 

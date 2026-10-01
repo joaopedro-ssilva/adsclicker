@@ -325,8 +325,11 @@ export interface SkinDef {
   default?: boolean;
   /** Asset keys relative to public/assets, without extension: "skins/edecio-samurai". */
   body: string;
-  /** Optional headgear drawn over the head: "hats/edecio-samurai". */
-  hat?: string;
+  /**
+   * Optional head for this skin: the professor's head drawn wearing the skin's headgear
+   * ("heads/edecio-samurai"). While that file does not exist the professor's plain head is used.
+   */
+  head?: string;
   /** Fallback colours for the procedural sprite. */
   palette: {
     primary: string;

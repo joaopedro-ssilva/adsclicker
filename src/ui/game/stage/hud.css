@@ -109,6 +109,7 @@
 /* Balance */
 
 .balance {
+  position: relative;
   grid-area: balance;
   justify-self: center;
   min-width: 300px;
@@ -118,6 +119,20 @@
   border: 2px solid var(--border);
   border-top: 4px solid var(--accent);
   box-shadow: var(--shadow);
+}
+
+.balance-dev {
+  position: absolute;
+  top: -12px;
+  right: -10px;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--warn);
+  border: 2px solid var(--bg);
 }
 
 .balance-label {

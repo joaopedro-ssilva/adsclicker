@@ -1,0 +1,64 @@
+/* The /admin page. */
+
+.admin {
+  display: grid;
+  gap: var(--space-5);
+  justify-items: start;
+  max-width: 720px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--space-7) var(--space-4);
+  align-content: start;
+}
+
+.admin-head h1 {
+  font-size: 32px;
+}
+
+.admin-card {
+  display: grid;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.admin-card h2 {
+  font-size: 14px;
+}
+
+.admin-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.admin-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.admin-custom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.admin-custom label {
+  font-weight: 800;
+}
+
+.admin-custom input {
+  width: 140px;
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.admin-hint {
+  font-size: 13px;
+}

@@ -570,10 +570,16 @@ async function processSheet(sheet, anchors) {
   // `img.data` keeps raw colours; the mask decides which pixels belong to sprites
   const groups = splitItems(comps, sheet.keys.length, img.w, sheet.file);
   const folder = KIND_FOLDER[sheet.kind];
+  const target = TARGET_W[sheet.kind] ? { axis: 'w', size: TARGET_W[sheet.kind] } : TARGET_MAX[sheet.kind] ? { axis: 'max', size: TARGET_MAX[sheet.kind] } : { axis: 'h', size: TARGET_H[sheet.kind] };
+  // A calibrated sheet starts with a plain reference item (key "_ref"): its block size is used for the
+  // whole row, so heads wearing tall headgear keep the same pixel scale as the plain head instead of
+  // being squeezed into the target height. Keys starting with "_" are never written.
+  const shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), target, `${sheet.keys[0]} (calibration)`) : null;
   for (let k = 0; k < groups.length; k++) {
     const key = sheet.keys[k];
+    if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
-    const { b, px, py } = detectBlock(item, TARGET_W[sheet.kind] ? { axis: 'w', size: TARGET_W[sheet.kind] } : TARGET_MAX[sheet.kind] ? { axis: 'max', size: TARGET_MAX[sheet.kind] } : { axis: 'h', size: TARGET_H[sheet.kind] }, key);
+    const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, target, key);
     let sprite = blockSample(item, b, px, py);
     removeFringe(sprite);
     removeIsolated(sprite);

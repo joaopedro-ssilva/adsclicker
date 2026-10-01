@@ -15,7 +15,7 @@ export const BASE_SYNERGY = 0.05;
  *
  * | StatKey            | Base                                                                   |
  * | ------------------ | ---------------------------------------------------------------------- |
- * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) |
+ * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) x settings.devMultiplier |
  * | clickPower         | 1                                                                      |
  * | idlePower          | 1                                                                      |
  * | prof:<id>          | 1                                                                      |
@@ -154,7 +154,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     globalPower:
       acc.value('globalPower', 1) *
       (1 + balance.achievementBonus * achievementCount(state)) *
-      (1 + diplomaBonus(state, content)),
+      (1 + diplomaBonus(state, content)) *
+      state.settings.devMultiplier,
     clickPower: acc.value('clickPower', 1),
     idlePower: acc.value('idlePower', 1),
     clickFromIdle: Math.max(0, acc.value('clickFromIdle', 0)),

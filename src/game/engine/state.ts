@@ -6,6 +6,10 @@ export const SAVE_VERSION = 1;
 
 export type BuyAmount = 1 | 10 | 'max';
 
+/** Bounds of Settings.devMultiplier (the /admin coin multiplier). */
+export const MIN_DEV_MULTIPLIER = 0.1;
+export const MAX_DEV_MULTIPLIER = 1_000_000;
+
 export interface ActiveBuff {
   /** BuffDef id. Applying a buff that is already active refreshes its timer. */
   id: string;
@@ -53,6 +57,11 @@ export interface Settings {
   musicEnabled: boolean;
   reducedMotion: 'system' | 'on' | 'off';
   floatingNumbers: boolean;
+  /**
+   * Admin/dev knob: multiplies every source of coins. 1 in normal play.
+   * Set from the /admin page for demos and quick progression tests.
+   */
+  devMultiplier: number;
 }
 
 /**

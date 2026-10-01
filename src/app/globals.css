@@ -32,6 +32,7 @@
 
 /* Pages */
 @import './kit/kit.css';
+@import './admin/admin.css';
 
 @theme inline {
   --font-sans: var(--font-body);

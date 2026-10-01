@@ -1,5 +1,6 @@
 import { content } from '@/game/content';
 import type { ProfessorId, SkinDef } from '@/game/content/types';
+import { ASSETS } from '@/ui/art/manifest';
 
 const skinsById = new Map(content.skins.map((skin) => [skin.id, skin]));
 const defaultSkinByProfessor = new Map(
@@ -9,7 +10,6 @@ const defaultSkinByProfessor = new Map(
 export interface CharacterSprite {
   body: string;
   head: string;
-  hat?: string;
   palette: SkinDef['palette'];
   seed: string;
 }
@@ -29,8 +29,8 @@ export function characterSprite(professor: ProfessorId, skinId?: string): Charac
   const skin = (skinId ? skinsById.get(skinId) : undefined) ?? defaultSkinOf(professor);
   return {
     body: skin.body,
-    head: `heads/${professor}`,
-    hat: skin.hat,
+    // A skin with headgear has its own head (the professor wearing it); until that art exists, the plain head.
+    head: skin.head && skin.head in ASSETS ? skin.head : `heads/${professor}`,
     palette: skin.palette,
     // The seed follows the professor so the procedural head stays the same across skins.
     seed: professor,

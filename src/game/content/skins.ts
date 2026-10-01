@@ -5,13 +5,14 @@ type SkinSeed = {
   name: string;
   rarity: Rarity;
   description: string;
-  hat?: boolean;
+  /** The skin has its own head, drawn wearing the headgear (heads/<skinId>). */
+  headgear?: boolean;
   default?: boolean;
   palette: [string, string, string];
   artPrompt: string;
 };
 
-/** Builds a SkinDef from the compact rows below: body/hat asset keys follow the skin id. */
+/** Builds a SkinDef from the compact rows below: body and head asset keys follow the skin id. */
 const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
   seeds.map((seed) => ({
     id: seed.id,
@@ -21,7 +22,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     description: seed.description,
     ...(seed.default ? { default: true } : {}),
     body: `skins/${seed.id}`,
-    ...(seed.hat ? { hat: `hats/${seed.id}` } : {}),
+    ...(seed.headgear ? { head: `heads/${seed.id}` } : {}),
     palette: { primary: seed.palette[0], secondary: seed.palette[1], accent: seed.palette[2] },
     artPrompt: seed.artPrompt,
   }));
@@ -67,7 +68,7 @@ export const skins: SkinDef[] = [
       name: 'Cria',
       rarity: 'rare',
       description: 'Camisa de time, corrente dourada, bermuda e chinelo. Estilo de quem chegou agora no campus.',
-      hat: true,
+      headgear: true,
       palette: ['#1f7a3d', '#f5c542', '#2a2a2a'],
       artPrompt: 'green football team jersey, thick gold chain, baggy shorts, flip-flops',
     },
@@ -92,7 +93,7 @@ export const skins: SkinDef[] = [
       name: 'Full Dima',
       rarity: 'epic',
       description: 'Armadura de blocos azul-diamante e espada de blocos. Cada nível é uma picareta nova.',
-      hat: true,
+      headgear: true,
       palette: ['#2ec4d6', '#1f6f86', '#e9fbff'],
       artPrompt: 'blocky voxel diamond armor in cyan and teal, chest plate and boots made of cubes, blocky diamond sword',
     },
@@ -109,7 +110,7 @@ export const skins: SkinDef[] = [
       name: 'Gladiador',
       rarity: 'epic',
       description: 'Armadura romana, capa vermelha e gládio. Ave, aluno: os que vão aprender te saúdam.',
-      hat: true,
+      headgear: true,
       palette: ['#b8402f', '#c9a227', '#6b4a2b'],
       artPrompt: 'Roman gladiator armor with bronze chest plate, red cape, leather skirt strips, sandals, short sword in hand',
     },
@@ -118,7 +119,7 @@ export const skins: SkinDef[] = [
       name: 'Samurai',
       rarity: 'legendary',
       description: 'Armadura samurai azul-petróleo e katana. Um corte só, um sorriso só.',
-      hat: true,
+      headgear: true,
       palette: ['#1f5f6b', '#d7b44a', '#15212a'],
       artPrompt: 'deep teal samurai armor with gold trim, shoulder plates, katana at the hip, dark hakama pants, sandals',
     },
@@ -146,7 +147,7 @@ export const skins: SkinDef[] = [
       name: 'Maker IoT',
       rarity: 'rare',
       description: 'Jaleco com sensores e LEDs, protoboard na mão e óculos de proteção. Solda antes de perguntar.',
-      hat: true,
+      headgear: true,
       palette: ['#f2f2f2', '#2ec27e', '#3b82f6'],
       artPrompt: 'white lab coat covered in small sensors and blinking LEDs, holding a breadboard with wires, jeans, sneakers',
     },
@@ -155,18 +156,9 @@ export const skins: SkinDef[] = [
       name: 'Piloto Rebelde',
       rarity: 'epic',
       description: 'Macacão laranja de piloto espacial e colete branco. Decola antes de o café esfriar.',
-      hat: true,
+      headgear: true,
       palette: ['#f08a1c', '#f2f2f2', '#2a3a5c'],
       artPrompt: 'orange space pilot flight suit with a white vest, utility belt, tall dark boots, no helmet',
-    },
-    {
-      id: 'gladimir-mestre',
-      name: 'Mestre da Galáxia',
-      rarity: 'legendary',
-      description: 'Túnica bege de cavaleiro espacial e sabre de luz azul. Que o JOIN esteja com você.',
-      hat: true,
-      palette: ['#d9c7a0', '#6b5a3c', '#4aa8ff'],
-      artPrompt: 'beige space knight robe tunic with a brown belt, glowing blue energy sword held in one hand, brown boots',
     },
     {
       id: 'gladimir-stormtrooper',
@@ -175,6 +167,15 @@ export const skins: SkinDef[] = [
       description: 'Armadura branca de soldado imperial. Erra todos os tiros, mas acerta todas as queries.',
       palette: ['#f2f2f2', '#1c1c22', '#8a8f9c'],
       artPrompt: 'white imperial stormtrooper armor with black joints and a black belt, holding a blaster rifle, no helmet',
+    },
+    {
+      id: 'gladimir-mestre',
+      name: 'Mestre da Galáxia',
+      rarity: 'legendary',
+      description: 'Túnica bege de cavaleiro espacial e sabre de luz azul. Que o JOIN esteja com você.',
+      headgear: true,
+      palette: ['#d9c7a0', '#6b5a3c', '#4aa8ff'],
+      artPrompt: 'beige space knight robe tunic with a brown belt, glowing blue energy sword held in one hand, brown boots',
     },
     {
       id: 'gladimir-vader',
@@ -252,7 +253,7 @@ export const skins: SkinDef[] = [
       name: 'Agente Secreto',
       rarity: 'rare',
       description: 'Terno preto, gravata fina e fone espiral. Missão: trocar a senha do laboratório.',
-      hat: true,
+      headgear: true,
       palette: ['#16161c', '#e5e7eb', '#ef4444'],
       artPrompt: 'slim black suit, thin black tie, white shirt, coiled earpiece cable, polished black shoes',
     },
@@ -269,7 +270,7 @@ export const skins: SkinDef[] = [
       name: 'Cavaleiro da Criptografia',
       rarity: 'legendary',
       description: 'Armadura prateada com cadeado no peito e escudo com chave. Só abre com a chave certa.',
-      hat: true,
+      headgear: true,
       palette: ['#c7ccd6', '#22c55e', '#f5c542'],
       artPrompt: 'shining silver knight armor with a big padlock emblem on the chest plate, shield decorated with a golden key, steel boots',
     },
@@ -297,7 +298,7 @@ export const skins: SkinDef[] = [
       name: 'Pagodeiro',
       rarity: 'rare',
       description: 'Camisa aberta, pandeiro na mão e chapéu panamá. Segunda-feira ainda não existe.',
-      hat: true,
+      headgear: true,
       palette: ['#f5e6c8', '#2f9e8f', '#e07a1f'],
       artPrompt: 'open linen shirt over a white t-shirt, light trousers, loafers, holding a tambourine',
     },
@@ -314,7 +315,7 @@ export const skins: SkinDef[] = [
       name: 'Astronauta da Nuvem',
       rarity: 'legendary',
       description: 'Traje espacial branco com nuvens azuis. A nuvem agora é literal.',
-      hat: true,
+      headgear: true,
       palette: ['#f2f4f8', '#38bdf8', '#06b6d4'],
       artPrompt: 'white space suit decorated with blue cloud patches and a cloud logo on the chest, gloves, chunky space boots',
     },
@@ -358,7 +359,7 @@ export const skins: SkinDef[] = [
       name: 'Rainha do CSS',
       rarity: 'legendary',
       description: 'Vestido roxo com capa e cetro de chaves { }. Seu reino tem estilo.',
-      hat: true,
+      headgear: true,
       palette: ['#7c3aed', '#facc15', '#f2f2f2'],
       artPrompt: 'long purple royal dress with a flowing cape, golden scepter topped with curly braces { }, jeweled belt',
     },
@@ -394,7 +395,7 @@ export const skins: SkinDef[] = [
       name: 'Paraninfo',
       rarity: 'epic',
       description: 'Beca preta de formatura com faixa âmbar e canudo na mão. Discurso de cinco minutos (dez).',
-      hat: true,
+      headgear: true,
       palette: ['#1a1a22', '#f59e0b', '#e5e7eb'],
       artPrompt: 'black graduation gown with an amber sash across the chest, rolled diploma tied with a ribbon in hand, black shoes',
     },
@@ -403,7 +404,7 @@ export const skins: SkinDef[] = [
       name: 'Herança Real',
       rarity: 'legendary',
       description: 'Manto real vermelho com arminho e cetro. A herança é múltipla e a coroa é só uma.',
-      hat: true,
+      headgear: true,
       palette: ['#b91c1c', '#f5c542', '#f5f5f4'],
       artPrompt: 'royal red velvet robe with white ermine fur trim, golden scepter in hand, ornate golden clasp, dark boots',
     },
@@ -439,7 +440,7 @@ export const skins: SkinDef[] = [
       name: 'Mago dos Algoritmos',
       rarity: 'epic',
       description: 'Manto azul com estrelas e cajado com árvore binária. Complexidade logarítmica, magia pura.',
-      hat: true,
+      headgear: true,
       palette: ['#2f2a8f', '#facc15', '#6366f1'],
       artPrompt: 'long blue wizard robe covered in yellow stars, wooden staff topped with a small binary tree of glowing nodes, pointed shoes',
     },
