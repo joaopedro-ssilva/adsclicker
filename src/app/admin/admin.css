@@ -62,3 +62,38 @@
 .admin-hint {
   font-size: 13px;
 }
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.admin-login {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 320px;
+}
+
+.admin-login label {
+  font-weight: 800;
+}
+
+.admin-login input {
+  min-height: 44px;
+  padding: 8px 12px;
+  margin-bottom: var(--space-2);
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.admin-login button {
+  justify-self: start;
+}
+
+.admin-error {
+  color: var(--bad);
+  font-weight: 800;
+}

@@ -6,6 +6,7 @@ import { MAX_DEV_MULTIPLIER, MIN_DEV_MULTIPLIER } from '@/game/engine/state';
 import { DEV_MULTIPLIER_KEY, readDevMultiplier, writeDevMultiplier } from '@/ui/dev/devMultiplier';
 import { Badge, Button, Panel } from '@/ui/kit';
 import { ThemeProvider } from '@/ui/ThemeProvider';
+import { logout } from './actions';
 
 const PRESETS = [1, 2, 5, 10, 50, 100, 1000];
 
@@ -99,9 +100,16 @@ export function AdminPanel() {
           </p>
         </Panel>
 
-        <Link className="ui-button" data-variant="secondary" href="/">
-          Voltar ao jogo
-        </Link>
+        <div className="admin-actions">
+          <Link className="ui-button" data-variant="secondary" href="/">
+            Voltar ao jogo
+          </Link>
+          <form action={logout}>
+            <Button type="submit" variant="ghost">
+              Sair
+            </Button>
+          </form>
+        </div>
       </main>
     </ThemeProvider>
   );

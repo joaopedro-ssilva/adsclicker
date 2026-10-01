@@ -51,9 +51,7 @@ export const achievements: AchievementDef[] = [
     skin: 'edecio-full-dima',
   }),
   ach('combo-10', 'click', 'Embalando', '🔥', 'Chegue a um combo de 10 passos.', counter('maxCombo', 10)),
-  ach('combo-20', 'click', 'Combo Cheio', '💥', 'Chegue a um combo de 20 passos.', counter('maxCombo', 20), {
-    scenery: 'academia',
-  }),
+  ach('combo-20', 'click', 'Combo Cheio', '💥', 'Chegue a um combo de 20 passos.', counter('maxCombo', 20)),
 
   // ------------------------------------------------------------------ production (15)
   ach('coins-1e3', 'production', 'Troco de Cantina', '🪙', 'Ganhe 1.000 ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e3' }),
@@ -85,6 +83,9 @@ export const achievements: AchievementDef[] = [
   ach('cps-1e10', 'production', 'Cachoeira de ADScoins', '🌊', 'Produza 10 bilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e10' }),
   ach('cps-1e13', 'production', 'Rack Cheio', '🗄️', 'Produza 10 trilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e13' }, {
     scenery: 'datacenter',
+  }),
+  ach('research-1', 'production', 'Primeira Pesquisa', '💪', 'Compre a sua primeira pesquisa. Estudar também é treino.', counter('researchBought', 1), {
+    scenery: 'academia',
   }),
   ach('research-10', 'production', 'Leitura Acessível', '🔬', 'Compre 10 pesquisas, somando todas as turmas.', counter('researchBought', 10), {
     theme: 'alto-contraste',
