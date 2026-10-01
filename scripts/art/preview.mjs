@@ -36,7 +36,8 @@ function listSkins(prof) {
 /** Compose body + head (+ hat) into one native-resolution RGBA canvas; returns {data,w,h}. */
 async function compose(skinId, prof) {
   const skin = await load(`skins/${skinId}`);
-  const head = await load(`heads/${prof}`);
+  // A skin with headgear has its own head (the professor wearing it); otherwise the professor's plain head.
+  const head = (await load(`heads/${skinId}`)) ?? (await load(`heads/${prof}`));
   const hat = await load(`hats/${skinId}`);
   const layers = [{ img: skin, x: 0, y: 0 }];
   if (head) layers.push({ img: head, x: skin.anchor.x - head.anchor.x, y: skin.anchor.y - head.anchor.y });
