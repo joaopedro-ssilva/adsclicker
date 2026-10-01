@@ -190,16 +190,17 @@ const iconsCall = {
   ],
 };
 
-// Order = priority: what the owner asked for first, then what completes art that already exists.
+// Order = priority: the heads with headgear (the owner asked for them first), then the Star Wars skins,
+// then the bodies that are still missing.
 calls.push(
   ...skinCalls.slice(0, 2),
-  { label: 'skins-starwars', images: [skinSheet('skins-starwars.png', STAR_WARS)] },
   headCall('edecio', 'gladimir'),
-  ...skinCalls.slice(2),
-  iconsCall,
   headCall('wagner', 'guto'),
   headCall('b1', 'angelo'),
   headCall('pablo'),
+  { label: 'skins-starwars', images: [skinSheet('skins-starwars.png', STAR_WARS)] },
+  ...skinCalls.slice(2),
+  iconsCall,
 );
 
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.

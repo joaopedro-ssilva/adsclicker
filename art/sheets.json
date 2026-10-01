@@ -179,14 +179,6 @@
       ]
     },
     {
-      "file": "skins-starwars.png",
-      "kind": "skin",
-      "keys": [
-        "gladimir-stormtrooper",
-        "gladimir-vader"
-      ]
-    },
-    {
       "file": "heads-skin-edecio.png",
       "kind": "head",
       "keys": [
@@ -208,6 +200,62 @@
         "gladimir-mestre"
       ],
       "calibrate": true
+    },
+    {
+      "file": "heads-skin-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-agente",
+        "wagner-cripto"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-pagodeiro",
+        "guto-astronauta"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-b1.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b1-rainha"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-paraninfo",
+        "angelo-rei"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "heads-skin-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-mago"
+      ],
+      "calibrate": true
+    },
+    {
+      "file": "skins-starwars.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-stormtrooper",
+        "gladimir-vader"
+      ]
     },
     {
       "file": "skins-more-5.png",
@@ -274,54 +322,6 @@
         "coin",
         "diploma"
       ]
-    },
-    {
-      "file": "heads-skin-wagner.png",
-      "kind": "head",
-      "keys": [
-        "_ref",
-        "wagner-agente",
-        "wagner-cripto"
-      ],
-      "calibrate": true
-    },
-    {
-      "file": "heads-skin-guto.png",
-      "kind": "head",
-      "keys": [
-        "_ref",
-        "guto-pagodeiro",
-        "guto-astronauta"
-      ],
-      "calibrate": true
-    },
-    {
-      "file": "heads-skin-b1.png",
-      "kind": "head",
-      "keys": [
-        "_ref",
-        "b1-rainha"
-      ],
-      "calibrate": true
-    },
-    {
-      "file": "heads-skin-angelo.png",
-      "kind": "head",
-      "keys": [
-        "_ref",
-        "angelo-paraninfo",
-        "angelo-rei"
-      ],
-      "calibrate": true
-    },
-    {
-      "file": "heads-skin-pablo.png",
-      "kind": "head",
-      "keys": [
-        "_ref",
-        "pablo-mago"
-      ],
-      "calibrate": true
     }
   ]
 }
