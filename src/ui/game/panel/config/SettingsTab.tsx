@@ -1,4 +1,5 @@
 import { About } from './About';
+import { AccountSection } from './AccountSection';
 import { ResetZone } from './ResetZone';
 import { SaveTools } from './SaveTools';
 import { SoundSettings } from './SoundSettings';
@@ -8,6 +9,7 @@ import { VisualSettings } from './VisualSettings';
 export function SettingsTab() {
   return (
     <div className="settings">
+      <AccountSection />
       <SoundSettings />
       <VisualSettings />
       <Statistics />

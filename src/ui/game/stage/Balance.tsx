@@ -1,7 +1,8 @@
 'use client';
 import { memo, useEffect, useRef } from 'react';
 import type Decimal from 'break_infinity.js';
-import { useClickValue, useCoins, useCoinsPerSecond, useGameState } from '@/game/store';
+import { useCloud } from '@/game/cloud';
+import { useClickValue, useCoins, useCoinsPerSecond } from '@/game/store';
 import { formatNumber } from '@/game/engine/format';
 import { Icon, NumberTicker } from '@/ui/kit';
 import { registerAnchor } from '../wiring/stageRefs';
@@ -26,11 +27,11 @@ function Rates() {
   );
 }
 
-/** Shown only while the /admin coin multiplier is on, so a boosted game never passes for a normal one. */
-function DevBadge() {
-  const multiplier = useGameState((state) => state.settings.devMultiplier);
+/** Shown only while the server's coin multiplier is on (an event or a demo account), so a boosted game never passes for a normal one. */
+function EventBadge() {
+  const multiplier = useCloud((store) => store.multiplier);
   if (multiplier === 1) return null;
-  return <span className="balance-dev">Dev ×{formatNumber(multiplier)}</span>;
+  return <span className="balance-dev">Evento ×{formatNumber(multiplier)}</span>;
 }
 
 /** Coin icon, the big ADScoin counter and what each click and each second are worth. Coins fly to this plate. */
@@ -45,7 +46,7 @@ export const Balance = memo(function Balance() {
 
   return (
     <div className="balance" ref={plate} data-qa="balance">
-      <DevBadge />
+      <EventBadge />
       <p className="balance-label">ADScoins</p>
       <div className="balance-value">
         <Icon name="coin" size={36} className="balance-coin" />

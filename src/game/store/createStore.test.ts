@@ -399,6 +399,19 @@ describe('saving', () => {
     store.getState().shutdown();
   });
 
+  it('serializes the raw save JSON, which importSave accepts back', () => {
+    const { store } = setup((state) => {
+      state.levels = { cafe: 7 };
+    });
+    store.getState().boot();
+    const json = store.getState().serialize();
+    expect(JSON.parse(json).levels.cafe).toBe(7);
+    store.getState().hardReset();
+    expect(store.getState().importSave(json)).toBe(true);
+    expect(store.getState().state.levels['cafe']).toBe(7);
+    store.getState().shutdown();
+  });
+
   it('does not pay offline earnings for an imported save', () => {
     const { store } = setup((state) => {
       state.hired.gladimir = true;

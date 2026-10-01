@@ -57,14 +57,15 @@ export async function startSession(): Promise<void> {
   const expected = credentials();
   if (!expected) return;
   (await cookies()).set(SESSION_COOKIE, sessionToken(expected), {
+    // Path "/": the cookie must also reach /api/admin/**, not only the /admin page.
     httpOnly: true,
     sameSite: 'strict',
     secure: process.env.NODE_ENV === 'production',
-    path: '/admin',
+    path: '/',
     maxAge: SESSION_SECONDS,
   });
 }
 
 export async function endSession(): Promise<void> {
-  (await cookies()).set(SESSION_COOKIE, '', { path: '/admin', maxAge: 0 });
+  (await cookies()).set(SESSION_COOKIE, '', { path: '/', maxAge: 0 });
 }

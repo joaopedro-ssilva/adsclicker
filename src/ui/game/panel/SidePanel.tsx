@@ -7,6 +7,7 @@ import type { IconName, TabItem } from '@/ui/kit';
 import { useUi } from '../shared/uiStore';
 import type { PanelTab } from '../shared/uiStore';
 import { AlbumTab } from './album/AlbumTab';
+import { CommunityTab } from './comunidade/CommunityTab';
 import { SettingsTab } from './config/SettingsTab';
 import { GraduationTab } from './formatura/GraduationTab';
 import { LessonsTab } from './aulas/LessonsTab';
@@ -54,6 +55,12 @@ export function SidePanel() {
           },
         ]
       : []),
+    {
+      value: 'comunidade',
+      label: <TabLabel icon="star">Turma</TabLabel>,
+      content: <CommunityTab />,
+      testId: 'tab-comunidade',
+    },
     { value: 'config', label: <TabLabel icon="settings">Config</TabLabel>, content: <SettingsTab />, testId: 'tab-config' },
   ];
 

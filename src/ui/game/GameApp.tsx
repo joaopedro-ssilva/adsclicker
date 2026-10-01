@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useGame } from '@/game/store';
 import { FxLayer } from '@/ui/fx';
 import { ToastStack } from '@/ui/kit';
+import { CloudRoot } from './cloud/CloudRoot';
 import { MomentsHost } from './moments/MomentsHost';
 import { SidePanel } from './panel/SidePanel';
 import { LoadingScreen } from './stage/LoadingScreen';
@@ -27,6 +28,7 @@ function GameScreen() {
       <ToastStack />
       <MomentsHost />
       <GameEffects />
+      <CloudRoot />
     </>
   );
 }

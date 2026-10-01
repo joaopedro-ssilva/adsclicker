@@ -1,24 +1,19 @@
-import { create } from 'zustand';
-import type { CloudStore } from './types';
+import { api } from '@/shared/apiClient';
+import { browserEnv, browserStorage, liveGame } from './browser';
+import { createCloudStore } from './createCloud';
 
 export type * from './types';
+export { moreProgress, summarizeState } from './summary';
 
-const unavailable = { ok: false, error: { code: 'unavailable', message: 'Nuvem indisponível.' } } as const;
-
-/** Placeholder with the final interface: the cloud engineer owns and replaces this file. */
-export const useCloud = create<CloudStore>(() => ({
-  status: 'idle',
-  me: null,
-  lastSyncedAt: null,
-  multiplier: 1,
-  conflict: null,
-  start: () => {},
-  stop: () => {},
-  syncNow: async () => {},
-  useCloudSave: () => {},
-  keepLocalSave: async () => {},
-  setNickname: async () => unavailable,
-  setPassword: async () => unavailable,
-  login: async () => unavailable,
-  logout: async () => {},
-}));
+/**
+ * The cloud store. Importing it touches no browser API: GameApp calls `useCloud.getState().start()`
+ * from an effect once the game is ready.
+ */
+export const useCloud = createCloudStore({
+  api,
+  game: liveGame,
+  env: browserEnv,
+  storage: browserStorage,
+  now: () => Date.now(),
+  timers: { set: (fn, ms) => setTimeout(fn, ms), clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>) },
+});

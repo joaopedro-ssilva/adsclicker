@@ -1,6 +1,5 @@
 'use client';
 import { useGameEvents } from '@/game/store';
-import { DevMultiplierSync } from './DevMultiplierSync';
 import { handleGameEvent } from './handleGameEvent';
 import { SecretWatchers } from './SecretWatchers';
 import { useAudioSettings } from './useAudioSettings';
@@ -12,7 +11,6 @@ export function GameEffects() {
   return (
     <>
       <SecretWatchers />
-      <DevMultiplierSync />
     </>
   );
 }

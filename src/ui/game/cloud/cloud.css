@@ -1,0 +1,147 @@
+/* Cloud: sync indicator and the conflict dialog. */
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.sync-status[data-tone='good'] {
+  color: var(--good);
+}
+
+.sync-status[data-tone='warn'] {
+  color: var(--warn);
+}
+
+.sync-status[data-tone='bad'] {
+  color: var(--bad);
+}
+
+.sync-status svg,
+.sync-status canvas {
+  flex-shrink: 0;
+}
+
+.conflict {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.conflict-intro {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.conflict-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.conflict-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-3);
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+}
+
+.conflict-column[data-recommended='true'] {
+  border-color: var(--good);
+}
+
+.conflict-column-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 24px;
+}
+
+.conflict-column-head h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.conflict-rows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.conflict-rows > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 6px 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.conflict-rows dt {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.conflict-rows dd {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.conflict-note {
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.conflict-advice {
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-width: 560px) {
+  .conflict {
+    gap: var(--space-3);
+  }
+
+  .conflict-intro {
+    font-size: 13px;
+  }
+
+  .conflict-columns {
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+  }
+
+  .conflict-column {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .conflict-rows > div {
+    padding: 3px 0;
+  }
+
+  .conflict-note {
+    display: none;
+  }
+}

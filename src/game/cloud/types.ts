@@ -29,6 +29,8 @@ export interface CloudState {
   /** Coin multiplier sent by the server (event x test account). 1 = normal. */
   multiplier: number;
   conflict: CloudConflict | null;
+  /** Additive: true when the backend answered that it is not configured (or the route does not exist). The account UI hides its forms. */
+  unavailable: boolean;
 }
 
 export interface CloudActions {

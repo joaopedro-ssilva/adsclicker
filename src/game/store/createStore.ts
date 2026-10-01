@@ -255,6 +255,8 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         emitEvent({ type: 'saved' });
       },
 
+      serialize: () => serializeState(working),
+
       exportSave: () => exportSaveData(working),
 
       importSave(data) {

@@ -192,6 +192,8 @@ export interface GameActions {
 
   updateSettings(patch: Partial<Settings>): void;
   save(): void;
+  /** The raw save JSON (what the cloud stores). Accepted back by importSave. */
+  serialize(): string;
   /** A string the player can copy or download. */
   exportSave(): string;
   /** Returns false when the string is not a valid save. */

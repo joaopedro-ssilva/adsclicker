@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type PanelTab = 'aulas' | 'pesquisas' | 'album' | 'formatura' | 'config';
+export type PanelTab = 'aulas' | 'pesquisas' | 'album' | 'formatura' | 'comunidade' | 'config';
 export type AlbumSection = 'skins' | 'cenarios' | 'temas' | 'conquistas';
 
 /**
