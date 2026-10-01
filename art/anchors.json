@@ -128,8 +128,8 @@
     "y": 2
   },
   "skins/b1-rainha": {
-    "x": 11,
-    "y": 3
+    "x": 25,
+    "y": 6
   },
   "skins/b2-darkmode": {
     "x": 17,
@@ -140,8 +140,8 @@
     "y": 1
   },
   "skins/b2-paleta": {
-    "x": 28,
-    "y": 4
+    "x": 15,
+    "y": 7
   },
   "skins/b2-postit": {
     "x": 21,
@@ -208,8 +208,8 @@
     "y": 2
   },
   "skins/gladimir-mestre": {
-    "x": 21,
-    "y": 8
+    "x": 24,
+    "y": 9
   },
   "skins/gladimir-piloto": {
     "x": 19,
@@ -252,8 +252,8 @@
     "y": 7
   },
   "skins/pablo-mago": {
-    "x": 23,
-    "y": 15
+    "x": 28,
+    "y": 16
   },
   "skins/wagner-agente": {
     "x": 14,

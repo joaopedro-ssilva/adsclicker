@@ -9,7 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
-import { RAW_DIR, ASSETS_DIR, ANCHORS_FILE, SHEETS_FILE, KIND_FOLDER, readJson, writeJson } from './lib.mjs';
+import { ROOT, RAW_DIR, ASSETS_DIR, ANCHORS_FILE, SHEETS_FILE, KIND_FOLDER, readJson, writeJson } from './lib.mjs';
 
 /** Target native heights per kind (px). */
 const TARGET_H = { skin: 48, head: 56 };
@@ -311,8 +311,9 @@ function bestGrid(prof, lo = MIN_BLOCK, hi = MAX_BLOCK) {
 }
 
 /** Decide the block size (px per art pixel) for an item. */
-function detectBlock(item, target, name) {
-  const dim = target.axis === 'w' ? item.w : target.axis === 'max' ? Math.max(item.w, item.h) : item.h;
+function detectBlock(item, target, name, refDim) {
+  // refDim: size the item as if it measured this much (a body holding something tall is taller than its siblings)
+  const dim = refDim ?? (target.axis === 'w' ? item.w : target.axis === 'max' ? Math.max(item.w, item.h) : item.h);
   const targetH = target.size;
   const tb0 = dim / targetH;
   const lo = Math.max(MIN_BLOCK, tb0 * 0.6), hi = Math.min(MAX_BLOCK, tb0 * 1.4);
@@ -475,10 +476,23 @@ function isSkin(data, i) {
   return h >= 8 && h <= 45 && s >= 0.25 && s <= 1.01 && l >= 0.5 && l <= 0.92;
 }
 
+/** Horizontal centre of the body: centroid of the opaque pixels in the lower 60% (torso and legs). */
+function bodyCentreX(img) {
+  const { data, w, h } = img;
+  let sum = 0, count = 0;
+  for (let y = Math.round(h * 0.4); y < h; y++) {
+    for (let x = 0; x < w; x++) if (data[(y * w + x) * 4 + 3]) { sum += x; count++; }
+  }
+  return count ? sum / count : w / 2;
+}
+
 function skinAnchor(img) {
   const { data, w, h } = img;
-  // topmost row (within the top 35%) holding a run of >= 3 skin pixels = neck stub top
-  const limit = Math.max(4, Math.round(h * 0.35));
+  // Topmost row (within the top half) holding a run of >= 3 skin pixels near the body's centre line = neck stub top.
+  // "Near the centre" matters: a raised scepter or brush can be skin-coloured and sit above the neck.
+  const limit = Math.max(4, Math.round(h * 0.5));
+  const cx = bodyCentreX(img);
+  const reach = Math.max(4, w * 0.15);
   for (let y = 0; y < limit; y++) {
     const xs = [];
     for (let x = 0; x < w; x++) if (isSkin(data, (y * w + x) * 4)) xs.push(x);
@@ -491,15 +505,19 @@ function skinAnchor(img) {
         else { runs.push(cur); cur = [xs[k]]; }
       }
       runs.push(cur);
-      const run = runs.filter((r) => r.length >= 3).sort((a, b) => b.length - a.length)[0];
+      const run = runs
+        .filter((r) => r.length >= 3 && Math.abs((r[0] + r[r.length - 1]) / 2 - cx) <= reach)
+        .sort((a, b) => b.length - a.length)[0];
       if (run) return { x: Math.round((run[0] + run[run.length - 1]) / 2), y: y + 1, method: 'skin' };
     }
   }
-  // fallback: centre of the topmost opaque row
+  // fallback: the topmost opaque pixel on the body's centre line
+  const column = Math.round(cx);
   for (let y = 0; y < h; y++) {
-    const xs = [];
-    for (let x = 0; x < w; x++) if (data[(y * w + x) * 4 + 3]) xs.push(x);
-    if (xs.length) return { x: Math.round((xs[0] + xs[xs.length - 1]) / 2), y: y + 1, method: 'top-row' };
+    for (let dx = -2; dx <= 2; dx++) {
+      const x = column + dx;
+      if (x >= 0 && x < w && data[(y * w + x) * 4 + 3]) return { x: column, y: y + 1, method: 'centre-column' };
+    }
   }
   return { x: w >> 1, y: 1, method: 'none' };
 }
@@ -575,11 +593,16 @@ async function processSheet(sheet, anchors) {
   // whole row, so heads wearing tall headgear keep the same pixel scale as the plain head instead of
   // being squeezed into the target height. Keys starting with "_" are never written.
   const shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), target, `${sheet.keys[0]} (calibration)`) : null;
+  // Bodies in a sheet are drawn at the same size. One that is much taller is holding something above its
+  // head; sized by its own height it would shrink, so it is sized by the typical height of the row instead.
+  const heights = sheet.kind === 'skin' ? groups.map((g) => cropItem(img, g).h).sort((a, b) => a - b) : [];
+  const typicalH = heights.length ? heights[Math.floor((heights.length - 1) / 2)] : 0;
   for (let k = 0; k < groups.length; k++) {
     const key = sheet.keys[k];
     if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
-    const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, target, key);
+    const tall = typicalH > 0 && item.h > typicalH * 1.12;
+    const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, target, key, tall ? typicalH : undefined);
     let sprite = blockSample(item, b, px, py);
     removeFringe(sprite);
     removeIsolated(sprite);
@@ -614,8 +637,29 @@ async function main() {
       console.error(`FAILED ${sheet.file}: ${e.message}`);
     }
   }
+  applyOverrides(anchors);
   writeJson(ANCHORS_FILE, Object.fromEntries(Object.entries(anchors).sort(([a], [b]) => a.localeCompare(b))));
   if (failed) process.exitCode = 1;
+}
+
+/**
+ * Hand-fixed or hand-made sprites win over generated ones: every art/overrides/<folder>/<key>.png is copied
+ * over the processed file after each run, so a retouch (or a head made from a real photo) survives
+ * reprocessing. An optional art/overrides/anchors.json sets the anchors of sprites whose size changed.
+ */
+function applyOverrides(anchors) {
+  const dir = path.join(ROOT, 'art', 'overrides');
+  if (!fs.existsSync(dir)) return;
+  for (const folder of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (!folder.isDirectory()) continue;
+    for (const file of fs.readdirSync(path.join(dir, folder.name))) {
+      if (!file.endsWith('.png')) continue;
+      fs.mkdirSync(path.join(ASSETS_DIR, folder.name), { recursive: true });
+      fs.copyFileSync(path.join(dir, folder.name, file), path.join(ASSETS_DIR, folder.name, file));
+      console.log(`override ${folder.name}/${file}`);
+    }
+  }
+  Object.assign(anchors, readJson(path.join(dir, 'anchors.json'), {}));
 }
 
 main();
