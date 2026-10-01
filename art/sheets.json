@@ -1,0 +1,277 @@
+{
+  "sheets": [
+    {
+      "file": "heads-1.png",
+      "kind": "head",
+      "keys": [
+        "edecio",
+        "gladimir",
+        "b2",
+        "wagner"
+      ]
+    },
+    {
+      "file": "heads-2.png",
+      "kind": "head",
+      "keys": [
+        "guto",
+        "b1",
+        "angelo",
+        "pablo"
+      ]
+    },
+    {
+      "file": "skins-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-default",
+        "gladimir-default",
+        "b2-default",
+        "wagner-default"
+      ]
+    },
+    {
+      "file": "skins-2.png",
+      "kind": "skin",
+      "keys": [
+        "guto-default",
+        "b1-default",
+        "angelo-default",
+        "pablo-default"
+      ]
+    },
+    {
+      "file": "scenery-sala-de-aula.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-de-aula"
+      ]
+    },
+    {
+      "file": "scenery-laboratorio.png",
+      "kind": "scenery",
+      "keys": [
+        "laboratorio"
+      ]
+    },
+    {
+      "file": "scenery-academia.png",
+      "kind": "scenery",
+      "keys": [
+        "academia"
+      ]
+    },
+    {
+      "file": "scenery-praia.png",
+      "kind": "scenery",
+      "keys": [
+        "praia"
+      ]
+    },
+    {
+      "file": "scenery-prisao.png",
+      "kind": "scenery",
+      "keys": [
+        "prisao"
+      ]
+    },
+    {
+      "file": "scenery-nether.png",
+      "kind": "scenery",
+      "keys": [
+        "nether"
+      ]
+    },
+    {
+      "file": "scenery-casa-automatica.png",
+      "kind": "scenery",
+      "keys": [
+        "casa-automatica"
+      ]
+    },
+    {
+      "file": "scenery-arena.png",
+      "kind": "scenery",
+      "keys": [
+        "arena"
+      ]
+    },
+    {
+      "file": "scenery-cidade.png",
+      "kind": "scenery",
+      "keys": [
+        "cidade"
+      ]
+    },
+    {
+      "file": "scenery-deserto.png",
+      "kind": "scenery",
+      "keys": [
+        "deserto"
+      ]
+    },
+    {
+      "file": "scenery-templo.png",
+      "kind": "scenery",
+      "keys": [
+        "templo"
+      ]
+    },
+    {
+      "file": "scenery-datacenter.png",
+      "kind": "scenery",
+      "keys": [
+        "datacenter"
+      ]
+    },
+    {
+      "file": "scenery-coordenacao.png",
+      "kind": "scenery",
+      "keys": [
+        "coordenacao"
+      ]
+    },
+    {
+      "file": "scenery-formatura.png",
+      "kind": "scenery",
+      "keys": [
+        "formatura"
+      ]
+    },
+    {
+      "file": "skins-more-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-cafe",
+        "edecio-programador",
+        "edecio-chad",
+        "edecio-cria"
+      ]
+    },
+    {
+      "file": "skins-more-2.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-prisioneiro",
+        "edecio-atleta",
+        "edecio-full-dima",
+        "edecio-ceo"
+      ]
+    },
+    {
+      "file": "skins-more-3.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-gladiador",
+        "edecio-samurai",
+        "gladimir-dba",
+        "gladimir-maker"
+      ]
+    },
+    {
+      "file": "skins-more-4.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-piloto",
+        "gladimir-mestre",
+        "b2-postit",
+        "b2-wireframe"
+      ]
+    },
+    {
+      "file": "skins-more-5.png",
+      "kind": "skin",
+      "keys": [
+        "b2-darkmode",
+        "b2-paleta",
+        "wagner-hacker",
+        "wagner-agente"
+      ]
+    },
+    {
+      "file": "skins-more-6.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-firewall",
+        "wagner-cripto",
+        "guto-churrasqueiro",
+        "guto-pagodeiro"
+      ]
+    },
+    {
+      "file": "skins-more-7.png",
+      "kind": "skin",
+      "keys": [
+        "guto-dj",
+        "guto-astronauta",
+        "b1-po",
+        "b1-flexbox"
+      ]
+    },
+    {
+      "file": "skins-more-8.png",
+      "kind": "skin",
+      "keys": [
+        "b1-lancamento",
+        "b1-rainha",
+        "angelo-terno",
+        "angelo-maestro"
+      ]
+    },
+    {
+      "file": "skins-more-9.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-paraninfo",
+        "angelo-rei",
+        "pablo-cientista",
+        "pablo-enxadrista"
+      ]
+    },
+    {
+      "file": "skins-more-10.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-mago",
+        "pablo-galactico"
+      ]
+    },
+    {
+      "file": "icons.png",
+      "kind": "icon",
+      "keys": [
+        "coin",
+        "diploma"
+      ]
+    },
+    {
+      "file": "hats-1.png",
+      "kind": "hat",
+      "keys": [
+        "edecio-cria",
+        "guto-pagodeiro",
+        "b1-rainha",
+        "angelo-rei"
+      ]
+    },
+    {
+      "file": "hats-2.png",
+      "kind": "hat",
+      "keys": [
+        "angelo-paraninfo",
+        "pablo-mago",
+        "edecio-gladiador",
+        "edecio-samurai"
+      ]
+    },
+    {
+      "file": "hats-3.png",
+      "kind": "hat",
+      "keys": [
+        "edecio-full-dima",
+        "gladimir-piloto",
+        "wagner-cripto"
+      ]
+    }
+  ]
+}

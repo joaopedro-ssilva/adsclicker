@@ -37,6 +37,11 @@ export interface ActiveSprint {
   endsAt: number;
   progress: number;
   target: number;
+  /**
+   * Only for 'earnSeconds' goals: the coins/second measured at acceptance, as a Decimal string.
+   * Progress then counts seconds of that production earned, so it never overflows a number.
+   */
+  refCps?: string;
 }
 
 export interface Settings {
@@ -104,6 +109,8 @@ export interface GameState {
   abilityReadyAt: Record<string, number>;
   invasion: ActiveInvasion | null;
   nextInvasionAt: number;
+  /** Counter behind ActiveInvasion.uid. */
+  invasionSeq: number;
   eventStreak: number;
   sprint: {
     /** SprintDef ids currently on offer. */
@@ -117,6 +124,9 @@ export interface GameState {
   counters: Record<CounterKey, number>;
 
   settings: Settings;
+
+  /** Throttles the full achievement scan done by the tick (about once per second). */
+  lastAchievementCheckAt: number;
 
   createdAt: number;
   lastTickAt: number;

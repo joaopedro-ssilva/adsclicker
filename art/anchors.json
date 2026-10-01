@@ -1,0 +1,66 @@
+{
+  "heads/angelo": {
+    "x": 23,
+    "y": 55
+  },
+  "heads/b1": {
+    "x": 30,
+    "y": 52
+  },
+  "heads/b2": {
+    "x": 28,
+    "y": 50
+  },
+  "heads/edecio": {
+    "x": 23,
+    "y": 52
+  },
+  "heads/gladimir": {
+    "x": 21,
+    "y": 51
+  },
+  "heads/guto": {
+    "x": 26,
+    "y": 55
+  },
+  "heads/pablo": {
+    "x": 26,
+    "y": 55
+  },
+  "heads/wagner": {
+    "x": 21,
+    "y": 52
+  },
+  "skins/angelo-default": {
+    "x": 20,
+    "y": 2
+  },
+  "skins/b1-default": {
+    "x": 21,
+    "y": 2
+  },
+  "skins/b2-default": {
+    "x": 18,
+    "y": 1
+  },
+  "skins/edecio-default": {
+    "x": 19,
+    "y": 1
+  },
+  "skins/gladimir-default": {
+    "x": 18,
+    "y": 1
+  },
+  "skins/guto-default": {
+    "x": 20,
+    "y": 2
+  },
+  "skins/pablo-default": {
+    "x": 20,
+    "y": 2
+  },
+  "skins/wagner-default": {
+    "x": 19,
+    "y": 1
+  }
+}
