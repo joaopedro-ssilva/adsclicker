@@ -66,12 +66,6 @@ const SKINS = [
   ['pablo-galactico', 'shimmering cosmic outfit with a star aura'],
 ];
 
-// Described generically on purpose: the image tool rejects prompts that name the film characters.
-const STAR_WARS = [
-  ['gladimir-stormtrooper', 'glossy white sci-fi space-soldier armor with black joints and a black utility belt, holding a black blaster rifle'],
-  ['gladimir-vader', 'black sci-fi dark-lord armor with a long black cape and a chest control panel with small coloured buttons, a glowing red energy sword in one hand, a glossy black helmet tucked under the other arm'],
-];
-
 const SCENERIES = [
   ['sala-de-aula', 'a classroom with a whiteboard on the back wall, a ceiling projector, and rows of school desks'],
   ['laboratorio', 'a computer lab with rows of desks and computers, glowing monitors showing code'],
@@ -191,15 +185,14 @@ const iconsCall = {
   ],
 };
 
-// Order = priority: the heads with headgear (the owner asked for them first), then the Star Wars skins,
-// then the bodies that are still missing.
+// Order = priority: the heads with headgear (the owner asked for them first), then the bodies
+// that are still missing.
 calls.push(
   ...skinCalls.slice(0, 2),
   headCall('edecio', 'gladimir'),
   headCall('wagner', 'guto'),
   headCall('b1', 'angelo'),
   headCall('pablo'),
-  { label: 'skins-starwars', images: [skinSheet('skins-starwars.png', STAR_WARS)] },
   ...skinCalls.slice(2),
   iconsCall,
 );

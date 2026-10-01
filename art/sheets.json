@@ -250,14 +250,6 @@
       "calibrate": true
     },
     {
-      "file": "skins-starwars.png",
-      "kind": "skin",
-      "keys": [
-        "gladimir-stormtrooper",
-        "gladimir-vader"
-      ]
-    },
-    {
       "file": "skins-more-5.png",
       "kind": "skin",
       "keys": [

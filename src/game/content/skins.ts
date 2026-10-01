@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 48 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 46 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -161,14 +161,6 @@ export const skins: SkinDef[] = [
       artPrompt: 'orange space pilot flight suit with a white vest, utility belt, tall dark boots, no helmet',
     },
     {
-      id: 'gladimir-stormtrooper',
-      name: 'Stormtrooper',
-      rarity: 'epic',
-      description: 'Armadura branca de soldado imperial. Erra todos os tiros, mas acerta todas as queries.',
-      palette: ['#f2f2f2', '#1c1c22', '#8a8f9c'],
-      artPrompt: 'white imperial stormtrooper armor with black joints and a black belt, holding a blaster rifle, no helmet',
-    },
-    {
       id: 'gladimir-mestre',
       name: 'Mestre da Galáxia',
       rarity: 'legendary',
@@ -176,15 +168,6 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#d9c7a0', '#6b5a3c', '#4aa8ff'],
       artPrompt: 'beige space knight robe tunic with a brown belt, glowing blue energy sword held in one hand, brown boots',
-    },
-    {
-      id: 'gladimir-vader',
-      name: 'Darth Gladimir',
-      rarity: 'legendary',
-      description: 'Armadura negra, capa e sabre de luz vermelho. "Eu sou o seu DBA."',
-      palette: ['#16161c', '#3a3a46', '#e5484d'],
-      artPrompt:
-        'black Darth Vader armor with a long black cape, chest control panel with small coloured buttons, glowing red lightsaber held in one hand, black helmet tucked under the other arm',
     },
   ]),
   ...make('b2', [
@@ -423,7 +406,7 @@ export const skins: SkinDef[] = [
       id: 'pablo-cientista',
       name: 'Cientista',
       rarity: 'common',
-      description: 'Jaleco branco e prancheta com fórmulas. A hipótese já nasceu provada.',
+      description: 'Jaleco branco e prancheta com fórmulas. Toda hipótese merece um bom experimento.',
       palette: ['#f2f4f8', '#6366f1', '#94a3b8'],
       artPrompt: 'white lab coat over a blue shirt, clipboard covered with math formulas, dark trousers, sneakers',
     },

@@ -10,10 +10,9 @@ interface ProfessorStripProps {
   onSelect: (id: ProfessorId) => void;
 }
 
-/** One portrait per hired professor: picks whose disciplines the list below shows. */
+/** One portrait per hired professor, all eight visible at once: picks who is on screen and whose lessons are listed. */
 export function ProfessorStrip({ selected, onSelect }: ProfessorStripProps) {
   const hired = useGame(useShallow((store) => PROFESSOR_IDS.filter((id) => store.state.hired[id])));
-  const active = useGame((store) => store.state.activeProfessor);
 
   return (
     <div className="professor-strip" role="group" aria-label="Professor">
@@ -26,14 +25,12 @@ export function ProfessorStrip({ selected, onSelect }: ProfessorStripProps) {
             className="professor-chip"
             style={themeVariables(undefined, professor.color)}
             aria-pressed={id === selected}
-            data-onstage={id === active}
+            aria-label={professor.name}
+            title={professor.name}
             data-qa={`tree-${id}`}
             onClick={() => onSelect(id)}
           >
-            <span className="professor-chip-face">
-              <Portrait professor={id} />
-            </span>
-            <span className="professor-chip-name">{professor.name}</span>
+            <Portrait professor={id} />
           </button>
         );
       })}

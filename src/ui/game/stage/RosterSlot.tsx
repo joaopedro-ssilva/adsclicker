@@ -30,7 +30,7 @@ function HiredSlot({ id, name, color, state, onSelect }: RosterSlotProps) {
       data-qa={`roster-${id}`}
       style={cssVariables({ '--prof': color })}
       aria-pressed={state === 'active'}
-      aria-label={state === 'active' ? `${name}, em sala` : `Colocar ${name} em sala`}
+      aria-label={state === 'active' ? `${name}, selecionado` : `Selecionar ${name}`}
       onClick={() => onSelect(id)}
     >
       <span className="roster-face">

@@ -162,12 +162,6 @@ export const achievements: AchievementDef[] = [
   ach('lvl100-gladimir', 'professor', 'Mestre do Banco', '🗡️', 'Deixe todas as disciplinas do Gladimir no nível 100.', allLevel('gladimir', 100), {
     skin: 'gladimir-mestre',
   }),
-  ach('lvl50-gladimir', 'professor', 'Tropa do Império', '🪖', 'Deixe todas as disciplinas do Gladimir no nível 50.', allLevel('gladimir', 50), {
-    skin: 'gladimir-stormtrooper',
-  }),
-  ach('abilities-50', 'professor', 'Lado Sombrio do Banco', '🌑', 'Use habilidades 50 vezes. O poder do lado sombrio do DELETE sem WHERE.', counter('abilitiesUsed', 50), {
-    skin: 'gladimir-vader',
-  }),
   ach('lvl100-b2', 'professor', 'Paleta Completa', '🌈', 'Deixe todas as disciplinas da Bruna B2 no nível 100.', allLevel('b2', 100), {
     skin: 'b2-paleta',
   }),
@@ -225,7 +219,7 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 48 skins.', { kind: 'skinsOwned', gte: 48 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 46 skins.', { kind: 'skinsOwned', gte: 46 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }),
@@ -234,7 +228,7 @@ export const achievements: AchievementDef[] = [
   ach('secret-logo', 'secret', 'Curioso Demais', '🔎', 'Clique 10 vezes no logo do jogo.', { kind: 'secret', trigger: 'logo-clicks' }, undefined, true),
   ach('secret-konami', 'secret', 'Código Antigo', '🕹️', 'Digite o código Konami.', { kind: 'secret', trigger: 'konami' }, { theme: 'terminal' }, true),
   ach('secret-night-owl', 'secret', 'Coruja da Madrugada', '🦉', 'Jogue entre 3h e 5h da manhã.', { kind: 'secret', trigger: 'night-owl' }, undefined, true),
-  ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor em sala 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, undefined, true),
+  ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, undefined, true),
   ach('secret-idle', 'secret', 'Observador Paciente', '👀', 'Fique 1 minuto sem clicar com o jogo aberto.', { kind: 'secret', trigger: 'idle-watcher' }, undefined, true),
   ach('secret-joinha', 'secret', 'Muito Legal!', '👍', 'Digite "muito legal" no jogo.', { kind: 'secret', trigger: 'joinha' }, undefined, true),
   ach('secret-offline', 'secret', 'Bom Retorno', '🌙', 'Recolha o ganho offline 5 vezes.', counter('offlineCollections', 5), undefined, true),

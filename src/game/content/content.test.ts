@@ -29,9 +29,7 @@ const EXPECTED_SKIN_IDS = [
   'gladimir-dba',
   'gladimir-maker',
   'gladimir-piloto',
-  'gladimir-stormtrooper',
   'gladimir-mestre',
-  'gladimir-vader',
   'b2-default',
   'b2-postit',
   'b2-wireframe',
@@ -81,8 +79,6 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'gladimir-maker': 'rare',
   'gladimir-piloto': 'epic',
   'gladimir-mestre': 'legendary',
-  'gladimir-stormtrooper': 'epic',
-  'gladimir-vader': 'legendary',
   'b2-default': 'common',
   'b2-postit': 'common',
   'b2-wireframe': 'rare',
@@ -553,7 +549,7 @@ describe('content: professors, disciplines and numbers', () => {
     expect(balance.baseClick).toBe(1);
     expect(balance.combo).toEqual({ windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 4 });
     expect(balance.crit).toEqual({ baseChance: 0.03, baseMult: 7 });
-    expect(balance.activeBonus).toBe(1.5);
+    expect(balance.activeBonus).toBe(1);
     expect(balance.achievementBonus).toBe(0.01);
     expect(balance.offline).toEqual({ baseHours: 2, baseRate: 0.5, minAwayMs: 60_000 });
     expect(balance.events).toEqual({ minIntervalMs: 75_000, maxIntervalMs: 150_000 });
@@ -564,7 +560,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 48 skins of the design, with their rarities', () => {
+  it('has exactly the 46 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -678,8 +674,8 @@ describe('content: achievements', () => {
   it('gives rarer skins to harder achievements within each source family', () => {
     const byRarity = (rarity: string) =>
       content.achievements.filter((a) => a.reward?.skin && EXPECTED_SKIN_RARITY[a.reward.skin] === rarity);
-    // Legendary skins come from the level 100 ladder or a long-haul counter; epic ones from research or big counters.
-    for (const achievement of byRarity('legendary')) expect(achievement.id).toMatch(/^lvl100-|^abilities-/);
+    // Legendary skins come only from the level 100 ladder; epic ones from research or big counters.
+    for (const achievement of byRarity('legendary')) expect(achievement.id).toMatch(/^lvl100-/);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });

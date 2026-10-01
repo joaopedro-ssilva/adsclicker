@@ -11,7 +11,8 @@ export const balance: BalanceConfig = {
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 4 },
   crit: { baseChance: 0.03, baseMult: 7 },
-  activeBonus: 1.5,
+  // 1 = off: the professor on screen earns no bonus (the "em sala" bonus confused players and was removed).
+  activeBonus: 1,
   achievementBonus: 0.01,
   offline: { baseHours: 2, baseRate: 0.5, minAwayMs: 60_000 },
   events: { minIntervalMs: 75_000, maxIntervalMs: 150_000 },

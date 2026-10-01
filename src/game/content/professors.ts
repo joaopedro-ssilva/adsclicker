@@ -179,14 +179,15 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     ],
     features: ['complexity'],
     quotes: {
-      hire: 'Finalmente alguém à minha altura. Brincadeira: ninguém. Mas vamos lá.',
-      click: ['Trivial.', 'Eu já tinha previsto esse clique.', 'O(1). Como esperado.', 'Ótimo clique. Quase tão bom quanto o meu.'],
+      hire: 'Bora otimizar isso juntos? Algoritmo bom é o que a turma inteira entende.',
+      click: ['Boa! Isso roda em O(1).', 'Clique limpo, sem efeito colateral.', 'Compilou de primeira.', 'Esse clique merecia um commit.'],
       idle: [
-        'Eu poderia explicar, mas levaria O(n) de paciência.',
-        'Não é arrogância se foi provado por indução.',
-        'Se der errado, a culpa é da entrada do usuário.',
+        'Rede neural também aprende errando. Segue o treino.',
+        'Todo problema grande é um monte de problema pequeno bem dividido.',
+        'A IA até escreve o código, mas quem entende o algoritmo sabe o que pedir.',
+        'Estrutura de dados certa é metade da solução.',
       ],
-      milestone: ['Previsível. E mesmo assim satisfatório.', 'Mais um nível. Dentro da minha estimativa.'],
+      milestone: ['Convergiu! Mais um nível.', 'Otimização encontrada. A turma está voando.'],
     },
   },
 };

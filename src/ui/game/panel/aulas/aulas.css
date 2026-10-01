@@ -7,76 +7,36 @@
 }
 
 .professor-strip {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
   gap: var(--space-2);
-  padding: 2px 4px 6px 2px;
-  margin: -2px -4px -6px -2px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.professor-strip::-webkit-scrollbar {
-  display: none;
 }
 
 .professor-chip {
   --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface));
 
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  width: 68px;
-  padding: 6px 4px 5px;
-  background: var(--surface-raised);
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 3px;
+  overflow: hidden;
+  background: var(--bg);
   border: 2px solid var(--border);
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 1.2;
+}
+
+.professor-chip .panel-portrait {
+  width: 100%;
+  height: auto;
 }
 
 .professor-chip:hover {
-  color: var(--text);
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
 }
 
 .professor-chip[aria-pressed='true'] {
   background: var(--accent-soft);
   border-color: var(--accent);
-  color: var(--text);
   box-shadow: 3px 3px 0 color-mix(in srgb, var(--accent) 40%, var(--bg));
-}
-
-.professor-chip-face {
-  display: grid;
-  place-items: center;
-  width: 51px;
-  height: 51px;
-  overflow: hidden;
-  background: var(--bg);
-  border: 2px solid var(--border);
-}
-
-.professor-chip[aria-pressed='true'] .professor-chip-face {
-  border-color: var(--accent);
-}
-
-.professor-chip-name {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.professor-chip[data-onstage='true'] .professor-chip-name::before {
-  content: '';
-  display: inline-block;
-  width: 6px;
-  height: 6px;
-  margin-right: 4px;
-  background: var(--accent);
 }
 
 .professor-header {
@@ -102,13 +62,6 @@
   font-size: 12px;
 }
 
-.professor-header-side {
-  display: flex;
-  flex-shrink: 0;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--space-2);
-}
 
 .professor-header-output {
   display: inline-flex;
@@ -406,19 +359,6 @@
     gap: var(--space-3);
   }
 
-  .professor-chip {
-    width: 58px;
-    padding: 4px;
-  }
-
-  .professor-chip-name {
-    display: none;
-  }
-
-  .professor-chip[data-onstage='true'] .professor-chip-face {
-    border-color: var(--accent);
-    box-shadow: 0 3px 0 var(--accent);
-  }
 
   .professor-header {
     padding: var(--space-2) var(--space-3);
@@ -430,7 +370,3 @@
   }
 }
 
-/* A fade on the right edge hints that the strip scrolls when many professors are hired. */
-.professor-strip {
-  mask-image: linear-gradient(to right, #000 calc(100% - 20px), transparent);
-}

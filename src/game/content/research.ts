@@ -412,7 +412,7 @@ export const research: ResearchDef[] = [
     professor: 'pablo',
     name: 'O(1) de Cabeça',
     emoji: '🧠',
-    description: 'O custo cresce menos a cada nível (-0,01) e toda disciplina rende 50% mais. Ele já sabia a resposta antes da pergunta.',
+    description: 'O custo cresce menos a cada nível (-0,01) e toda disciplina rende 50% mais. Resposta em tempo constante.',
     cost: '2.4e25',
     effects: [
       { stat: 'costGrowth', op: 'add', value: -0.01 },
@@ -451,7 +451,7 @@ export const research: ResearchDef[] = [
     professor: 'pablo',
     name: 'Big O',
     emoji: '📈',
-    description: 'Libera a habilidade Big O (custos pela metade por 20 s). Precisa do Guto contratado. Tudo cresce, mas nada cresce mais rápido que o Pablo.',
+    description: 'Libera a habilidade Big O (custos pela metade por 20 s). Precisa do Guto contratado. Saber como o problema cresce é meio caminho andado.',
     cost: '1.5e27',
     effects: [],
     requires: [level('pilha-e-fila', 15), { kind: 'professorHired', professor: 'guto' }],
@@ -475,7 +475,7 @@ export const research: ResearchDef[] = [
     professor: 'pablo',
     name: 'Árvore Balanceada',
     emoji: '🌳',
-    description: 'O custo cresce menos a cada nível (-0,01) e toda produção e clique valem x2. Altura mínima, ego proporcional.',
+    description: 'O custo cresce menos a cada nível (-0,01) e toda produção e clique valem x2. Altura mínima, busca rápida.',
     cost: '3e29',
     effects: [
       { stat: 'costGrowth', op: 'add', value: -0.01 },

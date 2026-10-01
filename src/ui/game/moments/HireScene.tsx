@@ -66,7 +66,7 @@ export function HireScene({ professor: id, onClose }: HireSceneProps) {
               onClose();
             }}
           >
-            Pôr em sala
+            Ver as aulas
           </Button>
           <Button variant="secondary" size="lg" onClick={onClose}>
             Continuar

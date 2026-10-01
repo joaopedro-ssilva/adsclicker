@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
 import { content, useGame, useHasFeature } from '@/game/store';
-import type { ProfessorId } from '@/game/content/types';
-import { useUi } from '../../shared/uiStore';
 import { Section } from '../lib/Section';
 import { BuyAmountSelector } from './BuyAmountSelector';
 import { LevelledCard } from './LevelledCard';
@@ -11,11 +9,9 @@ import { ProfessorStrip } from './ProfessorStrip';
 /** The tab players live in: the disciplines and click upgrades of one professor. */
 export function LessonsTab() {
   const bulkBuy = useHasFeature('bulkBuy');
-  const active = useGame((store) => store.state.activeProfessor);
-  const treeProfessor = useUi((ui) => ui.treeProfessor);
-  const setTreeProfessor = useUi((ui) => ui.setTreeProfessor);
-  const treeHired = useGame((store) => (treeProfessor ? store.state.hired[treeProfessor] : false));
-  const selected: ProfessorId = treeProfessor && treeHired ? treeProfessor : active;
+  // One selection for the whole screen: the professor picked here is the one shown on the stage.
+  const selected = useGame((store) => store.state.activeProfessor);
+  const selectProfessor = useGame((store) => store.setActiveProfessor);
 
   const disciplines = useMemo(
     () => content.disciplines.filter((entry) => entry.professor === selected).sort((a, b) => a.tier - b.tier),
@@ -25,7 +21,7 @@ export function LessonsTab() {
 
   return (
     <div className="lessons">
-      <ProfessorStrip selected={selected} onSelect={setTreeProfessor} />
+      <ProfessorStrip selected={selected} onSelect={selectProfessor} />
       <ProfessorHeader professor={selected} />
 
       <Section title="Aulas" note={bulkBuy ? <BuyAmountSelector /> : 'ADScoins por segundo'}>
@@ -46,7 +42,7 @@ export function LessonsTab() {
         </Section>
       ) : null}
 
-      <p className="panel-hint">Cada marco de nível dobra a produção da aula. Quem está em sala rende mais.</p>
+      <p className="panel-hint">Cada marco de nível dobra a produção da aula.</p>
     </div>
   );
 }

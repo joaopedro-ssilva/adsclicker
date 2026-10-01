@@ -24,7 +24,7 @@ Herança do original (Edécio Clicker v1.3): a moeda (Edécoin no original, ADSc
 
 Edécio começa contratado. Os outros são contratados com ADScoins, em ordem (cada um exige o anterior contratado). Pablo exige também `graduations >= 1`.
 
-O **professor em sala** é o alvo do clique e pode ser trocado a qualquer momento entre os contratados. As disciplinas de quem está em sala rendem ×1,5 (`activeBonus`).
+O professor selecionado aparece no palco e é o alvo do clique; pode ser trocado a qualquer momento entre os contratados. A troca é só visual: o bônus de "pôr em sala" foi removido por confundir (`activeBonus` vale 1).
 
 ### Personalidades (para falas e nomes; humor leve, nunca sobre a pessoa)
 
@@ -32,7 +32,7 @@ O **professor em sala** é o alvo do clique e pode ser trocado a qualquer moment
 - **Gladimir**: o mais piadista. Muito nerd, fã de Star Wars; trocadilhos de banco de dados com referências galácticas ("Que o JOIN esteja com você"). Pode ser bem engraçado.
 - **Guto**: o da resenha. Gosta de curtir e fazer piada. Sem referência direta a bebida.
 - **Angelo**: formal, coordenador, mas solta piada seca no meio da formalidade.
-- **Pablo**: se acha (e é) muito inteligente, de leve. Faz piada com isso.
+- **Pablo**: inteligente e fera em código, sem arrogância. Fala de algoritmos, tecnologias legais e inteligência artificial, sempre puxando o aluno para cima.
 - **Wagner, Bruna B1, Bruna B2**: ainda sem informação. Tom neutro e simpático, humor só da disciplina (senha fraca, pixel fora do lugar, backlog infinito).
 
 ## 3. Upgrades
@@ -48,7 +48,7 @@ Fórmulas (todas as constantes em `BalanceConfig`):
 - Custo do nível seguinte: `baseCost × growth^level × costMult`, com `growth = max(minCostGrowth, costGrowth + stat(costGrowth))`. Base `costGrowth = 1.15`, `minCostGrowth = 1.07`.
 - Marcos: nos níveis 10, 25, 50, 100, 200 e depois a cada 100, a saída daquele upgrade dobra.
 - Produção de uma disciplina por segundo:
-  `baseProduction × level × 2^marcos × disc × prof × idlePower × globalPower × (em sala ? activeBonus : 1) × (1 + synergy × outrosProfessoresContratados)`
+  `baseProduction × level × 2^marcos × disc × prof × idlePower × globalPower × (1 + synergy × outrosProfessoresContratados)`
 - `globalPower` inclui: `1 + 0.01 × conquistas` e `1 + min(1, 0.01 × diplomasEarned)` (`bonusPerDiploma` e `maxBonus`), além dos efeitos.
 - Valor do clique:
   `(baseClick + Σ upgradesDeClique(baseClick × level × 2^marcos)) × clickPower × globalPower × comboMult × (crítico ? critMult : 1) + clickFromIdle × coinsPerSecond`
@@ -118,7 +118,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (48)
+### Skins (46)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -137,9 +137,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | gladimir | `gladimir-dba` | DBA de Plantão | common | colete, cabo de rede no ombro, caneca "SELECT *" | |
 | gladimir | `gladimir-maker` | Maker IoT | rare | jaleco com sensores e LEDs, protoboard na mão | óculos de proteção |
 | gladimir | `gladimir-piloto` | Piloto Rebelde | epic | macacão laranja de piloto espacial, colete branco | capacete de piloto |
-| gladimir | `gladimir-stormtrooper` | Stormtrooper | epic | armadura branca de soldado imperial, blaster | |
 | gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
-| gladimir | `gladimir-vader` | Darth Gladimir | legendary | armadura negra, capa, sabre de luz vermelho, capacete debaixo do braço | |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |
