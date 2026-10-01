@@ -43,13 +43,77 @@
     "x": 18,
     "y": 1
   },
+  "skins/b2-postit": {
+    "x": 21,
+    "y": 2
+  },
+  "skins/b2-wireframe": {
+    "x": 20,
+    "y": 2
+  },
+  "skins/edecio-atleta": {
+    "x": 23,
+    "y": 2
+  },
+  "skins/edecio-cafe": {
+    "x": 19,
+    "y": 2
+  },
+  "skins/edecio-ceo": {
+    "x": 22,
+    "y": 2
+  },
+  "skins/edecio-chad": {
+    "x": 22,
+    "y": 2
+  },
+  "skins/edecio-cria": {
+    "x": 15,
+    "y": 2
+  },
   "skins/edecio-default": {
     "x": 19,
     "y": 1
   },
+  "skins/edecio-full-dima": {
+    "x": 31,
+    "y": 2
+  },
+  "skins/edecio-gladiador": {
+    "x": 22,
+    "y": 2
+  },
+  "skins/edecio-prisioneiro": {
+    "x": 24,
+    "y": 2
+  },
+  "skins/edecio-programador": {
+    "x": 19,
+    "y": 2
+  },
+  "skins/edecio-samurai": {
+    "x": 20,
+    "y": 5
+  },
+  "skins/gladimir-dba": {
+    "x": 19,
+    "y": 2
+  },
   "skins/gladimir-default": {
     "x": 18,
     "y": 1
+  },
+  "skins/gladimir-maker": {
+    "x": 18,
+    "y": 2
+  },
+  "skins/gladimir-mestre": {
+    "x": 21,
+    "y": 8
+  },
+  "skins/gladimir-piloto": {
+    "x": 19,
+    "y": 2
   },
   "skins/guto-default": {
     "x": 20,
