@@ -194,7 +194,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | --- | --- |
 | Primeiro upgrade | 10 s |
 | Gladimir | 5 min |
-| Primeira skin por conquista | 8 min |
+| Primeira skin por conquista (1.000 cliques) | 4 min |
 | 4 professores | 45 min |
 | Angelo e primeira formatura | 2 a 3 h |
 | Pablo | depois da primeira formatura |

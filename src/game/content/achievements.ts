@@ -36,7 +36,7 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ click (12)
   ach('click-100', 'click', 'Primeiros Joinhas', '👍', 'Dê 100 cliques.', counter('clicks', 100)),
   ach('click-500', 'click', 'Pegando o Jeito', '🖱️', 'Dê 500 cliques.', counter('clicks', 500)),
-  ach('click-2k', 'click', 'Dois Mil Joinhas', '☕', 'Dê 2.000 cliques. Merece um café.', counter('clicks', 2000), { skin: 'edecio-cafe' }),
+  ach('click-1k', 'click', 'Mil Joinhas', '☕', 'Dê 1.000 cliques. Merece um café.', counter('clicks', 1000), { skin: 'edecio-cafe' }),
   ach('click-5k', 'click', 'Dedo Calejado', '🤚', 'Dê 5.000 cliques.', counter('clicks', 5000), { skin: 'gladimir-dba' }),
   ach('click-10k', 'click', 'Rodando em Loop', '💻', 'Dê 10.000 cliques. O for não termina.', counter('clicks', 10000), {
     skin: 'edecio-programador',

@@ -52,8 +52,9 @@ export const MILESTONES: MilestoneDef[] = [
   {
     id: 'firstSkin',
     label: 'Primeira skin por conquista',
-    target: { min: 5 * MIN, max: 11 * MIN },
-    targetText: '8 min',
+    // The first skin comes at 1,000 clicks (owner's call), about 4 minutes of active play.
+    target: { min: 2.5 * MIN, max: 6 * MIN },
+    targetText: '4 min',
     reached: (state, context) => Object.keys(state.skins).length > context.initialSkins,
   },
   {
