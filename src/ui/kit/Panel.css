@@ -1,0 +1,13 @@
+.ui-panel {
+  background: var(--surface);
+  padding: var(--space-5);
+}
+
+.ui-panel[data-tone='raised'] {
+  background: var(--surface-raised);
+}
+
+.ui-panel[data-tone='inset'] {
+  background: var(--bg);
+  box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--bg) 60%, #000);
+}

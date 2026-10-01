@@ -1,0 +1,68 @@
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border: 2px solid var(--border);
+  background: var(--surface-raised);
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ui-badge[data-tone='accent'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.ui-badge[data-tone='good'] {
+  color: var(--good);
+  border-color: color-mix(in srgb, var(--good) 55%, var(--border));
+}
+
+.ui-badge[data-tone='warn'] {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 55%, var(--border));
+}
+
+.ui-badge[data-tone='bad'] {
+  color: var(--bad);
+  border-color: color-mix(in srgb, var(--bad) 55%, var(--border));
+}
+
+.rarity-badge {
+  color: var(--rarity);
+  border-color: color-mix(in srgb, var(--rarity) 55%, var(--border));
+  background: var(--surface);
+}
+
+.rarity-pips {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.rarity-pips i {
+  width: 5px;
+  height: 5px;
+  background: var(--rarity);
+}
+
+[data-rarity='common'] {
+  --rarity: var(--common);
+}
+
+[data-rarity='rare'] {
+  --rarity: var(--rare);
+}
+
+[data-rarity='epic'] {
+  --rarity: var(--epic);
+}
+
+[data-rarity='legendary'] {
+  --rarity: var(--legendary);
+}

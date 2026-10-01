@@ -25,7 +25,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '💻',
     description: 'Variável, if, for e muita paciência. Gera Edécoins por segundo.',
     baseCost: '140',
-    baseProduction: '1.3',
+    baseProduction: '1.5',
   },
   {
     id: 'projetinho',
@@ -35,7 +35,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🗿',
     description: 'O trabalho que "é bem simples, dá pra fazer no fim de semana". Gera Edécoins por segundo.',
     baseCost: '1200',
-    baseProduction: '8.5',
+    baseProduction: '12',
   },
 
   // Gladimir: Banco de Dados e IoT
@@ -47,7 +47,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🗃️',
     description: 'Traz a galáxia inteira de dados de uma vez. Gera Edécoins por segundo.',
     baseCost: '11000',
-    baseProduction: '55',
+    baseProduction: '91',
   },
   {
     id: 'join-galactico',
@@ -57,7 +57,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🪐',
     description: 'Une tabelas de planetas distantes. Que o JOIN esteja com você. Gera Edécoins por segundo.',
     baseCost: '98000',
-    baseProduction: '360',
+    baseProduction: '700',
   },
   {
     id: 'estacao-iot',
@@ -67,7 +67,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🛰️',
     description: 'Sensores em órbita mandando temperatura, umidade e curiosidades. Gera Edécoins por segundo.',
     baseCost: '890000',
-    baseProduction: '2300',
+    baseProduction: '5400',
   },
 
   // Bruna B2: Design UX
@@ -79,7 +79,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '👤',
     description: 'Dona Marlene, 52 anos, odeia pop-ups. Gera Edécoins por segundo.',
     baseCost: '8e6',
-    baseProduction: '15000',
+    baseProduction: '4.2e4',
   },
   {
     id: 'jornada-do-usuario',
@@ -89,7 +89,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🗺️',
     description: 'Mapa de tudo o que o usuário sente do clique ao checkout. Gera Edécoins por segundo.',
     baseCost: '7.2e7',
-    baseProduction: '98000',
+    baseProduction: '3.2e5',
   },
   {
     id: 'teste-com-usuario',
@@ -99,7 +99,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🧪',
     description: 'Ninguém clica onde você imaginou. Gera Edécoins por segundo.',
     baseCost: '6.5e8',
-    baseProduction: '640000',
+    baseProduction: '2.5e6',
   },
 
   // Wagner: Cibersegurança e Redes
@@ -111,7 +111,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🔌',
     description: 'Metade dos problemas de rede é um plugue mal encaixado. Gera Edécoins por segundo.',
     baseCost: '5.8e9',
-    baseProduction: '4.1e6',
+    baseProduction: '1.9e7',
   },
   {
     id: 'firewall-de-papelao',
@@ -121,7 +121,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🧱',
     description: 'Protege até chegar a primeira chuva de pacotes. Gera Edécoins por segundo.',
     baseCost: '5.2e10',
-    baseProduction: '2.7e7',
+    baseProduction: '1.5e8',
   },
   {
     id: 'pentest-amistoso',
@@ -131,7 +131,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🕵️',
     description: 'Invadir o próprio sistema, com autorização e sorriso. Gera Edécoins por segundo.',
     baseCost: '4.7e11',
-    baseProduction: '1.8e8',
+    baseProduction: '1.1e9',
   },
 
   // Guto: Arquitetura em Nuvem
@@ -143,7 +143,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🚀',
     description: 'O que pode dar errado? (o fim de semana inteiro). Gera Edécoins por segundo.',
     baseCost: '4.2e12',
-    baseProduction: '1.1e9',
+    baseProduction: '8.7e9',
   },
   {
     id: 'conteiner-sem-medo',
@@ -153,7 +153,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '📦',
     description: 'Na minha máquina funcionava. Agora funciona na de todo mundo. Gera Edécoins por segundo.',
     baseCost: '3.8e13',
-    baseProduction: '7.4e9',
+    baseProduction: '6.7e10',
   },
   {
     id: 'nuvem-multirregiao',
@@ -163,7 +163,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🌍',
     description: 'Seu servidor em três continentes e a conta em todos eles. Gera Edécoins por segundo.',
     baseCost: '3.4e14',
-    baseProduction: '4.8e10',
+    baseProduction: '5.2e11',
   },
 
   // Bruna B1: Produtos e CSS/UX
@@ -175,7 +175,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '📏',
     description: 'A dúvida eterna do espaçamento. Gera Edécoins por segundo.',
     baseCost: '3.1e15',
-    baseProduction: '3.1e11',
+    baseProduction: '4e12',
   },
   {
     id: 'pixel-fora-do-lugar',
@@ -185,7 +185,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🔍',
     description: 'Só ela vê, e depois de ver ninguém consegue mais ignorar. Gera Edécoins por segundo.',
     baseCost: '2.8e16',
-    baseProduction: '2e12',
+    baseProduction: '3.1e13',
   },
   {
     id: 'backlog-infinito',
@@ -195,7 +195,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '📋',
     description: 'Cada card entregue gera dois novos. Gera Edécoins por segundo.',
     baseCost: '2.5e17',
-    baseProduction: '1.3e13',
+    baseProduction: '2.4e14',
   },
 
   // Angelo: Coordenação e POO
@@ -207,7 +207,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '📜',
     description: 'Tudo o que foi decidido, e o que ficou para a próxima. Gera Edécoins por segundo.',
     baseCost: '2.3e18',
-    baseProduction: '8.6e13',
+    baseProduction: '1.8e15',
   },
   {
     id: 'heranca-multipla',
@@ -217,7 +217,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🧬',
     description: 'Uma classe filha com tantos pais que ninguém sabe de quem é o método. Gera Edécoins por segundo.',
     baseCost: '2e19',
-    baseProduction: '5.6e14',
+    baseProduction: '1.4e16',
   },
   {
     id: 'polimorfismo',
@@ -227,7 +227,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🎭',
     description: 'Mesmo método, vários comportamentos, uma só coordenação. Gera Edécoins por segundo.',
     baseCost: '1.8e20',
-    baseProduction: '3.6e15',
+    baseProduction: '1.1e17',
   },
 
   // Pablo: Algoritmos e Estrutura de Dados
@@ -239,7 +239,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🔗',
     description: 'Cada elo sabe quem vem depois. O resto, ele finge que sabe. Gera Edécoins por segundo.',
     baseCost: '1.6e21',
-    baseProduction: '2.4e16',
+    baseProduction: '8.3e17',
   },
   {
     id: 'pilha-e-fila',
@@ -249,7 +249,7 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🥞',
     description: 'Quem chega por último sai primeiro, mas só na pilha. Gera Edécoins por segundo.',
     baseCost: '1.5e22',
-    baseProduction: '1.5e17',
+    baseProduction: '6.4e18',
   },
   {
     id: 'grafo-caminho-minimo',
@@ -259,6 +259,6 @@ export const disciplines: DisciplineDef[] = [
     emoji: '🕸️',
     description: 'O menor caminho entre dois pontos. Pablo já sabia a resposta. Gera Edécoins por segundo.',
     baseCost: '1.3e23',
-    baseProduction: '1e18',
+    baseProduction: '4.9e19',
   },
 ];

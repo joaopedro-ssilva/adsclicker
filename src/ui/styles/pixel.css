@@ -1,0 +1,15 @@
+/* Pixel frame utilities and sprite rendering. */
+
+.pixel-frame {
+  border: var(--pixel) solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.pixel-inset {
+  border: var(--pixel) solid var(--border);
+  box-shadow: inset 3px 3px 0 var(--bg);
+}
+
+.pixel-image {
+  image-rendering: pixelated;
+}

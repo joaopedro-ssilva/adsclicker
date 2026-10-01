@@ -1,11 +1,40 @@
 @import 'tailwindcss';
 
-:root {
-  --bg: #0e0f14;
-  --text: #f2f3f7;
-}
+/* Foundations */
+@import '../ui/styles/tokens.css';
+@import '../ui/styles/base.css';
+@import '../ui/styles/pixel.css';
+@import '../ui/styles/forms.css';
 
-body {
-  background: var(--bg);
-  color: var(--text);
+/* UI kit, one file per component */
+@import '../ui/kit/Panel.css';
+@import '../ui/kit/Button.css';
+@import '../ui/kit/Badge.css';
+@import '../ui/kit/Keycap.css';
+@import '../ui/kit/Tabs.css';
+@import '../ui/kit/ProgressBar.css';
+@import '../ui/kit/Meter.css';
+@import '../ui/kit/NumberTicker.css';
+@import '../ui/kit/EmptyState.css';
+@import '../ui/kit/Tooltip.css';
+@import '../ui/kit/Modal.css';
+@import '../ui/kit/Toast.css';
+
+/* Art and effects */
+@import '../ui/art/Character.css';
+@import '../ui/art/Scenery.css';
+@import '../ui/fx/FxLayer.css';
+
+/* Game screen: each file is an index owned by one engineer */
+@import '../ui/game/stage/stage.css';
+@import '../ui/game/moments/moments.css';
+@import '../ui/game/panel/panel.css';
+
+/* Pages */
+@import './home.css';
+@import './kit/kit.css';
+
+@theme inline {
+  --font-sans: var(--font-body);
+  --font-display: var(--font-pixel);
 }

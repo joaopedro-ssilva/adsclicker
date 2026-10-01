@@ -9,7 +9,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '👍',
     description: 'Cada nível soma Edécoins ao valor de cada clique. O joinha do Edécio vale ouro.',
     baseCost: '60',
-    baseClick: '1',
+    baseClick: '0.1',
     requires: [],
   },
   {
@@ -19,7 +19,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '📡',
     description: 'Cada nível soma Edécoins ao valor de cada clique. Detecta o dedo a três metros de distância.',
     baseCost: '2.5e4',
-    baseClick: '50',
+    baseClick: '3.6',
     requires: [{ kind: 'professorHired', professor: 'gladimir' }],
   },
   {
@@ -29,7 +29,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '🔘',
     description: 'Cada nível soma Edécoins ao valor de cada clique. Um botão tão bem desenhado que dá vontade de clicar.',
     baseCost: '2e7',
-    baseClick: '3e4',
+    baseClick: '1.7e3',
     requires: [{ kind: 'professorHired', professor: 'b2' }],
   },
   {
@@ -39,7 +39,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '🖱️',
     description: 'Cada nível soma Edécoins ao valor de cada clique. O mesmo clique, rodando em mil servidores.',
     baseCost: '1e13',
-    baseClick: '2e9',
+    baseClick: '3.5e8',
     requires: [{ kind: 'professorHired', professor: 'guto' }],
   },
   {
@@ -49,7 +49,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '✍️',
     description: 'Cada nível soma Edécoins ao valor de cada clique. Um clique com firma reconhecida.',
     baseCost: '5e18',
-    baseClick: '1e14',
+    baseClick: '7.2e13',
     requires: [{ kind: 'professorHired', professor: 'angelo' }],
   },
   {
@@ -59,7 +59,7 @@ export const clickUpgrades: ClickUpgradeDef[] = [
     emoji: '⚡',
     description: 'Cada nível soma Edécoins ao valor de cada clique. Resposta em tempo constante, como manda o bom algoritmo.',
     baseCost: '4e21',
-    baseClick: '3e16',
+    baseClick: '4.4e15',
     requires: [{ kind: 'professorHired', professor: 'pablo' }],
   },
 ];

@@ -1,5 +1,18 @@
 import type { Metadata, Viewport } from 'next';
+import { Nunito_Sans, Silkscreen } from 'next/font/google';
 import './globals.css';
+
+// Silkscreen has no lowercase: it is for titles, numbers and short labels. Nunito Sans carries all running text.
+const display = Silkscreen({
+  weight: ['400', '700'],
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-pixel',
+});
+
+const body = Nunito_Sans({
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-body',
+});
 
 export const metadata: Metadata = {
   title: 'ADSClicker',
@@ -15,7 +28,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body className={`${display.variable} ${body.variable}`}>{children}</body>
     </html>
   );
 }

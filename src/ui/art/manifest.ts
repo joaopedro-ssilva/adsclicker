@@ -19,4 +19,23 @@ export interface SpriteMeta {
   anchor?: { x: number; y: number };
 }
 
-export const ASSETS: Record<string, SpriteMeta> = {};
+export const ASSETS: Record<string, SpriteMeta> = {
+  "heads/angelo": { w: 47, h: 56, anchor: { x: 23, y: 55 } },
+  "heads/b1": { w: 61, h: 56, anchor: { x: 30, y: 52 } },
+  "heads/b2": { w: 57, h: 58, anchor: { x: 28, y: 50 } },
+  "heads/edecio": { w: 47, h: 53, anchor: { x: 23, y: 52 } },
+  "heads/gladimir": { w: 43, h: 52, anchor: { x: 21, y: 51 } },
+  "heads/guto": { w: 53, h: 56, anchor: { x: 26, y: 55 } },
+  "heads/pablo": { w: 53, h: 56, anchor: { x: 26, y: 55 } },
+  "heads/wagner": { w: 42, h: 53, anchor: { x: 21, y: 52 } },
+  "sceneries/laboratorio": { w: 480, h: 270 },
+  "sceneries/sala-de-aula": { w: 480, h: 270 },
+  "skins/angelo-default": { w: 41, h: 48, anchor: { x: 20, y: 2 } },
+  "skins/b1-default": { w: 43, h: 49, anchor: { x: 21, y: 2 } },
+  "skins/b2-default": { w: 35, h: 48, anchor: { x: 18, y: 1 } },
+  "skins/edecio-default": { w: 38, h: 52, anchor: { x: 19, y: 1 } },
+  "skins/gladimir-default": { w: 35, h: 48, anchor: { x: 18, y: 1 } },
+  "skins/guto-default": { w: 42, h: 48, anchor: { x: 20, y: 2 } },
+  "skins/pablo-default": { w: 41, h: 47, anchor: { x: 20, y: 2 } },
+  "skins/wagner-default": { w: 38, h: 52, anchor: { x: 19, y: 1 } },
+};

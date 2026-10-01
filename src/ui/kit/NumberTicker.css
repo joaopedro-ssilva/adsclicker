@@ -1,0 +1,11 @@
+.ui-number {
+  position: relative;
+  display: inline-block;
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  white-space: pre;
+}
+
+.ui-number-cell {
+  display: inline-block;
+}

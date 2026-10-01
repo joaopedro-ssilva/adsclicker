@@ -1,0 +1,62 @@
+.ui-progress {
+  --progress-color: var(--accent);
+
+  width: 100%;
+}
+
+.ui-progress[data-tone='good'] {
+  --progress-color: var(--good);
+}
+
+.ui-progress[data-tone='warn'] {
+  --progress-color: var(--warn);
+}
+
+.ui-progress[data-tone='bad'] {
+  --progress-color: var(--bad);
+}
+
+.ui-progress-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.ui-progress-label span:last-child {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-progress-track {
+  display: flex;
+  gap: 2px;
+  height: 16px;
+  padding: 2px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.ui-progress[data-size='sm'] .ui-progress-track {
+  height: 12px;
+  padding: 1px;
+}
+
+.ui-progress-fill {
+  height: 100%;
+  background: var(--progress-color);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3);
+  transition: width 250ms steps(12);
+}
+
+.ui-progress-track[data-segmented='true'] > i {
+  flex: 1;
+  background: color-mix(in srgb, var(--border) 55%, var(--bg));
+}
+
+.ui-progress-track[data-segmented='true'] > i[data-on='true'] {
+  background: var(--progress-color);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.3);
+}

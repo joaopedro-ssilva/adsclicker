@@ -1,0 +1,17 @@
+.ui-empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+}
+
+.ui-empty > svg {
+  color: var(--text-muted);
+}
+
+.ui-empty-text {
+  max-width: 300px;
+  color: var(--text-muted);
+  font-size: 13px;
+}

@@ -9,7 +9,7 @@ export const sprints: SprintDef[] = [
     description: 'Dê 60 cliques em 60 s. Dedo quente, cartão movido.',
     goal: { kind: 'clicks', amount: 60 },
     durationMs: 60_000,
-    reward: { kind: 'coins', seconds: 60 },
+    reward: { kind: 'coins', seconds: 15 },
     requires: [],
   },
   {
@@ -19,14 +19,14 @@ export const sprints: SprintDef[] = [
     description: 'Dê 200 cliques em 2 min. Respire entre um clique e outro.',
     goal: { kind: 'clicks', amount: 200 },
     durationMs: 120_000,
-    reward: { kind: 'coins', seconds: 180 },
+    reward: { kind: 'coins', seconds: 45 },
     requires: [],
   },
   {
     id: 'martelada',
     name: 'Martelada',
     emoji: '🔨',
-    description: 'Dê 400 cliques em 2 min 30 s. Recompensa: produção x7 por 30 s.',
+    description: 'Dê 400 cliques em 2 min 30 s. Recompensa: produção x3 por 30 s.',
     goal: { kind: 'clicks', amount: 400 },
     durationMs: 150_000,
     reward: {
@@ -36,7 +36,7 @@ export const sprints: SprintDef[] = [
         name: 'Sprint Concluída',
         emoji: '🏁',
         durationMs: 30_000,
-        effects: [{ stat: 'idlePower', op: 'mult', value: 7 }],
+        effects: [{ stat: 'idlePower', op: 'mult', value: 3 }],
       },
     },
     requires: [],
@@ -48,7 +48,7 @@ export const sprints: SprintDef[] = [
     description: 'Acerte 3 críticos em 90 s. Ninguém prometeu que seria justo.',
     goal: { kind: 'crits', amount: 3 },
     durationMs: 90_000,
-    reward: { kind: 'coins', seconds: 120 },
+    reward: { kind: 'coins', seconds: 30 },
     requires: [{ kind: 'professorHired', professor: 'edecio' }],
   },
   {
@@ -77,7 +77,7 @@ export const sprints: SprintDef[] = [
     description: 'Chegue a um combo de 10 passos em 60 s. É só não parar de clicar.',
     goal: { kind: 'reachCombo', amount: 10 },
     durationMs: 60_000,
-    reward: { kind: 'coins', seconds: 90 },
+    reward: { kind: 'coins', seconds: 22 },
     requires: [{ kind: 'professorHired', professor: 'edecio' }],
   },
   {
@@ -87,7 +87,7 @@ export const sprints: SprintDef[] = [
     description: 'Chegue a um combo de 20 passos em 90 s. A janela de 1,5 s é curta, mas honesta.',
     goal: { kind: 'reachCombo', amount: 20 },
     durationMs: 90_000,
-    reward: { kind: 'coins', seconds: 240 },
+    reward: { kind: 'coins', seconds: 60 },
     requires: [{ kind: 'professorHired', professor: 'edecio' }],
   },
   {
@@ -97,14 +97,14 @@ export const sprints: SprintDef[] = [
     description: 'Compre 10 níveis de disciplinas ou upgrades em 90 s. Edécoin parado não rende.',
     goal: { kind: 'buyLevels', amount: 10 },
     durationMs: 90_000,
-    reward: { kind: 'coins', seconds: 100 },
+    reward: { kind: 'coins', seconds: 25 },
     requires: [],
   },
   {
     id: 'matricula-em-massa',
     name: 'Matrícula em Massa',
     emoji: '📝',
-    description: 'Compre 30 níveis em 2 min 30 s. Recompensa: produção x7 por 30 s.',
+    description: 'Compre 30 níveis em 2 min 30 s. Recompensa: produção x3 por 30 s.',
     goal: { kind: 'buyLevels', amount: 30 },
     durationMs: 150_000,
     reward: {
@@ -114,7 +114,7 @@ export const sprints: SprintDef[] = [
         name: 'Turma Cheia',
         emoji: '🎒',
         durationMs: 30_000,
-        effects: [{ stat: 'idlePower', op: 'mult', value: 7 }],
+        effects: [{ stat: 'idlePower', op: 'mult', value: 3 }],
       },
     },
     requires: [],
@@ -126,7 +126,7 @@ export const sprints: SprintDef[] = [
     description: 'Defenda 1 invasão em 2 min. Fique de olho no palco.',
     goal: { kind: 'defendEvents', amount: 1 },
     durationMs: 120_000,
-    reward: { kind: 'coins', seconds: 150 },
+    reward: { kind: 'coins', seconds: 38 },
     requires: [{ kind: 'professorHired', professor: 'wagner' }],
   },
   {
@@ -136,7 +136,7 @@ export const sprints: SprintDef[] = [
     description: 'Defenda 3 invasões em 3 min. Cada alerta conta.',
     goal: { kind: 'defendEvents', amount: 3 },
     durationMs: 180_000,
-    reward: { kind: 'coins', seconds: 400 },
+    reward: { kind: 'coins', seconds: 100 },
     requires: [{ kind: 'professorHired', professor: 'wagner' }],
   },
   {
@@ -146,7 +146,7 @@ export const sprints: SprintDef[] = [
     description: 'Ganhe o equivalente a 70 s de produção em 60 s. Clicar ajuda a passar da meta.',
     goal: { kind: 'earnSeconds', amount: 70 },
     durationMs: 60_000,
-    reward: { kind: 'coins', seconds: 100 },
+    reward: { kind: 'coins', seconds: 25 },
     requires: [],
   },
   {
@@ -156,7 +156,7 @@ export const sprints: SprintDef[] = [
     description: 'Ganhe o equivalente a 250 s de produção em 3 min. Só a produção parada não dá conta.',
     goal: { kind: 'earnSeconds', amount: 250 },
     durationMs: 180_000,
-    reward: { kind: 'coins', seconds: 500 },
+    reward: { kind: 'coins', seconds: 125 },
     requires: [],
   },
 ];

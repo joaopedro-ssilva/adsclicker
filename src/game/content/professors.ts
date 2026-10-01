@@ -34,7 +34,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Produção parada também rende: ganho offline e cliques automáticos dos sensores.',
     color: '#3b82f6',
     order: 2,
-    hireCost: '3600',
+    hireCost: '5500',
     requires: [{ kind: 'professorHired', professor: 'edecio' }],
     features: ['offline'],
     quotes: {
@@ -61,7 +61,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Conforto: compra em lote, descontos e temas de cor para a interface.',
     color: '#ec4899',
     order: 3,
-    hireCost: '2.7e6',
+    hireCost: '4e6',
     requires: [{ kind: 'professorHired', professor: 'gladimir' }],
     features: ['bulkBuy', 'hudThemes'],
     quotes: {
@@ -82,7 +82,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Invasões na tela: defenda o campus clicando nas ameaças a tempo.',
     color: '#22c55e',
     order: 4,
-    hireCost: '1.9e9',
+    hireCost: '2.9e9',
     requires: [{ kind: 'professorHired', professor: 'b2' }],
     features: ['events'],
     quotes: {
@@ -103,7 +103,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Escala: habilidades com recarga que turbinam a produção por alguns segundos.',
     color: '#06b6d4',
     order: 5,
-    hireCost: '1.4e12',
+    hireCost: '2.1e12',
     requires: [{ kind: 'professorHired', professor: 'wagner' }],
     features: ['abilities'],
     quotes: {
@@ -125,7 +125,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Missões: sprints com meta, prazo e recompensa.',
     color: '#a855f7',
     order: 6,
-    hireCost: '1e15',
+    hireCost: '1.55e15',
     requires: [{ kind: 'professorHired', professor: 'guto' }],
     features: ['sprints'],
     quotes: {
@@ -146,7 +146,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Sinergia entre professores e a Formatura, o prestígio do curso.',
     color: '#f59e0b',
     order: 7,
-    hireCost: '7.5e17',
+    hireCost: '1.15e18',
     requires: [{ kind: 'professorHired', professor: 'b1' }],
     features: ['synergy', 'graduation'],
     quotes: {
@@ -172,7 +172,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Otimização: pesquisas que deixam todo o resto mais barato. Exige uma formatura.',
     color: '#6366f1',
     order: 8,
-    hireCost: '5.5e20',
+    hireCost: '8e20',
     requires: [
       { kind: 'professorHired', professor: 'angelo' },
       { kind: 'graduations', count: 1 },

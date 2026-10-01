@@ -1,0 +1,12 @@
+.ui-keycap {
+  display: inline-flex;
+  min-width: 26px;
+  justify-content: center;
+  padding: 1px 6px;
+  border: 2px solid var(--border);
+  border-bottom-width: 4px;
+  background: var(--surface-raised);
+  color: var(--text);
+  font: 11px/1.5 var(--font-display);
+  text-transform: uppercase;
+}

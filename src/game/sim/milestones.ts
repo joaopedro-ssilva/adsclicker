@@ -6,6 +6,8 @@ export type MilestoneId =
   | 'gladimir'
   | 'firstSkin'
   | 'fourProfessors'
+  | 'guto'
+  | 'b1'
   | 'angelo'
   | 'graduationAvailable'
   | 'firstGraduation'
@@ -57,9 +59,23 @@ export const MILESTONES: MilestoneDef[] = [
   {
     id: 'fourProfessors',
     label: '4 professores',
-    target: { min: 32 * MIN, max: 58 * MIN },
+    target: { min: 35 * MIN, max: 55 * MIN },
     targetText: '45 min',
     reached: (state) => hiredCount(state) >= 4 || state.counters.graduations > 0,
+  },
+  {
+    id: 'guto',
+    label: 'Guto contratado',
+    target: { min: 1 * HOUR + 5 * MIN, max: 1 * HOUR + 30 * MIN },
+    targetText: '1 h 15',
+    reached: (state) => state.hired.guto || state.counters.graduations > 0,
+  },
+  {
+    id: 'b1',
+    label: 'Bruna B1 contratada',
+    target: { min: 1 * HOUR + 30 * MIN, max: 2 * HOUR },
+    targetText: '1 h 45',
+    reached: (state) => state.hired.b1 || state.counters.graduations > 0,
   },
   {
     id: 'angelo',
@@ -78,7 +94,7 @@ export const MILESTONES: MilestoneDef[] = [
   {
     id: 'firstGraduation',
     label: 'Primeira formatura',
-    target: { min: 2 * HOUR, max: 3.5 * HOUR },
+    target: { min: 2 * HOUR, max: 3 * HOUR },
     targetText: '2 a 3 h',
     reached: (state) => state.counters.graduations > 0,
   },

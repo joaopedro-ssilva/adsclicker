@@ -1,0 +1,39 @@
+.scenery {
+  position: relative;
+  /* clip, not hidden: the oversized art must not be scrollable by focus or scrollIntoView */
+  overflow: hidden;
+  overflow: clip;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+.scenery-backdrop {
+  position: absolute;
+  max-width: none;
+  image-rendering: pixelated;
+}
+
+/* Before the first measurement (server render) the art is simply centred. */
+.scenery-backdrop[data-placed='false'] {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.scenery-backdrop image {
+  image-rendering: pixelated;
+}
+
+.ambient-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.scenery-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+}

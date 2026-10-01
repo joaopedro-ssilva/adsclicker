@@ -1,0 +1,68 @@
+.ui-meter {
+  --meter-size: 64px;
+  --meter-gap: 6px;
+
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.ui-meter[data-size='sm'] {
+  --meter-size: 48px;
+  --meter-gap: 5px;
+}
+
+.ui-meter[data-size='lg'] {
+  --meter-size: 88px;
+  --meter-gap: 8px;
+}
+
+.ui-meter-ring {
+  --octagon: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+
+  position: relative;
+  width: var(--meter-size);
+  height: var(--meter-size);
+  clip-path: var(--octagon);
+  background: conic-gradient(var(--accent) var(--meter-fill), var(--border) 0);
+}
+
+.ui-meter-ring[data-full='true'] {
+  background: var(--accent);
+}
+
+.ui-meter-ring::before {
+  content: '';
+  position: absolute;
+  inset: var(--meter-gap);
+  clip-path: var(--octagon);
+  background: var(--surface);
+}
+
+.ui-meter-center {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  font-size: calc(var(--meter-size) * 0.4);
+  line-height: 1;
+}
+
+.ui-meter-value {
+  font: 13px var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.ui-meter-value::after {
+  content: '%';
+  font-size: 9px;
+}
+
+.ui-meter-label {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}

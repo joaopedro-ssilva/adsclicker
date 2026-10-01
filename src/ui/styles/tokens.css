@@ -1,0 +1,79 @@
+/* Design tokens. Components read these variables only, so a theme or accent swap never needs a component change. */
+
+:root {
+  /* Theme colours (ThemeDef.colors). Default dark values; ThemeProvider overrides them on a wrapper element. */
+  --bg: #0e0f14;
+  --surface: #171920;
+  --surface-raised: #22252e;
+  --border: #393d49;
+  --text: #f2f3f7;
+  --text-muted: #a7acba;
+  --ink: #ffffff;
+
+  /* Accent: the colour of the professor on stage. */
+  --accent: #e5484d;
+  --on-accent: #0e0f14;
+
+  /* Rarity */
+  --common: #a7acba;
+  --rare: #79b7ff;
+  --epic: #c69bff;
+  --legendary: #f7ca75;
+
+  /* Status */
+  --good: #78d9a5;
+  --warn: #f0c676;
+  --bad: #ff6b6b;
+  --on-bad: #1a0b0d;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* Pixel frame: hard borders and offset shadows, never blur. */
+  --pixel: 2px;
+  --shadow-offset: 4px;
+
+  /* Motion */
+  --ease-pop: cubic-bezier(0.2, 1.6, 0.5, 1);
+
+  /* Layers */
+  --z-popover: 30;
+  --z-fx: 100;
+  --z-toast: 120;
+}
+
+/* Derived tokens must be declared on the theme root too: a custom property that uses var() is resolved where it is declared. */
+:root,
+.ui-theme {
+  --accent-text: color-mix(in srgb, var(--accent) 68%, var(--ink));
+  --accent-soft: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  --shadow-color: color-mix(in srgb, var(--bg) 70%, #000);
+  --shadow: var(--shadow-offset) var(--shadow-offset) 0 var(--shadow-color);
+}
+
+/* next/font defines --font-pixel and --font-body on the body element, so the tokens built from them live there too. */
+body {
+  --font-display: var(--font-pixel), monospace;
+  --font-text: var(--font-body), system-ui, sans-serif;
+}
+
+/* Light themes need darker status and rarity colours to stay readable on pale surfaces. */
+.ui-theme[data-scheme='light'] {
+  --ink: #000000;
+  --common: #5b5f6e;
+  --rare: #1f62c4;
+  --epic: #7b3fc4;
+  --legendary: #96600a;
+  --good: #16794a;
+  --warn: #8a5a00;
+  --bad: #c0282d;
+  --on-bad: #ffffff;
+  --shadow-color: color-mix(in srgb, var(--border) 60%, transparent);
+}

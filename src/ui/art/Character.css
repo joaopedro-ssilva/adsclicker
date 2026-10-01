@@ -1,0 +1,36 @@
+.character {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.character-squash {
+  transform-origin: 50% 100%;
+}
+
+.character svg {
+  display: block;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+.character image {
+  image-rendering: pixelated;
+}
+
+/* The head bobs one sprite pixel at a time: breathing in hard pixel steps. */
+.character[data-idle='true'] .character-head {
+  animation: character-bob 1.6s steps(1, end) infinite;
+  animation-delay: var(--bob-delay, 0s);
+}
+
+@keyframes character-bob {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-1px);
+  }
+}
