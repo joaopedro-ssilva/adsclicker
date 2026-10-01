@@ -1,0 +1,24 @@
+# Local database for development: `docker compose up -d`.
+# Production uses a managed Postgres (see docs/BACKEND.md); only DATABASE_URL changes.
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: adsclicker-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: adsclicker
+      POSTGRES_PASSWORD: adsclicker
+      POSTGRES_DB: adsclicker
+    ports:
+      # 5439 on the host so it never fights another Postgres on 5432 or 5433.
+      - '5439:5432'
+    volumes:
+      - adsclicker-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U adsclicker -d adsclicker']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  adsclicker-db:
