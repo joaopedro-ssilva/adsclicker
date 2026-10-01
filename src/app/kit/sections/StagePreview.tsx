@@ -61,7 +61,7 @@ export function StagePreview({ professor }: { professor: ProfessorDef }) {
         <Scenery scenery={scenery} className="stage">
           <div className="stage-hud">
             <div className="coin-readout" ref={balance}>
-              <p className="eyebrow">Edécoins</p>
+              <p className="eyebrow">ADScoins</p>
               <div>
                 <Icon name="coin" className="coin-icon" />
                 <NumberTicker value={coins.toLocaleString('pt-BR')} numericHint={coins} />

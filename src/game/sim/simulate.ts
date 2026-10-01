@@ -1,10 +1,12 @@
 import { PROFESSOR_IDS } from '../content/types';
 import type { GameContent, ProfessorId } from '../content/types';
 import { click } from '../engine/click';
+import { getIndex } from '../engine/contentIndex';
 import { Decimal, ZERO } from '../engine/decimal';
 import { coinsPerSecondWith, hiredCount } from '../engine/economy';
 import { createInitialState } from '../engine/init';
 import { applyOffline } from '../engine/offline';
+import { researchLock } from '../engine/requirements';
 import { createRng } from '../engine/rng';
 import type { GameState } from '../engine/state';
 import { computeStats } from '../engine/stats';
@@ -19,6 +21,9 @@ import {
   graduateIfWorth,
   handleInvasion,
   hireIfAffordable,
+  income,
+  serveSprint,
+  researchGain,
   spendGreedily,
   takeSprint,
   trackLevels,
@@ -41,6 +46,8 @@ export interface SimOptions extends Partial<StrategyOptions> {
   away?: { playSeconds: number; awaySeconds: number };
   /** Stops the simulation as soon as this returns true (checked every engine step). */
   until?: (state: GameState) => boolean;
+  /** Continues from this state (kept and mutated) instead of a new game. Its clock must come from a simulation. */
+  from?: GameState;
   /** Runs once on the fresh state, to start a scenario from somewhere else (tests and experiments). */
   setup?: (state: GameState) => void;
 }
@@ -64,6 +71,8 @@ export interface SimSample {
   achievements: number;
   /** Income since the previous sample. */
   shares: IncomeShares;
+  /** Levels of every upgrade at that moment. */
+  levels: Record<string, number>;
 }
 
 export interface MilestoneResult {
@@ -97,6 +106,17 @@ export interface RunRecord {
   options: number;
   /** Coins produced in the run. */
   runCoins: Decimal;
+  /** Where the coins of the run came from. */
+  shares: IncomeShares;
+}
+
+/** A research the first time its requirements are met in the simulation. */
+export interface ResearchUnlock {
+  id: string;
+  at: number;
+  /** Income equivalent (coins/second) and the income the research would add, at that moment. */
+  income: Decimal;
+  gain: Decimal;
 }
 
 export interface SprintStats {
@@ -112,6 +132,7 @@ export interface SimResult {
   timeline: SimSample[];
   /** Purchases that are not plain levels: research, hires and tree nodes. */
   purchases: PurchaseRecord[];
+  unlocks: ResearchUnlock[];
   sprints: Record<string, SprintStats>;
   /** Achievement id -> seconds when it unlocked. */
   achievementTimes: Record<string, number>;
@@ -119,7 +140,7 @@ export interface SimResult {
   awaySeconds: number;
   /** Simulated seconds played. */
   seconds: number;
-  options: Required<Omit<SimOptions, keyof StrategyOptions | 'away' | 'setup' | 'until'>> & StrategyOptions & Pick<SimOptions, 'away'>;
+  options: Required<Omit<SimOptions, keyof StrategyOptions | 'away' | 'setup' | 'until' | 'from'>> & StrategyOptions & Pick<SimOptions, 'away'>;
   finalState: GameState;
 }
 
@@ -186,8 +207,8 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
   };
 
   const rng = createRng(opts.seed);
-  const state = createInitialState(content, START);
-  opts.setup?.(state);
+  const state = opts.from ?? createInitialState(content, START);
+  if (!opts.from) opts.setup?.(state);
 
   const tally = emptyTally();
   const sprints: Record<string, SprintStats> = {};
@@ -220,14 +241,16 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
   };
 
   const purchases: PurchaseRecord[] = [];
+  const unlocks: ResearchUnlock[] = [];
+  const unlocked = new Set<string>();
   const env: Env = {
     state,
     content,
-    now: START,
+    now: state.lastTickAt,
     rng,
     emit,
     start: START,
-    memory: { levelRate: 0, lastLevels: 0, lastAt: START },
+    memory: { levelRate: 0, lastLevels: state.counters.levelsBought, lastAt: state.lastTickAt },
     onPurchase: (record) => {
       if (record.kind !== 'discipline' && record.kind !== 'clickUpgrade') purchases.push(record);
     },
@@ -243,16 +266,29 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
   let run: RunRecord = newRun(0, 0);
   runs.push(run);
   let clickCarry = 0;
-  let nextDecision = START;
-  let nextSample = START;
-  let now = START;
+  let nextDecision = opts.from ? state.lastTickAt + opts.decisionMs : START;
+  let now = state.lastTickAt;
+  let nextSample = now;
   let awayTotal = 0;
-  let nextAway = opts.away ? START + opts.away.playSeconds * 1000 : Infinity;
+  let nextAway = opts.away ? now + opts.away.playSeconds * 1000 : Infinity;
   let lastTally = emptyTally();
   let lastLifetime = state.lifetimeCoins;
+  let runTally: Tally = emptyTally();
+  let runLifetime = state.lifetimeCoins;
 
   function newRun(index: number, startedAt: number): RunRecord {
-    return { index, startedAt, endedAt: null, hires: {}, diplomas: 0, diplomasTotal: 0, bought: [], options: 0, runCoins: ZERO };
+    return {
+      index,
+      startedAt,
+      endedAt: null,
+      hires: {},
+      diplomas: 0,
+      diplomasTotal: 0,
+      bought: [],
+      options: 0,
+      runCoins: ZERO,
+      shares: sharesBetween(emptyTally(), emptyTally(), ZERO, ZERO),
+    };
   }
 
   const recordHires = () => {
@@ -266,6 +302,16 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
     }
   };
 
+  /** Remembers when each research first became available and what it would have been worth. */
+  function noteUnlocks(): void {
+    for (const def of getIndex(content).research.values()) {
+      if (unlocked.has(def.id) || researchLock(state, content, def) !== null) continue;
+      unlocked.add(def.id);
+      const base = income(env, computeStats(state, content), strategy);
+      unlocks.push({ id: def.id, at: (now - START) / 1000, income: base, gain: researchGain(env, def.id, strategy, base) });
+    }
+  }
+
   const sample = () => {
     const stats = computeStats(state, content);
     const snapshot: Tally = { ...tally };
@@ -277,6 +323,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       diplomasEarned: state.diplomasEarned,
       achievements: Object.keys(state.achievements).length,
       shares: sharesBetween(lastTally, snapshot, lastLifetime, state.lifetimeCoins),
+      levels: { ...state.levels },
     });
     lastTally = snapshot;
     lastLifetime = state.lifetimeCoins;
@@ -306,9 +353,11 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       trackLevels(env, opts.decisionMs / 1000);
       activateReadyAbilities(env);
       takeSprint(env, strategy);
+      serveSprint(env);
       hireIfAffordable(env);
       spendGreedily(env, strategy);
       buyCheapResearch(env, strategy);
+      noteUnlocks();
       recordHires(); // before a graduation resets the faculty
 
       const runCoins = state.runCoins;
@@ -320,6 +369,9 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
         run.bought = outcome.bought;
         run.options = outcome.options;
         run.runCoins = runCoins;
+        run.shares = sharesBetween(runTally, { ...tally }, runLifetime, state.lifetimeCoins);
+        runTally = { ...tally };
+        runLifetime = state.lifetimeCoins;
         run = newRun(runs.length, run.endedAt);
         runs.push(run);
         nextDecision = now; // the next decision happens at once, on the fresh run
@@ -346,6 +398,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
   }
   sample();
   run.runCoins = state.runCoins;
+  run.shares = sharesBetween(runTally, { ...tally }, runLifetime, state.lifetimeCoins);
 
   const achievementTimes: Record<string, number> = {};
   for (const id in state.achievements) achievementTimes[id] = ((state.achievements[id] ?? START) - START) / 1000;
@@ -362,6 +415,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
     runs,
     timeline,
     purchases,
+    unlocks,
     sprints,
     achievementTimes,
     awaySeconds: awayTotal,

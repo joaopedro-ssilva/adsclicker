@@ -20,25 +20,23 @@ function baseStats(): Stats {
   return computeStats(state, content);
 }
 
-const close = (a: Decimal, b: Decimal) => Math.abs(a.sub(b).toNumber()) <= Math.abs(b.toNumber()) * 1e-9;
-
 describe('level cost', () => {
-  it('is baseCost x growth^level', () => {
+  it('is baseCost x growth^level, rounded up to whole coins', () => {
     const stats = baseStats();
     const base = new Decimal(10);
     expect(levelCost(base, 0, stats).toNumber()).toBeCloseTo(10);
-    expect(levelCost(base, 10, stats).toNumber()).toBeCloseTo(10 * 1.15 ** 10, 6);
+    expect(levelCost(base, 10, stats).toNumber()).toBe(Math.ceil(10 * 1.15 ** 10));
     expect(levelCost(base, 100, stats).toNumber()).toBeCloseTo(10 * 1.15 ** 100, -3);
   });
 
   it('applies costMult and a changed growth', () => {
     const stats: Stats = { ...baseStats(), costMult: 0.5, costGrowth: 1.1 };
-    expect(levelCost(new Decimal(100), 5, stats).toNumber()).toBeCloseTo(100 * 1.1 ** 5 * 0.5, 6);
+    expect(levelCost(new Decimal(100), 5, stats).toNumber()).toBe(Math.ceil(100 * 1.1 ** 5 * 0.5));
   });
 });
 
 describe('bulk cost', () => {
-  it('equals the sum of the individual level costs', () => {
+  it('is the rounded-up series: never above the sum of the single levels, and within one coin per level of it', () => {
     const stats = baseStats();
     const base = new Decimal(15);
     for (const [level, count] of [
@@ -48,7 +46,10 @@ describe('bulk cost', () => {
     ] as const) {
       let sum = new Decimal(0);
       for (let i = 0; i < count; i += 1) sum = sum.add(levelCost(base, level + i, stats));
-      expect(close(bulkCost(base, level, count, stats), sum)).toBe(true);
+      const bulk = bulkCost(base, level, count, stats);
+      expect(bulk.lte(sum)).toBe(true);
+      expect(sum.sub(bulk).toNumber()).toBeLessThan(count);
+      expect(bulk.toNumber()).toBe(Math.ceil(bulk.toNumber()));
     }
   });
 

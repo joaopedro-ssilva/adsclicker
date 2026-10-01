@@ -61,6 +61,9 @@ const SKINS = [
   ['pablo-enxadrista', 'chess-pattern vest, holding a chess king piece'],
   ['pablo-mago', 'blue robe with stars, holding a staff topped with a binary tree'],
   ['pablo-galactico', 'shimmering cosmic outfit with a star aura'],
+  // Added after the first batches: kept at the end so the sheets already generated keep their grouping.
+  ['gladimir-stormtrooper', 'white imperial stormtrooper armor with black joints and a black belt, holding a blaster rifle'],
+  ['gladimir-vader', 'black Darth Vader armor with a long black cape and a chest control panel, a glowing red lightsaber in one hand, a black helmet tucked under the other arm'],
 ];
 
 const SCENERIES = [

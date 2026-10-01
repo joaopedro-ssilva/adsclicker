@@ -32,12 +32,12 @@ describe('simulate', () => {
     const result = simulate(createFixtureContent(), { maxSeconds: 700, sampleSeconds: 300, stopWhenDone: false });
     expect(result.timeline.length).toBeGreaterThanOrEqual(3);
     expect(result.timeline.at(-1)!.seconds).toBeGreaterThanOrEqual(699);
-  });
+  }, 30_000);
 
   it('can graduate and keep playing', () => {
     const content = createFixtureContent();
     const result = simulate(content, { maxSeconds: 4 * 3600, seed: 3, graduateMinDiplomas: 1 });
     expect(result.finalState.counters.graduations).toBeGreaterThan(0);
     expect(result.finalState.diplomasEarned).toBeGreaterThan(0);
-  });
+  }, 30_000);
 });

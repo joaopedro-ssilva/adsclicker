@@ -28,7 +28,7 @@ export function OverlaysSpecimen() {
             <Button size="sm" onClick={() => toast({ title: 'Pesquisa concluída', description: '+10% de ideias muito legais.', tone: 'good' })}>
               Sucesso
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => toast({ title: 'Faltam Edécoins', description: 'Mais uns cliques resolvem.', tone: 'bad' })}>
+            <Button size="sm" variant="secondary" onClick={() => toast({ title: 'Faltam ADScoins', description: 'Mais uns cliques resolvem.', tone: 'bad' })}>
               Erro
             </Button>
             <Button size="sm" variant="secondary" onClick={() => toast({ title: 'Habilidade em recarga', tone: 'warn' })}>

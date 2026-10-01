@@ -31,7 +31,7 @@ describe('buying disciplines', () => {
     coins(g.state, 1000);
     buyDiscipline(g.state, g.content, 'cafe', T0, g.emit);
     buyDiscipline(g.state, g.content, 'cafe', T0, g.emit);
-    expect(num(g.state.coins)).toBeCloseTo(1000 - 10 - 11.5, 6);
+    expect(num(g.state.coins)).toBe(1000 - 10 - 12);
   });
 
   it('refuses when it cannot be afforded and leaves the state alone', () => {

@@ -15,7 +15,7 @@ export const BASE_SYNERGY = 0.05;
  *
  * | StatKey            | Base                                                                   |
  * | ------------------ | ---------------------------------------------------------------------- |
- * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + bonusPerDiploma * diplomasEarned) |
+ * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) |
  * | clickPower         | 1                                                                      |
  * | idlePower          | 1                                                                      |
  * | prof:<id>          | 1                                                                      |
@@ -112,6 +112,13 @@ export function hasFeature(state: GameState, content: GameContent, feature: Feat
   return false;
 }
 
+/** Additive global bonus of the diplomas ever earned: bonusPerDiploma each, up to maxBonus when set. */
+export function diplomaBonus(state: GameState, content: GameContent): number {
+  const { bonusPerDiploma, maxBonus } = content.balance.graduation;
+  const bonus = bonusPerDiploma * state.diplomasEarned;
+  return maxBonus === undefined ? bonus : Math.min(maxBonus, bonus);
+}
+
 export function achievementCount(state: GameState): number {
   return Object.keys(state.achievements).length;
 }
@@ -147,7 +154,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     globalPower:
       acc.value('globalPower', 1) *
       (1 + balance.achievementBonus * achievementCount(state)) *
-      (1 + balance.graduation.bonusPerDiploma * state.diplomasEarned),
+      (1 + diplomaBonus(state, content)),
     clickPower: acc.value('clickPower', 1),
     idlePower: acc.value('idlePower', 1),
     clickFromIdle: Math.max(0, acc.value('clickFromIdle', 0)),

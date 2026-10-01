@@ -5,16 +5,16 @@ import type { Stats } from './stats';
 /** Hard cap on one bulk purchase, so a free-cost edge case (costMult 0) cannot loop or overflow. */
 const MAX_BULK = 100_000;
 
-/** Cost of the next level: baseCost x growth^level x costMult. */
+/** Cost of the next level: baseCost x growth^level x costMult, rounded up so prices are whole coins. */
 export function levelCost(baseCost: Decimal, level: number, stats: Stats): Decimal {
-  return baseCost.mul(Decimal.pow(stats.costGrowth, level)).mul(stats.costMult);
+  return baseCost.mul(Decimal.pow(stats.costGrowth, level)).mul(stats.costMult).ceil();
 }
 
-/** Cost of buying `count` levels at once, from `level`. Closed-form geometric series. */
+/** Cost of buying `count` levels at once, from `level`. Closed-form geometric series, rounded up. */
 export function bulkCost(baseCost: Decimal, level: number, count: number, stats: Stats): Decimal {
   if (count <= 0) return new Decimal(0);
   if (count === 1) return levelCost(baseCost, level, stats);
-  return Decimal.sumGeometricSeries(count, baseCost.mul(stats.costMult), stats.costGrowth, level);
+  return Decimal.sumGeometricSeries(count, baseCost.mul(stats.costMult), stats.costGrowth, level).ceil();
 }
 
 /** How many levels `coins` can buy from `level`. Closed form, then corrected for float error. */

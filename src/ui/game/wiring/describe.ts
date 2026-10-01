@@ -10,10 +10,10 @@ const themeNames = new Map(content.themes.map((theme) => [theme.id, theme.name])
 export const invasionById = new Map(content.invasions.map((def) => [def.id, def]));
 export const sprintById = new Map(content.sprints.map((def) => [def.id, def]));
 
-/** "+12,5 K Edécoins" or "⚡ Clique Turbo por 15 s". */
+/** "+12,5 K ADScoins" or "⚡ Clique Turbo por 15 s". */
 export function rewardText(reward: RewardResult): string {
   return reward.kind === 'coins'
-    ? `+${formatNumber(reward.amount, { integer: true })} Edécoins`
+    ? `+${formatNumber(reward.amount, { integer: true })} ADScoins`
     : `${reward.emoji} ${reward.name} por ${formatDuration(reward.durationMs)}`;
 }
 

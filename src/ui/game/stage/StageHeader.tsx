@@ -26,7 +26,7 @@ function SettingsShortcut() {
   return <IconButton icon="settings" label="Abrir as configurações" variant="secondary" size="sm" onClick={() => setTab('config')} />;
 }
 
-/** Logo and tools on the edges, the Edécoin balance in the middle (below them on wide stages). */
+/** Logo and tools on the edges, the ADScoin balance in the middle (below them on wide stages). */
 export const StageHeader = memo(function StageHeader() {
   return (
     <header className="stage-head">

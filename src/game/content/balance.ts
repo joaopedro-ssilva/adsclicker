@@ -15,7 +15,7 @@ export const balance: BalanceConfig = {
   achievementBonus: 0.01,
   offline: { baseHours: 2, baseRate: 0.5, minAwayMs: 60_000 },
   events: { minIntervalMs: 75_000, maxIntervalMs: 150_000 },
-  sprints: { offers: 3, cooldownMs: 60_000 },
+  sprints: { offers: 3, cooldownMs: 150_000 },
   rewardClickFloor: 50,
-  graduation: { base: '1e12', exponent: 0.5, bonusPerDiploma: 0.02 },
+  graduation: { base: '2e19', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1 },
 };

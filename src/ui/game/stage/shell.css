@@ -1,5 +1,14 @@
 /* Screen layout: the stage takes what the panel leaves. The page itself never scrolls. */
 
+/*
+ * The screen shake translates .game, which pushes its box past the viewport for a few frames.
+ * Its parent clips that, otherwise the browser shows scrollbars mid-shake and the layout jumps.
+ */
+.ui-theme:has(> .game) {
+  height: 100dvh;
+  overflow: clip;
+}
+
 .game {
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(440px, 34vw, 500px);

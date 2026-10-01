@@ -28,7 +28,7 @@ export function LessonsTab() {
       <ProfessorStrip selected={selected} onSelect={setTreeProfessor} />
       <ProfessorHeader professor={selected} />
 
-      <Section title="Aulas" note={bulkBuy ? <BuyAmountSelector /> : 'Edécoins por segundo'}>
+      <Section title="Aulas" note={bulkBuy ? <BuyAmountSelector /> : 'ADScoins por segundo'}>
         <div className="lesson-list">
           {disciplines.map((entry) => (
             <LevelledCard key={entry.id} id={entry.id} kind="discipline" />
@@ -37,7 +37,7 @@ export function LessonsTab() {
       </Section>
 
       {clickUpgrades.length > 0 ? (
-        <Section title="Cliques" note="Edécoins por clique">
+        <Section title="Cliques" note="ADScoins por clique">
           <div className="lesson-list">
             {clickUpgrades.map((entry) => (
               <LevelledCard key={entry.id} id={entry.id} kind="clickUpgrade" />

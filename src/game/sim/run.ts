@@ -9,10 +9,12 @@
  *
  * Flags: --profile active|casual|idle|all, --cps, --defend, --hours, --seed, --graduate-min,
  * --graduate-ratio, --graduate-until, --no-graduate, --away play,away (seconds), --audit (research
- * table), --sprints (sprint table), --every (timeline step, minutes).
+ * table), --sprints (sprint table), --sprint-audit h1,h2,... (can the active player, and one who does
+ * nothing, finish each sprint at those hours of an active run?), --every (timeline step, minutes).
  */
 import { content } from '@/game/content';
 import { formatDuration } from '../engine/format';
+import { auditSprints } from './audit';
 import { PROFILES, PROFILE_IDS } from './profiles';
 import type { ProfileId } from './profiles';
 import {
@@ -20,6 +22,7 @@ import {
   milestoneTable,
   researchAudit,
   runTable,
+  sprintAuditTable,
   sprintSummary,
   timelineTable,
   treeSummary,
@@ -47,6 +50,13 @@ function main(): void {
     const parsed = raw === undefined ? Number.NaN : Number(raw);
     return Number.isFinite(parsed) ? parsed : undefined;
   };
+
+  const auditHours = flags.get('sprint-audit');
+  if (auditHours) {
+    const checkpoints = auditHours.split(',').map((h) => Number(h) * 3600);
+    console.log(sprintAuditTable(auditSprints(content, checkpoints)).join('\n'));
+    return;
+  }
 
   const choice = flags.get('profile') ?? 'active';
   const profileIds: ProfileId[] = choice === 'all' ? PROFILE_IDS : PROFILE_IDS.filter((id) => id === choice);

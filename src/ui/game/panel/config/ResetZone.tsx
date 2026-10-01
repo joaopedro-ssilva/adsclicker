@@ -20,7 +20,7 @@ export function ResetZone() {
   return (
     <Section title="Zona de perigo">
       <div className="setting-group danger-zone">
-        <p className="setting-hint">Apaga tudo: Edécoins, professores, diplomas, conquistas e coleção. Não dá para desfazer.</p>
+        <p className="setting-hint">Apaga tudo: ADScoins, professores, diplomas, conquistas e coleção. Não dá para desfazer.</p>
         <Button size="sm" variant="danger" data-qa="reset-open" onClick={() => setOpen(true)}>
           <Icon name="x" size={12} />
           Apagar meu progresso

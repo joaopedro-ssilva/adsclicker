@@ -146,7 +146,13 @@ function eventsRate(env: Env, stats: Stats, opts: StrategyOptions, cps: Decimal,
 }
 
 /** How long the player needs to finish a sprint, in seconds, or Infinity when he would not try. */
-export function sprintSeconds(env: Env, def: SprintDef, stats: Stats, opts: StrategyOptions): number {
+/** The part of the income a sprint estimate needs: production and everything but the sprints. */
+interface Base {
+  production: Decimal;
+  total: Decimal;
+}
+
+export function sprintSeconds(env: Env, def: SprintDef, stats: Stats, opts: StrategyOptions, base?: Base): number {
   const goal = def.goal;
   const { balance } = env.content;
   const cps = opts.clicksPerSecond;
@@ -159,8 +165,15 @@ export function sprintSeconds(env: Env, def: SprintDef, stats: Stats, opts: Stra
     }
     case 'reachCombo':
       return cps * (balance.combo.windowMs / 1000) >= 1 && goal.amount <= stats.comboMax ? goal.amount / cps + 2 : Infinity;
-    case 'buyLevels':
-      return env.memory.levelRate > 0 ? goal.amount / env.memory.levelRate : Infinity;
+    case 'buyLevels': {
+      // He would spend on the cheapest levels: the coins in hand and the income pay for them.
+      const cheapest = cheapestLevel(env, stats);
+      if (!cheapest) return Infinity;
+      const needed = cheapest.mul(goal.amount * 1.4).sub(env.state.coins);
+      if (needed.lte(0)) return 5;
+      const perSecond = (base ?? incomeParts(env, stats, opts, false)).total;
+      return perSecond.gt(0) ? Math.max(5, needed.div(perSecond).toNumber()) : Infinity;
+    }
     case 'defendEvents': {
       if (!hasFeature(env.state, env.content, 'events') || opts.defendRate <= 0) return Infinity;
       const { minIntervalMs, maxIntervalMs } = balance.events;
@@ -168,7 +181,7 @@ export function sprintSeconds(env: Env, def: SprintDef, stats: Stats, opts: Stra
       return (goal.amount * interval) / opts.defendRate;
     }
     case 'earnSeconds': {
-      const parts = incomeParts(env, stats, opts, false);
+      const parts = base ?? incomeParts(env, stats, opts, false);
       const ref = Decimal.max(parts.production, clickBase(env.state, env.content, stats));
       if (ref.lte(0)) return Infinity;
       const perSecond = parts.total.div(ref).toNumber();
@@ -177,19 +190,56 @@ export function sprintSeconds(env: Env, def: SprintDef, stats: Stats, opts: Stra
   }
 }
 
-/** The player takes a sprint only when he expects to finish it with some margin. */
-export function sprintFeasible(env: Env, def: SprintDef, stats: Stats, opts: StrategyOptions): boolean {
-  return sprintSeconds(env, def, stats, opts) <= (def.durationMs / 1000) * 0.8;
+/** Cost of the cheapest level he could buy right now, or null. */
+function cheapestLevel(env: Env, stats: Stats): Decimal | null {
+  let best: Decimal | null = null;
+  for (const entry of getIndex(env.content).levelled.values()) {
+    if (levelledLock(env.state, env.content, entry) !== null) continue;
+    const cost = quoteLevels(env.state, env.content, stats, entry.def.id, 1).cost;
+    if (!best || cost.lt(best)) best = cost;
+  }
+  return best;
 }
 
-function sprintsRate(env: Env, stats: Stats, opts: StrategyOptions, cps: Decimal, click: Decimal, perClickAuto: Decimal): Decimal {
+/** While a buy-levels sprint runs, he buys the cheapest levels he can pay for. */
+export function serveSprint(env: Env): void {
+  const { state, content } = env;
+  const active = state.sprint.active;
+  if (!active) return;
+  const def = getIndex(content).sprints.get(active.def);
+  if (def?.goal.kind !== 'buyLevels') return;
+  for (let guard = 0; guard < 200 && active.progress < active.target; guard += 1) {
+    const stats = computeStats(state, content);
+    let pick: { id: string; kind: 'discipline' | 'clickUpgrade'; cost: Decimal } | null = null;
+    for (const entry of getIndex(content).levelled.values()) {
+      if (levelledLock(state, content, entry) !== null) continue;
+      const cost = quoteLevels(state, content, stats, entry.def.id, 1).cost;
+      if (!pick || cost.lt(pick.cost)) pick = { id: entry.def.id, kind: entry.kind, cost };
+    }
+    if (!pick || pick.cost.gt(state.coins)) return;
+    const previous = state.buyAmount;
+    state.buyAmount = 1;
+    const ok = pick.kind === 'discipline'
+      ? engine.buyDiscipline(state, content, pick.id, env.now, env.emit)
+      : engine.buyClickUpgrade(state, content, pick.id, env.now, env.emit);
+    state.buyAmount = previous;
+    if (!ok) return;
+  }
+}
+
+/** The player takes a sprint only when he expects to finish it with some margin. */
+export function sprintFeasible(env: Env, def: SprintDef, stats: Stats, opts: StrategyOptions, base?: Base): boolean {
+  return sprintSeconds(env, def, stats, opts, base) <= (def.durationMs / 1000) * 0.8;
+}
+
+function sprintsRate(env: Env, stats: Stats, opts: StrategyOptions, cps: Decimal, click: Decimal, perClickAuto: Decimal, base: Base): Decimal {
   if (!hasFeature(env.state, env.content, 'sprints')) return ZERO;
   let value = ZERO;
   let cycle = 0;
   let count = 0;
   for (const def of env.content.sprints) {
     if (!isEligible(env, def)) continue;
-    const seconds = sprintSeconds(env, def, stats, opts);
+    const seconds = sprintSeconds(env, def, stats, opts, base);
     if (!(seconds <= (def.durationMs / 1000) * 0.8)) continue;
     value = value.add(rewardValue(env, def.reward, stats, cps, click, perClickAuto, 'sprint'));
     cycle += seconds + env.content.balance.sprints.cooldownMs / 1000;
@@ -232,8 +282,9 @@ export function incomeParts(env: Env, stats: Stats, opts: StrategyOptions, withS
   const perClickAuto = clickBase(env.state, env.content, stats).add(production.mul(stats.clickFromIdle));
   const abilities = abilitiesRate(env, stats, production, click, perClickAuto);
   const events = eventsRate(env, stats, opts, production, click, perClickAuto);
-  const sprints = withSprints ? sprintsRate(env, stats, opts, production, click, perClickAuto) : ZERO;
-  const total = production.add(click).add(auto).add(abilities).add(events).add(sprints);
+  const partial = production.add(click).add(auto).add(abilities).add(events);
+  const sprints = withSprints ? sprintsRate(env, stats, opts, production, click, perClickAuto, { production, total: partial }) : ZERO;
+  const total = partial.add(sprints);
   return { production, click, auto, abilities, events, sprints, total };
 }
 
@@ -258,12 +309,23 @@ interface Candidate {
 /** Research that does not move income (hud, offline, graduation) is worth a small slice of it. */
 const SLICE = 0.01;
 
-function researchGain(env: Env, id: string, opts: StrategyOptions, base: Decimal): Decimal {
+/** What cheaper levels are worth: a discount lets the same coins buy more, a lower growth makes late levels far cheaper. */
+export function discountValue(effects: readonly Effect[], base: Decimal): Decimal {
+  let value = ZERO;
+  for (const effect of effects) {
+    if (effect.stat === 'costMult' && effect.op === 'mult' && effect.value > 0) value = value.add(base.mul((1 / effect.value - 1) * 0.8));
+    if (effect.stat === 'costGrowth' && effect.op === 'add') value = value.add(base.mul(-effect.value * 30));
+  }
+  return value;
+}
+
+export function researchGain(env: Env, id: string, opts: StrategyOptions, base: Decimal): Decimal {
   const { state } = env;
   state.research[id] = true;
   const after = income(env, computeStats(state, env.content), opts);
   delete state.research[id];
-  return after.sub(base);
+  const def = getIndex(env.content).research.get(id);
+  return after.sub(base).add(def ? discountValue(def.effects, base) : ZERO);
 }
 
 function candidates(env: Env, opts: StrategyOptions, stats: Stats, base: Decimal): Candidate[] {
@@ -307,7 +369,7 @@ function candidates(env: Env, opts: StrategyOptions, stats: Stats, base: Decimal
   for (const def of affordableResearch) {
     const cost = parseDecimal(def.cost);
     // Pricey research is only evaluated once it is close; the evaluation is the expensive part.
-    if (cost.gt(state.coins.mul(50).add(base.mul(600)))) continue;
+    if (cost.gt(state.coins.mul(50).add(base.mul(7200)))) continue;
     let gain = researchGain(env, def.id, opts, base);
     if (gain.lte(0)) gain = base.mul(SLICE);
     list.push({ kind: 'research', id: def.id, levels: 1, cost, gain });
@@ -393,6 +455,8 @@ export function spendGreedily(env: Env, opts: StrategyOptions): void {
       // The best purchase is not affordable yet: wait for it when it is near, else look further.
       const wait = c.cost.sub(state.coins).div(base);
       if (wait.lte(opts.patienceSeconds) && wait.lte(payback)) return;
+      // A big purchase is worth saving for when the wait is a small part of its payback.
+      if (wait.lte(3600) && wait.mul(3).lte(payback)) return;
     }
     if (!acted) return;
   }
@@ -455,14 +519,14 @@ export function takeSprint(env: Env, opts: StrategyOptions): void {
   if (state.sprint.active || state.sprint.offers.length === 0) return;
   const stats = computeStats(state, content);
   const index = getIndex(content);
-  const parts = incomeParts(env, stats, opts);
+  const parts = incomeParts(env, stats, opts, false);
   const perClickAuto = clickBase(state, content, stats).add(parts.production.mul(stats.clickFromIdle));
 
   let best: { id: string; score: Decimal } | null = null;
   for (const id of state.sprint.offers) {
     const def = index.sprints.get(id);
-    if (!def || !sprintFeasible(env, def, stats, opts)) continue;
-    const seconds = Math.max(5, sprintSeconds(env, def, stats, opts));
+    if (!def || !sprintFeasible(env, def, stats, opts, parts)) continue;
+    const seconds = Math.max(5, sprintSeconds(env, def, stats, opts, parts));
     const value = rewardValue(env, def.reward, stats, parts.production, parts.click, perClickAuto, 'sprint');
     const score = value.div(seconds);
     if (!best || score.gt(best.score)) best = { id, score };
@@ -485,7 +549,7 @@ function nodeScore(env: Env, opts: StrategyOptions, id: string, base: Decimal, c
   if (level === 0) delete state.prestige[id];
   else state.prestige[id] = level;
 
-  let fraction = base.gt(0) ? after.sub(base).div(base).toNumber() : 0;
+  let fraction = base.gt(0) ? after.sub(base).add(discountValue(def.effects, base)).div(base).toNumber() : 0;
   for (const effect of def.effects) {
     if (effect.stat === 'diplomaGain') fraction += (effect.value - 1) * 0.5;
   }

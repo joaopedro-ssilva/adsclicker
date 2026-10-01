@@ -26,7 +26,7 @@ function Rates() {
   );
 }
 
-/** Coin icon, the big Edécoin counter and what each click and each second are worth. Coins fly to this plate. */
+/** Coin icon, the big ADScoin counter and what each click and each second are worth. Coins fly to this plate. */
 export const Balance = memo(function Balance() {
   const coins = useCoins();
   const plate = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ export const Balance = memo(function Balance() {
 
   return (
     <div className="balance" ref={plate} data-qa="balance">
-      <p className="balance-label">Edécoins</p>
+      <p className="balance-label">ADScoins</p>
       <div className="balance-value">
         <Icon name="coin" size={36} className="balance-coin" />
         <NumberTicker value={formatNumber(coins, { integer: true })} numericHint={magnitude(coins)} />

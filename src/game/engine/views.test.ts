@@ -87,7 +87,7 @@ describe('discipline views', () => {
     setBuyAmount(g.state, g.content, 10);
     const ten = levelledView(g.state, g.content, 'cafe')!;
     expect(ten.buyCount).toBe(10);
-    expect(num(ten.cost)).toBeCloseTo(10 * ((1.15 ** 10 - 1) / 0.15), 4);
+    expect(num(ten.cost)).toBe(Math.ceil(10 * ((1.15 ** 10 - 1) / 0.15)));
 
     setBuyAmount(g.state, g.content, 'max');
     const max = levelledView(g.state, g.content, 'cafe')!;

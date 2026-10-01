@@ -46,7 +46,7 @@ export function OfflineReport({ report }: { report: OfflineReportData }) {
             +<CountUp value={report.coins} />
           </span>
         </p>
-        <p className="muted offline-note">Edécoins renderam enquanto você estava fora.</p>
+        <p className="muted offline-note">ADScoins renderam enquanto você estava fora.</p>
       </div>
     </Modal>
   );

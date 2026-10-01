@@ -35,7 +35,7 @@ export function Statistics() {
 
   const stats: Stat[] = [
     { label: 'Tempo de jogo', value: formatDuration(counters.playSeconds * 1000) },
-    { label: 'Edécoins ganhos', value: lifetime },
+    { label: 'ADScoins ganhos', value: lifetime },
     { label: 'Por segundo', value: fmt(perSecond) },
     { label: 'Por clique', value: fmt(perClick) },
     ...COUNTER_LABELS.map(([key, label]) => ({ label, value: fmtInt(counters[key]) })),

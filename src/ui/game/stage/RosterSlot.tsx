@@ -58,8 +58,8 @@ function NextSlot({ id, name, color, cost, progress, affordable, lockReason, onH
             <p className="roster-cost">
               <Icon name="coin" size={12} /> {cost}
             </p>
-            <ProgressBar value={progress} max={100} ariaLabel={`Edécoins para contratar ${name}`} size="sm" tone={affordable ? 'good' : 'accent'} />
-            <Button size="sm" disabled={!affordable} onClick={() => onHire(id)} data-qa={`hire-${id}`} aria-label={`Contratar ${name} por ${cost} Edécoins`}>
+            <ProgressBar value={progress} max={100} ariaLabel={`ADScoins para contratar ${name}`} size="sm" tone={affordable ? 'good' : 'accent'} />
+            <Button size="sm" disabled={!affordable} onClick={() => onHire(id)} data-qa={`hire-${id}`} aria-label={`Contratar ${name} por ${cost} ADScoins`}>
               Contratar
             </Button>
           </>

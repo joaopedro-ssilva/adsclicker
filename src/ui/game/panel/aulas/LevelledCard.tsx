@@ -10,7 +10,7 @@ interface LevelledCardProps {
   kind: 'discipline' | 'clickUpgrade';
 }
 
-/** "A aula começa com café. Gera Edécoins por segundo." -> "A aula começa com café." */
+/** "A aula começa com café. Gera ADScoins por segundo." -> "A aula começa com café." */
 const firstSentence = (text: string): string => text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text;
 
 /** A discipline or click upgrade. Locked ones read "???" and say what unlocks them. */

@@ -115,6 +115,16 @@ describe('effect folding', () => {
     expect(computeStats(state, content).globalPower).toBeCloseTo(1.05 * 1.2);
   });
 
+  it('stops the diploma bonus at maxBonus when the balance sets one', () => {
+    const { state, content } = newGame();
+    state.diplomasEarned = 100;
+    expect(computeStats(state, content).globalPower).toBeCloseTo(1 + 0.02 * 100);
+    content.balance.graduation.maxBonus = 0.5;
+    expect(computeStats(state, content).globalPower).toBeCloseTo(1.5);
+    state.diplomasEarned = 10;
+    expect(computeStats(state, content).globalPower).toBeCloseTo(1.2);
+  });
+
   it('never lets the cost growth fall below the minimum', () => {
     const { state, content } = newGame();
     state.research['r-complexity'] = true;

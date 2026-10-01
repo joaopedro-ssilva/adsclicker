@@ -43,7 +43,7 @@ export function BuyButton({ id, kind, name, buyCount, cost, affordable }: BuyBut
       data-qa={`buy-${id}`}
       data-affordable={affordable}
       aria-disabled={!affordable}
-      aria-label={`Comprar ${buyCount} ${buyCount === 1 ? 'nível' : 'níveis'} de ${name} por ${cost} Edécoins`}
+      aria-label={`Comprar ${buyCount} ${buyCount === 1 ? 'nível' : 'níveis'} de ${name} por ${cost} ADScoins`}
       {...hold}
     >
       <span className="buy-button-count">

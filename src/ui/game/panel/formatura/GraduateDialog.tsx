@@ -38,7 +38,7 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
     >
       <div className="graduate-dialog">
         <p>
-          Você recomeça uma turma nova com <strong>{fmtInt(diplomas)}</strong> {diplomas === 1 ? 'diploma' : 'diplomas'} no bolso. Edécoins,
+          Você recomeça uma turma nova com <strong>{fmtInt(diplomas)}</strong> {diplomas === 1 ? 'diploma' : 'diplomas'} no bolso. ADScoins,
           aulas, pesquisas e professores voltam ao começo. Conquistas, skins, cenários, temas e a árvore ficam com você.
         </p>
         <p className="muted">Cada diploma ganho vale um bônus permanente de produção.</p>

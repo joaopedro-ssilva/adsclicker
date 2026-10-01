@@ -3,7 +3,7 @@ import { content, useGame } from '@/game/store';
 import { Icon } from '@/ui/kit';
 
 const RESETS = [
-  'Edécoins da turma',
+  'ADScoins da turma',
   'Níveis das aulas e dos upgrades de clique',
   'Pesquisas',
   'Professores contratados',

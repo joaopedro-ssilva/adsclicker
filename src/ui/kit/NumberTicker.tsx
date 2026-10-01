@@ -10,11 +10,15 @@ export interface NumberTickerProps {
   className?: string;
 }
 
+/** How long a digit must have stayed the same before its next change is animated. */
+const STILL_BEFORE_ROLL_MS = 900;
+
 /** Characters are matched from the right, so "9.999" to "10.000" only rolls the digits that changed. */
 export function NumberTicker({ value, numericHint, className }: NumberTickerProps) {
   const reduced = useReducedMotion();
   const cells = useRef(new Map<number, HTMLSpanElement>());
   const previous = useRef({ value, hint: numericHint });
+  const lastChange = useRef(new Map<number, number>());
 
   useEffect(() => {
     const before = previous.current;
@@ -22,11 +26,17 @@ export function NumberTicker({ value, numericHint, className }: NumberTickerProp
     const direction = Math.sign(numericHint - before.hint);
     if (reduced || direction === 0 || before.value === value) return;
 
+    const now = performance.now();
     const animations: Animation[] = [];
     const next = [...value];
     const old = [...before.value];
     for (let fromRight = 0; fromRight < next.length; fromRight += 1) {
       if (next[next.length - 1 - fromRight] === old[old.length - 1 - fromRight]) continue;
+      // A digit that changes many times a second would be mid-roll all the time and unreadable:
+      // only digits that had been still for a while roll, the fast ones just swap.
+      const sinceLastChange = now - (lastChange.current.get(fromRight) ?? -Infinity);
+      lastChange.current.set(fromRight, now);
+      if (sinceLastChange < STILL_BEFORE_ROLL_MS) continue;
       const animation = cells.current.get(fromRight)?.animate(
         [
           { transform: `translateY(${direction * 55}%)`, opacity: 0.2 },

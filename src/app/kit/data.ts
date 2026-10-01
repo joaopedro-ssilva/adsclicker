@@ -78,7 +78,7 @@ export const soundLabels: Record<SoundName, string> = {
 };
 
 export const iconLabels: Record<IconName, string> = {
-  coin: 'Edécoin',
+  coin: 'ADScoin',
   diploma: 'Diploma',
   click: 'Clique',
   clock: 'Relógio',

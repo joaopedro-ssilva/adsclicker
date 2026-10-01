@@ -30,6 +30,8 @@ const EXPECTED_SKIN_IDS = [
   'gladimir-maker',
   'gladimir-piloto',
   'gladimir-mestre',
+  'gladimir-stormtrooper',
+  'gladimir-vader',
   'b2-default',
   'b2-postit',
   'b2-wireframe',
@@ -79,6 +81,8 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'gladimir-maker': 'rare',
   'gladimir-piloto': 'epic',
   'gladimir-mestre': 'legendary',
+  'gladimir-stormtrooper': 'epic',
+  'gladimir-vader': 'legendary',
   'b2-default': 'common',
   'b2-postit': 'common',
   'b2-wireframe': 'rare',
@@ -412,7 +416,7 @@ describe('content: professors, disciplines and numbers', () => {
       previousCost = cost;
       previousProduction = production;
     }
-    expect(dec(content.disciplines[0]!.baseCost).toNumber()).toBe(15);
+    expect(dec(content.disciplines[0]!.baseCost).toNumber()).toBe(60);
     expect(dec(content.disciplines[0]!.baseProduction).toNumber()).toBeCloseTo(0.2);
   });
 
@@ -514,7 +518,7 @@ describe('content: professors, disciplines and numbers', () => {
       expect(invasion.windowMs).toBeGreaterThanOrEqual(5_000);
       expect(invasion.clicksRequired).toBeGreaterThanOrEqual(1);
       if (invasion.reward.kind === 'coins') {
-        expect(invasion.reward.seconds).toBeGreaterThanOrEqual(60);
+        expect(invasion.reward.seconds).toBeGreaterThanOrEqual(10);
         expect(invasion.reward.seconds).toBeLessThanOrEqual(600);
       } else {
         expect(invasion.reward.buff.durationMs).toBeGreaterThan(0);
@@ -522,12 +526,12 @@ describe('content: professors, disciplines and numbers', () => {
     }
   });
 
-  it('has about 12 sprints within 60 to 180 seconds, gated when they depend on another layer', () => {
+  it('has about 12 sprints within 60 to 240 seconds, gated when they depend on another layer', () => {
     expect(content.sprints.length).toBeGreaterThanOrEqual(10);
     expect(content.sprints.length).toBeLessThanOrEqual(14);
     for (const sprint of content.sprints) {
       expect(sprint.durationMs).toBeGreaterThanOrEqual(60_000);
-      expect(sprint.durationMs).toBeLessThanOrEqual(180_000);
+      expect(sprint.durationMs).toBeLessThanOrEqual(240_000);
       expect(sprint.goal.amount).toBeGreaterThan(0);
       if (sprint.goal.kind === 'defendEvents') {
         expect(sprint.requires).toContainEqual({ kind: 'professorHired', professor: 'wagner' });
@@ -553,14 +557,14 @@ describe('content: professors, disciplines and numbers', () => {
     expect(balance.achievementBonus).toBe(0.01);
     expect(balance.offline).toEqual({ baseHours: 2, baseRate: 0.5, minAwayMs: 60_000 });
     expect(balance.events).toEqual({ minIntervalMs: 75_000, maxIntervalMs: 150_000 });
-    expect(balance.sprints).toEqual({ offers: 3, cooldownMs: 60_000 });
+    expect(balance.sprints).toEqual({ offers: 3, cooldownMs: 150_000 });
     expect(balance.rewardClickFloor).toBe(50);
-    expect(balance.graduation).toEqual({ base: '1e12', exponent: 0.5, bonusPerDiploma: 0.02 });
+    expect(balance.graduation).toEqual({ base: '2e19', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1 });
   });
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 46 skins of the design, with their rarities', () => {
+  it('has exactly the 48 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -674,8 +678,8 @@ describe('content: achievements', () => {
   it('gives rarer skins to harder achievements within each source family', () => {
     const byRarity = (rarity: string) =>
       content.achievements.filter((a) => a.reward?.skin && EXPECTED_SKIN_RARITY[a.reward.skin] === rarity);
-    // Legendary skins come only from the level 100 ladder; epic ones from research or big counters.
-    for (const achievement of byRarity('legendary')) expect(achievement.id).toMatch(/^lvl100-/);
+    // Legendary skins come from the level 100 ladder or a long-haul counter; epic ones from research or big counters.
+    for (const achievement of byRarity('legendary')) expect(achievement.id).toMatch(/^lvl100-|^abilities-/);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });

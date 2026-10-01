@@ -2,12 +2,12 @@
 
 Clicker + idle em pixel art. O jogador monta o corpo docente de um curso de ADS: começa com o Edécio em sala e contrata os outros 7 professores. Cada professor é dono de uma camada do jogo. Texto do jogo em pt-BR.
 
-Herança do original (Edécio Clicker v1.3): a moeda Edécoin, o "+N 👍" flutuante, a regra "nível 10 libera o próximo", os nomes dos upgrades (Café Quentinho ☕, Muito Legal 👍, Programação 💻, Academia Avenida 💪, Projetinho 🗿, Prainha 🏝️, Cria 🤬, Prisão ⛓️, Nether 🕳️, Full Dima 💎, Casa Automática 🏠, Atleta ⚽️, Cidade 🏙️, Ceo 💼, Exílio 🏜️, Gladiador 🗡️, Templo 🛕, Samurai 🥷🏻) e as skins/cenários com esses temas.
+Herança do original (Edécio Clicker v1.3): a moeda (Edécoin no original, ADScoin no remaster), o "+N 👍" flutuante, a regra "nível 10 libera o próximo", os nomes dos upgrades (Café Quentinho ☕, Muito Legal 👍, Programação 💻, Academia Avenida 💪, Projetinho 🗿, Prainha 🏝️, Cria 🤬, Prisão ⛓️, Nether 🕳️, Full Dima 💎, Casa Automática 🏠, Atleta ⚽️, Cidade 🏙️, Ceo 💼, Exílio 🏜️, Gladiador 🗡️, Templo 🛕, Samurai 🥷🏻) e as skins/cenários com esses temas.
 
 ## 1. Moedas
 
-- **Edécoins**: compra tudo dentro de uma turma. Símbolo `$`.
-- **Diplomas**: prestígio. Ganhos na Formatura, gastos na árvore permanente. Cada diploma já ganho dá +2% de produção global para sempre.
+- **ADScoins**: compra tudo dentro de uma turma. Símbolo `$`.
+- **Diplomas**: prestígio. Ganhos na Formatura, gastos na árvore permanente. Cada diploma já ganho dá +1% de produção global para sempre, até um teto de +100% (100 diplomas).
 
 ## 2. Professores
 
@@ -22,7 +22,7 @@ Herança do original (Edécio Clicker v1.3): a moeda Edécoin, o "+N 👍" flutu
 | 7 | `angelo` | Angelo | Coordenação e POO | Sinergia e Formatura (`synergy`, `graduation`) | âmbar `#f59e0b` |
 | 8 | `pablo` | Pablo | Algoritmos e Estrutura de Dados | Otimização: reduz crescimento de custo (`complexity`). Exige 1 formatura | índigo `#6366f1` |
 
-Edécio começa contratado. Os outros são contratados com Edécoins, em ordem (cada um exige o anterior contratado). Pablo exige também `graduations >= 1`.
+Edécio começa contratado. Os outros são contratados com ADScoins, em ordem (cada um exige o anterior contratado). Pablo exige também `graduations >= 1`.
 
 O **professor em sala** é o alvo do clique e pode ser trocado a qualquer momento entre os contratados. As disciplinas de quem está em sala rendem ×1,5 (`activeBonus`).
 
@@ -39,7 +39,7 @@ O **professor em sala** é o alvo do clique e pode ser trocado a qualquer moment
 
 Três tipos, sempre ligados a um professor.
 
-- **Disciplinas** (24 = 3 por professor): têm nível, geram Edécoins/s. A disciplina de tier 0 abre ao contratar; a de tier n abre quando a de tier n-1 chega ao nível 10.
+- **Disciplinas** (24 = 3 por professor): têm nível, geram ADScoins/s. A disciplina de tier 0 abre ao contratar; a de tier n abre quando a de tier n-1 chega ao nível 10.
 - **Upgrades de clique** (6 no total, espalhados): têm nível, somam valor ao clique.
 - **Pesquisas** (~40, 4 a 6 por professor): compra única. Efeitos por `Effect`. É aqui que a mecânica de cada professor melhora.
 
@@ -49,12 +49,12 @@ Fórmulas (todas as constantes em `BalanceConfig`):
 - Marcos: nos níveis 10, 25, 50, 100, 200 e depois a cada 100, a saída daquele upgrade dobra.
 - Produção de uma disciplina por segundo:
   `baseProduction × level × 2^marcos × disc × prof × idlePower × globalPower × (em sala ? activeBonus : 1) × (1 + synergy × outrosProfessoresContratados)`
-- `globalPower` inclui: `1 + 0.01 × conquistas` e `1 + 0.02 × diplomasEarned`, além dos efeitos.
+- `globalPower` inclui: `1 + 0.01 × conquistas` e `1 + min(1, 0.01 × diplomasEarned)` (`bonusPerDiploma` e `maxBonus`), além dos efeitos.
 - Valor do clique:
   `(baseClick + Σ upgradesDeClique(baseClick × level × 2^marcos)) × clickPower × globalPower × comboMult × (crítico ? critMult : 1) + clickFromIdle × coinsPerSecond`
 - Compra em lote ×1, ×10, máx. (feature `bulkBuy`; antes dela só ×1).
 
-Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta): custo base cresce ~×9 e produção base ~×6,5 a cada tier global, partindo de custo 15 e produção 0,2/s. Custos de contratação ficam entre o último tier do professor anterior e o primeiro do novo.
+Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta): custo base cresce ~×9 e produção base ~×7,8 a cada tier global, partindo de custo 60 e produção 0,2/s. Custos de contratação ficam entre o último tier do professor anterior e o primeiro do novo. Cada upgrade de clique soma por nível ~4% da produção do primeiro tier do seu professor (o clique é o motor dos primeiros minutos; depois o que paga é a produção e o `clickFromIdle`). O preço das pesquisas segue a renda do jogador quando elas liberam (de 30 s a 5 min de renda, conforme o ganho).
 
 ## 4. Camadas
 
@@ -74,21 +74,21 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 ### Invasões (Wagner)
 - A cada 75 a 150 s (× `eventInterval`) surge uma ameaça numa posição aleatória do palco. Ela some depois de `windowMs` (× `eventWindow`). O jogador precisa clicar `clicksRequired` vezes nela.
 - Defendida: recompensa (`Reward`) × `eventReward` e a sequência (`eventStreak`) sobe. Perdida: a sequência zera. Sem punição além disso.
-- 6 tipos, por exemplo: Phishing 🎣, DDoS 🌊, Ransomware 🔒, SQL Injection 💉, Senha 123456 🔑, Engenharia Social 🎭. Recompensas: moedas equivalentes a 60–600 s de produção, ou buffs curtos (produção ×7 por 30 s, clique ×10 por 15 s).
+- 6 tipos, por exemplo: Phishing 🎣, DDoS 🌊, Ransomware 🔒, SQL Injection 💉, Senha 123456 🔑, Engenharia Social 🎭. Recompensas: moedas equivalentes a 15–150 s de produção, ou buffs curtos (produção ×3 por 30 s, clique ×10 por 15 s). Defendendo 80% delas, rendem cerca de +25% de renda no começo; as pesquisas e a árvore de eventos podem dobrar isso.
 
 ### Habilidades (Guto)
 - Botões com recarga que aplicam um buff. "Auto Scaling ☁️": toda a produção ×5 por 30 s, recarga 10 min. Outras 2 ou 3 habilidades são liberadas por pesquisas de outros professores (ex.: Edécio "Aula Show": clique ×10 por 15 s; Pablo "Big O": custos ×0,5 por 20 s).
 
 ### Sprints (Bruna B1)
-- O jogo oferece 3 sprints; o jogador aceita 1. Cada sprint tem meta, prazo (60–180 s) e recompensa. Concluído ou falho, novas ofertas aparecem após 60 s.
+- O jogo oferece 3 sprints; o jogador aceita 1. Cada sprint tem meta, prazo (60–240 s) e recompensa (coins de 5 a 125 s de produção, ou produção ×3 por 30 s). Concluído ou falho, novas ofertas aparecem após 150 s.
 - Metas: N cliques, N críticos, chegar a combo N, comprar N níveis, defender N invasões, ganhar o equivalente a N segundos de produção. ~12 sprints no conteúdo; os que dependem de outra camada têm `requires`.
 
 ### Sinergia e Formatura (Angelo)
 - Sinergia: cada disciplina ganha `synergy` (base 5%) por cada outro professor contratado. Pesquisas aumentam.
-- **Formatura** (prestígio): disponível com o Angelo contratado. `diplomas = floor((runCoins / base)^exponent × diplomaGain)`, com `base = 1e12` e `exponent = 0.5`. Só pode formar se ganhar pelo menos 1.
+- **Formatura** (prestígio): disponível com o Angelo contratado. `diplomas = floor((runCoins / base)^exponent × diplomaGain)`, com `base = 2e19` e `exponent = 0.5`: a primeira formatura de um jogador ativo (cerca de 2 h 45) rende uns 10 diplomas, e cada formatura seguinte exige 4× mais ADScoins da corrida para dobrar os diplomas dela. Só pode formar se ganhar pelo menos 1.
 - Zera: moedas, `runCoins`, níveis, pesquisas, contratações (menos Edécio e os mantidos por nós de prestígio), buffs, invasão, sprint, combo, recargas.
 - Mantém: diplomas, árvore, conquistas, skins, cenários, temas, contadores, configurações.
-- **Árvore de prestígio**: ~20 nós em 4 ramos — `core` (tronco: produção global, manter professores, ganho de diplomas), `click`, `idle`, `events`. Nós têm nível máximo e custo crescente.
+- **Árvore de prestígio**: ~20 nós em 4 ramos — `core` (tronco: produção global, manter professores, ganho de diplomas), `click`, `idle`, `events`. Nós têm nível máximo e custo crescente (1 a 30 diplomas no primeiro nível, dobrando a cada nível; a árvore inteira custa ~1.900 diplomas, algo como 12 formaturas).
 
 ### Complexidade (Pablo)
 - Pesquisas caras que reduzem `costGrowth` em 0,01 cada (até 1,10) e dão multiplicadores grandes. É o conteúdo de fim de jogo.
@@ -100,7 +100,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 | Família | Quantas | Exemplos |
 | --- | --- | --- |
 | `click` | ~14 | 100 / 1k / 10k / 100k cliques; 100 críticos; combo máximo |
-| `production` | ~16 | marcos de Edécoins totais e de Edécoins/s |
+| `production` | ~16 | marcos de ADScoins totais e de ADScoins/s |
 | `professor` | ~24 | contratar cada um; todas as disciplinas de X no nível 25 / 50 / 100; todas as pesquisas de X |
 | `events` | ~8 | defender 10 / 50 / 250; sequência de 10 / 25 |
 | `sprints` | ~6 | concluir 5 / 25 / 100 sprints |
@@ -118,7 +118,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `hats/<skinId>.png`, `heads/<professorId>.png`, `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (46)
+### Skins (48)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -138,6 +138,8 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `hats/<skinId>.png`, `heads/
 | gladimir | `gladimir-maker` | Maker IoT | rare | jaleco com sensores e LEDs, protoboard na mão | óculos de proteção |
 | gladimir | `gladimir-piloto` | Piloto Rebelde | epic | macacão laranja de piloto espacial, colete branco | capacete de piloto |
 | gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
+| gladimir | `gladimir-stormtrooper` | Stormtrooper | epic | armadura branca de soldado imperial, blaster | |
+| gladimir | `gladimir-vader` | Darth Gladimir | legendary | armadura negra, capa, sabre de luz vermelho, capacete debaixo do braço | |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |

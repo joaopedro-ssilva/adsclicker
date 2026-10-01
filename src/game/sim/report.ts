@@ -1,6 +1,7 @@
 import type { GameContent, ProfessorId } from '../content/types';
 import { PROFESSOR_IDS } from '../content/types';
 import { formatDuration, formatNumber } from '../engine/format';
+import type { SprintAudit } from './audit';
 import type { MilestoneResult, RunRecord, SimResult } from './simulate';
 
 const pad = (text: string, width: number): string => (text.length >= width ? text : text + ' '.repeat(width - text.length));
@@ -49,8 +50,8 @@ export function hireTable(result: SimResult, content: GameContent): string[] {
 
 export function runTable(result: SimResult): string[] {
   const lines = [
-    `${pad('Corrida', 9)}${pad('Duração', 12)}${pad('Total', 12)}${pad('Angelo em', 12)}${pad('Pablo em', 12)}${pad('Diplomas', 10)}${pad('Acumulado', 11)}${pad('Edécoins', 10)}Opções`,
-    '-'.repeat(100),
+    `${pad('Corrida', 9)}${pad('Duração', 12)}${pad('Total', 12)}${pad('Angelo em', 12)}${pad('Pablo em', 12)}${pad('Diplomas', 10)}${pad('Acumulado', 11)}${pad('ADScoins', 10)}${pad('Prod/Clq/Auto/Inv/Spr', 24)}Opções`,
+    '-'.repeat(124),
   ];
   const shown: RunRecord[] = result.runs.slice(0, 14);
   for (const run of shown) {
@@ -64,6 +65,7 @@ export function runTable(result: SimResult): string[] {
         pad(run.endedAt === null ? '—' : String(run.diplomas), 10) +
         pad(run.endedAt === null ? '—' : String(run.diplomasTotal), 11) +
         pad(formatNumber(run.runCoins), 10) +
+        pad(['production', 'click', 'auto', 'invasions', 'sprints'].map((k) => String(Math.round(run.shares[k as keyof typeof run.shares] * 100))).join('/'), 24) +
         (run.endedAt === null ? '' : String(run.options)),
     );
   }
@@ -73,7 +75,7 @@ export function runTable(result: SimResult): string[] {
 
 export function timelineTable(result: SimResult, everySeconds: number): string[] {
   const lines = [
-    `${pad('Tempo', 12)}${pad('Edécoins/s', 13)}${pad('Prof.', 6)}${pad('Dipl.', 8)}${pad('Conq.', 7)}${pad('Prod.', 7)}${pad('Clique', 8)}${pad('Auto', 7)}${pad('Invas.', 8)}${pad('Sprint', 8)}Offline`,
+    `${pad('Tempo', 12)}${pad('ADScoins/s', 13)}${pad('Prof.', 6)}${pad('Dipl.', 8)}${pad('Conq.', 7)}${pad('Prod.', 7)}${pad('Clique', 8)}${pad('Auto', 7)}${pad('Invas.', 8)}${pad('Sprint', 8)}Offline`,
     '-'.repeat(95),
   ];
   let next = 0;
@@ -154,5 +156,17 @@ export function researchAudit(result: SimResult, content: GameContent, firstRunO
         padLeft(Number.isFinite(payback) ? formatDuration(payback * 1000) : '—', 12),
     );
   }
+  return lines;
+}
+
+/** Sprint audit: "active/idle" successes out of the trials, per checkpoint ("-" when not on offer). */
+export function sprintAuditTable(audit: SprintAudit): string[] {
+  const head = audit.checkpoints.map((at) => padLeft(time(at), 13)).join('');
+  const lines = [`${pad('Sprint', 28)}${padLeft('prazo', 8)}${head}`, '-'.repeat(36 + 13 * audit.checkpoints.length)];
+  for (const row of audit.rows) {
+    const cells = row.cells.map((cell) => padLeft(cell.eligible ? `${cell.active}/${cell.trials} · ${cell.idle}/${cell.trials}` : '-', 13));
+    lines.push(`${pad(row.sprint.name, 28)}${padLeft(`${row.sprint.durationMs / 1000}s`, 8)}${cells.join('')}`);
+  }
+  lines.push('(ativo · sem fazer nada)');
   return lines;
 }

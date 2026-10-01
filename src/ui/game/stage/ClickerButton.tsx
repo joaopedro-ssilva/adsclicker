@@ -60,7 +60,7 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
       type="button"
       className="clicker"
       data-qa="clicker"
-      aria-label={`Clicar em ${professor.name} para ganhar Edécoins`}
+      aria-label={`Clicar em ${professor.name} para ganhar ADScoins`}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
       onKeyUp={(event) => {

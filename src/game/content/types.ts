@@ -406,6 +406,8 @@ export interface BalanceConfig {
     exponent: number;
     /** Additive global bonus per diploma ever earned. */
     bonusPerDiploma: number;
+    /** Ceiling of the diploma bonus (additive, 3 = +300%). Omitted = no ceiling. */
+    maxBonus?: number;
   };
 }
 

@@ -46,7 +46,7 @@ export const ResearchCard = memo(function ResearchCard({ id }: { id: string }) {
           variant={data.affordable ? 'primary' : 'secondary'}
           data-qa={`research-${id}`}
           aria-disabled={!data.affordable}
-          aria-label={`Pesquisar ${data.name} por ${data.cost} Edécoins`}
+          aria-label={`Pesquisar ${data.name} por ${data.cost} ADScoins`}
           onClick={(event) => buy(event.currentTarget)}
         >
           <span className="research-buy-label">Pesquisar</span>

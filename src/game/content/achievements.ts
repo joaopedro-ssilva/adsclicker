@@ -36,8 +36,8 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ click (12)
   ach('click-100', 'click', 'Primeiros Joinhas', '👍', 'Dê 100 cliques.', counter('clicks', 100)),
   ach('click-500', 'click', 'Pegando o Jeito', '🖱️', 'Dê 500 cliques.', counter('clicks', 500)),
-  ach('click-1k', 'click', 'Mil Joinhas', '☕', 'Dê 1.000 cliques. Merece um café.', counter('clicks', 1000), { skin: 'edecio-cafe' }),
-  ach('click-5k', 'click', 'Dedo Calejado', '🤚', 'Dê 5.000 cliques.', counter('clicks', 5000)),
+  ach('click-2k', 'click', 'Dois Mil Joinhas', '☕', 'Dê 2.000 cliques. Merece um café.', counter('clicks', 2000), { skin: 'edecio-cafe' }),
+  ach('click-5k', 'click', 'Dedo Calejado', '🤚', 'Dê 5.000 cliques.', counter('clicks', 5000), { skin: 'gladimir-dba' }),
   ach('click-10k', 'click', 'Rodando em Loop', '💻', 'Dê 10.000 cliques. O for não termina.', counter('clicks', 10000), {
     skin: 'edecio-programador',
   }),
@@ -56,34 +56,34 @@ export const achievements: AchievementDef[] = [
   }),
 
   // ------------------------------------------------------------------ production (15)
-  ach('coins-1e3', 'production', 'Troco de Cantina', '🪙', 'Ganhe 1.000 Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e3' }),
-  ach('coins-1e6', 'production', 'Primeiro Milhão', '🏝️', 'Ganhe 1 milhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e6' }, {
+  ach('coins-1e3', 'production', 'Troco de Cantina', '🪙', 'Ganhe 1.000 ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e3' }),
+  ach('coins-1e6', 'production', 'Primeiro Milhão', '🏝️', 'Ganhe 1 milhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e6' }, {
     scenery: 'praia',
   }),
-  ach('coins-1e9', 'production', 'Capital da Cidade', '🏙️', 'Ganhe 1 bilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e9' }, {
+  ach('coins-1e9', 'production', 'Capital da Cidade', '🏙️', 'Ganhe 1 bilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e9' }, {
     scenery: 'cidade',
   }),
-  ach('coins-1e12', 'production', 'Fundo do Nether', '🕳️', 'Ganhe 1 trilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e12' }, {
+  ach('coins-1e12', 'production', 'Fundo do Nether', '🕳️', 'Ganhe 1 trilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e12' }, {
     scenery: 'nether',
   }),
-  ach('coins-1e15', 'production', 'Exílio Dourado', '🏜️', 'Ganhe 1 quatrilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e15' }, {
+  ach('coins-1e15', 'production', 'Exílio Dourado', '🏜️', 'Ganhe 1 quatrilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e15' }, {
     scenery: 'deserto',
   }),
-  ach('coins-1e18', 'production', 'Paz do Templo', '🛕', 'Ganhe 1 quintilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e18' }, {
+  ach('coins-1e18', 'production', 'Paz do Templo', '🛕', 'Ganhe 1 quintilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e18' }, {
     scenery: 'templo',
   }),
-  ach('coins-1e21', 'production', 'Sextilhão no Bolso', '💰', 'Ganhe 1 sextilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e21' }),
-  ach('coins-1e24', 'production', 'Septilhão de Boas Notas', '🏦', 'Ganhe 1 septilhão de Edécoins no total.', { kind: 'lifetimeCoins', gte: '1e24' }),
-  ach('cps-10', 'production', 'Tá Rendendo', '📈', 'Produza 10 Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '10' }),
-  ach('cps-100', 'production', 'Rato de Laboratório', '🖥️', 'Produza 100 Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '100' }, {
+  ach('coins-1e21', 'production', 'Sextilhão no Bolso', '💰', 'Ganhe 1 sextilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e21' }),
+  ach('coins-1e24', 'production', 'Septilhão de Boas Notas', '🏦', 'Ganhe 1 septilhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e24' }),
+  ach('cps-10', 'production', 'Tá Rendendo', '📈', 'Produza 10 ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '10' }),
+  ach('cps-100', 'production', 'Rato de Laboratório', '🖥️', 'Produza 100 ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '100' }, {
     scenery: 'laboratorio',
   }),
-  ach('cps-1e4', 'production', 'Casa que Trabalha Sozinha', '🏠', 'Produza 10.000 Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '1e4' }, {
+  ach('cps-1e4', 'production', 'Casa que Trabalha Sozinha', '🏠', 'Produza 10.000 ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e4' }, {
     scenery: 'casa-automatica',
   }),
-  ach('cps-1e7', 'production', 'Dez Milhões por Segundo', '⚡', 'Produza 10 milhões de Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '1e7' }),
-  ach('cps-1e10', 'production', 'Cachoeira de Edécoins', '🌊', 'Produza 10 bilhões de Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '1e10' }),
-  ach('cps-1e13', 'production', 'Rack Cheio', '🗄️', 'Produza 10 trilhões de Edécoins por segundo.', { kind: 'coinsPerSecond', gte: '1e13' }, {
+  ach('cps-1e7', 'production', 'Dez Milhões por Segundo', '⚡', 'Produza 10 milhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e7' }),
+  ach('cps-1e10', 'production', 'Cachoeira de ADScoins', '🌊', 'Produza 10 bilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e10' }),
+  ach('cps-1e13', 'production', 'Rack Cheio', '🗄️', 'Produza 10 trilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e13' }, {
     scenery: 'datacenter',
   }),
   ach('research-10', 'production', 'Leitura Acessível', '🔬', 'Compre 10 pesquisas, somando todas as turmas.', counter('researchBought', 10), {
@@ -92,7 +92,7 @@ export const achievements: AchievementDef[] = [
 
   // ------------------------------------------------------------------ professor (31)
   // Hiring: common skin
-  ach('hire-gladimir', 'professor', 'Que o JOIN Esteja com Você', '🪐', 'Contrate o Gladimir.', hired('gladimir'), { skin: 'gladimir-dba' }),
+  ach('hire-gladimir', 'professor', 'Que o JOIN Esteja com Você', '🪐', 'Contrate o Gladimir.', hired('gladimir')),
   ach('hire-b2', 'professor', 'Interface Amigável', '🎨', 'Contrate a Bruna B2.', hired('b2'), { skin: 'b2-postit', theme: 'claro' }),
   ach('hire-wagner', 'professor', 'Rede Protegida', '🛡️', 'Contrate o Wagner.', hired('wagner'), { skin: 'wagner-hacker' }),
   ach('hire-guto', 'professor', 'Subiu pra Nuvem', '☁️', 'Contrate o Guto.', hired('guto'), { skin: 'guto-churrasqueiro' }),
@@ -162,6 +162,12 @@ export const achievements: AchievementDef[] = [
   ach('lvl100-gladimir', 'professor', 'Mestre do Banco', '🗡️', 'Deixe todas as disciplinas do Gladimir no nível 100.', allLevel('gladimir', 100), {
     skin: 'gladimir-mestre',
   }),
+  ach('lvl50-gladimir', 'professor', 'Tropa do Império', '🪖', 'Deixe todas as disciplinas do Gladimir no nível 50.', allLevel('gladimir', 50), {
+    skin: 'gladimir-stormtrooper',
+  }),
+  ach('abilities-50', 'professor', 'Lado Sombrio do Banco', '🌑', 'Use habilidades 50 vezes. O poder do lado sombrio do DELETE sem WHERE.', counter('abilitiesUsed', 50), {
+    skin: 'gladimir-vader',
+  }),
   ach('lvl100-b2', 'professor', 'Paleta Completa', '🌈', 'Deixe todas as disciplinas da Bruna B2 no nível 100.', allLevel('b2', 100), {
     skin: 'b2-paleta',
   }),
@@ -219,7 +225,7 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-46', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 46 skins.', { kind: 'skinsOwned', gte: 46 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 48 skins.', { kind: 'skinsOwned', gte: 48 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }),
