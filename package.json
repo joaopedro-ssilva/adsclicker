@@ -13,7 +13,8 @@
     "test:watch": "vitest",
     "sim": "tsx src/game/sim/run.ts",
     "art:process": "node scripts/art/process.mjs",
-    "art:manifest": "node scripts/art/manifest.mjs"
+    "art:manifest": "node scripts/art/manifest.mjs",
+    "dev:save": "tsx scripts/dev/dev-save.ts"
   },
   "dependencies": {
     "break_infinity.js": "^2.2.0",

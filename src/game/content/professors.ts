@@ -34,7 +34,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Produção parada também rende: ganho offline e cliques automáticos dos sensores.',
     color: '#3b82f6',
     order: 2,
-    hireCost: '7910',
+    hireCost: '7840',
     requires: [{ kind: 'professorHired', professor: 'edecio' }],
     features: ['offline'],
     quotes: {
@@ -82,7 +82,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Invasões na tela: defenda o campus clicando nas ameaças a tempo.',
     color: '#22c55e',
     order: 4,
-    hireCost: '1.34e9',
+    hireCost: '1.3e9',
     requires: [{ kind: 'professorHired', professor: 'b2' }],
     features: ['events'],
     quotes: {
@@ -103,7 +103,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Escala: habilidades com recarga que turbinam a produção por alguns segundos.',
     color: '#06b6d4',
     order: 5,
-    hireCost: '8.28e11',
+    hireCost: '9.66e11',
     requires: [{ kind: 'professorHired', professor: 'wagner' }],
     features: ['abilities'],
     quotes: {
@@ -125,7 +125,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Missões: sprints com meta, prazo e recompensa.',
     color: '#a855f7',
     order: 6,
-    hireCost: '7.55e14',
+    hireCost: '9.62e14',
     requires: [{ kind: 'professorHired', professor: 'guto' }],
     features: ['sprints'],
     quotes: {
@@ -146,7 +146,7 @@ export const professors: Record<ProfessorId, ProfessorDef> = {
     tagline: 'Sinergia entre professores e a Formatura, o prestígio do curso.',
     color: '#f59e0b',
     order: 7,
-    hireCost: '1.15e18',
+    hireCost: '5.42e17',
     requires: [{ kind: 'professorHired', professor: 'b1' }],
     features: ['synergy', 'graduation'],
     quotes: {

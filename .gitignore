@@ -24,3 +24,9 @@ npm-debug.log*
 # QA screenshots and scratch saves
 /art/preview/
 /.next-build/
+
+# dev account save (npm run dev:save)
+/dev-save.txt
+
+# simulator scratch experiments
+/src/game/sim/_*.ts
