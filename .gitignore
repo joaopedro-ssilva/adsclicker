@@ -1,0 +1,22 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+
+# misc
+.DS_Store
+*.pem
+*.tsbuildinfo
+npm-debug.log*
+.env*.local
+
+# art pipeline: raw generations are kept out of git, processed sprites are committed
+/art/raw/
