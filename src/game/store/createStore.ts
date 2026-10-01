@@ -13,6 +13,8 @@ import { cloneState, publishState } from './share';
 import type { Emit, GameEvent, GameStore } from './types';
 
 export const SAVE_KEY = 'adsclicker.save';
+/** Where a save that failed to load is kept, so it can still be recovered by hand. */
+export const UNREADABLE_SAVE_KEY = 'adsclicker.save.unreadable';
 
 export const TICK_MS = 100;
 export const AUTOSAVE_MS = 15_000;
@@ -108,8 +110,13 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
 
     function loadSaved(at: number): GameState | null {
       try {
-        const text = getStorage()?.getItem(SAVE_KEY);
-        return text ? deserializeState(text, content, at) : null;
+        const storage = getStorage();
+        const text = storage?.getItem(SAVE_KEY);
+        if (!text) return null;
+        const loaded = deserializeState(text, content, at);
+        // A save that cannot be read is set aside, so the fresh game that replaces it does not erase it.
+        if (!loaded) storage?.setItem(UNREADABLE_SAVE_KEY, text);
+        return loaded;
       } catch {
         return null;
       }

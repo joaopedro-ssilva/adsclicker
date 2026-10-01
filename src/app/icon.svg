@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" shape-rendering="crispEdges">
+  <!-- The logo mark of the stage header: the accent block with a pixel cursor cut into it. -->
+  <rect width="22" height="22" fill="#e5484d"/>
+  <rect width="22" height="3" fill="#fff" fill-opacity=".3"/>
+  <rect y="18" width="22" height="4" fill="#000" fill-opacity=".25"/>
+  <g fill="#101217">
+    <rect x="6" y="4" width="4" height="12"/>
+    <rect x="10" y="8" width="4" height="8"/>
+    <rect x="14" y="12" width="4" height="4"/>
+  </g>
+</svg>
