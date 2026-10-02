@@ -16,7 +16,7 @@ import { diffFeed } from './feed';
 import { effectiveMultiplier } from './multiplier';
 import { isRollback, judgeSave } from './plausibility';
 import { coinsOutOfRange, projectState } from './projection';
-import { toCloudSave, toMe } from './summary';
+import { isRanked, toCloudSave, toMe } from './summary';
 
 export interface SyncInput {
   request: SyncRequest;
@@ -80,7 +80,7 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
 
   const flagged = player.flagged || !verdict.ok;
   const flagReason = verdict.ok ? player.flagReason : verdict.reason.slice(0, FLAG_REASON_MAX);
-  const ranked = player.nickname !== null && !flagged && !player.banned && !player.testAccount;
+  const ranked = isRanked({ ...player, flagged });
   const drafts = ranked ? diffFeed(previous, parsed) : [];
 
   const values = {

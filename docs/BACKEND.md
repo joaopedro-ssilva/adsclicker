@@ -81,6 +81,7 @@ Reprovação marca, não apaga nem bloqueia: falso positivo custa ao jogador o r
 
 - Quatro quadros: `coins` (ADScoins produzidos na vida), `diplomas` (diplomas ganhos), `achievements`, `clicks`. Top 100 de cada.
 - Entra no ranking quem tem apelido e não está `flagged`, `banned` nem é conta de teste.
+- **Fase de teste:** por enquanto quem está `flagged` (suspeito) também aparece no ranking, no feed e nos totais; a marca e o motivo continuam guardados e visíveis no admin. Para voltar à regra rígida, defina `RANK_FLAGGED_PLAYERS=false` no ambiente ou troque o padrão em `src/server/players/ranking.ts`.
 - ADScoins passam de 10^300, então o banco guarda três colunas: o texto exato, um `numeric` para somar e o `log10` em `double precision` para ordenar com índice.
 - `GET /api/community`: online agora (último sync há menos de 2 min), total de jogadores, ADScoins da comunidade, turmas formadas, cliques, conquistas, multiplicador do evento e os 30 eventos mais recentes do feed.
 - **Feed.** Gerado no sync, comparando o save novo com o anterior: escolheu apelido (`joined`), contratou professor (`hire`), completou o elenco (`allProfessors`), formou turma (`graduation`), ganhou skin épica ou lendária (`skin`). Só de jogadores ranqueados.

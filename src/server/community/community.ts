@@ -4,14 +4,18 @@ import type { CommunityResponse, FeedItem } from '@/shared/api';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { feedEvents, players, rankedCondition } from '../db/schema';
+import { flaggedAreRanked } from '../players/ranking';
 import { createTtlCache } from './cache';
 
 export const FEED_SIZE = 30;
 const FEED_KEEP_MS = 14 * 24 * 60 * 60 * 1000;
 const PRUNE_EVERY_MS = 60 * 60 * 1000;
 
-/** Players that count in the totals: everyone who is not banned, flagged or a test account (nickname or not). */
-const COUNTED = sql`not ${players.banned} and not ${players.flagged} and not ${players.testAccount}`;
+/** Players that count in the totals: everyone who is not banned or a test account (nickname or not); flagged ones only in the test phase. */
+const counted = () =>
+  flaggedAreRanked()
+    ? sql`not ${players.banned} and not ${players.testAccount}`
+    : sql`not ${players.banned} and not ${players.flagged} and not ${players.testAccount}`;
 
 /** to_char prints " 1.5000000000e+05" (zero as " 0.0000000000e+00"); the game wants "1.5e5". */
 export function cleanCoins(text: string | null): string {
@@ -41,7 +45,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
         achievements: sql<number>`coalesce(sum(${players.achievements}), 0)::int`,
       })
       .from(players)
-      .where(COUNTED),
+      .where(counted()),
     db
       .select({
         id: feedEvents.id,

@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // The suite checks the strict ranking rule; the running game is lenient during the test phase.
+    env: { RANK_FLAGGED_PLAYERS: 'false' },
   },
 });

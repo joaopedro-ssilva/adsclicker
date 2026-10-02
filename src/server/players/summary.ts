@@ -1,11 +1,12 @@
 import type { CloudSave, Me, SaveSummary } from '@/shared/api';
 import type { PlayerRow } from '../db/schema';
+import { flaggedAreRanked } from './ranking';
 
 /** The columns every "who is this" answer needs; the save text is not among them. */
 export type PlayerCore = Omit<PlayerRow, 'save'>;
 
 export function isRanked(player: Pick<PlayerCore, 'nickname' | 'flagged' | 'banned' | 'testAccount'>): boolean {
-  return player.nickname !== null && !player.flagged && !player.banned && !player.testAccount;
+  return player.nickname !== null && (flaggedAreRanked() || !player.flagged) && !player.banned && !player.testAccount;
 }
 
 function unrankedReason(player: Pick<PlayerCore, 'nickname' | 'flagged' | 'banned' | 'testAccount'>): string | null {

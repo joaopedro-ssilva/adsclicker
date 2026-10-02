@@ -15,6 +15,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import { flaggedAreRanked } from '../players/ranking';
 
 const timestamptz = (name: string) => timestamp(name, { withTimezone: true, mode: 'date' });
 
@@ -97,7 +98,15 @@ export const players = pgTable(
 );
 
 /** The condition of "ranked player" for queries on `players`. */
-export const rankedCondition = () => rankedWhere(players);
+/**
+ * Who is on the boards right now. In the test phase flagged players are included (see
+ * players/ranking.ts); that text no longer matches the partial indexes, so the boards sort
+ * without them, which is fine at test scale.
+ */
+export const rankedCondition = () =>
+  flaggedAreRanked()
+    ? sql`${players.nickname} is not null and not ${players.banned} and not ${players.testAccount}`
+    : rankedWhere(players);
 
 /** Only the SHA-256 of the cookie token is stored, so a database leak cannot be replayed. */
 export const sessions = pgTable(
