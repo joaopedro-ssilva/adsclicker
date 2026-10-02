@@ -30,6 +30,10 @@
 @import '../ui/game/moments/moments.css';
 @import '../ui/game/panel/panel.css';
 
+/* Hackathon mode: each file is an index owned by one engineer */
+@import '../ui/hackathon/arena/arena.css';
+@import '../ui/hackathon/panel/hk-panel.css';
+
 /* Pages */
 @import './kit/kit.css';
 @import './admin/admin.css';
