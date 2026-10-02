@@ -3,6 +3,7 @@ import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
   boolean,
+  check,
   doublePrecision,
   index,
   integer,
@@ -160,3 +161,136 @@ export const rateLimits = pgTable(
 );
 
 export type PlayerRow = typeof players.$inferSelect;
+
+// ---------------------------------------------------------------------------
+// Hackathon mode (docs/HACKATHON.md). Everything is keyed by player_id and goes away with the player.
+// ---------------------------------------------------------------------------
+
+/** The student. One row per player; every mutation locks it (`select ... for update`) to serialise a player's writes. */
+export const hackathonProfiles = pgTable(
+  'hackathon_profiles',
+  {
+    playerId: uuid('player_id')
+      .primaryKey()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    head: text('head').notNull(),
+    cargo: text('cargo').notNull().default('estudante'),
+    level: integer('level').notNull().default(1),
+    xp: bigint('xp', { mode: 'number' }).notNull().default(0),
+    commits: bigint('commits', { mode: 'number' }).notNull().default(0),
+
+    /** Café held as of `cafeAt`; the real count is computed lazily from these two (see hackathon/cafe.ts). */
+    cafeCount: integer('cafe_count').notNull().default(0),
+    cafeAt: timestamptz('cafe_at').notNull().defaultNow(),
+
+    /** Skill node id -> level. */
+    skillNodes: jsonb('skill_nodes').$type<Record<string, number>>().notNull().default({}),
+    activeSkills: jsonb('active_skills').$type<string[]>().notNull().default([]),
+    /** Professor id -> mentor level. */
+    mentors: jsonb('mentors').$type<Record<string, number>>().notNull().default({}),
+    /** Slot id -> item id. */
+    equipped: jsonb('equipped').$type<Record<string, string>>().notNull().default({}),
+
+    /** Victories since the last legendary item. */
+    pity: integer('pity').notNull().default(0),
+    victories: integer('victories').notNull().default(0),
+    defeats: integer('defeats').notNull().default(0),
+    itemsFound: integer('items_found').notNull().default(0),
+    legendaries: integer('legendaries').notNull().default(0),
+
+    /** Classroom counters already paid out (see hackathon/classroom.ts). */
+    cafesBoughtCredited: integer('cafes_bought_credited').notNull().default(0),
+    graduationsCredited: integer('graduations_credited').notNull().default(0),
+    /** Day (America/Sao_Paulo) the two per-day counters below belong to. */
+    creditDay: text('credit_day').notNull().default(''),
+    cafesCreditedToday: integer('cafes_credited_today').notNull().default(0),
+    graduationsCreditedToday: integer('graduations_credited_today').notNull().default(0),
+
+    /** Victories in the daily stage on `dailyDay`. */
+    dailyDay: text('daily_day').notNull().default(''),
+    dailyClears: integer('daily_clears').notNull().default(0),
+
+    /** The best item owned, kept up to date when items change so the boards need no computation. */
+    bestItemBase: text('best_item_base'),
+    bestItemRarity: text('best_item_rarity'),
+
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+  },
+  (t) => [
+    // Balances can never go negative, whatever a code path does.
+    check('hackathon_profiles_commits_nonneg', sql`${t.commits} >= 0`),
+    check('hackathon_profiles_xp_nonneg', sql`${t.xp} >= 0`),
+    check('hackathon_profiles_cafe_nonneg', sql`${t.cafeCount} >= 0`),
+  ],
+);
+
+export const hackathonItems = pgTable(
+  'hackathon_items',
+  {
+    id: uuid('id').primaryKey(),
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    base: text('base').notNull(),
+    rarity: text('rarity').notNull(),
+    level: integer('level').notNull(),
+    affixes: jsonb('affixes').$type<unknown[]>().notNull(),
+    quality: doublePrecision('quality').notNull(),
+    rerolls: integer('rerolls').notNull().default(0),
+    /** Epoch ms, as stamped by the engine. */
+    createdAt: bigint('created_at', { mode: 'number' }).notNull(),
+  },
+  (t) => [index('hackathon_items_player_idx').on(t.playerId)],
+);
+
+/** One attempt at a stage. `build` and `stage` are the snapshots the server re-simulates with. */
+export const hackathonRuns = pgTable(
+  'hackathon_runs',
+  {
+    id: uuid('id').primaryKey(),
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    stageId: text('stage_id').notNull(),
+    seed: bigint('seed', { mode: 'number' }).notNull(),
+    auto: boolean('auto').notNull(),
+    build: jsonb('build').notNull(),
+    stage: jsonb('stage').notNull(),
+    /** open | finished | abandoned | expired */
+    status: text('status').notNull().default('open'),
+    startedAt: timestamptz('started_at').notNull(),
+    finishedAt: timestamptz('finished_at'),
+  },
+  (t) => [
+    // A player has at most one open run: the one-way door that makes a replayed finish pay once.
+    uniqueIndex('hackathon_runs_open_uq')
+      .on(t.playerId)
+      .where(sql`${t.status} = 'open'`),
+    index('hackathon_runs_player_idx').on(t.playerId, t.startedAt.desc()),
+  ],
+);
+
+export const hackathonStages = pgTable(
+  'hackathon_stages',
+  {
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    stageId: text('stage_id').notNull(),
+    clears: integer('clears').notNull().default(0),
+    firstClearAt: timestamptz('first_clear_at'),
+  },
+  (t) => [primaryKey({ columns: [t.playerId, t.stageId] })],
+);
+
+export const hackathonCollection = pgTable(
+  'hackathon_collection',
+  {
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'cascade' }),
+    base: text('base').notNull(),
+    foundAt: timestamptz('found_at').notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.playerId, t.base] })],
+);

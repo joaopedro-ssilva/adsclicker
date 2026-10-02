@@ -1,6 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { apiErrorSchema } from '@/shared/api';
 import { POST as account } from './account/nickname/route';
+import { POST as hackathonEquip } from './hackathon/equip/route';
+import { POST as hackathonItems } from './hackathon/items/route';
+import { POST as hackathonMentors } from './hackathon/mentors/route';
+import { GET as hackathonProfile, POST as hackathonCreate } from './hackathon/profile/route';
+import { POST as hackathonFinish } from './hackathon/run/finish/route';
+import { POST as hackathonStart } from './hackathon/run/start/route';
+import { POST as hackathonSkills } from './hackathon/skills/route';
 import { POST as login } from './auth/login/route';
 import { POST as logout } from './auth/logout/route';
 import { GET as community } from './community/route';
@@ -33,6 +40,14 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
     ['logout', () => logout(post('/api/auth/logout', {}))],
     ['leaderboard', () => leaderboard(get('/api/leaderboard?board=coins'))],
     ['community', () => community()],
+    ['hackathon profile', () => hackathonProfile(get('/api/hackathon/profile'))],
+    ['hackathon create', () => hackathonCreate(post('/api/hackathon/profile', { head: 'h1' }))],
+    ['hackathon start', () => hackathonStart(post('/api/hackathon/run/start', { stageId: 'cap1-fase1', auto: false }))],
+    ['hackathon finish', () => hackathonFinish(post('/api/hackathon/run/finish', { runId: 'x', actions: [] }))],
+    ['hackathon equip', () => hackathonEquip(post('/api/hackathon/equip', { slot: 'setup', itemId: null }))],
+    ['hackathon skills', () => hackathonSkills(post('/api/hackathon/skills', { action: 'respec' }))],
+    ['hackathon mentors', () => hackathonMentors(post('/api/hackathon/mentors', { professor: 'edecio' }))],
+    ['hackathon items', () => hackathonItems(post('/api/hackathon/items', { action: 'recycle', itemIds: ['a'] }))],
   ];
 
   for (const [name, call] of cases) {
@@ -42,6 +57,13 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
       expect(apiErrorSchema.parse(await response.json()).error.code).toBe('unavailable');
     });
   }
+
+  it('still rejects a cross-site Hackathon POST before looking for the database', async () => {
+    const response = await hackathonStart(
+      new Request('http://localhost:3000/api/hackathon/run/start', { method: 'POST', headers: { 'sec-fetch-site': 'cross-site' }, body: '{}' }),
+    );
+    expect(response.status).toBe(403);
+  });
 
   it('still rejects a cross-site POST before looking for the database', async () => {
     const response = await sync(

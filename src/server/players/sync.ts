@@ -3,10 +3,14 @@ import type { SQL } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { content } from '@/game/content';
 import { deserializeState, serializeState } from '@/game/engine';
-import type { SyncRequest, SyncResponse } from '@/shared/api';
+import type { CloudBonusPayload, SyncRequest, SyncResponse } from '@/shared/api';
 import { createGuest } from '../auth/guest';
 import { findSessionWithSave, sessionCookie } from '../auth/session';
 import { getEventMultiplier } from '../config/eventMultiplier';
+import { bonusOf, creditClassroom } from '../hackathon/classroom';
+import type { HackathonDeps } from '../hackathon/deps';
+import { sharedDeps } from '../hackathon/deps';
+import { readProfileRow } from '../hackathon/store';
 import type { Db } from '../db/client';
 import { feedEvents, players } from '../db/schema';
 import type { PlayerRow } from '../db/schema';
@@ -24,6 +28,8 @@ export interface SyncInput {
   token: string | null;
   ip: string;
   now?: number;
+  /** Engine and content of the Hackathon link; the real ones unless a test passes its own. */
+  hackathon?: HackathonDeps;
 }
 
 export interface SyncResult {
@@ -64,12 +70,18 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
   const eventMultiplier = await getEventMultiplier(db, now);
   const multiplier = effectiveMultiplier(eventMultiplier, player.multiplier);
 
+  // The Hackathon student (if any) decides the classroom bonus: one primary-key read.
+  const hackathon = input.hackathon ?? sharedDeps();
+  const student = await readProfileRow(db, player.id);
+  const bonus = student ? bonusOf(student, hackathon) : undefined;
+
   if (player.rev > request.baseRev && !request.force) {
-    return { body: conflictBody(player, multiplier), cookies };
+    return { body: conflictBody(player, multiplier, bonus), cookies };
   }
 
-  // The client's own multiplier is never trusted: the server's replaces it before anything is computed.
+  // The client's own multiplier and bonus are never trusted: the server's replace them before anything is computed.
   parsed.settings.devMultiplier = multiplier;
+  parsed.cloudBonus = bonus ? { cargo: bonus.cargo, mentors: bonus.mentors } : { cargo: 1, mentors: {} };
 
   // A forced overwrite that goes back to older progress (the other device's save) has no baseline:
   // it is judged like a first sync, by its own play time. One that moves forward is judged as usual,
@@ -98,17 +110,19 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
     // Another device synced between our read and our write: treat it as the conflict it is.
     const [fresh] = await db.select().from(players).where(eq(players.id, player.id)).limit(1);
     if (!fresh) throw new ApiFailure('unauthorized');
-    return { body: conflictBody(fresh, multiplier), cookies };
+    return { body: conflictBody(fresh, multiplier, bonus), cookies };
   }
 
+  await creditClassroom(db, student, parsed.counters, hackathon, now);
+
   const me = toMe({ ...player, flagged });
-  return { body: { status: 'ok', rev: newRev, serverTime: now, multiplier, me }, cookies };
+  return { body: { status: 'ok', rev: newRev, serverTime: now, multiplier, ...(bonus ? { bonus } : {}), me }, cookies };
 }
 
-function conflictBody(player: PlayerRow, multiplier: number): SyncResponse {
+function conflictBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined): SyncResponse {
   const cloud = toCloudSave(player);
   if (!cloud) throw new ApiFailure('internal');
-  return { status: 'conflict', cloud, multiplier, me: toMe(player) };
+  return { status: 'conflict', cloud, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player) };
 }
 
 async function writeSync(

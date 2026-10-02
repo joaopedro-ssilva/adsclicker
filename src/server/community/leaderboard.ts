@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import { ONLINE_WINDOW_MS } from '@/shared/api';
 import type { Board, LeaderboardResponse, RanksResponse } from '@/shared/api';
@@ -6,7 +6,7 @@ import { professorIdSchema } from '@/shared/api';
 import type { PlayerCore } from '../players/summary';
 import { isRanked } from '../players/summary';
 import type { Db } from '../db/client';
-import { players, rankedCondition } from '../db/schema';
+import { hackathonProfiles, players, rankedCondition } from '../db/schema';
 import { createTtlCache } from './cache';
 
 export const BOARD_SIZE = 100;
@@ -46,8 +46,12 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
       avatarProfessor: players.avatarProfessor,
       avatarSkin: players.avatarSkin,
       lastSeenAt: players.lastSeenAt,
+      bestItemBase: hackathonProfiles.bestItemBase,
+      bestItemRarity: hackathonProfiles.bestItemRarity,
     })
     .from(players)
+    // The best item lives on the profile (kept current when items change): a primary-key join over at most 100 rows.
+    .leftJoin(hackathonProfiles, eq(hackathonProfiles.playerId, players.id))
     .where(rankedCondition())
     // "desc nulls last" and the id tie-break spelled out, exactly as the index is declared.
     .orderBy(sql`${column} desc nulls last`, players.id)
@@ -68,6 +72,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
         diplomas: row.diplomasEarned,
         achievements: row.achievements,
         online: row.lastSeenAt.getTime() > onlineSince,
+        ...(row.bestItemBase && row.bestItemRarity ? { item: { base: row.bestItemBase, rarity: row.bestItemRarity } } : {}),
       };
     }),
   };

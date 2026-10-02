@@ -2,6 +2,9 @@ import { eq } from 'drizzle-orm';
 import type { LoginRequest, LoginResponse } from '@/shared/api';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
+import { classroomBonusFor } from '../hackathon/classroom';
+import type { HackathonDeps } from '../hackathon/deps';
+import { sharedDeps } from '../hackathon/deps';
 import { players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { hashIp } from '../http/ip';
@@ -20,7 +23,7 @@ import { createSession, deleteSession, hashToken, sessionCookie, clearedSessionC
 export async function login(
   db: Db,
   request: LoginRequest,
-  context: { ip: string; currentToken: string | null; now?: number },
+  context: { ip: string; currentToken: string | null; now?: number; hackathon?: HackathonDeps },
 ): Promise<{ body: LoginResponse; cookies: string[] }> {
   const now = context.now ?? Date.now();
   const key = nicknameKey(request.nickname);
@@ -38,8 +41,9 @@ export async function login(
   if (context.currentToken) await deleteSession(db, hashToken(context.currentToken));
 
   const multiplier = effectiveMultiplier(await getEventMultiplier(db, now), player.multiplier);
+  const bonus = await classroomBonusFor(db, player.id, context.hackathon ?? sharedDeps());
   return {
-    body: { me: toMe(player), multiplier, cloud: toCloudSave(player) },
+    body: { me: toMe(player), multiplier, ...(bonus ? { bonus } : {}), cloud: toCloudSave(player) },
     cookies: [sessionCookie(token)],
   };
 }
