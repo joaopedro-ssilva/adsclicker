@@ -247,7 +247,9 @@ describe('hackathon content: progression', () => {
       expect(stage.requires).toBe(previous.id);
       expect(stage.level).toBeGreaterThan(previous.level);
       expect(stage.requiredLevel).toBeGreaterThanOrEqual(previous.requiredLevel);
-      expect(stage.xp).toBeGreaterThan(previous.xp);
+      // The boss pays little XP on purpose: it is the stage farmed after promotion, and cheap XP there is
+      // what stretches the climb from level 10 to 20.
+      if (!stage.boss) expect(stage.xp).toBeGreaterThan(previous.xp);
       expect(stage.commits).toBeGreaterThan(previous.commits);
     });
     expect(c.stages.at(-1)?.requiredLevel).toBe(10);

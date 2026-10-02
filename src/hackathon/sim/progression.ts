@@ -6,7 +6,7 @@ import { applyXp, mentorCost } from '../engine/progression';
 import { mix32, mulberry32 } from '../engine/rng';
 import { resolveStage } from '../engine/stage';
 import type { Build, ItemInstance } from '../engine/types';
-import { allocateSkills } from './builds';
+import { allocateSkills, chooseActive } from './builds';
 import { playRun } from './fights';
 import type { PolicyId } from './policies';
 
@@ -21,8 +21,10 @@ export interface ProgressionOptions {
 export interface StudentResult {
   /** Fights fought in each stage (farming included). */
   attemptsByStage: Record<string, number>;
-  /** Total Cafés spent and the level when each stage was first cleared. */
-  firstClear: Record<string, { cafes: number; level: number }>;
+  /** Cafés spent, level and total mentor levels when each stage was first cleared. */
+  firstClear: Record<string, { cafes: number; level: number; mentorLevels: number }>;
+  /** Cafés spent when each level was reached. */
+  levelAt: Record<number, number>;
   finalLevel: number;
   cafes: number;
 }
@@ -35,27 +37,33 @@ export interface StageProgress {
   avgCafesToClear: number;
   avgAttemptsInStage: number;
   avgLevelAtClear: number;
+  avgMentorLevels: number;
 }
 
 export interface ProgressionReport {
   options: ProgressionOptions;
   stages: StageProgress[];
   avgFinalLevel: number;
+  /** Average Cafés to reach each milestone level (students who got there). */
+  levelMilestones: { level: number; reached: number; avgCafes: number }[];
 }
 
 const LOSSES_BEFORE_FARMING = 2;
 const FARM_FIGHTS = 5;
-const FIXED_DATE = '2026-01-01';
+/** One Café in this many goes to the daily stage, once the student can handle it. */
+const DAILY_EVERY = 12;
+const DAILY_MIN_LEVEL = 5;
 
 /** One fresh student farming the campaign in order, with luck drawn from a seeded stream. */
 export function simulateStudent(content: HackathonContent, policy: PolicyId, seed: number, maxAttempts: number): StudentResult {
   const index = indexOf(content);
   const rng = mulberry32(seed);
   const stages = [...content.stages].sort((a, b) => a.chapter - b.chapter || a.order - b.order);
+  const cargosByOrder = [...content.cargos].sort((a, b) => a.order - b.order);
   const won = new Set<string>();
-  const result: StudentResult = { attemptsByStage: {}, firstClear: {}, finalLevel: 1, cafes: 0 };
+  const result: StudentResult = { attemptsByStage: {}, firstClear: {}, levelAt: {}, finalLevel: 1, cafes: 0 };
 
-  let cargo: CargoId = [...content.cargos].sort((a, b) => a.order - b.order)[0]?.id ?? 'estudante';
+  let cargo: CargoId = cargosByOrder[0]?.id ?? 'estudante';
   let level = 1;
   let xp = 0;
   let commits = 0;
@@ -66,8 +74,9 @@ export function simulateStudent(content: HackathonContent, policy: PolicyId, see
   let lossStreak = 0;
   let farmLeft = 0;
 
-  const buildNow = (): Build => {
-    const { skillNodes, activeSkills } = allocateSkills(level, cargo, content);
+  const buildNow = (facingBoss: boolean): Build => {
+    const { skillNodes, activeSkills: owned } = allocateSkills(level, content);
+    const activeSkills = chooseActive(owned, facingBoss, index.cargos.get(cargo)?.skillSlots ?? 0, content);
     return computeBuild({ cargo, level, skillNodes, mentors, equipped, activeSkills }, content);
   };
   const buyMentors = (): void => {
@@ -94,8 +103,8 @@ export function simulateStudent(content: HackathonContent, policy: PolicyId, see
     }
   };
 
-  const boss = [...stages].reverse().find((s) => s.boss);
-  while (result.cafes < maxAttempts && !(boss && won.has(boss.id))) {
+  const finalCap = Math.max(...content.cargos.map((c) => c.maxLevel));
+  while (result.cafes < maxAttempts && level < finalCap) {
     const open = stages.filter((s) => (s.requires === null || won.has(s.requires)) && s.requiredLevel <= level);
     const target = open.find((s) => !won.has(s.id));
     const beaten = open.filter((s) => won.has(s.id));
@@ -103,14 +112,17 @@ export function simulateStudent(content: HackathonContent, policy: PolicyId, see
     const farming = farmLeft > 0 || !target;
     const stageDef = farming ? (farm ?? target) : target;
     if (!stageDef) break;
-    const stage = resolveStage(stageDef.id, FIXED_DATE, content);
+    const dailyToday = result.cafes % DAILY_EVERY === DAILY_EVERY - 1 && level >= DAILY_MIN_LEVEL;
+    const dateKey = `2026-03-${Math.floor(result.cafes / DAILY_EVERY)}`;
+    const stage = resolveStage(dailyToday ? 'daily' : stageDef.id, dateKey, content);
     if (!stage) break;
+    const regular = stage.id !== 'daily';
 
     result.cafes += 1;
     result.attemptsByStage[stage.id] = (result.attemptsByStage[stage.id] ?? 0) + 1;
-    const build = buildNow();
+    const build = buildNow(stage.boss);
     const { outcome } = playRun(build, stage, mix32(Math.floor(rng() * 4294967296)), policy, content);
-    const firstClear = outcome.won && !won.has(stage.id);
+    const firstClear = outcome.won && regular && !won.has(stage.id);
 
     if (outcome.won) {
       const dropped = rollDrops({ stage, build, firstClear, pity, rng, now: 0, newId: () => `s${(itemCount += 1)}` }, content);
@@ -121,14 +133,14 @@ export function simulateStudent(content: HackathonContent, policy: PolicyId, see
       commits += gain(stage.commits, build.meta.commitsGain) * (firstClear ? content.config.firstClear.commitsMultiplier : 1);
       if (firstClear) {
         won.add(stage.id);
-        const promoted = content.cargos.find((c) => c.promotionStage === stage.id);
-        const next = promoted ? [...content.cargos].sort((a, b) => a.order - b.order).find((c) => c.order > promoted.order) : undefined;
+        const promoted = cargosByOrder.find((c) => c.promotionStage === stage.id);
+        const next = promoted ? cargosByOrder.find((c) => c.order > promoted.order) : undefined;
         if (next) cargo = next.id;
       }
-      if (!farming) lossStreak = 0;
+      if (!farming && regular) lossStreak = 0;
     } else {
       xp += Math.floor(stage.xp * content.config.defeatXpShare);
-      if (!farming) lossStreak += 1;
+      if (!farming && regular) lossStreak += 1;
     }
     if (farmLeft > 0) farmLeft -= 1;
     else if (lossStreak >= LOSSES_BEFORE_FARMING && farm) {
@@ -136,16 +148,20 @@ export function simulateStudent(content: HackathonContent, policy: PolicyId, see
       lossStreak = 0;
     }
 
+    const before = level;
     const progress = applyXp({ cargo, level, xp }, 0, content);
     level = progress.level;
     xp = progress.xp;
     buyMentors();
     if (firstClear) {
-      result.firstClear[stage.id] = { cafes: result.cafes, level };
-      const cap = applyXp({ cargo, level, xp }, 0, content);
-      level = cap.level;
-      xp = cap.xp;
+      // The promotion may raise the cap, so level up again with the XP that was waiting.
+      const raised = applyXp({ cargo, level, xp }, 0, content);
+      level = raised.level;
+      xp = raised.xp;
+      const mentorLevels = Object.values(mentors).reduce<number>((sum, n) => sum + (n ?? 0), 0);
+      result.firstClear[stage.id] = { cafes: result.cafes, level, mentorLevels };
     }
+    for (let l = before + 1; l <= level; l += 1) result.levelAt[l] = result.cafes;
   }
   result.finalLevel = level;
   return result;
@@ -156,18 +172,30 @@ export function simulateProgression(content: HackathonContent, options: Progress
   for (let i = 0; i < options.students; i += 1) {
     students.push(simulateStudent(content, options.policy, mix32(options.seed + i * 7919), options.maxAttempts));
   }
+  const avg = (values: number[]) => (values.length === 0 ? 0 : values.reduce((a, b) => a + b, 0) / values.length);
   const stages = [...content.stages]
     .sort((a, b) => a.chapter - b.chapter || a.order - b.order)
     .map((stage): StageProgress => {
-      const clears = students.flatMap((s) => (s.firstClear[stage.id] ? [s.firstClear[stage.id]!] : []));
-      const avg = (values: number[]) => (values.length === 0 ? 0 : values.reduce((a, b) => a + b, 0) / values.length);
+      const who = students.filter((s) => s.firstClear[stage.id]);
+      const clears = who.map((s) => s.firstClear[stage.id]!);
       return {
         stage,
         cleared: clears.length,
         avgCafesToClear: avg(clears.map((c) => c.cafes)),
-        avgAttemptsInStage: avg(students.filter((s) => s.firstClear[stage.id]).map((s) => s.attemptsByStage[stage.id] ?? 0)),
+        avgAttemptsInStage: avg(who.map((s) => s.attemptsByStage[stage.id] ?? 0)),
         avgLevelAtClear: avg(clears.map((c) => c.level)),
+        avgMentorLevels: avg(clears.map((c) => c.mentorLevels)),
       };
     });
-  return { options, stages, avgFinalLevel: students.reduce((s, r) => s + r.finalLevel, 0) / Math.max(1, students.length) };
+  const cap = Math.max(...content.cargos.map((c) => c.maxLevel));
+  const levelMilestones = [5, 8, 10, 15, cap].map((level) => {
+    const reached = students.filter((s) => s.levelAt[level] !== undefined);
+    return { level, reached: reached.length, avgCafes: avg(reached.map((s) => s.levelAt[level] ?? 0)) };
+  });
+  return {
+    options,
+    stages,
+    avgFinalLevel: avg(students.map((s) => s.finalLevel)),
+    levelMilestones,
+  };
 }

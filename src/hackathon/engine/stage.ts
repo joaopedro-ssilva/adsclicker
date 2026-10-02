@@ -27,14 +27,15 @@ function average(values: number[]): number {
   return values.length === 0 ? 0 : values.reduce((sum, v) => sum + v, 0) / values.length;
 }
 
-/** The last wave: the boss with a minion, or, without a boss in the content, the three toughest commons. */
+/**
+ * The last wave is a mini-boss: the toughest common enemy with one random minion. The chapter's
+ * real boss stays a set piece of the campaign (without commons, it is all the content has).
+ */
 function finalWave(enemies: EnemyDef[], commons: EnemyDef[], rng: Stream): string[] {
-  const boss = pickOne(rng, enemies.filter((e) => e.boss));
-  if (boss) {
-    const minion = pickOne(rng, commons);
-    return minion ? [boss.id, minion.id] : [boss.id];
-  }
-  return [...commons].sort((a, b) => b.hp - a.hp || a.id.localeCompare(b.id)).slice(0, 3).map((e) => e.id);
+  const toughest = [...commons].sort((a, b) => b.hp - a.hp || a.id.localeCompare(b.id))[0] ?? enemies[0];
+  if (!toughest) return [];
+  const minion = pickOne(rng, commons);
+  return minion ? [toughest.id, minion.id] : [toughest.id];
 }
 
 function dailyWaves(content: HackathonContent, rng: Stream): string[][] {
@@ -43,7 +44,7 @@ function dailyWaves(content: HackathonContent, rng: Stream): string[][] {
   const count = Math.max(1, content.config.daily.waves);
   const waves: string[][] = [];
   for (let i = 0; i < count - 1; i += 1) {
-    const size = 1 + Math.floor(rng() * 3);
+    const size = 1 + Math.floor(rng() * 2);
     const wave: string[] = [];
     for (let j = 0; j < size; j += 1) {
       const enemy = pickOne(rng, pool);
@@ -58,8 +59,9 @@ function dailyWaves(content: HackathonContent, rng: Stream): string[][] {
 /**
  * The Hackathon of the day, generated from the date key alone (the same for every player).
  *
- * - Waves: `config.daily.waves`; every wave but the last has 1 to 3 random common enemies, the
- *   last has a boss (with one minion) or, if the content has no boss, the three toughest commons.
+ * - Waves: `config.daily.waves`; every wave but the last has 1 or 2 random common enemies, the
+ *   last is a mini-boss: the toughest common enemy (by HP) with one random minion. The campaign's
+ *   boss never appears in the daily.
  * - Level: the mean level of the campaign's regular (non-boss) stages, rounded: a fair fight for
  *   a build from the middle of the chapter. Difficulty comes from the modifiers, not the date.
  * - Rewards: 1.5x the mean XP and Commits of those stages, plus the modifiers' `xpPercent`.

@@ -37,12 +37,13 @@ describe('daily stage', () => {
       if (!stage) continue;
       expect(stage.id).toBe('daily');
       expect(stage.waves).toHaveLength(content.config.daily.waves);
-      expect(stage.waves[stage.waves.length - 1]).toContain('boss');
+      expect(stage.waves[stage.waves.length - 1]?.[0]).toBe('timed'); // the toughest common by HP
       for (const wave of stage.waves.slice(0, -1)) {
         expect(wave.length).toBeGreaterThanOrEqual(1);
-        expect(wave.length).toBeLessThanOrEqual(3);
+        expect(wave.length).toBeLessThanOrEqual(2);
         expect(wave.every((id) => id !== 'boss')).toBe(true);
       }
+      expect(stage.waves.flat()).not.toContain('boss');
       expect(stage.modifiers).toHaveLength(content.config.daily.modifiers);
       expect(new Set(stage.modifiers.map((m) => m.id)).size).toBe(stage.modifiers.length);
       expect(stage.level).toBe(2); // mean of the regular stages' levels 1, 2, 3

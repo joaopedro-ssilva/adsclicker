@@ -21,11 +21,11 @@ const cell = (s: FightStats) => `${pct(s.winRate)} ${s.winRate > 0 ? secs(s.avgW
 function fightRow(spec: StudentSpec, stageId: string, policies: PolicyId[], runs: number, content: HackathonContent): string[] {
   const stage = resolveStage(stageId, '2026-01-01', content);
   if (!stage) return policies.map(() => '-');
-  const build = buildStudent(spec, content);
+  const build = buildStudent(spec, content, stage.boss);
   return policies.map((p) => cell(measureFights(build, stage, p, runs, content)));
 }
 
-const FIGHT_POLICIES: PolicyId[] = ['none', 'auto', 'flow', 'good'];
+const FIGHT_POLICIES: PolicyId[] = ['none', 'auto', 'good'];
 
 /** One row per stage: an on-level student with no items and one with average rare items. */
 export function stageFightTable(content: HackathonContent, runs: number): string {
@@ -44,15 +44,15 @@ export function stageFightTable(content: HackathonContent, runs: number): string
 export function bossTable(content: HackathonContent, runs: number): string {
   const boss = [...content.stages].reverse().find((s) => s.boss);
   if (!boss) return '(no boss stage in the content)';
-  const withFirewall = ['firewall', 'deploy'];
-  const withoutFirewall = ['deploy', 'cafe-duplo'];
+  const withFirewall = ['firewall'];
+  const withoutFirewall = ['deploy'];
   const specs: { label: string; spec: StudentSpec }[] = [
-    { label: 'bare, Firewall + Deploy', spec: { level: 10, gear: null, skills: withFirewall } },
-    { label: 'common gear, Firewall + Deploy', spec: { level: 10, gear: 'comum', itemLevel: 8, skills: withFirewall } },
-    { label: 'rare gear, Firewall + Deploy', spec: { level: 10, gear: 'raro', itemLevel: 8, skills: withFirewall } },
-    { label: 'rare gear, Deploy + Café duplo (no Firewall)', spec: { level: 10, gear: 'raro', itemLevel: 8, skills: withoutFirewall } },
-    { label: 'rare gear + mentors 2, Firewall + Deploy', spec: { level: 10, gear: 'raro', itemLevel: 8, mentorLevel: 2, skills: withFirewall } },
-    { label: 'epic gear, Firewall + Deploy', spec: { level: 10, gear: 'epico', itemLevel: 8, skills: withFirewall } },
+    { label: 'bare, Firewall', spec: { level: 10, gear: null, skills: withFirewall } },
+    { label: 'common gear, Firewall', spec: { level: 10, gear: 'comum', itemLevel: 8, skills: withFirewall } },
+    { label: 'rare gear, Firewall', spec: { level: 10, gear: 'raro', itemLevel: 8, skills: withFirewall } },
+    { label: 'rare gear, Deploy, no Firewall', spec: { level: 10, gear: 'raro', itemLevel: 8, skills: withoutFirewall } },
+    { label: 'rare gear + mentors 2, Firewall', spec: { level: 10, gear: 'raro', itemLevel: 8, mentorLevel: 2, skills: withFirewall } },
+    { label: 'epic gear, Firewall', spec: { level: 10, gear: 'epico', itemLevel: 8, skills: withFirewall } },
   ];
   const policies: PolicyId[] = ['none', 'flow', 'auto', 'good'];
   const labels: Record<PolicyId, string> = {
@@ -73,8 +73,12 @@ export function progressionTable(report: ProgressionReport): string {
     p.cleared ? p.avgCafesToClear.toFixed(1) : '-',
     p.cleared ? p.avgAttemptsInStage.toFixed(1) : '-',
     p.cleared ? p.avgLevelAtClear.toFixed(1) : '-',
+    p.cleared ? p.avgMentorLevels.toFixed(1) : '-',
     p.cleared ? `${Math.max(0, (p.avgCafesToClear - 5) / regen).toFixed(1)}h` : '-',
   ]);
-  const head = table(['stage', 'cleared', 'cafes until clear', 'fights in stage', 'level at clear', 'regen wait'], rows);
-  return `${head}\n(policy ${report.options.policy}, ${report.options.students} students, average final level ${report.avgFinalLevel.toFixed(1)}; regen wait = Cafes beyond the first 5 at 4 per hour)`;
+  const head = table(['stage', 'cleared', 'cafes until clear', 'fights in stage', 'level at clear', 'mentor levels', 'regen wait'], rows);
+  const levels = report.levelMilestones.map((m) => `level ${m.level}: ${m.reached ? m.avgCafes.toFixed(0) : '-'} cafes (${m.reached}/${report.options.students})`).join('; ');
+  return `${head}
+${levels}
+(policy ${report.options.policy}, ${report.options.students} students, average final level ${report.avgFinalLevel.toFixed(1)}; regen wait = Cafes beyond the first 5 at 4 per hour; one Cafe in 12 goes to the daily stage from level 5)`;
 }

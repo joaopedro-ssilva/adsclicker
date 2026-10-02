@@ -12,6 +12,22 @@ export function cargoForLevel(level: number, content: HackathonContent): CargoId
   return (cargos.find((c) => level <= c.maxLevel) ?? cargos[cargos.length - 1])?.id ?? 'estudante';
 }
 
+const SKILL_KINDS_PLAN = ['aoe', 'block'] as const;
+const PRIORITY_BOSS = ['block', 'aoe', 'heal', 'haste'];
+const PRIORITY_STAGE = ['aoe', 'heal', 'block', 'haste'];
+
+/** Skills a sensible student unlocks: the area attack first (cheap), then the block for the boss. */
+function defaultPlan(content: HackathonContent): string[] {
+  return SKILL_KINDS_PLAN.flatMap((kind) => content.skills.filter((s) => s.effect.kind === kind).map((s) => s.id));
+}
+
+/** Which of the owned skills go in the slots: the block against a boss, the area attack otherwise. */
+export function chooseActive(owned: string[], facingBoss: boolean, slots: number, content: HackathonContent): string[] {
+  const priority = facingBoss ? PRIORITY_BOSS : PRIORITY_STAGE;
+  const rank = (id: string): number => priority.indexOf(content.skills.find((s) => s.id === id)?.effect.kind ?? '');
+  return [...owned].sort((a, b) => rank(a) - rank(b)).slice(0, slots);
+}
+
 /** The node to buy next on the way to `target`: its first missing prerequisite, or the node itself. */
 function nextStep(target: SkillNodeDef, owned: Record<string, number>, content: HackathonContent): SkillNodeDef {
   for (const id of target.requires) {
@@ -28,12 +44,10 @@ function nextStep(target: SkillNodeDef, owned: Record<string, number>, content: 
  */
 export function allocateSkills(
   level: number,
-  cargo: CargoId,
   content: HackathonContent,
   wanted?: string[],
 ): { skillNodes: Record<string, number>; activeSkills: string[] } {
-  const slots = indexOf(content).cargos.get(cargo)?.skillSlots ?? 0;
-  const goals = (wanted ?? content.skills.map((s) => s.id)).slice(0, slots);
+  const goals = wanted ?? defaultPlan(content);
   const skillNodes: Record<string, number> = {};
   const activeSkills: string[] = [];
   for (let guard = 0; guard < 500; guard += 1) {
@@ -75,19 +89,43 @@ export interface StudentSpec {
   mentorLevel?: number;
   /** Item level; defaults to the student's level. */
   itemLevel?: number;
-  /** Active skills to unlock, in order of priority (default: the tree order). */
+  /** Skills to unlock and equip, in order of priority (default: area attack, then block). */
   skills?: string[];
 }
 
-/** A student with spent skill points and, optionally, one typical item per slot. */
-export function buildStudent(spec: StudentSpec, content: HackathonContent): Build {
+/** Rough fighting power of a build: damage per second times effective HP. */
+function power(build: Build): number {
+  const { logica, agilidade, foco, resiliencia } = build.stats;
+  return logica * (agilidade / 100) * foco * (1 + resiliencia / 100);
+}
+
+/**
+ * A decent item for the slot: of all its bases (set pieces apart) rolled at the same rarity, the
+ * second best for a bare student in a fight (a careful player has the best one only sometimes).
+ */
+function decentItem(slot: SlotId, rarity: ItemRarity, level: number, content: HackathonContent): ItemInstance | null {
+  const bare = computeBuild({ cargo: 'estudante', level, skillNodes: {}, mentors: {}, equipped: {}, activeSkills: [] }, content);
+  const candidates = content.items
+    .filter((b) => b.slot === slot && !b.set)
+    .flatMap((b) => typicalItem(b.id, rarity, level, content) ?? [])
+    .map((item) => ({
+      item,
+      value: power(computeBuild({ cargo: 'estudante', level, skillNodes: {}, mentors: {}, equipped: { [slot]: item }, activeSkills: [] }, content)) - power(bare),
+    }))
+    .sort((a, b) => a.value - b.value);
+  return (candidates[candidates.length - 2] ?? candidates[candidates.length - 1])?.item ?? null;
+}
+
+/** A student with spent skill points and, optionally, a decent item of one rarity in every slot. */
+export function buildStudent(spec: StudentSpec, content: HackathonContent, facingBoss = false): Build {
   const cargo = cargoForLevel(spec.level, content);
-  const { skillNodes, activeSkills } = allocateSkills(spec.level, cargo, content, spec.skills);
+  const { skillNodes, activeSkills: owned } = allocateSkills(spec.level, content, spec.skills);
+  const slots = indexOf(content).cargos.get(cargo)?.skillSlots ?? 0;
+  const activeSkills = spec.skills ? owned.slice(0, slots) : chooseActive(owned, facingBoss, slots, content);
   const equipped: Partial<Record<SlotId, ItemInstance>> = {};
   if (spec.gear) {
     for (const slot of SLOT_IDS) {
-      const base = content.items.find((b) => b.slot === slot && !b.set) ?? content.items.find((b) => b.slot === slot);
-      const item = base ? typicalItem(base.id, spec.gear, spec.itemLevel ?? spec.level, content) : null;
+      const item = decentItem(slot, spec.gear, spec.itemLevel ?? spec.level, content);
       if (item) equipped[slot] = item;
     }
   }
