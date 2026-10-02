@@ -1,1 +1,4 @@
 /* Hackathon arena, mode switch and moments. Owned by the arena engineer; import further files from here. */
+@import './arena-base.css';
+@import './arena-fight.css';
+@import './arena-rewards.css';

@@ -1,0 +1,970 @@
+/* The fight: field, actors, bars, telegraph, Flow bar, skills, choice cards, end banner. */
+
+.ar-arena {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+/* ---------- Top bar ---------- */
+
+.ar-hud {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-2) var(--space-3) 0;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border: 2px solid var(--border);
+}
+
+.ar-hud-left,
+.ar-hud-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ar-hud-right {
+  justify-content: flex-end;
+}
+
+.ar-hud-stage {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ar-badge {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--on-accent);
+  background: var(--accent);
+}
+
+.ar-hud-wave {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.ar-hud-wave-text {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ar-pips {
+  display: flex;
+  gap: 4px;
+}
+
+.ar-pips i {
+  display: block;
+  width: 14px;
+  height: 6px;
+  background: var(--border);
+}
+
+.ar-pips i[data-state='done'] {
+  background: var(--good);
+}
+
+.ar-pips i[data-state='now'] {
+  background: var(--accent);
+  animation: ar-pip 0.8s steps(2) infinite;
+}
+
+@keyframes ar-pip {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.ar-wave-timer {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--warn);
+}
+
+.ar-wave-timer[data-urgent='true'] {
+  color: var(--bad);
+  animation: ar-pip 0.5s steps(2) infinite;
+}
+
+.ar-abandon {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: transparent;
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+
+.ar-abandon[data-confirming='true'] {
+  color: var(--on-bad);
+  background: var(--bad);
+  border-color: var(--bad);
+}
+
+/* ---------- Field and actors ---------- */
+
+.ar-play {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.ar-field {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) 7%;
+}
+
+.ar-player {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+
+.ar-player-info,
+.ar-enemy-info {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.ar-player-name,
+.ar-enemy-name {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.8);
+}
+
+.ar-player-body {
+  position: relative;
+}
+
+.ar-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px;
+  min-height: 15px;
+  margin: 0;
+}
+
+.ar-status b {
+  padding: 0 5px;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #10131c;
+  background: var(--warn);
+}
+
+.ar-status b[data-kind='block'] {
+  background: var(--ar-flow);
+}
+
+.ar-status b[data-kind='flow'] {
+  background: var(--ar-flow);
+  animation: ar-pip 0.5s steps(2) infinite;
+}
+
+.ar-status b[data-kind='stun'] {
+  background: #ffe066;
+}
+
+.ar-player[data-flow-ready='true'] .ar-player-body {
+  filter: drop-shadow(0 0 8px var(--ar-flow));
+}
+
+.ar-stars {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  z-index: 2;
+  width: 0;
+  height: 0;
+}
+
+.ar-stars i {
+  position: absolute;
+  font-size: 18px;
+  font-style: normal;
+  animation: ar-orbit 0.9s steps(8) infinite;
+}
+
+.ar-stars i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.ar-stars i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+
+@keyframes ar-orbit {
+  0% {
+    transform: translate(-30px, 0);
+  }
+
+  25% {
+    transform: translate(0, 8px);
+  }
+
+  50% {
+    transform: translate(26px, 0);
+  }
+
+  75% {
+    transform: translate(0, -8px);
+  }
+
+  100% {
+    transform: translate(-30px, 0);
+  }
+}
+
+.ar-shield {
+  position: absolute;
+  inset: -6px -14px;
+  z-index: 2;
+  border: 3px solid var(--ar-flow);
+  border-radius: 40% 40% 50% 50%;
+  box-shadow:
+    0 0 14px var(--ar-flow),
+    inset 0 0 14px color-mix(in srgb, var(--ar-flow) 50%, transparent);
+  background: color-mix(in srgb, var(--ar-flow) 12%, transparent);
+  pointer-events: none;
+}
+
+.ar-enemies {
+  position: relative;
+  align-self: stretch;
+}
+
+.ar-enemy {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  transform: translateX(-50%);
+  animation: ar-walk-in 420ms steps(6) both;
+}
+
+.ar-enemy[data-entry='spawn'] {
+  animation: ar-pop 360ms steps(5) both;
+}
+
+.ar-enemy-body {
+  position: relative;
+  line-height: 0;
+  animation: ar-bob 1.1s steps(1, end) infinite;
+  animation-delay: calc(var(--slot, 0) * -0.35s);
+}
+
+.ar-enemy[data-dying='true'] .ar-enemy-body {
+  animation: ar-die 520ms steps(6) both;
+}
+
+@keyframes ar-bob {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes ar-walk-in {
+  from {
+    opacity: 0;
+    translate: 60px 0;
+  }
+}
+
+@keyframes ar-pop {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+
+  70% {
+    scale: 1.2;
+  }
+}
+
+@keyframes ar-die {
+  0% {
+    filter: brightness(4);
+  }
+
+  40% {
+    filter: brightness(2);
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 0.4;
+    translate: 0 14px;
+  }
+}
+
+.ar-enemy[data-boss='true'] .ar-enemy-name {
+  color: var(--warn);
+}
+
+/* ---------- Bars ---------- */
+
+.ar-hp {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  overflow: hidden;
+  background: #1a0d12;
+  border: 2px solid #05070d;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.5);
+}
+
+.ar-hp-fill {
+  height: 100%;
+  background: var(--bad);
+  transition: width 140ms steps(3);
+}
+
+.ar-hp[data-tone='player'] {
+  height: 16px;
+}
+
+.ar-hp[data-tone='player'] .ar-hp-fill {
+  background: var(--good);
+}
+
+.ar-hp[data-tone='boss'] {
+  height: 14px;
+}
+
+.ar-hp[data-tone='boss'] .ar-hp-fill {
+  background: #ff9f45;
+}
+
+.ar-hp[data-low='true'] .ar-hp-fill {
+  background: var(--bad);
+  animation: ar-pip 0.6s steps(2) infinite;
+}
+
+.ar-hp-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: #fff;
+  text-shadow:
+    0 1px 0 #000,
+    1px 0 0 #000,
+    -1px 0 0 #000;
+}
+
+/* ---------- Charged attack telegraph ---------- */
+
+.ar-charge {
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  padding: 2px 8px 3px;
+  color: #fff;
+  background: color-mix(in srgb, var(--bad) calc(40% + var(--p, 0) * 55%), #12060a);
+  border: 2px solid #ffd0d0;
+  box-shadow: 0 0 calc(6px + var(--p, 0) * 18px) var(--bad);
+  animation: ar-charge-pulse calc(0.5s - var(--p, 0) * 0.3s) steps(2) infinite;
+}
+
+.ar-charge[data-covered='true'] {
+  --bad: var(--ar-flow);
+
+  color: #06202a;
+}
+
+.ar-charge-label {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ar-charge-time {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ar-charge-bar {
+  width: 100%;
+  height: 5px;
+  background: rgb(0 0 0 / 0.55);
+}
+
+.ar-charge-bar i {
+  display: block;
+  height: 100%;
+  background: #fff;
+}
+
+@keyframes ar-charge-pulse {
+  50% {
+    filter: brightness(1.35);
+    transform: scale(1.04);
+  }
+}
+
+.ar-enemy[data-charging='true'] .ar-enemy-sprite {
+  filter: drop-shadow(0 0 8px var(--bad));
+  animation: ar-tremble 0.12s steps(2) infinite;
+}
+
+@keyframes ar-tremble {
+  50% {
+    transform: translateX(3px);
+  }
+}
+
+.ar-charge-ring {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: 140%;
+  height: 28%;
+  border: 3px solid var(--bad);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bad) 20%, transparent);
+  transform: translateX(-50%);
+  animation: ar-ring 0.7s steps(4) infinite;
+  pointer-events: none;
+}
+
+@keyframes ar-ring {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) scale(0.6);
+  }
+
+  to {
+    opacity: 0.2;
+    transform: translateX(-50%) scale(1.15);
+  }
+}
+
+.ar-vignette,
+.ar-danger {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.ar-vignette {
+  box-shadow: inset 0 0 90px 24px var(--bad);
+}
+
+.ar-danger {
+  box-shadow: inset 0 0 60px 10px color-mix(in srgb, var(--bad) 70%, transparent);
+}
+
+.ar-arena[data-charging='true'] .ar-danger {
+  opacity: 1;
+  animation: ar-pip 0.5s steps(2) infinite;
+}
+
+/* ---------- Controls ---------- */
+
+.ar-controls {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+}
+
+.ar-skills {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ar-flow {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 8px 12px 6px;
+  text-align: left;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ar-flow:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow-color);
+}
+
+.ar-flow-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--ar-flow);
+}
+
+.ar-flow-track {
+  display: block;
+  height: 18px;
+  background: #0a1a22;
+  border: 2px solid #05070d;
+}
+
+.ar-flow-track i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--ar-flow) 0 8px, color-mix(in srgb, var(--ar-flow) 70%, #fff) 8px 10px);
+  transition: width 90ms steps(2);
+}
+
+.ar-flow-caption {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ar-flow[data-mode='waiting'],
+.ar-flow[data-mode='armed'] {
+  border-color: var(--ar-flow);
+}
+
+.ar-flow[data-mode='armed'] {
+  animation: ar-flow-glow 0.5s steps(2) infinite;
+}
+
+.ar-flow[data-mode='armed'] .ar-flow-caption {
+  color: var(--ar-flow);
+}
+
+@keyframes ar-flow-glow {
+  50% {
+    box-shadow:
+      var(--shadow),
+      0 0 18px var(--ar-flow);
+  }
+}
+
+.ar-skill {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'ring name'
+    'ring caption';
+  align-items: center;
+  column-gap: var(--space-2);
+  width: 150px;
+  padding: 5px 10px 5px 5px;
+  text-align: left;
+  color: var(--text);
+  background: color-mix(in srgb, var(--bg) 86%, transparent);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.ar-skill .ui-meter {
+  grid-area: ring;
+}
+
+.ar-skill-name {
+  grid-area: name;
+  align-self: end;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.ar-skill-caption {
+  grid-area: caption;
+  align-self: start;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.ar-skill-key {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  transform: scale(0.8);
+}
+
+.ar-skill[data-state='ready'] {
+  border-color: var(--accent);
+}
+
+.ar-skill[data-state='ready'] .ar-skill-caption {
+  color: var(--accent-text);
+}
+
+.ar-skill[data-state='cooldown'],
+.ar-skill[data-auto='true'] {
+  cursor: default;
+}
+
+.ar-skill[data-state='cooldown'] {
+  opacity: 0.8;
+}
+
+.ar-skill:disabled {
+  filter: none;
+}
+
+.ar-skill[data-hinted='true'] {
+  border-color: var(--ar-flow);
+  animation: ar-flow-glow 0.4s steps(2) infinite;
+}
+
+/* ---------- Between waves ---------- */
+
+.ar-choice {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: rgb(5 7 13 / 0.82);
+  cursor: default;
+}
+
+.ar-choice-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--good);
+}
+
+.ar-choice-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 190px));
+  gap: var(--space-3);
+}
+
+.ar-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  text-align: center;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-top: 4px solid var(--accent);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  animation: ar-card-in 360ms steps(6) both;
+}
+
+.ar-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.ar-card[data-picked='true'] {
+  border-color: var(--good);
+  box-shadow: 0 0 18px var(--good);
+}
+
+.ar-card:disabled:not([data-picked='true']) {
+  opacity: 0.45;
+}
+
+.ar-card-key {
+  position: absolute;
+  top: -10px;
+  left: -8px;
+  transform: scale(0.85);
+}
+
+.ar-card-emoji {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.ar-card-name {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ar-card-text {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.ar-choice-auto {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@keyframes ar-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ---------- End banner ---------- */
+
+.ar-end {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-2);
+  background: rgb(5 7 13 / 0.45);
+  pointer-events: none;
+}
+
+.ar-end-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 6cqw, 52px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bad);
+  text-shadow:
+    0 5px 0 rgb(0 0 0 / 0.7),
+    0 0 26px color-mix(in srgb, var(--bad) 60%, transparent);
+  animation: ar-end-in 520ms steps(7) both;
+}
+
+.ar-end[data-won='true'] .ar-end-title {
+  color: var(--legendary);
+  text-shadow:
+    0 5px 0 rgb(0 0 0 / 0.7),
+    0 0 30px color-mix(in srgb, var(--legendary) 70%, transparent);
+}
+
+.ar-end-sub {
+  margin: 0;
+  padding: 3px 12px;
+  font-size: 13px;
+  background: rgb(5 7 13 / 0.78);
+  color: var(--text);
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.8);
+  animation: ar-pip 1s steps(2) infinite;
+}
+
+@keyframes ar-end-in {
+  from {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/* ---------- Phones ---------- */
+
+/* While a fight runs the panel is read-only, so the stage takes more of the stacked screen. */
+@media (max-width: 1023px) {
+  .game:has(.ar-arena, .ar-rewards) {
+    grid-template-rows: max(64dvh, 480px) minmax(0, 1fr);
+  }
+}
+
+@container stage (max-width: 639px) {
+  .ar-hud {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    margin: 4px var(--space-2) 0;
+    padding: 3px 8px;
+    gap: var(--space-2);
+  }
+
+  .ar-hud-stage {
+    font-size: 10px;
+  }
+
+  .ar-hud-wave {
+    grid-auto-flow: column;
+    gap: var(--space-2);
+  }
+
+  .ar-hud-wave-text {
+    font-size: 11px;
+  }
+
+  .ar-hud-left .ar-badge {
+    display: none;
+  }
+
+  .ar-hud-left {
+    display: none;
+  }
+
+  .ar-hud {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .ar-field {
+    padding: 0 var(--space-2) 4%;
+    gap: 4px;
+  }
+
+  .ar-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    padding: 6px var(--space-2) var(--space-2);
+  }
+
+  .ar-skills {
+    justify-content: center;
+  }
+
+  .ar-skill {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 3px 6px 3px 3px;
+    column-gap: 6px;
+  }
+
+  .ar-skill .ui-meter {
+    transform: scale(0.8);
+    margin: -4px;
+  }
+
+  .ar-skill-name {
+    font-size: 11px;
+  }
+
+  .ar-flow {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'label track'
+      'caption caption';
+    align-items: center;
+    column-gap: 8px;
+    padding: 4px 8px;
+    gap: 2px 8px;
+  }
+
+  .ar-flow-label {
+    grid-area: label;
+  }
+
+  .ar-flow-track {
+    grid-area: track;
+    height: 14px;
+  }
+
+  .ar-flow-caption {
+    grid-area: caption;
+    font-size: 11px;
+  }
+
+  .ar-choice {
+    gap: var(--space-2);
+    padding: var(--space-2);
+  }
+
+  .ar-choice-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .ar-card {
+    gap: 4px;
+    padding: var(--space-2) 6px 6px;
+  }
+
+  .ar-card-emoji {
+    font-size: 24px;
+  }
+
+  .ar-card-name {
+    font-size: 9px;
+  }
+
+  .ar-card-text {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .ar-enemy-name,
+  .ar-player-name {
+    font-size: 9px;
+  }
+
+  .ar-hp[data-tone='player'] {
+    height: 13px;
+  }
+
+  .ar-charge {
+    padding: 1px 5px 2px;
+  }
+
+  .ar-charge-label {
+    font-size: 10px;
+  }
+
+  .ar-charge-time {
+    font-size: 16px;
+  }
+}

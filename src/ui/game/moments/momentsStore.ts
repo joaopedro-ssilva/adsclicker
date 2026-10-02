@@ -21,10 +21,15 @@ export interface GraduateMoment {
   diplomas: number;
 }
 
-/** Ceremonies that take the screen and wait for the player. */
-export type BlockingMoment = HireMoment | GraduateMoment | (UnlockMoment & { rarity: 'epic' | 'legendary' });
+export interface HackathonMoment {
+  id: number;
+  kind: 'hackathon';
+}
 
-type NewBlocking = Omit<HireMoment, 'id'> | Omit<GraduateMoment, 'id'>;
+/** Ceremonies that take the screen and wait for the player. */
+export type BlockingMoment = HireMoment | GraduateMoment | HackathonMoment | (UnlockMoment & { rarity: 'epic' | 'legendary' });
+
+type NewBlocking = Omit<HireMoment, 'id'> | Omit<GraduateMoment, 'id'> | Omit<HackathonMoment, 'id'>;
 
 interface MomentsStore {
   /** One at a time, in order. The first is on screen. */

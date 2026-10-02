@@ -1,5 +1,6 @@
 'use client';
 import { useGame } from '@/game/store';
+import { HackathonInviteScene } from '@/ui/hackathon/arena/HackathonInviteScene';
 import { GraduationScene } from './GraduationScene';
 import { HireScene } from './HireScene';
 import { useMoments } from './momentsStore';
@@ -21,6 +22,8 @@ export function MomentsHost() {
     scene =
       current.kind === 'hire' ? (
         <HireScene key={current.id} professor={current.professor} onClose={close} />
+      ) : current.kind === 'hackathon' ? (
+        <HackathonInviteScene key={current.id} onClose={close} />
       ) : current.kind === 'graduate' ? (
         <GraduationScene key={current.id} diplomas={current.diplomas} onClose={close} />
       ) : (

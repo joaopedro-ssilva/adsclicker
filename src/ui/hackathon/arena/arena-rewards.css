@@ -1,0 +1,269 @@
+/* Rewards screen, level bar, item drops, legendary and promotion scenes. */
+
+.ar-rewards {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  padding: var(--space-3);
+  overflow: auto;
+}
+
+.ar-rewards-card {
+  display: grid;
+  gap: var(--space-3);
+  width: min(560px, 100%);
+  padding: var(--space-4) var(--space-5);
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+  border: 2px solid var(--border);
+  border-top: 4px solid var(--bad);
+  box-shadow: var(--shadow);
+}
+
+.ar-rewards[data-won='true'] .ar-rewards-card {
+  border-top-color: var(--legendary);
+}
+
+.ar-rewards-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--bad);
+}
+
+.ar-rewards[data-won='true'] .ar-rewards-title {
+  color: var(--legendary);
+}
+
+.ar-first {
+  margin: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  color: #10131c;
+  background: var(--legendary);
+  animation: ar-pip 0.8s steps(2) 3;
+}
+
+.ar-rewards-note {
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.ar-reward-row {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 8px;
+  animation: ar-card-in 300ms steps(5) both;
+}
+
+.ar-reward-row[data-shown='false'] {
+  visibility: hidden;
+  animation: none;
+}
+
+.ar-reward-value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.ar-levelbar {
+  display: grid;
+  gap: 4px;
+}
+
+.ar-levelbar-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ar-levelup {
+  color: var(--legendary);
+  animation: ar-pip 0.4s steps(2) infinite;
+}
+
+.ar-levelbar-track {
+  height: 18px;
+  background: #101421;
+  border: 2px solid #05070d;
+}
+
+.ar-levelbar-track i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--accent) 0 8px, color-mix(in srgb, var(--accent) 70%, #fff) 8px 10px);
+}
+
+.ar-drops {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ar-drop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--rarity) calc(8% + var(--rank) * 4%), var(--bg));
+  border: 2px solid var(--rarity);
+  box-shadow: 0 0 calc(var(--rank) * 5px) color-mix(in srgb, var(--rarity) 70%, transparent);
+  animation: ar-drop-in 460ms steps(7) both;
+}
+
+.ar-drop-art {
+  display: grid;
+  place-items: center;
+  min-width: 72px;
+  min-height: 72px;
+  background: rgb(0 0 0 / 0.3);
+}
+
+.ar-drop-info {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ar-drop-rarity {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rarity);
+}
+
+.ar-drop-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.ar-drop-affixes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@keyframes ar-drop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-6deg);
+  }
+
+  70% {
+    transform: scale(1.08);
+  }
+}
+
+.ar-rewards-actions {
+  position: sticky;
+  bottom: calc(var(--space-4) * -1);
+  display: grid;
+  justify-items: center;
+  padding: var(--space-2) 0 var(--space-1);
+  background: linear-gradient(transparent, var(--surface) 35%);
+}
+
+.ar-legend {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  text-align: center;
+}
+
+.ar-legend-art {
+  padding: var(--space-4);
+  filter: drop-shadow(0 0 28px color-mix(in srgb, var(--scene) 80%, transparent));
+  animation: ar-legend-in 900ms steps(9) both;
+}
+
+.ar-legend-affixes {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ar-legend-unique {
+  max-width: 420px;
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--scene);
+  background: rgb(0 0 0 / 0.35);
+  border: 2px solid var(--scene);
+}
+
+@keyframes ar-legend-in {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.3);
+  }
+
+  70% {
+    transform: translateY(-10px) scale(1.12);
+  }
+}
+
+.ar-perks {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ar-perks li::before {
+  content: '▸ ';
+  color: var(--scene);
+}
+
+@container stage (max-width: 639px) {
+  .ar-rewards {
+    padding: var(--space-2);
+  }
+
+  .ar-rewards-card {
+    gap: var(--space-2);
+    padding: var(--space-3);
+  }
+
+  .ar-rewards-title {
+    font-size: 20px;
+  }
+
+  .ar-reward-value {
+    font-size: 16px;
+  }
+}
