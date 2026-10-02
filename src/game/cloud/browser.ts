@@ -11,6 +11,8 @@ export const liveGame: CloudGame = {
   summary: () => summarizeState(useGame.getState().state),
   multiplier: () => useGame.getState().state.settings.devMultiplier,
   setMultiplier: (value) => useGame.getState().updateSettings({ devMultiplier: value }),
+  bonus: () => useGame.getState().state.cloudBonus,
+  setBonus: (value) => useGame.getState().setCloudBonus(value),
   subscribe: subscribeGameEvents,
 };
 

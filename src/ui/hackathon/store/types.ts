@@ -26,6 +26,8 @@ export interface ActiveRun {
   flowCharge: number;
   /** True from the end of the fight until the server answers with the rewards. */
   finishing: boolean;
+  /** Additive: set while the finish request is being retried after a lost connection. */
+  finishError?: string | null;
 }
 
 export type ActionResult = { ok: true } | { ok: false; message: string };

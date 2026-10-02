@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SYNC_INTERVAL_MS } from '@/shared/api';
-import type { CloudSave, Me, SaveSummary, SyncResponse } from '@/shared/api';
+import type { CloudBonusPayload, CloudSave, Me, SaveSummary, SyncResponse } from '@/shared/api';
 import type { ApiResult } from '@/shared/apiClient';
 import type { StorageLike } from '../store/createStore';
 import type { GameEvent } from '../store/types';
@@ -101,7 +101,7 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
   } satisfies CloudDeps['api'];
 
   const listeners = new Set<(event: GameEvent) => void>();
-  const gameState = { multiplier: 1, local: summary({ playSeconds: 600 }), adopted: [] as string[], adoptOk: true };
+  const gameState = { bonus: { cargo: 1, mentors: {} } as CloudBonusPayload, multiplier: 1, local: summary({ playSeconds: 600 }), adopted: [] as string[], adoptOk: true };
   const game: CloudDeps['game'] = {
     serialize: () => '{"local":true}',
     adopt: (text) => {
@@ -111,6 +111,10 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
       return gameState.adoptOk;
     },
     summary: () => gameState.local,
+    bonus: () => gameState.bonus,
+    setBonus: (value) => {
+      gameState.bonus = value;
+    },
     multiplier: () => gameState.multiplier,
     setMultiplier: (value) => {
       gameState.multiplier = value;
@@ -500,6 +504,34 @@ describe('cloud store', () => {
       expect(t.store.getState().status).toBe('offline');
       expect(t.gameState.multiplier).toBe(10);
       expect(t.store.getState().multiplier).toBe(10);
+    });
+  });
+
+  describe('classroom bonus', () => {
+    const earned = { cargo: 1.25, mentors: { gladimir: 1.2 } };
+
+    it('applies the bonus of /me and of every sync, and drops it when the answer has none', async () => {
+      const t = setup();
+      t.queues.me.push(() => ok({ me: guest, multiplier: 1, bonus: earned, cloud: null }));
+      t.queues.sync.push(() => ok({ status: 'ok', rev: 1, serverTime: T0, multiplier: 1, bonus: earned, me: guest }));
+      await t.start();
+      expect(t.gameState.bonus).toEqual(earned);
+      t.queues.sync.push(() => ok({ status: 'ok', rev: 2, serverTime: T0, multiplier: 1, bonus: { cargo: 1.25, mentors: { gladimir: 1.3 } }, me: guest }));
+      await t.advance(SYNC_INTERVAL_MS);
+      expect(t.gameState.bonus.mentors).toEqual({ gladimir: 1.3 });
+      t.queues.sync.push(() => syncOk(3));
+      await t.advance(SYNC_INTERVAL_MS);
+      expect(t.gameState.bonus).toEqual({ cargo: 1, mentors: {} });
+    });
+
+    it('keeps the last bonus while offline', async () => {
+      const t = setup();
+      t.queues.me.push(() => ok({ me: guest, multiplier: 1, bonus: earned, cloud: null }));
+      t.queues.sync.push(() => ok({ status: 'ok', rev: 1, serverTime: T0, multiplier: 1, bonus: earned, me: guest }));
+      await t.start();
+      t.queues.sync.push(() => network);
+      await t.advance(SYNC_INTERVAL_MS);
+      expect(t.gameState.bonus).toEqual(earned);
     });
   });
 

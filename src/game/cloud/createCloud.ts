@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { StoreApi, UseBoundStore } from 'zustand';
 import { z } from 'zod';
 import { SYNC_INTERVAL_MS, saveSummarySchema } from '@/shared/api';
-import type { ApiError, CloudSave, Me, SaveSummary } from '@/shared/api';
+import type { ApiError, CloudBonusPayload, CloudSave, Me, SaveSummary } from '@/shared/api';
 import type { ApiResult, api as realApi } from '@/shared/apiClient';
 import type { StorageLike } from '../store/createStore';
 import type { GameEvent } from '../store/types';
@@ -32,6 +32,9 @@ export interface CloudGame {
   summary(): SaveSummary;
   multiplier(): number;
   setMultiplier(value: number): void;
+  /** Permanent classroom bonuses earned in the Hackathon (game state `cloudBonus`). */
+  bonus(): CloudBonusPayload;
+  setBonus(value: CloudBonusPayload): void;
   subscribe(listener: (event: GameEvent) => void): () => void;
 }
 
@@ -51,6 +54,12 @@ export interface CloudDeps {
     set: (fn: () => void, ms: number) => unknown;
     clear: (handle: unknown) => void;
   };
+}
+
+const NO_BONUS: CloudBonusPayload = { cargo: 1, mentors: {} };
+
+function sameBonus(a: CloudBonusPayload, b: CloudBonusPayload): boolean {
+  return a.cargo === b.cargo && JSON.stringify(a.mentors) === JSON.stringify(b.mentors);
 }
 
 type Failure = 'network' | 'unavailable' | 'limited' | 'failed';
@@ -163,6 +172,12 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       if (game.multiplier() !== value) game.setMultiplier(value);
     };
 
+    /** An answer without `bonus` (older server, no Hackathon profile) means no bonus. */
+    const applyBonus = (value: CloudBonusPayload | undefined) => {
+      const next = value ?? NO_BONUS;
+      if (!sameBonus(game.bonus(), next)) game.setBonus(next);
+    };
+
     const adoptCloud = (cloud: CloudSave): boolean => {
       adopting = true;
       let adopted = false;
@@ -240,6 +255,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         bootstrapped = true;
         set({ me: me.data.me, unavailable: false });
         applyMultiplier(me.data.multiplier);
+        applyBonus(me.data.bonus);
       }
 
       const forced = forceNext;
@@ -265,6 +281,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       afterAttempt(SYNC_INTERVAL_MS, false);
       const { data } = result;
       applyMultiplier(data.multiplier);
+      applyBonus(data.bonus);
       if (data.status === 'conflict' && isOwnWrite(pending, data.cloud)) {
         // Our own earlier request landed after the page closed: take its revision and send what is new.
         rev = data.cloud.rev;
@@ -435,6 +452,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         persist();
         afterAttempt(SYNC_INTERVAL_MS, false);
         applyMultiplier(result.data.multiplier);
+        applyBonus(result.data.bonus);
         set({ conflict: null, status: 'synced', me: result.data.me, lastSyncedAt: now() });
         plan();
       },
@@ -450,9 +468,10 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         }
         const result = await exclusive(() => api.login({ nickname, password }));
         if (!result.ok) return failed(result.error);
-        const { me, multiplier, cloud } = result.data;
+        const { me, multiplier, cloud, bonus } = result.data;
         set({ me, unavailable: false });
         applyMultiplier(multiplier);
+        applyBonus(bonus);
         bootstrapped = true;
 
         if (!cloud) {
@@ -489,6 +508,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         bootstrapped = true;
         persist();
         applyMultiplier(1);
+        applyBonus(undefined);
         set({ me: null, conflict: null, status: 'idle', lastSyncedAt: null });
         syncSoon();
       },
