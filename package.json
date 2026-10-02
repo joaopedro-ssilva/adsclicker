@@ -17,7 +17,8 @@
     "dev:save": "tsx scripts/dev/dev-save.ts",
     "db:up": "docker compose up -d --wait",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "tsx src/server/db/migrate.ts"
+    "db:migrate": "tsx src/server/db/migrate.ts",
+    "art:generate": "node scripts/art/generate.mjs"
   },
   "dependencies": {
     "break_infinity.js": "^2.2.0",

@@ -168,6 +168,8 @@ function headVariantSheet(professor) {
     kind: 'head',
     keys: ['_ref', ...items.map((i) => i[0])],
     calibrate: true,
+    // For the API generator: the reference head travels with the request.
+    refs: [`ref-head-${professor}.png`],
     text: `${BASE}. First open the reference image ref-head-${professor}.png in the current directory: it is this character's head. Draw that SAME character's head ${items.length + 1} times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: ${list(items.map((i) => i[1]))}.`,
   };
 }
@@ -229,4 +231,8 @@ calls.forEach((c, idx) => {
 const known = new Set(sheets.map((x) => x.file));
 const extra = (readJson(SHEETS_FILE, { sheets: [] }).sheets || []).filter((x) => !known.has(x.file));
 writeJson(SHEETS_FILE, { sheets: [...sheets, ...extra] });
+// The same queue for the API generator (scripts/art/generate.mjs): one entry per image.
+writeJson(path.join(ROOT, 'art', 'queue.json'), {
+  images: calls.flatMap((c) => c.images.map((im) => ({ file: im.file, kind: im.kind, keys: im.keys, prompt: im.text, ...(im.refs ? { refs: im.refs } : {}) }))),
+});
 console.log(`queue: ${calls.length} calls, ${sheets.length} sheets registered`);
