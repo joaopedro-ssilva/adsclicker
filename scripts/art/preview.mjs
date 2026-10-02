@@ -46,6 +46,11 @@ async function compose(skinId, prof) {
     // hat rests on the top of the head, a few px down into the hair
     layers.push({ img: hat, x: hx + (head.w >> 1) - hat.anchor.x, y: hy + 4 - hat.anchor.y });
   }
+  return flatten(layers, skin);
+}
+
+/** Flatten placed layers (the first one is the body) into one native-resolution RGBA canvas. */
+function flatten(layers, skin) {
   let x0 = 0, y0 = 0, x1 = skin.w, y1 = skin.h;
   for (const l of layers) {
     x0 = Math.min(x0, l.x); y0 = Math.min(y0, l.y);
@@ -150,5 +155,93 @@ async function main() {
     console.log(`preview: art/preview/overview.png (${W}x${H})`);
   }
   await sceneries();
+  await hackathon();
+}
+
+// ---------------------------------------------------------------- Hackathon contact sheets
+
+const HK_HEADS = ['cacheado', 'oculos-redondos', 'topete', 'black-power', 'barba-ruiva', 'raspado', 'trancas', 'coque', 'franja-oculos', 'cabelo-rosa', 'cacho-longo', 'chanel'];
+const HK_BODIES = ['estudante', 'estagiario'];
+const HK_ENEMIES = ['bug', 'loop-infinito', 'vazamento-de-memoria', 'codigo-legado', 'conflito-de-merge', 'bug-de-merge', 'deploy-de-sexta'];
+const HK_ITEMS = ['teclado-mecanico', 'notebook-velho', 'mouse-vertical', 'editor-escuro', 'terminal-hacker', 'calculadora-cientifica', 'cadeira-ergonomica', 'monitor-ultrawide', 'mesa-regulavel', 'luminaria-de-mesa', 'ventilador-de-mesa', 'nobreak', 'fone-cancelamento', 'mochila-de-notebook', 'cracha-do-hackathon', 'camiseta-do-evento', 'oculos-luz-azul', 'relogio-de-ponto', 'caneca-termica', 'pato-de-borracha', 'adesivo-de-linguagem', 'moeda-de-um-commit', 'trevo-de-quatro-folhas', 'suculenta-de-mesa'];
+
+/** A student: a hackathon body with a hackathon head seated on the neck anchor. */
+async function student(bodyId, headId) {
+  const body = await load(`hackathon/bodies/${bodyId}`);
+  const head = await load(`hackathon/heads/${headId}`);
+  if (!body) return null;
+  const layers = [{ img: body, x: 0, y: 0 }];
+  if (head) layers.push({ img: head, x: body.anchor.x - head.anchor.x, y: body.anchor.y - head.anchor.y });
+  return flatten(layers, body);
+}
+
+const asCanvas = (img) => ({ data: Buffer.from(img.data), w: img.w, h: img.h });
+
+async function rawPng(c, scale) {
+  return sharp(c.data, { raw: { width: c.w, height: c.h, channels: 4 } }).resize(c.w * scale, c.h * scale, { kernel: 'nearest' }).png().toBuffer();
+}
+
+/** Lay out {c, label}[] in a grid; sprites of a row share a bottom line. Writes the file. */
+async function grid(cells, scale, perRow, file, labelPx = 12) {
+  const pad = 8;
+  const cw = Math.max(Math.max(...cells.map((x) => x.c.w)) * scale, labelPx * 11) + pad * 2, ch = Math.max(...cells.map((x) => x.c.h)) * scale;
+  const labelH = labelPx + 10;
+  const rows = Math.ceil(cells.length / perRow);
+  const cellH = ch + labelH + pad;
+  const layers = [];
+  for (let k = 0; k < cells.length; k++) {
+    const { c, label } = cells[k];
+    const left = (k % perRow) * cw, top = ((k / perRow) | 0) * cellH;
+    layers.push({ input: await rawPng(c, scale), left: left + Math.round((cw - c.w * scale) / 2), top: top + ch - c.h * scale + pad });
+    layers.push({ input: await labelPng(label, cw, labelH, labelPx), left, top: top + ch + pad });
+  }
+  const W = cw * Math.min(perRow, cells.length), H = cellH * rows + pad;
+  await sharp({ create: { width: W, height: H, channels: 4, background: BG } }).composite(layers).png().toFile(file);
+  console.log(`preview: ${path.relative(process.cwd(), file)} (${W}x${H})`);
+}
+
+async function hackathon() {
+  if (!fs.existsSync(path.join(ASSETS_DIR, 'hackathon'))) return;
+  // 1) every head on each of the two bodies, x6 (one file per body)
+  for (const body of HK_BODIES) {
+    const cells = [];
+    for (const head of HK_HEADS) {
+      const c = await student(body, head);
+      if (c) cells.push({ c, label: head });
+    }
+    if (cells.length) await grid(cells, SCALE, 6, path.join(PREVIEW_DIR, `hackathon-students-${body}.png`), 18);
+  }
+  const st = await student('estudante', 'cacheado');
+  // 2) enemies side by side at x4, with a professor and a student for reference
+  const cells = [];
+  if (fs.existsSync(path.join(ASSETS_DIR, 'skins', 'edecio-default.png'))) cells.push({ c: await compose('edecio-default', 'edecio'), label: 'professor (ref)' });
+  if (st) cells.push({ c: st, label: 'student (ref)' });
+  for (const id of HK_ENEMIES) {
+    const img = await load(`hackathon/enemies/${id}`);
+    if (img) cells.push({ c: asCanvas(img), label: id });
+  }
+  if (cells.length > 2) await grid(cells, 4, 5, path.join(PREVIEW_DIR, 'hackathon-enemies.png'), 14);
+  // 3) all item icons at x4 with their ids
+  const items = [];
+  for (const id of HK_ITEMS) {
+    const img = await load(`hackathon/items/${id}`);
+    if (img) items.push({ c: asCanvas(img), label: id });
+  }
+  if (items.length) await grid(items, 4, 6, path.join(PREVIEW_DIR, 'hackathon-items.png'), 14);
+  // 4) the arena with a student, a common enemy and the boss standing on the floor, x2
+  const arena = path.join(ASSETS_DIR, 'hackathon', 'arenas', 'capitulo-1.png');
+  if (fs.existsSync(arena)) {
+    const w = 480, h = 270, floorY = Math.round(h * 0.86);
+    const layers = [{ input: arena, left: 0, top: 0 }];
+    if (st) layers.push({ input: await rawPng(st, 1), left: Math.round(w * 0.2 - st.w / 2), top: floorY - st.h });
+    for (const [id, cx] of [['bug', 0.48], ['deploy-de-sexta', 0.76]]) {
+      const img = await load(`hackathon/enemies/${id}`);
+      if (img) layers.push({ input: await rawPng(asCanvas(img), 1), left: Math.round(w * cx - img.w / 2), top: floorY - img.h });
+    }
+    const base = await sharp({ create: { width: w, height: h, channels: 4, background: BG } }).composite(layers).png().toBuffer();
+    const file = path.join(PREVIEW_DIR, 'hackathon-arena.png');
+    await sharp(base).resize(w * 2, h * 2, { kernel: 'nearest' }).png().toFile(file);
+    console.log(`preview: ${path.relative(process.cwd(), file)}`);
+  }
 }
 main();

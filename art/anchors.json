@@ -1,4 +1,60 @@
 {
+  "hackathon/bodies/estagiario": {
+    "x": 17,
+    "y": 1
+  },
+  "hackathon/bodies/estudante": {
+    "x": 15,
+    "y": 1
+  },
+  "hackathon/heads/barba-ruiva": {
+    "x": 20,
+    "y": 58
+  },
+  "hackathon/heads/black-power": {
+    "x": 23,
+    "y": 55
+  },
+  "hackathon/heads/cabelo-rosa": {
+    "x": 23,
+    "y": 55
+  },
+  "hackathon/heads/cacheado": {
+    "x": 21,
+    "y": 54
+  },
+  "hackathon/heads/cacho-longo": {
+    "x": 27,
+    "y": 59
+  },
+  "hackathon/heads/chanel": {
+    "x": 23,
+    "y": 49
+  },
+  "hackathon/heads/coque": {
+    "x": 21,
+    "y": 62
+  },
+  "hackathon/heads/franja-oculos": {
+    "x": 24,
+    "y": 51
+  },
+  "hackathon/heads/oculos-redondos": {
+    "x": 22,
+    "y": 58
+  },
+  "hackathon/heads/raspado": {
+    "x": 21,
+    "y": 50
+  },
+  "hackathon/heads/topete": {
+    "x": 20,
+    "y": 58
+  },
+  "hackathon/heads/trancas": {
+    "x": 25,
+    "y": 53
+  },
   "heads/angelo": {
     "x": 23,
     "y": 55

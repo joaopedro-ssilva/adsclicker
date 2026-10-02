@@ -208,7 +208,7 @@ function bboxGap(a, b) {
 }
 
 /** Pick `count` items out of the components, merging fragments, sorted left to right. */
-function splitItems(comps, count, w, name) {
+function splitItems(comps, count, w, name, layout) {
   const speck = 40;
   const sorted = [...comps].sort((a, b) => b.area - a.area);
   if (sorted.length < count) {
@@ -240,8 +240,39 @@ function splitItems(comps, count, w, name) {
       best.area += frag.area;
     }
   }
-  groups.sort((a, b) => (a.x0 + a.x1) - (b.x0 + b.x1));
-  return groups;
+  if (!layout) {
+    groups.sort((a, b) => (a.x0 + a.x1) - (b.x0 + b.x1));
+    return groups;
+  }
+  return orderInRows(groups, layout, name);
+}
+
+/**
+ * Grid sheets: `layout` lists how many items each row holds, top to bottom (e.g. [6, 6]). Items are sorted by
+ * their vertical centre, the first layout[0] form row 0 and so on, then each row is sorted left to right.
+ * Rows must be clearly separated vertically (an item straddling two rows would be misfiled): fails loudly otherwise.
+ */
+function orderInRows(groups, layout, name) {
+  const total = layout.reduce((a, b) => a + b, 0);
+  if (total !== groups.length) throw new Error(`${name}: layout ${JSON.stringify(layout)} needs ${total} items, found ${groups.length}`);
+  const cy = (g) => (g.y0 + g.y1) / 2;
+  const byY = [...groups].sort((a, b) => cy(a) - cy(b));
+  const rows = [];
+  let at = 0;
+  for (const n of layout) {
+    rows.push(byY.slice(at, at + n).sort((a, b) => (a.x0 + a.x1) - (b.x0 + b.x1)));
+    at += n;
+  }
+  for (let r = 0; r + 1 < rows.length; r++) {
+    const lowestCentre = Math.max(...rows[r].map(cy));
+    const highestNext = Math.min(...rows[r + 1].map(cy));
+    const medianBottom = rows[r].map((g) => g.y1).sort((a, b) => a - b)[rows[r].length >> 1];
+    const medianTop = rows[r + 1].map((g) => g.y0).sort((a, b) => a - b)[rows[r + 1].length >> 1];
+    if (highestNext - lowestCentre < 4 || medianBottom >= medianTop) {
+      throw new Error(`${name}: rows ${r} and ${r + 1} are not clearly separated vertically (layout ${JSON.stringify(layout)})`);
+    }
+  }
+  return rows.flat();
 }
 
 function cropItem(img, group) {
@@ -573,7 +604,7 @@ async function processScenery(sheet, anchors) {
   const fixed = await sharp(Buffer.from(out.data.buffer), { raw: { width: out.w, height: out.h, channels: 4 } })
     .resize(SCENERY_W, SCENERY_H, { kernel: 'nearest', fit: 'fill' }).raw().toBuffer();
   const img = { data: new Uint8ClampedArray(fixed), w: SCENERY_W, h: SCENERY_H };
-  const rel = `${KIND_FOLDER.scenery}/${key}`;
+  const rel = `${sheet.folder ?? KIND_FOLDER.scenery}/${key}`;
   await savePng(img, path.join(ASSETS_DIR, `${rel}.png`));
   delete anchors[rel];
   console.log(`  ${rel}  ${img.w}x${img.h}  (raw ${raw.w}x${raw.h}, block ${b.toFixed(2)})`);
@@ -586,23 +617,32 @@ async function processSheet(sheet, anchors) {
   const mask = removeBackground(img);
   const comps = components(mask, img.w, img.h);
   // `img.data` keeps raw colours; the mask decides which pixels belong to sprites
-  const groups = splitItems(comps, sheet.keys.length, img.w, sheet.file);
-  const folder = KIND_FOLDER[sheet.kind];
-  const target = TARGET_W[sheet.kind] ? { axis: 'w', size: TARGET_W[sheet.kind] } : TARGET_MAX[sheet.kind] ? { axis: 'max', size: TARGET_MAX[sheet.kind] } : { axis: 'h', size: TARGET_H[sheet.kind] };
+  const groups = splitItems(comps, sheet.keys.length, img.w, sheet.file, sheet.layout);
+  const folder = sheet.folder ?? KIND_FOLDER[sheet.kind];
+  // sheet.target = { axis: 'h' | 'w' | 'max', size } replaces the per-kind default; sheet.sizes[key] sets one item's size
+  const target = sheet.target ?? (TARGET_W[sheet.kind] ? { axis: 'w', size: TARGET_W[sheet.kind] } : TARGET_MAX[sheet.kind] ? { axis: 'max', size: TARGET_MAX[sheet.kind] } : { axis: 'h', size: TARGET_H[sheet.kind] });
   // A calibrated sheet starts with a plain reference item (key "_ref"): its block size is used for the
   // whole row, so heads wearing tall headgear keep the same pixel scale as the plain head instead of
   // being squeezed into the target height. Keys starting with "_" are never written.
-  const shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), target, `${sheet.keys[0]} (calibration)`) : null;
+  let shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), target, `${sheet.keys[0]} (calibration)`) : null;
+  // sheet.shareScale: every item of the row was drawn at the same size, so they all get the same block size
+  // (the one that brings the median item to the target), instead of each being stretched to the target alone.
+  if (sheet.shareScale && !shared) {
+    const dims = groups.map((g) => { const c = cropItem(img, g); return target.axis === 'w' ? c.w : target.axis === 'max' ? Math.max(c.w, c.h) : c.h; }).sort((a, b) => a - b);
+    shared = { b: dims[(dims.length - 1) >> 1] / target.size };
+    console.log(`    shared block ${shared.b.toFixed(2)} for the whole sheet`);
+  }
   // Bodies in a sheet are drawn at the same size. One that is much taller is holding something above its
   // head; sized by its own height it would shrink, so it is sized by the typical height of the row instead.
-  const heights = sheet.kind === 'skin' ? groups.map((g) => cropItem(img, g).h).sort((a, b) => a - b) : [];
+  const heights = sheet.kind === 'skin' && !sheet.target ? groups.map((g) => cropItem(img, g).h).sort((a, b) => a - b) : [];
   const typicalH = heights.length ? heights[Math.floor((heights.length - 1) / 2)] : 0;
   for (let k = 0; k < groups.length; k++) {
     const key = sheet.keys[k];
     if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
     const tall = typicalH > 0 && item.h > typicalH * 1.12;
-    const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, target, key, tall ? typicalH : undefined);
+    const itemTarget = sheet.sizes?.[key] ? { ...target, size: sheet.sizes[key] } : target;
+    const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, itemTarget, key, tall ? typicalH : undefined);
     let sprite = blockSample(item, b, px, py);
     removeFringe(sprite);
     removeIsolated(sprite);
@@ -611,6 +651,7 @@ async function processSheet(sheet, anchors) {
     if (sheet.kind === 'skin') anchor = skinAnchor(sprite);
     else if (sheet.kind === 'head') anchor = headAnchor(sprite);
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);
+    if (sheet.noAnchor) anchor = undefined;
     const rel = `${folder}/${key}`;
     await savePng(sprite, path.join(ASSETS_DIR, `${rel}.png`));
     if (anchor) anchors[rel] = { x: anchor.x, y: anchor.y };

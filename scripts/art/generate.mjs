@@ -53,8 +53,8 @@ async function request(image) {
     size: SIZE[image.kind === 'scenery' ? 'scenery' : 'sheet'],
     quality,
     output_format: 'png',
-    // Sceneries are full pictures; sprite sheets are cut out, so a transparent background saves a step.
-    background: image.kind === 'scenery' ? 'opaque' : 'transparent',
+    // Always opaque: sprite sheets carry a flat magenta background that process.mjs removes (the model has no reliable transparent mode).
+    background: 'opaque',
   };
   if (!image.refs?.length) {
     return fetch(`${API}/generations`, {

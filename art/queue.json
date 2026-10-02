@@ -320,6 +320,132 @@
         "diploma"
       ],
       "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. It shows 2 separate chunky game icons in a single row, well spaced, not touching, front view, bold simple shapes with a thick dark outline: (a) a shiny gold coin with a large letter \"A\" on it; (b) a rolled diploma scroll tied with a red ribbon."
+    },
+    {
+      "file": "hk-heads-1.png",
+      "kind": "head",
+      "keys": [
+        "cacheado",
+        "oculos-redondos",
+        "topete",
+        "black-power",
+        "barba-ruiva",
+        "raspado"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 6 different invented young students' heads in a single row, well spaced, not touching, front view, all exactly the same size, friendly smiling expressions, big chibi heads with the same proportions as the heads in the reference image, heads only, no neck, no body, no shoulders. Every head is a different person (do not copy the faces of the reference). Left to right: (a) masculine, tan skin, short curly dark hair; (b) masculine, light skin, messy brown hair, round glasses; (c) masculine, medium skin, high black quiff; (d) masculine, dark skin, rounded black afro; (e) masculine, pale skin, red hair and a full red beard; (f) masculine, brown skin, shaved head, light stubble.",
+      "refs": [
+        "heads-1.png"
+      ]
+    },
+    {
+      "file": "hk-heads-2.png",
+      "kind": "head",
+      "keys": [
+        "trancas",
+        "coque",
+        "franja-oculos",
+        "cabelo-rosa",
+        "cacho-longo",
+        "chanel"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 6 different invented young students' heads in a single row, well spaced, not touching, front view, all exactly the same size, friendly smiling expressions, big chibi heads with the same proportions as the heads in the reference image, heads only, no neck, no body, no shoulders. Every head is a different person (do not copy the faces of the reference). Left to right: (a) feminine, dark skin, long black braids; (b) feminine, light skin, blonde hair in a high bun; (c) feminine, medium skin, black hair with bangs, square glasses; (d) feminine, light skin, short bright pink hair; (e) feminine, tan skin, long loose brown curls; (f) feminine, brown skin, sleek black bob haircut.",
+      "refs": [
+        "heads-1.png"
+      ]
+    },
+    {
+      "file": "hk-bodies.png",
+      "kind": "skin",
+      "keys": [
+        "estudante",
+        "estagiario"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 2 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare medium tan skin, and so are the hands) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. Outfits left to right: (a) a casual teal hoodie and blue jeans with sneakers, with a backpack strap over one shoulder; (b) a smart-casual polo shirt with a company lanyard and ID badge around the neck stub, chinos and clean shoes.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "hk-enemies-1.png",
+      "kind": "skin",
+      "keys": [
+        "bug",
+        "loop-infinito",
+        "vazamento-de-memoria",
+        "codigo-legado"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 4 different cute but menacing little game monsters in a single row, well spaced, not touching, front view, chunky bold shapes, each with a thick dark outline and an expressive face. All four are about the same size. Left to right: (a) a cute but menacing green beetle with small angry eyes, little antennae and six tiny legs; (b) a ring-shaped circular arrow chasing its own tail, with dizzy spiral swirl eyes, the arrow in warm orange and teal (no purple, no pink); (c) a blue gooey blob dripping drops, with a gold memory-chip pin pattern on its body, mean eyes; (d) a dusty grey old floppy-disk and paper-scroll monster covered in cobwebs and cracks, grumpy tired eyes.",
+      "refs": [
+        "icons.png"
+      ]
+    },
+    {
+      "file": "hk-enemies-2.png",
+      "kind": "skin",
+      "keys": [
+        "conflito-de-merge",
+        "bug-de-merge",
+        "deploy-de-sexta"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 3 different cute but menacing little game monsters in a single row, well spaced, not touching, front view, chunky bold shapes, each with a thick dark outline and an expressive face. The third one (the boss) is much bigger than the first, and the second is tiny. Left to right: (a) a round creature split down the middle by a jagged lightning-like line, left half red and right half blue, one angry eye on each side; (b) a TINY little bug split in half, left half red and right half blue, drawn about one third the size of the other creatures; (c) THE BOSS, HUGE: a giant angry red button on top of a server-rack body on fire with orange flames, a small round clock on the rack showing 17:59, glowing angry eyes; clearly much bigger than the others, about twice as tall as the first creature.",
+      "refs": [
+        "icons.png"
+      ]
+    },
+    {
+      "file": "hk-items-1.png",
+      "kind": "icon",
+      "keys": [
+        "teclado-mecanico",
+        "notebook-velho",
+        "mouse-vertical",
+        "editor-escuro",
+        "terminal-hacker",
+        "calculadora-cientifica",
+        "cadeira-ergonomica",
+        "monitor-ultrawide",
+        "mesa-regulavel",
+        "luminaria-de-mesa",
+        "ventilador-de-mesa",
+        "nobreak"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. The chair and the dark-mode editor share a night-shift palette of deep blue and purple accents. Row 1 left to right: (a) a mechanical keyboard with colourful RGB-lit keycaps; (b) an old beige chunky laptop with a cracked corner and stickers, screen showing a green prompt; (c) a vertical ergonomic computer mouse, grey and orange; (d) a small code-editor window in dark mode with coloured code lines, deep blue and purple tones; (e) a black terminal window with a green \">_\" prompt and a few green text lines; (f) a scientific calculator with many small buttons and a green LCD. Row 2 left to right: (a) an ergonomic office chair on wheels, deep blue and purple tones; (b) an ultrawide curved computer monitor on a stand showing colourful code; (c) a height-adjustable standing desk with a small up-down arrow on its leg; (d) an articulated desk lamp glowing warm yellow; (e) a small desk fan with blue blades; (f) a UPS battery backup box with a green LED and a power plug cable.",
+      "refs": [
+        "icons.png"
+      ]
+    },
+    {
+      "file": "hk-items-2.png",
+      "kind": "icon",
+      "keys": [
+        "fone-cancelamento",
+        "mochila-de-notebook",
+        "cracha-do-hackathon",
+        "camiseta-do-evento",
+        "oculos-luz-azul",
+        "relogio-de-ponto",
+        "caneca-termica",
+        "pato-de-borracha",
+        "adesivo-de-linguagem",
+        "moeda-de-um-commit",
+        "trevo-de-quatro-folhas",
+        "suculenta-de-mesa"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. The headphones and the mug share a night-shift palette of deep blue and purple accents. Row 1 left to right: (a) over-ear noise-cancelling headphones, deep blue and purple tones; (b) a laptop backpack with pockets and a zipper, grey and teal; (c) an event ID badge on a lanyard with the word \"HACKATHON\" on it; (d) a folded event t-shirt with a simple \"</>\" print; (e) anti blue-light glasses with slightly blue tinted lenses; (f) a wall time-clock punch machine with a round clock face and a card slot. Row 2 left to right: (a) a thermal coffee mug with a lid and steam, deep blue and purple tones; (b) a yellow rubber duck; (c) a round programming-language sticker with \"{ }\" curly braces on it; (d) a shiny gold coin with a small git-branch symbol on it; (e) a green four-leaf clover; (f) a small succulent plant in a little terracotta pot.",
+      "refs": [
+        "icons.png"
+      ]
+    },
+    {
+      "file": "hk-arena.png",
+      "kind": "scenery",
+      "keys": [
+        "capitulo-1"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view of a computer lab at night: dark blue and purple room, glowing monitors showing code on desks, tangled cables along the walls and desk edges, coffee cups and energy drinks on the desks, a dark window with a few distant city lights, warm desk lamps. There is a clear, flat, uncluttered floor area in the lower third of the image where the fighters stand; the details of the scene stay in the upper two thirds and at the sides.",
+      "refs": [
+        "scenery-laboratorio.png"
+      ]
     }
   ]
 }

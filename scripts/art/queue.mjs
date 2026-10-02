@@ -20,7 +20,7 @@ const SUFFIX =
 const BODY_RULES =
   'Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size.';
 
-const letters = 'abcd';
+const letters = 'abcdefghijkl';
 const list = (items) => items.map((t, i) => `(${letters[i]}) ${t}`).join('; ');
 
 // ---- data ---------------------------------------------------------------------------------
@@ -199,6 +199,129 @@ calls.push(
   iconsCall,
 );
 
+// 6) Hackathon mode art (API generator; refs travel with the request from art/raw).
+//    Extra sheet fields read by process.mjs: folder (output folder under public/assets), layout (items per
+//    row, top to bottom), target ({axis,size}) and sizes (per-key size override).
+const HK_STYLE =
+  'Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness.';
+const HK_BASE = BASE.replace(
+  'flat solid pure magenta (#FF00FF) background with nothing else on it',
+  'flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows',
+);
+
+const HK_HEADS = [
+  ['cacheado', 'masculine, tan skin, short curly dark hair'],
+  ['oculos-redondos', 'masculine, light skin, messy brown hair, round glasses'],
+  ['topete', 'masculine, medium skin, high black quiff'],
+  ['black-power', 'masculine, dark skin, rounded black afro'],
+  ['barba-ruiva', 'masculine, pale skin, red hair and a full red beard'],
+  ['raspado', 'masculine, brown skin, shaved head, light stubble'],
+  ['trancas', 'feminine, dark skin, long black braids'],
+  ['coque', 'feminine, light skin, blonde hair in a high bun'],
+  ['franja-oculos', 'feminine, medium skin, black hair with bangs, square glasses'],
+  ['cabelo-rosa', 'feminine, light skin, short bright pink hair'],
+  ['cacho-longo', 'feminine, tan skin, long loose brown curls'],
+  ['chanel', 'feminine, brown skin, sleek black bob haircut'],
+];
+const hkHeadSheet = (file, items) => ({
+  file,
+  kind: 'head',
+  keys: items.map((i) => i[0]),
+  refs: ['heads-1.png'],
+  sheet: { folder: 'hackathon/heads', shareScale: true },
+  text: `${HK_BASE}. ${HK_STYLE} It shows ${items.length} different invented young students' heads in a single row, well spaced, not touching, front view, all exactly the same size, friendly smiling expressions, big chibi heads with the same proportions as the heads in the reference image, heads only, no neck, no body, no shoulders. Every head is a different person (do not copy the faces of the reference). Left to right: ${list(items.map((i) => i[1]))}.`,
+});
+
+const HK_BODIES = [
+  ['estudante', 'a casual teal hoodie and blue jeans with sneakers, with a backpack strap over one shoulder'],
+  ['estagiario', 'a smart-casual polo shirt with a company lanyard and ID badge around the neck stub, chinos and clean shoes'],
+];
+const hkBodySheet = {
+  file: 'hk-bodies.png',
+  kind: 'skin',
+  keys: HK_BODIES.map((b) => b[0]),
+  refs: ['skins-1.png'],
+  sheet: { folder: 'hackathon/bodies' },
+  text: `${HK_BASE}. ${HK_STYLE} It shows 2 separate HEADLESS chibi character bodies in a single row. ${BODY_RULES.replace('light tan skin', 'medium tan skin, and so are the hands')} Outfits left to right: ${list(HK_BODIES.map((b) => b[1]))}.`,
+};
+
+const HK_ENEMIES_A = [
+  ['bug', 'a cute but menacing green beetle with small angry eyes, little antennae and six tiny legs'],
+  ['loop-infinito', 'a ring-shaped circular arrow chasing its own tail, with dizzy spiral swirl eyes, the arrow in warm orange and teal (no purple, no pink)'],
+  ['vazamento-de-memoria', 'a blue gooey blob dripping drops, with a gold memory-chip pin pattern on its body, mean eyes'],
+  ['codigo-legado', 'a dusty grey old floppy-disk and paper-scroll monster covered in cobwebs and cracks, grumpy tired eyes'],
+];
+const HK_ENEMIES_B = [
+  ['conflito-de-merge', 'a round creature split down the middle by a jagged lightning-like line, left half red and right half blue, one angry eye on each side'],
+  ['bug-de-merge', 'a TINY little bug split in half, left half red and right half blue, drawn about one third the size of the other creatures'],
+  ['deploy-de-sexta', 'THE BOSS, HUGE: a giant angry red button on top of a server-rack body on fire with orange flames, a small round clock on the rack showing 17:59, glowing angry eyes; clearly much bigger than the others, about twice as tall as the first creature'],
+];
+const hkEnemySheet = (file, items, note, sizes) => ({
+  file,
+  kind: 'skin',
+  keys: items.map((i) => i[0]),
+  refs: ['icons.png'],
+  sheet: { folder: 'hackathon/enemies', noAnchor: true, target: { axis: 'h', size: 44 }, sizes },
+  text: `${HK_BASE}. ${HK_STYLE} It shows ${items.length} different cute but menacing little game monsters in a single row, well spaced, not touching, front view, chunky bold shapes, each with a thick dark outline and an expressive face. ${note} Left to right: ${list(items.map((i) => i[1]))}.`,
+});
+
+const HK_ITEMS_A = [
+  ['teclado-mecanico', 'a mechanical keyboard with colourful RGB-lit keycaps'],
+  ['notebook-velho', 'an old beige chunky laptop with a cracked corner and stickers, screen showing a green prompt'],
+  ['mouse-vertical', 'a vertical ergonomic computer mouse, grey and orange'],
+  ['editor-escuro', 'a small code-editor window in dark mode with coloured code lines, deep blue and purple tones'],
+  ['terminal-hacker', 'a black terminal window with a green ">_" prompt and a few green text lines'],
+  ['calculadora-cientifica', 'a scientific calculator with many small buttons and a green LCD'],
+  ['cadeira-ergonomica', 'an ergonomic office chair on wheels, deep blue and purple tones'],
+  ['monitor-ultrawide', 'an ultrawide curved computer monitor on a stand showing colourful code'],
+  ['mesa-regulavel', 'a height-adjustable standing desk with a small up-down arrow on its leg'],
+  ['luminaria-de-mesa', 'an articulated desk lamp glowing warm yellow'],
+  ['ventilador-de-mesa', 'a small desk fan with blue blades'],
+  ['nobreak', 'a UPS battery backup box with a green LED and a power plug cable'],
+];
+const HK_ITEMS_B = [
+  ['fone-cancelamento', 'over-ear noise-cancelling headphones, deep blue and purple tones'],
+  ['mochila-de-notebook', 'a laptop backpack with pockets and a zipper, grey and teal'],
+  ['cracha-do-hackathon', 'an event ID badge on a lanyard with the word "HACKATHON" on it'],
+  ['camiseta-do-evento', 'a folded event t-shirt with a simple "</>" print'],
+  ['oculos-luz-azul', 'anti blue-light glasses with slightly blue tinted lenses'],
+  ['relogio-de-ponto', 'a wall time-clock punch machine with a round clock face and a card slot'],
+  ['caneca-termica', 'a thermal coffee mug with a lid and steam, deep blue and purple tones'],
+  ['pato-de-borracha', 'a yellow rubber duck'],
+  ['adesivo-de-linguagem', 'a round programming-language sticker with "{ }" curly braces on it'],
+  ['moeda-de-um-commit', 'a shiny gold coin with a small git-branch symbol on it'],
+  ['trevo-de-quatro-folhas', 'a green four-leaf clover'],
+  ['suculenta-de-mesa', 'a small succulent plant in a little terracotta pot'],
+];
+const hkItemSheet = (file, items, note) => ({
+  file,
+  kind: 'icon',
+  keys: items.map((i) => i[0]),
+  refs: ['icons.png'],
+  sheet: { folder: 'hackathon/items', layout: [6, 6], target: { axis: 'max', size: 28 } },
+  text: `${HK_BASE}. ${HK_STYLE} It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
+});
+
+const hkArena = {
+  file: 'hk-arena.png',
+  kind: 'scenery',
+  keys: ['capitulo-1'],
+  refs: ['scenery-laboratorio.png'],
+  sheet: { folder: 'hackathon/arenas' },
+  text: `a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. ${HK_STYLE} Side view of a computer lab at night: dark blue and purple room, glowing monitors showing code on desks, tangled cables along the walls and desk edges, coffee cups and energy drinks on the desks, a dark window with a few distant city lights, warm desk lamps. There is a clear, flat, uncluttered floor area in the lower third of the image where the fighters stand; the details of the scene stay in the upper two thirds and at the sides.`,
+};
+
+calls.push(
+  { label: 'hk-heads-1', images: [hkHeadSheet('hk-heads-1.png', HK_HEADS.slice(0, 6))] },
+  { label: 'hk-heads-2', images: [hkHeadSheet('hk-heads-2.png', HK_HEADS.slice(6))] },
+  { label: 'hk-bodies', images: [hkBodySheet] },
+  { label: 'hk-enemies-1', images: [hkEnemySheet('hk-enemies-1.png', HK_ENEMIES_A, 'All four are about the same size.', {})] },
+  { label: 'hk-enemies-2', images: [hkEnemySheet('hk-enemies-2.png', HK_ENEMIES_B, 'The third one (the boss) is much bigger than the first, and the second is tiny.', { 'bug-de-merge': 26, 'deploy-de-sexta': 80 })] },
+  { label: 'hk-items-1', images: [hkItemSheet('hk-items-1.png', HK_ITEMS_A, 'The chair and the dark-mode editor share a night-shift palette of deep blue and purple accents.')] },
+  { label: 'hk-items-2', images: [hkItemSheet('hk-items-2.png', HK_ITEMS_B, 'The headphones and the mug share a night-shift palette of deep blue and purple accents.')] },
+  { label: 'hk-arena', images: [hkArena] },
+);
+
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const professor of Object.keys(HEAD_VARIANTS)) {
@@ -224,7 +347,7 @@ calls.forEach((c, idx) => {
   const prompt = `${head} ${body} ${SUFFIX}`;
   const file = path.join(QUEUE_DIR, `${String(idx + 1).padStart(2, '0')}-${c.label}.txt`);
   fs.writeFileSync(file, prompt + '\n');
-  for (const im of c.images) sheets.push({ file: im.file, kind: im.kind, keys: im.keys, ...(im.calibrate ? { calibrate: true } : {}) });
+  for (const im of c.images) sheets.push({ file: im.file, kind: im.kind, keys: im.keys, ...(im.calibrate ? { calibrate: true } : {}), ...(im.sheet ?? {}) });
 });
 
 // keep hand-added entries (e.g. real-photo heads) that this script does not generate

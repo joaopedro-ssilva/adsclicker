@@ -314,6 +314,141 @@
         "coin",
         "diploma"
       ]
+    },
+    {
+      "file": "hk-heads-1.png",
+      "kind": "head",
+      "keys": [
+        "cacheado",
+        "oculos-redondos",
+        "topete",
+        "black-power",
+        "barba-ruiva",
+        "raspado"
+      ],
+      "folder": "hackathon/heads",
+      "shareScale": true
+    },
+    {
+      "file": "hk-heads-2.png",
+      "kind": "head",
+      "keys": [
+        "trancas",
+        "coque",
+        "franja-oculos",
+        "cabelo-rosa",
+        "cacho-longo",
+        "chanel"
+      ],
+      "folder": "hackathon/heads",
+      "shareScale": true
+    },
+    {
+      "file": "hk-bodies.png",
+      "kind": "skin",
+      "keys": [
+        "estudante",
+        "estagiario"
+      ],
+      "folder": "hackathon/bodies"
+    },
+    {
+      "file": "hk-enemies-1.png",
+      "kind": "skin",
+      "keys": [
+        "bug",
+        "loop-infinito",
+        "vazamento-de-memoria",
+        "codigo-legado"
+      ],
+      "folder": "hackathon/enemies",
+      "noAnchor": true,
+      "target": {
+        "axis": "h",
+        "size": 44
+      },
+      "sizes": {}
+    },
+    {
+      "file": "hk-enemies-2.png",
+      "kind": "skin",
+      "keys": [
+        "conflito-de-merge",
+        "bug-de-merge",
+        "deploy-de-sexta"
+      ],
+      "folder": "hackathon/enemies",
+      "noAnchor": true,
+      "target": {
+        "axis": "h",
+        "size": 44
+      },
+      "sizes": {
+        "bug-de-merge": 26,
+        "deploy-de-sexta": 80
+      }
+    },
+    {
+      "file": "hk-items-1.png",
+      "kind": "icon",
+      "keys": [
+        "teclado-mecanico",
+        "notebook-velho",
+        "mouse-vertical",
+        "editor-escuro",
+        "terminal-hacker",
+        "calculadora-cientifica",
+        "cadeira-ergonomica",
+        "monitor-ultrawide",
+        "mesa-regulavel",
+        "luminaria-de-mesa",
+        "ventilador-de-mesa",
+        "nobreak"
+      ],
+      "folder": "hackathon/items",
+      "layout": [
+        6,
+        6
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      }
+    },
+    {
+      "file": "hk-items-2.png",
+      "kind": "icon",
+      "keys": [
+        "fone-cancelamento",
+        "mochila-de-notebook",
+        "cracha-do-hackathon",
+        "camiseta-do-evento",
+        "oculos-luz-azul",
+        "relogio-de-ponto",
+        "caneca-termica",
+        "pato-de-borracha",
+        "adesivo-de-linguagem",
+        "moeda-de-um-commit",
+        "trevo-de-quatro-folhas",
+        "suculenta-de-mesa"
+      ],
+      "folder": "hackathon/items",
+      "layout": [
+        6,
+        6
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      }
+    },
+    {
+      "file": "hk-arena.png",
+      "kind": "scenery",
+      "keys": [
+        "capitulo-1"
+      ],
+      "folder": "hackathon/arenas"
     }
   ]
 }
