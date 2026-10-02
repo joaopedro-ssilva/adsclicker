@@ -1,32 +1,32 @@
-/**
- * Placeholder with the final signatures: the engine engineer owns and replaces this file.
- * Everything throws until then, so the server and the UI can compile against the contract.
- */
+/** The Hackathon engine: pure TypeScript, identical in the browser and on the server. */
+import * as build from './build';
+import * as fight from './fight';
+import * as loot from './loot';
+import * as progression from './progression';
+import { simulateRun as simulate } from './simulate';
+import * as stage from './stage';
 import type { HackathonEngine } from './types';
 
 export * from './types';
 
-const pending = (name: string) => (): never => {
-  throw new Error(`hackathon engine: ${name} is not implemented yet`);
-};
-
+// Typed as the contract so callers see the frozen signatures (some implementations ignore `content`).
 const engine: HackathonEngine = {
-  computeBuild: pending('computeBuild'),
-  resolveStage: pending('resolveStage'),
-  createRun: pending('createRun'),
-  stepRun: pending('stepRun'),
-  simulateRun: pending('simulateRun'),
-  rollDrops: pending('rollDrops'),
-  rerollAffix: pending('rerollAffix'),
-  rerollCost: pending('rerollCost'),
-  recycleValue: pending('recycleValue'),
-  itemScore: pending('itemScore'),
-  xpToNext: pending('xpToNext'),
-  applyXp: pending('applyXp'),
-  freeSkillPoints: pending('freeSkillPoints'),
-  nodeLock: pending('nodeLock'),
-  mentorCost: pending('mentorCost'),
-  classroomBonus: pending('classroomBonus'),
+  computeBuild: build.computeBuild,
+  resolveStage: stage.resolveStage,
+  createRun: fight.createRun,
+  stepRun: (run, actions) => fight.stepRun(run, actions),
+  simulateRun: simulate,
+  rollDrops: loot.rollDrops,
+  rerollAffix: loot.rerollAffix,
+  rerollCost: loot.rerollCost,
+  recycleValue: loot.recycleValue,
+  itemScore: (item) => loot.itemScore(item),
+  xpToNext: progression.xpToNext,
+  applyXp: progression.applyXp,
+  freeSkillPoints: progression.freeSkillPoints,
+  nodeLock: progression.nodeLock,
+  mentorCost: progression.mentorCost,
+  classroomBonus: progression.classroomBonus,
 };
 
 export const {
