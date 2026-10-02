@@ -1,5 +1,6 @@
 import { content } from '@/game/content';
 import type { ProfessorId } from '@/game/content/types';
+import { hackathonContent } from '@/hackathon/content';
 import type { FeedItem } from '@/shared/api';
 import { skinById } from '../../shared/characterProps';
 
@@ -19,6 +20,14 @@ export function feedAction(item: FeedItem): string {
     case 'skin': {
       const skin = item.detail ? skinById(item.detail) : undefined;
       return skin ? `ganhou a skin ${skin.name}` : 'ganhou uma skin nova';
+    }
+    case 'item': {
+      const base = item.detail ? hackathonContent.items.find((entry) => entry.id === item.detail) : undefined;
+      return base ? `encontrou ${base.name} lendário no Hackathon` : 'encontrou um item lendário no Hackathon';
+    }
+    case 'promotion': {
+      const cargo = item.detail ? hackathonContent.cargos.find((entry) => entry.id === item.detail) : undefined;
+      return cargo ? `foi promovido a ${cargo.name} no Hackathon` : 'foi promovido no Hackathon';
     }
   }
 }

@@ -55,6 +55,18 @@ export const meSchema = z.object({
 });
 export type Me = z.infer<typeof meSchema>;
 
+/**
+ * Permanent classroom bonuses earned in the Hackathon mode (docs/HACKATHON.md). The game applies
+ * them with the store's setCloudBonus. Absent = no bonus (older servers, or no Hackathon profile).
+ */
+export const cloudBonusSchema = z.object({
+  /** Multiplies every source of ADScoins. */
+  cargo: z.number(),
+  /** Multiplies the disciplines of one professor. */
+  mentors: z.partialRecord(professorIdSchema, z.number()),
+});
+export type CloudBonusPayload = z.infer<typeof cloudBonusSchema>;
+
 /** A few numbers that describe a save, to let the player choose between two of them. */
 export const saveSummarySchema = z.object({
   /** Decimal string, e.g. "1.5e12". */
@@ -116,6 +128,7 @@ export const syncResponseSchema = z.discriminatedUnion('status', [
     serverTime: z.number(),
     /** Coin multiplier the game must apply (global event x this player's own). 1 = normal. */
     multiplier: z.number(),
+    bonus: cloudBonusSchema.optional(),
     me: meSchema,
   }),
   z.object({
@@ -123,6 +136,7 @@ export const syncResponseSchema = z.discriminatedUnion('status', [
     status: z.literal('conflict'),
     cloud: cloudSaveSchema,
     multiplier: z.number(),
+    bonus: cloudBonusSchema.optional(),
     me: meSchema,
   }),
 ]);
@@ -136,6 +150,7 @@ export const meResponseSchema = z.object({
   /** null when this browser has no session yet (it gets one on its first sync). */
   me: meSchema.nullable(),
   multiplier: z.number(),
+  bonus: cloudBonusSchema.optional(),
   /** Revision and summary of the cloud save, without the save itself. */
   cloud: cloudSaveSchema.omit({ save: true }).nullable(),
 });
@@ -169,6 +184,7 @@ export type LoginRequest = z.infer<typeof loginRequestSchema>;
 export const loginResponseSchema = z.object({
   me: meSchema,
   multiplier: z.number(),
+  bonus: cloudBonusSchema.optional(),
   /** The account's save, for the device to adopt (or to ask the player when it also has progress). */
   cloud: cloudSaveSchema.nullable(),
 });
@@ -197,6 +213,8 @@ export const leaderboardEntrySchema = z.object({
   diplomas: z.number(),
   achievements: z.number(),
   online: z.boolean(),
+  /** The best Hackathon item this player owns, to show off next to the nickname. */
+  item: z.object({ base: z.string(), rarity: z.string() }).nullable().optional(),
 });
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
@@ -218,13 +236,13 @@ export type RanksResponse = z.infer<typeof ranksResponseSchema>;
 // GET /api/community — totals and the activity feed
 // ---------------------------------------------------------------------------
 
-export const FEED_KINDS = ['joined', 'hire', 'allProfessors', 'graduation', 'skin'] as const;
+export const FEED_KINDS = ['joined', 'hire', 'allProfessors', 'graduation', 'skin', 'item', 'promotion'] as const;
 
 export const feedItemSchema = z.object({
   id: z.string(),
   nickname: z.string(),
   kind: z.enum(FEED_KINDS),
-  /** hire: professor id; skin: skin id; graduation: the graduation number as text. */
+  /** hire: professor id; skin: skin id; graduation: the graduation number as text; item: Hackathon item base id (a legendary drop); promotion: Hackathon cargo id. */
   detail: z.string().nullable(),
   at: z.number(),
 });

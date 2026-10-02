@@ -68,6 +68,8 @@ export function buyPrestigeNode(state: GameState, content: GameContent, id: stri
   return bought;
 }
 
+export { buyCafe, cafeCost } from './cafe';
+
 /** Easter eggs: remembers the trigger so achievements with { kind: 'secret', trigger } unlock. */
 export function triggerSecret(state: GameState, content: GameContent, trigger: string, now: number, emit: Emit): void {
   if (state.secrets[trigger]) return;

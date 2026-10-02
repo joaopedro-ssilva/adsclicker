@@ -5,7 +5,7 @@ import type { GameContent } from '../content/types';
 import * as engine from '../engine/actions';
 import { createInitialState } from '../engine/init';
 import { applyOffline } from '../engine/offline';
-import { deserializeState, importSave as importSaveData, exportSave as exportSaveData, serializeState } from '../engine/save';
+import { deserializeState, importSave as importSaveData, exportSave as exportSaveData, readCloudBonus, serializeState } from '../engine/save';
 import type { GameState } from '../engine/state';
 import { advance } from '../engine/tick';
 import { emitGameEvent } from './bus';
@@ -231,6 +231,16 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         return done;
       },
       buyPrestigeNode: (id) => run((state, emit) => engine.buyPrestigeNode(state, content, id, now(), emit), true),
+
+      buyCafe() {
+        return run((state, emit) => engine.buyCafe(state, content, now(), emit), true);
+      },
+
+      setCloudBonus(bonus) {
+        run((state) => {
+          state.cloudBonus = readCloudBonus(bonus);
+        });
+      },
 
       triggerSecret(trigger) {
         run((state, emit) => engine.triggerSecret(state, content, trigger, now(), emit), true);

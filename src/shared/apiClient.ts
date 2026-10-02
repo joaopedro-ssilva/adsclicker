@@ -40,7 +40,7 @@ interface CallOptions {
   signal?: AbortSignal;
 }
 
-async function call<S extends z.ZodType>(
+export async function call<S extends z.ZodType>(
   method: 'GET' | 'POST',
   path: string,
   schema: S,

@@ -4,8 +4,8 @@ import { grantAchievementRewards } from './achievements';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
 import { createInitialState } from './init';
-import { MAX_DEV_MULTIPLIER, MIN_DEV_MULTIPLIER, SAVE_VERSION } from './state';
-import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, GameState, Settings } from './state';
+import { MAX_CARGO_BONUS, MAX_DEV_MULTIPLIER, MAX_MENTOR_BONUS, MIN_DEV_MULTIPLIER, SAVE_VERSION } from './state';
+import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, CloudBonus, GameState, Settings } from './state';
 
 export type RawSave = Record<string, unknown>;
 export type Migration = (raw: RawSave) => RawSave;
@@ -138,6 +138,19 @@ function readSprint(value: unknown, content: GameContent): GameState['sprint'] {
   return fresh;
 }
 
+export function readCloudBonus(value: unknown): CloudBonus {
+  const bonus: CloudBonus = { cargo: 1, mentors: {} };
+  if (!isRecord(value)) return bonus;
+  bonus.cargo = readNumber(value.cargo, 1, 1, MAX_CARGO_BONUS);
+  if (isRecord(value.mentors)) {
+    for (const id of PROFESSOR_IDS) {
+      const mentor = readNumber(value.mentors[id], 1, 1, MAX_MENTOR_BONUS);
+      if (mentor !== 1) bonus.mentors[id] = mentor;
+    }
+  }
+  return bonus;
+}
+
 function readSettings(value: unknown, fallback: Settings): Settings {
   if (!isRecord(value)) return fallback;
   const motion = value.reducedMotion;
@@ -238,6 +251,7 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
     state.counters[key] = readNumber(counters[key], 0, 0);
   }
   state.settings = readSettings(raw.settings, state.settings);
+  state.cloudBonus = readCloudBonus(raw.cloudBonus);
 
   state.lastAchievementCheckAt = readNumber(raw.lastAchievementCheckAt, 0, 0, now);
   state.createdAt = readNumber(raw.createdAt, now, 0, now);

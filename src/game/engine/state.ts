@@ -10,6 +10,20 @@ export type BuyAmount = 1 | 10 | 'max';
 export const MIN_DEV_MULTIPLIER = 0.1;
 export const MAX_DEV_MULTIPLIER = 1_000_000;
 
+/**
+ * Permanent bonuses earned in the Hackathon mode. The server owns them: they arrive with each
+ * sync and are kept in the save only so that offline time still counts them.
+ */
+export interface CloudBonus {
+  /** Multiplies every source of coins (the student's cargo). */
+  cargo: number;
+  /** Multiplies the disciplines of one professor (mentor levels). Missing = 1. */
+  mentors: Partial<Record<ProfessorId, number>>;
+}
+
+export const MAX_CARGO_BONUS = 10;
+export const MAX_MENTOR_BONUS = 5;
+
 export interface ActiveBuff {
   /** BuffDef id. Applying a buff that is already active refreshes its timer. */
   id: string;
@@ -133,6 +147,8 @@ export interface GameState {
   counters: Record<CounterKey, number>;
 
   settings: Settings;
+
+  cloudBonus: CloudBonus;
 
   /** Throttles the full achievement scan done by the tick (about once per second). */
   lastAchievementCheckAt: number;

@@ -1,6 +1,6 @@
 import type Decimal from 'break_infinity.js';
 import type { ProfessorId, Rarity } from '../content/types';
-import type { BuyAmount, GameState, Settings } from '../engine/state';
+import type { BuyAmount, CloudBonus, GameState, Settings } from '../engine/state';
 
 // ---------------------------------------------------------------------------
 // Event bus: things that happened, for animation, sound and toasts.
@@ -189,6 +189,11 @@ export interface GameActions {
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;
+
+  /** Buys one Café for the Hackathon mode with ADScoins (see engine/cafe.ts). False when it cannot be afforded. */
+  buyCafe(): boolean;
+  /** Applies the Hackathon bonuses sent by the server. */
+  setCloudBonus(bonus: CloudBonus): void;
 
   updateSettings(patch: Partial<Settings>): void;
   save(): void;

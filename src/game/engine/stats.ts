@@ -15,7 +15,7 @@ export const BASE_SYNERGY = 0.05;
  *
  * | StatKey            | Base                                                                   |
  * | ------------------ | ---------------------------------------------------------------------- |
- * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) x settings.devMultiplier |
+ * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) x settings.devMultiplier x cloudBonus.cargo |
  * | clickPower         | 1                                                                      |
  * | idlePower          | 1                                                                      |
  * | prof:<id>          | 1                                                                      |
@@ -146,7 +146,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
   const offline = on('offline');
 
   const prof = {} as Record<ProfessorId, number>;
-  for (const id of PROFESSOR_IDS) prof[id] = acc.value(`prof:${id}`, 1);
+  for (const id of PROFESSOR_IDS) prof[id] = acc.value(`prof:${id}`, 1) * (state.cloudBonus.mentors[id] ?? 1);
   const disc: Record<string, number> = {};
   for (const id of acc.discIds()) disc[id] = acc.value(`disc:${id}`, 1);
 
@@ -155,7 +155,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
       acc.value('globalPower', 1) *
       (1 + balance.achievementBonus * achievementCount(state)) *
       (1 + diplomaBonus(state, content)) *
-      state.settings.devMultiplier,
+      state.settings.devMultiplier *
+      state.cloudBonus.cargo,
     clickPower: acc.value('clickPower', 1),
     idlePower: acc.value('idlePower', 1),
     clickFromIdle: Math.max(0, acc.value('clickFromIdle', 0)),

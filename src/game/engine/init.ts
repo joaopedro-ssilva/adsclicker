@@ -22,6 +22,7 @@ export function createCounters(): Record<CounterKey, number> {
     professorSwaps: 0,
     playSeconds: 0,
     offlineCollections: 0,
+    cafesBought: 0,
   };
 }
 
@@ -91,6 +92,7 @@ export function createInitialState(content: GameContent, now: number): GameState
 
     counters: createCounters(),
     settings: defaultSettings(),
+    cloudBonus: { cargo: 1, mentors: {} },
 
     lastAchievementCheckAt: 0,
     createdAt: now,

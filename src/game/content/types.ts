@@ -90,7 +90,9 @@ export type CounterKey =
   | 'graduations'
   | 'professorSwaps'
   | 'playSeconds'
-  | 'offlineCollections';
+  | 'offlineCollections'
+  /** Cafés bought for the Hackathon mode; the server credits the difference at each sync. */
+  | 'cafesBought';
 
 export type Requirement =
   | { kind: 'professorHired'; professor: ProfessorId }
