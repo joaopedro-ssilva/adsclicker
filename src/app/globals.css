@@ -33,6 +33,7 @@
 /* Hackathon mode: each file is an index owned by one engineer */
 @import '../ui/hackathon/arena/arena.css';
 @import '../ui/hackathon/panel/hk-panel.css';
+@import '../ui/hackathon/screen/screen.css';
 
 /* Pages */
 @import './kit/kit.css';

@@ -1,0 +1,397 @@
+/*
+ * Hackathon shell: the mode takes the whole screen. A top bar, then the fight, the hub or a window over the arena,
+ * and the tabs at the bottom on narrow screens. Shared frames (window, card) live here; each screen styles its own inside.
+ */
+
+.game[data-mode='hackathon'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.hx-screen {
+  /* Frame line and glass of every panel drawn over the arena. */
+  --hx-line: color-mix(in srgb, var(--border) 55%, #7f95d8);
+  --hx-glass: color-mix(in srgb, var(--bg) 90%, transparent);
+  --hx-glass-raised: color-mix(in srgb, var(--surface-raised) 82%, transparent);
+  --hx-gap: var(--space-4);
+}
+
+.hx-ui {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
+}
+
+/* A shade keeps text readable over the art; windows dim the arena further. */
+.hx-ui::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgb(5 7 13 / 0.66), transparent 26%, transparent 62%, rgb(5 7 13 / 0.6));
+}
+
+.hx-ui[data-view='window']::before,
+.hx-ui[data-view='notice']::before {
+  background: rgb(5 7 13 / 0.5);
+}
+
+/* ---------- Top bar ---------- */
+
+.hx-top {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) 0;
+}
+
+.hx-top .stage-logo {
+  grid-area: auto;
+}
+
+.hx-top-center {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hx-top-right {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.hx-top .ar-mode {
+  grid-area: auto;
+  padding: 3px 12px 3px 8px;
+  animation: none;
+}
+
+/* The button says where it goes; the small "voltar para" line would not fit the bar. */
+.hx-top .ar-mode-text small {
+  display: none;
+}
+
+.hx-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hx-resources {
+  display: flex;
+  align-items: stretch;
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.hx-res {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.hx-res + .hx-res {
+  border-left: 2px solid var(--border);
+}
+
+.hx-res b {
+  font-family: var(--font-display);
+  font-size: 12px;
+}
+
+.hx-res-level {
+  display: grid;
+  gap: 3px;
+  align-content: center;
+}
+
+/* Experience toward the next level. */
+.hx-res-level > i {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 4px;
+  background: var(--surface-raised);
+}
+
+.hx-res-level > i::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--fill, 0%);
+  background: var(--ar-flow);
+}
+
+.hx-res-coins svg {
+  color: #f0b43c;
+}
+
+.hx-res-cafe[data-empty='true'] b {
+  color: var(--bad);
+}
+
+/* ---------- Tabs ---------- */
+
+.hx-tabs {
+  display: flex;
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.hx-tabs[data-placement='bottom'] {
+  display: none;
+}
+
+.hx-tab {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  min-width: 88px;
+  padding: 7px 12px 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.hx-tab + .hx-tab {
+  border-left: 2px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.hx-tab:hover {
+  color: var(--text);
+  background: var(--hx-glass-raised);
+}
+
+.hx-tab[aria-current='page'] {
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg));
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.hx-tab:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -4px;
+}
+
+/* ---------- Body ---------- */
+
+.hx-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+}
+
+.hx-ui[data-view='window'] .hx-body {
+  place-items: center;
+  padding: var(--hx-gap);
+  overflow: hidden;
+}
+
+.hx-ui[data-view='hub'] .hx-body {
+  padding: var(--hx-gap);
+}
+
+/* The fight keeps its two rows: the arena and the controls under it. */
+.hx-ui[data-view='fight'] .hx-body {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+/* ---------- Window ---------- */
+
+.hx-window {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(1040px, 100%);
+  max-height: 100%;
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow:
+    0 0 0 2px var(--shadow-color),
+    8px 8px 0 var(--shadow-color);
+}
+
+.hx-window[data-size='md'] {
+  width: min(880px, 100%);
+}
+
+.hx-window[data-size='xl'] {
+  width: min(1240px, 100%);
+}
+
+.hx-window-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--hx-glass-raised);
+  border-bottom: 2px solid var(--hx-line);
+}
+
+.hx-window-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.hx-window-title {
+  min-width: 0;
+}
+
+.hx-window-title h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hx-window-title p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.hx-window-aside {
+  margin-left: auto;
+}
+
+.hx-window-body {
+  min-height: 0;
+  padding: var(--space-4);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---------- Card ---------- */
+
+.hx-card {
+  padding: var(--space-3);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+}
+
+.hx-card-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  color: var(--accent-text);
+}
+
+.hx-card-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hx-card-aside {
+  margin-left: auto;
+  color: var(--text);
+}
+
+/* ---------- Narrow screens: tabs move to the bottom, windows fill the width and the body scrolls ---------- */
+
+@container stage (max-width: 1179px) {
+  .hx-top {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .hx-top-center:has(.hx-tabs) {
+    display: none;
+  }
+
+  .hx-tabs[data-placement='bottom'] {
+    position: relative;
+    z-index: 3;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    border-width: 2px 0 0;
+    box-shadow: none;
+    background: var(--bg);
+  }
+
+  .hx-tab {
+    min-width: 0;
+    padding: 8px 2px 7px;
+    font-size: 8px;
+    letter-spacing: 0.04em;
+  }
+}
+
+@container stage (max-width: 719px) {
+  .hx-screen {
+    --hx-gap: var(--space-2);
+  }
+
+  .hx-top {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-2) 0;
+  }
+
+  .hx-res {
+    padding: 3px 7px;
+    font-size: 12px;
+  }
+
+  .hx-res-level > i {
+    width: 44px;
+  }
+
+  .hx-ui[data-view='window'] .hx-body,
+  .hx-ui[data-view='hub'] .hx-body {
+    place-items: start stretch;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .hx-window {
+    max-height: none;
+    box-shadow: 0 0 0 2px var(--shadow-color);
+  }
+
+  .hx-window-head {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .hx-window-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .hx-window-title h2 {
+    font-size: 13px;
+  }
+
+  .hx-window-body {
+    padding: var(--space-3);
+    overflow: visible;
+  }
+}

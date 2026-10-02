@@ -4,8 +4,7 @@ import { useEffect } from 'react';
 import { useGame } from '@/game/store';
 import { FxLayer } from '@/ui/fx';
 import { HackathonInviteWatcher } from '@/ui/hackathon/arena/HackathonInviteWatcher';
-import { HackathonStage } from '@/ui/hackathon/arena/HackathonStage';
-import { HackathonPanel } from '@/ui/hackathon/panel/HackathonPanel';
+import { HackathonScreen } from '@/ui/hackathon/screen/HackathonScreen';
 import { useHackathon } from '@/ui/hackathon/store';
 import { ToastStack } from '@/ui/kit';
 import { CloudRoot } from './cloud/CloudRoot';
@@ -20,13 +19,14 @@ function GameScreen() {
   const hackathon = useHackathon((store) => store.mode === 'hackathon');
   return (
     <>
-      <main className="game" data-shake-root>
-        <div className="game-stage">
-          {hackathon ? <HackathonStage /> : <Stage />}
-        </div>
-        <div className="game-panel">
-          {hackathon ? <HackathonPanel /> : <SidePanel />}
-        </div>
+      {/* The Hackathon takes the whole screen; the classroom splits it between stage and panel. */}
+      <main className="game" data-mode={hackathon ? 'hackathon' : 'classroom'} data-shake-root>
+        <div className="game-stage">{hackathon ? <HackathonScreen /> : <Stage />}</div>
+        {hackathon ? null : (
+          <div className="game-panel">
+            <SidePanel />
+          </div>
+        )}
       </main>
       {/* Outside the shaking root: effects, notifications and ceremonies must not shake with the screen. */}
       <FxLayer />
