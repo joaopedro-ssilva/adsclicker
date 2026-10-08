@@ -1,44 +1,42 @@
-/* The fight: field, actors, bars, telegraph, Flow bar, skills, choice cards, end banner. */
+/* The fight over the whole screen: HUD in the top bar, health panels, field, actors, bars, charge telegraph. */
 
 .ar-arena {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100%;
   min-height: 0;
 }
 
-/* ---------- Top bar ---------- */
+/* ---------- HUD (lives in the centre slot of the top bar) ---------- */
 
 .ar-hud {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--space-2);
-  margin: var(--space-2) var(--space-3) 0;
-  padding: 6px 10px;
-  background: color-mix(in srgb, var(--bg) 80%, transparent);
-  border: 2px solid var(--border);
+  gap: 2px var(--space-3);
+  min-width: 0;
+  padding: 6px 12px;
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 3px 3px 0 var(--shadow-color);
 }
 
-.ar-hud-left,
-.ar-hud-right {
+.ar-hud-stage-row,
+.ar-hud-wave-row {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
 }
 
-.ar-hud-right {
-  justify-content: flex-end;
-}
-
 .ar-hud-stage {
   margin: 0;
   overflow: hidden;
   font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.05em;
+  font-size: 13px;
+  letter-spacing: 0.1em;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -46,25 +44,25 @@
 
 .ar-badge {
   flex-shrink: 0;
-  padding: 1px 6px;
-  font-size: 10px;
-  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--on-accent);
   background: var(--accent);
 }
 
-.ar-hud-wave {
-  display: grid;
-  justify-items: center;
-  gap: 3px;
+.ar-hud-wave-row {
+  grid-column: 1;
 }
 
 .ar-hud-wave-text {
   font-family: var(--font-display);
   font-size: 12px;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--text-muted);
 }
 
 .ar-pips {
@@ -74,7 +72,7 @@
 
 .ar-pips i {
   display: block;
-  width: 14px;
+  width: 16px;
   height: 6px;
   background: var(--border);
 }
@@ -95,9 +93,9 @@
 }
 
 .ar-wave-timer {
-  margin: 0;
+  margin: 0 0 0 auto;
   font-family: var(--font-display);
-  font-size: 15px;
+  font-size: 13px;
   font-variant-numeric: tabular-nums;
   color: var(--warn);
 }
@@ -108,15 +106,22 @@
 }
 
 .ar-abandon {
-  flex-shrink: 0;
-  padding: 3px 10px;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: stretch;
+  padding: 0 14px;
+  font-family: var(--font-display);
   font-size: 11px;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
-  background: transparent;
-  border: 2px solid var(--border);
+  color: var(--text);
+  background: var(--hx-glass-raised);
+  border: 2px solid var(--hx-line);
   cursor: pointer;
+}
+
+.ar-abandon:hover {
+  border-color: var(--text-muted);
 }
 
 .ar-abandon[data-confirming='true'] {
@@ -125,73 +130,123 @@
   border-color: var(--bad);
 }
 
-/* ---------- Field and actors ---------- */
+.ar-abandon:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
 
-.ar-play {
+/* ---------- Health panels ---------- */
+
+.ar-vs {
   position: relative;
-  min-height: 0;
-  overflow: hidden;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: var(--hx-gap) var(--space-4) 0;
   cursor: pointer;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
 }
 
-.ar-field {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: end;
+/* Each panel sits over its fighter: the student's at a quarter of the width, the wave's at three quarters. */
+.ar-panel {
+  justify-self: center;
+  width: min(440px, 100%);
+  padding: var(--space-2) var(--space-3);
+  cursor: default;
+}
+
+.ar-panel-head {
+  display: flex;
+  align-items: center;
   gap: var(--space-2);
-  padding: 0 var(--space-3) 7%;
+  min-height: 22px;
+  margin-bottom: 4px;
 }
 
-.ar-player {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  gap: 4px;
-}
-
-.ar-player-info,
-.ar-enemy-info {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  pointer-events: none;
-}
-
-.ar-player-name,
-.ar-enemy-name {
+.ar-panel-name {
+  min-width: 0;
   margin: 0;
-  max-width: 100%;
   overflow: hidden;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.1em;
   text-overflow: ellipsis;
+  text-transform: uppercase;
   white-space: nowrap;
-  text-shadow: 0 2px 0 rgb(0 0 0 / 0.8);
 }
 
-.ar-player-body {
-  position: relative;
+.ar-panel-warn {
+  font-size: 16px;
+  line-height: 1;
+  color: var(--bad);
+  animation: ar-pip 0.6s steps(2) infinite;
 }
 
+.ar-panel-tag {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #10131c;
+  background: var(--warn);
+}
+
+.ar-panel-left {
+  margin: 0 0 0 auto;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.ar-panel-head[data-boss='true'] .ar-panel-name {
+  color: var(--warn);
+}
+
+.ar-panel-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ar-panel .ar-hp {
+  flex: 1 1 auto;
+  width: auto;
+  height: 18px;
+}
+
+.ar-heart {
+  flex-shrink: 0;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--bad);
+}
+
+.ar-panel-hp {
+  flex-shrink: 0;
+  margin: 0;
+  min-width: 82px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* Statuses sit on the right of the student's name, where the warning mark is. */
 .ar-status {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 3px;
-  min-height: 15px;
-  margin: 0;
+  margin: 0 0 0 auto;
 }
 
 .ar-status b {
-  padding: 0 5px;
-  font-size: 10px;
-  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #10131c;
   background: var(--warn);
@@ -210,8 +265,71 @@
   background: #ffe066;
 }
 
+.ar-vs-mark {
+  position: absolute;
+  top: calc(var(--hx-gap) + 18px);
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  text-shadow: 0 3px 0 rgb(0 0 0 / 0.8);
+}
+
+/* ---------- Field and actors ---------- */
+
+.ar-play {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* The student stands around a quarter of the width, the wave around three quarters. */
+.ar-field {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  padding: 0 var(--space-4) 3%;
+}
+
+.ar-player {
+  position: relative;
+  justify-self: center;
+}
+
+.ar-enemy-info {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.ar-enemy-name {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.8);
+}
+
+.ar-player-body {
+  position: relative;
+}
+
 .ar-player[data-flow-ready='true'] .ar-player-body {
-  filter: drop-shadow(0 0 8px var(--ar-flow));
+  filter: drop-shadow(0 0 10px var(--ar-flow));
 }
 
 .ar-stars {
@@ -225,7 +343,7 @@
 
 .ar-stars i {
   position: absolute;
-  font-size: 18px;
+  font-size: 22px;
   font-style: normal;
   animation: ar-orbit 0.9s steps(8) infinite;
 }
@@ -365,10 +483,6 @@
   transition: width 140ms steps(3);
 }
 
-.ar-hp[data-tone='player'] {
-  height: 16px;
-}
-
 .ar-hp[data-tone='player'] .ar-hp-fill {
   background: var(--good);
 }
@@ -386,27 +500,13 @@
   animation: ar-pip 0.6s steps(2) infinite;
 }
 
-.ar-hp-text {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-family: var(--font-display);
-  font-size: 10px;
-  color: #fff;
-  text-shadow:
-    0 1px 0 #000,
-    1px 0 0 #000,
-    -1px 0 0 #000;
-}
-
 /* ---------- Charged attack telegraph ---------- */
 
 .ar-charge {
   display: grid;
   justify-items: center;
   gap: 1px;
-  padding: 2px 8px 3px;
+  padding: 2px 10px 3px;
   color: #fff;
   background: color-mix(in srgb, var(--bad) calc(40% + var(--p, 0) * 55%), #12060a);
   border: 2px solid #ffd0d0;
@@ -432,7 +532,7 @@
 .ar-charge-time {
   margin: 0;
   font-family: var(--font-display);
-  font-size: 26px;
+  font-size: 28px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -492,20 +592,22 @@
   }
 }
 
+/* The red edges of a hit and of a charge cover the whole screen, panels and controls included. */
 .ar-vignette,
 .ar-danger {
   position: absolute;
   inset: 0;
+  z-index: 4;
   pointer-events: none;
   opacity: 0;
 }
 
 .ar-vignette {
-  box-shadow: inset 0 0 90px 24px var(--bad);
+  box-shadow: inset 0 0 110px 28px var(--bad);
 }
 
 .ar-danger {
-  box-shadow: inset 0 0 60px 10px color-mix(in srgb, var(--bad) 70%, transparent);
+  box-shadow: inset 0 0 70px 12px color-mix(in srgb, var(--bad) 70%, transparent);
 }
 
 .ar-arena[data-charging='true'] .ar-danger {
@@ -513,447 +615,80 @@
   animation: ar-pip 0.5s steps(2) infinite;
 }
 
-/* ---------- Controls ---------- */
+/* ---------- Narrow screens: the HUD drops under the bar, the student and the wave share one row ---------- */
 
-.ar-controls {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3) var(--space-3);
-}
-
-.ar-skills {
-  display: flex;
-  gap: var(--space-2);
-}
-
-.ar-flow {
-  display: grid;
-  gap: 4px;
-  width: 100%;
-  padding: 8px 12px 6px;
-  text-align: left;
-  color: var(--text);
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  border: 2px solid var(--border);
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.ar-flow:active {
-  transform: translate(2px, 2px);
-  box-shadow: 1px 1px 0 var(--shadow-color);
-}
-
-.ar-flow-label {
-  font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  color: var(--ar-flow);
-}
-
-.ar-flow-track {
-  display: block;
-  height: 18px;
-  background: #0a1a22;
-  border: 2px solid #05070d;
-}
-
-.ar-flow-track i {
-  display: block;
-  height: 100%;
-  background: repeating-linear-gradient(90deg, var(--ar-flow) 0 8px, color-mix(in srgb, var(--ar-flow) 70%, #fff) 8px 10px);
-  transition: width 90ms steps(2);
-}
-
-.ar-flow-caption {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.ar-flow[data-mode='waiting'],
-.ar-flow[data-mode='armed'] {
-  border-color: var(--ar-flow);
-}
-
-.ar-flow[data-mode='armed'] {
-  animation: ar-flow-glow 0.5s steps(2) infinite;
-}
-
-.ar-flow[data-mode='armed'] .ar-flow-caption {
-  color: var(--ar-flow);
-}
-
-@keyframes ar-flow-glow {
-  50% {
-    box-shadow:
-      var(--shadow),
-      0 0 18px var(--ar-flow);
+@container stage (max-width: 1179px) {
+  .hx-top[data-fighting='true'] .hx-top-right {
+    grid-column: 2;
+    grid-row: 1;
   }
-}
 
-.ar-skill {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    'ring name'
-    'ring caption';
-  align-items: center;
-  column-gap: var(--space-2);
-  width: 150px;
-  padding: 5px 10px 5px 5px;
-  text-align: left;
-  color: var(--text);
-  background: color-mix(in srgb, var(--bg) 86%, transparent);
-  border: 2px solid var(--border);
-  box-shadow: var(--shadow);
-  cursor: pointer;
-}
-
-.ar-skill .ui-meter {
-  grid-area: ring;
-}
-
-.ar-skill-name {
-  grid-area: name;
-  align-self: end;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.ar-skill-caption {
-  grid-area: caption;
-  align-self: start;
-  font-family: var(--font-display);
-  font-size: 10px;
-  color: var(--text-muted);
-}
-
-.ar-skill-key {
-  position: absolute;
-  top: -10px;
-  right: -8px;
-  transform: scale(0.8);
-}
-
-.ar-skill[data-state='ready'] {
-  border-color: var(--accent);
-}
-
-.ar-skill[data-state='ready'] .ar-skill-caption {
-  color: var(--accent-text);
-}
-
-.ar-skill[data-state='cooldown'],
-.ar-skill[data-auto='true'] {
-  cursor: default;
-}
-
-.ar-skill[data-state='cooldown'] {
-  opacity: 0.8;
-}
-
-.ar-skill:disabled {
-  filter: none;
-}
-
-.ar-skill[data-hinted='true'] {
-  border-color: var(--ar-flow);
-  animation: ar-flow-glow 0.4s steps(2) infinite;
-}
-
-/* ---------- Between waves ---------- */
-
-.ar-choice {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background: rgb(5 7 13 / 0.82);
-  cursor: default;
-}
-
-.ar-choice-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 14px;
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-transform: uppercase;
-  color: var(--good);
-}
-
-.ar-choice-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 190px));
-  gap: var(--space-3);
-}
-
-.ar-card {
-  position: relative;
-  display: grid;
-  justify-items: center;
-  align-content: start;
-  gap: var(--space-2);
-  padding: var(--space-4) var(--space-3) var(--space-3);
-  text-align: center;
-  color: var(--text);
-  background: var(--surface);
-  border: 2px solid var(--border);
-  border-top: 4px solid var(--accent);
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  animation: ar-card-in 360ms steps(6) both;
-}
-
-.ar-card:hover:not(:disabled) {
-  transform: translateY(-4px);
-  border-color: var(--accent);
-}
-
-.ar-card[data-picked='true'] {
-  border-color: var(--good);
-  box-shadow: 0 0 18px var(--good);
-}
-
-.ar-card:disabled:not([data-picked='true']) {
-  opacity: 0.45;
-}
-
-.ar-card-key {
-  position: absolute;
-  top: -10px;
-  left: -8px;
-  transform: scale(0.85);
-}
-
-.ar-card-emoji {
-  font-size: 36px;
-  line-height: 1;
-}
-
-.ar-card-name {
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.ar-card-text {
-  font-size: 12px;
-  line-height: 1.4;
-  color: var(--text-muted);
-}
-
-.ar-choice-auto {
-  margin: 0;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-@keyframes ar-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
+  .hx-top[data-fighting='true'] .hx-top-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
-}
 
-/* ---------- End banner ---------- */
-
-.ar-end {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: var(--space-2);
-  background: rgb(5 7 13 / 0.45);
-  pointer-events: none;
-}
-
-.ar-end-title {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(26px, 6cqw, 52px);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--bad);
-  text-shadow:
-    0 5px 0 rgb(0 0 0 / 0.7),
-    0 0 26px color-mix(in srgb, var(--bad) 60%, transparent);
-  animation: ar-end-in 520ms steps(7) both;
-}
-
-.ar-end[data-won='true'] .ar-end-title {
-  color: var(--legendary);
-  text-shadow:
-    0 5px 0 rgb(0 0 0 / 0.7),
-    0 0 30px color-mix(in srgb, var(--legendary) 70%, transparent);
-}
-
-.ar-end-sub {
-  margin: 0;
-  padding: 3px 12px;
-  font-size: 13px;
-  background: rgb(5 7 13 / 0.78);
-  color: var(--text);
-  text-shadow: 0 2px 0 rgb(0 0 0 / 0.8);
-  animation: ar-pip 1s steps(2) infinite;
-}
-
-@keyframes ar-end-in {
-  from {
-    opacity: 0;
-    transform: scale(2.2);
-  }
-}
-
-/* ---------- Phones ---------- */
-
-/* While a fight runs the panel is read-only, so the stage takes more of the stacked screen. */
-@media (max-width: 1023px) {
-  .game:has(.ar-arena, .ar-rewards) {
-    grid-template-rows: max(64dvh, 480px) minmax(0, 1fr);
-  }
-}
-
-@container stage (max-width: 639px) {
   .ar-hud {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    margin: 4px var(--space-2) 0;
-    padding: 3px 8px;
-    gap: var(--space-2);
+    width: 100%;
+  }
+}
+
+@container stage (max-width: 719px) {
+  .ar-vs {
+    gap: 4px;
+    padding: var(--space-2) var(--space-2) 0;
   }
 
-  .ar-hud-stage {
+  .ar-panel {
+    width: 100%;
+    padding: 4px 6px;
+  }
+
+  .ar-panel-head {
+    gap: 4px;
+    min-height: 18px;
+  }
+
+  .ar-panel-name {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  .ar-panel-left {
     font-size: 10px;
   }
 
-  .ar-hud-wave {
-    grid-auto-flow: column;
-    gap: var(--space-2);
-  }
-
-  .ar-hud-wave-text {
-    font-size: 11px;
-  }
-
-  .ar-hud-left .ar-badge {
-    display: none;
-  }
-
-  .ar-hud-left {
-    display: none;
-  }
-
-  .ar-hud {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-
-  .ar-field {
-    padding: 0 var(--space-2) 4%;
-    gap: 4px;
-  }
-
-  .ar-controls {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 6px;
-    padding: 6px var(--space-2) var(--space-2);
-  }
-
-  .ar-skills {
-    justify-content: center;
-  }
-
-  .ar-skill {
-    width: auto;
-    flex: 1 1 0;
+  .ar-panel-hp {
     min-width: 0;
-    padding: 3px 6px 3px 3px;
-    column-gap: 6px;
+    font-size: 10px;
   }
 
-  .ar-skill .ui-meter {
-    transform: scale(0.8);
-    margin: -4px;
-  }
-
-  .ar-skill-name {
-    font-size: 11px;
-  }
-
-  .ar-flow {
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-areas:
-      'label track'
-      'caption caption';
-    align-items: center;
-    column-gap: 8px;
-    padding: 4px 8px;
-    gap: 2px 8px;
-  }
-
-  .ar-flow-label {
-    grid-area: label;
-  }
-
-  .ar-flow-track {
-    grid-area: track;
+  .ar-panel .ar-hp {
     height: 14px;
   }
 
-  .ar-flow-caption {
-    grid-area: caption;
+  .ar-heart {
+    font-size: 14px;
+  }
+
+  .ar-status b {
+    padding: 0 4px;
+    font-size: 8px;
+  }
+
+  .ar-vs-mark {
+    top: calc(var(--space-2) + 14px);
     font-size: 11px;
   }
 
-  .ar-choice {
-    gap: var(--space-2);
-    padding: var(--space-2);
-  }
-
-  .ar-choice-cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  .ar-card {
+  .ar-field {
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 4px;
-    padding: var(--space-2) 6px 6px;
+    padding: 0 var(--space-2) 3%;
   }
 
-  .ar-card-emoji {
-    font-size: 24px;
-  }
-
-  .ar-card-name {
+  .ar-enemy-name {
     font-size: 9px;
-  }
-
-  .ar-card-text {
-    font-size: 10px;
-    line-height: 1.3;
-  }
-
-  .ar-enemy-name,
-  .ar-player-name {
-    font-size: 9px;
-  }
-
-  .ar-hp[data-tone='player'] {
-    height: 13px;
   }
 
   .ar-charge {
@@ -965,6 +700,10 @@
   }
 
   .ar-charge-time {
+    font-size: 16px;
+  }
+
+  .ar-stars i {
     font-size: 16px;
   }
 }

@@ -6,7 +6,9 @@ import { enemyById } from '../shared/lookup';
 export const PLAYER_NATIVE = { w: 60, h: 102 };
 const SIDE_GAP = 16;
 const MIN_SCALE = 1;
-const MAX_SCALE = 4;
+const MAX_SCALE = 6;
+/** From this width the student and the wave each take half of the field; below it they share one row. */
+export const SPLIT_WIDTH = 720;
 
 export interface SlotPosition {
   /** Centre of the sprite as a fraction of the enemy zone's width. */
@@ -22,9 +24,9 @@ const BY_GROUP_SIZE: Record<number, SlotPosition[]> = {
     { x: 0.74, depth: 8 },
   ],
   3: [
-    { x: 0.2, depth: 0 },
-    { x: 0.8, depth: 0 },
-    { x: 0.5, depth: 14 },
+    { x: 0.17, depth: 0 },
+    { x: 0.83, depth: 0 },
+    { x: 0.5, depth: 18 },
   ],
 };
 
@@ -62,13 +64,19 @@ export function enemyFootprint(stage: Pick<ResolvedStage, 'waves'>): { w: number
   return { w, h };
 }
 
-/** Largest whole-number zoom at which the student and the widest wave fit the box. */
+/**
+ * Largest whole-number zoom at which the student and the widest wave fit the box. On a wide field each side has its
+ * own half (the student around a quarter of the width, the wave around three quarters); on a phone they share the row.
+ */
 export function pickScale(box: { width: number; height: number }, stage: Pick<ResolvedStage, 'waves'>): number {
   const enemies = enemyFootprint(stage);
-  const needWidth = PLAYER_NATIVE.w + SIDE_GAP + enemies.w;
   const needHeight = Math.max(PLAYER_NATIVE.h, enemies.h + 20);
-  const byWidth = Math.floor((box.width * 0.94) / needWidth);
-  // 34px go to the name and health bar above each sprite.
-  const byHeight = Math.floor((box.height - 34) / needHeight);
+  const half = box.width / 2;
+  const byWidth =
+    box.width >= SPLIT_WIDTH
+      ? Math.min(Math.floor((half * 0.9) / PLAYER_NATIVE.w), Math.floor((half * 0.96) / enemies.w))
+      : Math.floor((box.width * 0.94) / (PLAYER_NATIVE.w + SIDE_GAP + enemies.w));
+  // The small bar (and name) over each enemy takes 34px, and the floor of the art some margin under the feet.
+  const byHeight = Math.floor((box.height * 0.94 - 34) / needHeight);
   return Math.max(MIN_SCALE, Math.min(MAX_SCALE, byWidth, byHeight));
 }

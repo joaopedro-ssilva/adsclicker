@@ -1,5 +1,6 @@
 /* Hackathon panel. Owned by the panel engineer; each tab imports its own file from here. */
 @import './lib/hk-common.css';
+@import '../hub/hk-hub.css';
 @import './aluno/hk-aluno.css';
 @import './itens/hk-itens.css';
 @import './habilidades/hk-habilidades.css';

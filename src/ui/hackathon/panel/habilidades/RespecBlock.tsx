@@ -24,11 +24,9 @@ export function RespecBlock({ profile }: { profile: HackathonProfile }) {
   };
 
   return (
-    <div className="hk-card hk-respec">
-      <div>
-        <h3>Redistribuir pontos</h3>
-        <p className="hk-note">Devolve os {Math.max(0, spent)} pontos gastos. As habilidades ativas escolhidas saem dos espaços.</p>
-      </div>
+    <section className="hk-respec">
+      <h3>Redistribuir pontos</h3>
+      <p className="hk-note">Devolve os {Math.max(0, spent)} pontos gastos. As habilidades ativas escolhidas saem dos espaços.</p>
       <div className="hk-button-note">
         <Button
           size="sm"
@@ -59,6 +57,6 @@ export function RespecBlock({ profile }: { profile: HackathonProfile }) {
           Todos os {spent} pontos voltam para você e a árvore zera. Custa <strong>{whole(price)} Commits</strong>.
         </p>
       </ConfirmDialog>
-    </div>
+    </section>
   );
 }

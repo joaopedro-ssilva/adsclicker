@@ -63,7 +63,7 @@ export function BulkRecycle({ marked, commons, selecting, onDone }: BulkRecycleP
             data-qa="hk-recycle-commons"
             onClick={() => setBatch(commons)}
           >
-            Reciclar todos os comuns ({commons.length})
+            Reciclar comuns ({commons.length})
             {commons.length > 0 ? <Commits amount={total(commons)} /> : null}
           </Button>
         )}

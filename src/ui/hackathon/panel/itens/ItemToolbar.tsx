@@ -40,7 +40,7 @@ export function ItemToolbar({ sort, onSort, slot, onSlot, counts, selecting, onT
       </div>
       <div className="hk-toolbar-row">
         <div className="hk-chips" role="group" aria-label="Ordenar">
-          <span className="hk-toolbar-label">Ordem</span>
+          <span className="hk-toolbar-label">Ordenar</span>
           {SORTS.map((key) => (
             <button key={key} type="button" className="hk-chip" aria-pressed={sort === key} data-qa={`hk-sort-${key}`} onClick={() => onSort(key)}>
               {SORT_LABEL[key]}

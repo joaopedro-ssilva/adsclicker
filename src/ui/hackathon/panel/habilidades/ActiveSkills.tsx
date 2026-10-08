@@ -21,32 +21,35 @@ export function ActiveSkills({ profile }: { profile: HackathonProfile }) {
   const remove = (id: string) => apply(chosen.filter((entry) => entry !== id));
 
   return (
-    <div className="hk-active" data-qa="hk-active-skills">
-      <ul className="hk-slots-row" aria-label="Espaços de habilidade">
-        {Array.from({ length: slots }, (_, index) => {
-          const skill = skillById.get(chosen[index] ?? '');
-          return (
-            <li key={index} className="hk-skill-slot" data-filled={skill !== undefined}>
+    <section className="hk-active" data-qa="hk-active-skills" aria-label="Habilidades ativas">
+      <header className="hk-active-head">
+        <h3>Habilidades ativas</h3>
+        <ul className="hk-slots-row" aria-label="Espaços de habilidade">
+          {Array.from({ length: slots }, (_, index) => {
+            const skill = skillById.get(chosen[index] ?? '');
+            return (
+              <li key={index} className="hk-skill-slot" data-filled={skill !== undefined}>
+                <span className="hk-skill-emoji" aria-hidden="true">
+                  {skill?.emoji ?? '+'}
+                </span>
+                <span>{skill?.name ?? 'Vazio'}</span>
+              </li>
+            );
+          })}
+          {extras.map((id) => (
+            <li key={id} className="hk-skill-slot" data-filled="true" data-extra="true" title="Concedida por um item lendário equipado">
               <span className="hk-skill-emoji" aria-hidden="true">
-                {skill?.emoji ?? '+'}
+                {skillById.get(id)?.emoji}
               </span>
-              <span>{skill?.name ?? 'Vazio'}</span>
+              <span>{skillById.get(id)?.name}</span>
+              <small>extra do item</small>
             </li>
-          );
-        })}
-        {extras.map((id) => (
-          <li key={id} className="hk-skill-slot" data-filled="true" data-extra="true" title="Concedida por um item lendário equipado">
-            <span className="hk-skill-emoji" aria-hidden="true">
-              {skillById.get(id)?.emoji}
-            </span>
-            <span>{skillById.get(id)?.name}</span>
-            <small>extra do item</small>
-          </li>
-        ))}
-      </ul>
-      <p className="hk-note">
-        {slots} {slots === 1 ? 'espaço' : 'espaços'} neste cargo. {slots < 2 ? 'O próximo cargo libera mais um.' : ''}
-      </p>
+          ))}
+        </ul>
+        <p className="hk-note">
+          {slots} {slots === 1 ? 'espaço' : 'espaços'} neste cargo. {slots < 2 ? 'O próximo cargo libera mais um.' : ''}
+        </p>
+      </header>
 
       <InlineError message={error} />
       <ul className="hk-skill-list">
@@ -82,6 +85,6 @@ export function ActiveSkills({ profile }: { profile: HackathonProfile }) {
           );
         })}
       </ul>
-    </div>
+    </section>
   );
 }

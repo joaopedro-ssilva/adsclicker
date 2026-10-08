@@ -1,0 +1,421 @@
+/* The bottom of the fight (Flow bar, skills), the upgrade cards between waves and the end banner. */
+
+/* ---------- Controls ---------- */
+
+.ar-controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4) var(--space-4);
+}
+
+.ar-skills {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.ar-flow {
+  display: grid;
+  flex: 0 1 540px;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 12px 10px;
+  text-align: left;
+  color: var(--text);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ar-flow:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow-color);
+}
+
+.ar-flow:focus-visible,
+.ar-skill:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.ar-flow-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.ar-flow-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ar-flow);
+}
+
+.ar-flow-track {
+  display: block;
+  height: 20px;
+  background: #0a1a22;
+  border: 2px solid #05070d;
+}
+
+.ar-flow-track i {
+  display: block;
+  height: 100%;
+  background: repeating-linear-gradient(90deg, var(--ar-flow) 0 8px, color-mix(in srgb, var(--ar-flow) 70%, #fff) 8px 10px);
+  transition: width 90ms steps(2);
+}
+
+.ar-flow-caption {
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.ar-flow[data-mode='waiting'],
+.ar-flow[data-mode='armed'] {
+  border-color: var(--ar-flow);
+}
+
+.ar-flow[data-mode='armed'] {
+  animation: ar-flow-glow 0.5s steps(2) infinite;
+}
+
+.ar-flow[data-mode='armed'] .ar-flow-caption {
+  color: var(--ar-flow);
+}
+
+@keyframes ar-flow-glow {
+  50% {
+    box-shadow:
+      4px 4px 0 var(--shadow-color),
+      0 0 18px var(--ar-flow);
+  }
+}
+
+.ar-skill {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'ring name'
+    'ring caption';
+  align-items: center;
+  column-gap: var(--space-2);
+  width: 158px;
+  height: 100%;
+  padding: 5px 10px 5px 5px;
+  text-align: left;
+  color: var(--text);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+  cursor: pointer;
+}
+
+.ar-skill .ui-meter {
+  grid-area: ring;
+}
+
+.ar-skill-name {
+  grid-area: name;
+  align-self: end;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.ar-skill-caption {
+  grid-area: caption;
+  align-self: start;
+  font-family: var(--font-display);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.ar-skill-key {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  transform: scale(0.8);
+}
+
+.ar-skill[data-state='ready'] {
+  border-color: var(--accent);
+}
+
+.ar-skill[data-state='ready'] .ar-skill-caption {
+  color: var(--accent-text);
+}
+
+.ar-skill[data-state='cooldown'],
+.ar-skill[data-auto='true'] {
+  cursor: default;
+}
+
+.ar-skill[data-state='cooldown'] {
+  opacity: 0.8;
+}
+
+.ar-skill:disabled {
+  filter: none;
+}
+
+.ar-skill[data-hinted='true'] {
+  border-color: var(--ar-flow);
+  animation: ar-flow-glow 0.4s steps(2) infinite;
+}
+
+/* ---------- Between waves ---------- */
+
+.ar-choice {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-4) var(--space-4);
+  background: rgb(5 7 13 / 0.8);
+  cursor: default;
+}
+
+.ar-choice-title {
+  margin: 0;
+  padding: 6px 16px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--good);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+}
+
+.ar-choice-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 230px));
+  gap: var(--space-4);
+}
+
+.ar-card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3) var(--space-3);
+  text-align: center;
+  color: var(--text);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  border-top: 4px solid var(--accent);
+  box-shadow: 6px 6px 0 var(--shadow-color);
+  cursor: pointer;
+  animation: ar-card-in 360ms steps(6) both;
+}
+
+.ar-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+}
+
+.ar-card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.ar-card[data-picked='true'] {
+  border-color: var(--good);
+  box-shadow: 0 0 18px var(--good);
+}
+
+.ar-card:disabled:not([data-picked='true']) {
+  opacity: 0.45;
+}
+
+.ar-card-key {
+  position: absolute;
+  top: -10px;
+  left: -8px;
+  transform: scale(0.85);
+}
+
+.ar-card-emoji {
+  font-size: 40px;
+  line-height: 1;
+}
+
+.ar-card-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ar-card-text {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+.ar-choice-auto {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+@keyframes ar-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+/* ---------- End banner ---------- */
+
+.ar-end {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  background: rgb(5 7 13 / 0.45);
+  pointer-events: none;
+}
+
+.ar-end-box {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  background: var(--hx-glass);
+  border: 2px solid var(--hx-line);
+  border-top: 4px solid var(--bad);
+  box-shadow: 8px 8px 0 var(--shadow-color);
+}
+
+.ar-end[data-won='true'] .ar-end-box {
+  border-top-color: var(--legendary);
+}
+
+.ar-end-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(26px, 5cqw, 48px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bad);
+  text-shadow: 0 4px 0 rgb(0 0 0 / 0.7);
+  animation: ar-end-in 520ms steps(7) both;
+}
+
+.ar-end[data-won='true'] .ar-end-title {
+  color: var(--legendary);
+}
+
+.ar-end-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  animation: ar-pip 1s steps(2) infinite;
+}
+
+@keyframes ar-end-in {
+  from {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/* ---------- Phones: Flow on its own row, the skills under it ---------- */
+
+@container stage (max-width: 719px) {
+  .ar-controls {
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px var(--space-2) var(--space-2);
+  }
+
+  .ar-flow {
+    flex: none;
+    padding: 6px 8px 8px;
+    gap: 4px;
+  }
+
+  .ar-flow-label {
+    font-size: 11px;
+  }
+
+  .ar-flow-caption {
+    font-size: 11px;
+  }
+
+  .ar-flow-track {
+    height: 16px;
+  }
+
+  .ar-skills {
+    gap: 6px;
+  }
+
+  .ar-skill {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    padding: 3px 6px 3px 3px;
+    column-gap: 6px;
+  }
+
+  .ar-skill .ui-meter {
+    transform: scale(0.8);
+    margin: -4px;
+  }
+
+  .ar-skill-name {
+    font-size: 11px;
+  }
+
+  .ar-choice {
+    gap: var(--space-2);
+    padding: var(--space-5) var(--space-2) var(--space-2);
+  }
+
+  .ar-choice-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .ar-card {
+    gap: 4px;
+    padding: var(--space-2) 6px 6px;
+  }
+
+  .ar-card-emoji {
+    font-size: 24px;
+  }
+
+  .ar-card-name {
+    font-size: 9px;
+  }
+
+  .ar-card-text {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  .ar-end-box {
+    padding: var(--space-3) var(--space-4);
+  }
+}

@@ -1,5 +1,6 @@
 import { SLOT_IDS } from '@/hackathon/content/types';
 import type { HackathonProfile } from '@/shared/hackathonApi';
+import { Icon } from '@/ui/kit';
 import { baseById } from '../lib/hk';
 import { ItemIcon } from '../lib/ItemIcon';
 import { RARITY_NAME, SLOT_LABEL } from '../lib/labels';
@@ -8,10 +9,12 @@ import { equippedItems } from '../lib/profileBuild';
 interface EquipmentSlotsProps {
   profile: HackathonProfile;
   onOpenItem: (id: string) => void;
+  /** An empty slot: the items tab is where something gets equipped. */
+  onOpenItems: () => void;
 }
 
-/** The four slots with what is equipped. A filled slot opens the item in the items tab. */
-export function EquipmentSlots({ profile, onOpenItem }: EquipmentSlotsProps) {
+/** The four slots with what is equipped. Every slot opens the items tab, on the item when there is one. */
+export function EquipmentSlots({ profile, onOpenItem, onOpenItems }: EquipmentSlotsProps) {
   const equipped = equippedItems(profile);
   return (
     <ul className="hk-slots" data-qa="hk-slots">
@@ -21,13 +24,22 @@ export function EquipmentSlots({ profile, onOpenItem }: EquipmentSlotsProps) {
         if (!item || !base) {
           return (
             <li key={slot}>
-              <div className="hk-slot" data-empty="true" data-slot={slot}>
-                <span className="hk-frame hk-slot-frame" data-empty="true" />
+              <button
+                type="button"
+                className="hk-slot"
+                data-empty="true"
+                data-slot={slot}
+                onClick={onOpenItems}
+                aria-label={`${SLOT_LABEL[slot]}: vazio. Abrir os itens.`}
+              >
+                <span className="hk-frame hk-slot-frame" data-empty="true">
+                  <Icon name="plus" size={12} />
+                </span>
                 <span className="hk-slot-text">
                   <small>{SLOT_LABEL[slot]}</small>
                   <span className="hk-slot-name">Vazio</span>
                 </span>
-              </div>
+              </button>
             </li>
           );
         }

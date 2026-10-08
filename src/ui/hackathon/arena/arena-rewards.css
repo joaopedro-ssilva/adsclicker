@@ -1,28 +1,17 @@
 /* Rewards screen, level bar, item drops, legendary and promotion scenes. */
 
-.ar-rewards {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-  padding: var(--space-3);
-  overflow: auto;
-}
-
 .ar-rewards-card {
   display: grid;
   gap: var(--space-3);
-  width: min(560px, 100%);
-  padding: var(--space-4) var(--space-5);
-  background: color-mix(in srgb, var(--surface) 95%, transparent);
-  border: 2px solid var(--border);
-  border-top: 4px solid var(--bad);
-  box-shadow: var(--shadow);
 }
 
-.ar-rewards[data-won='true'] .ar-rewards-card {
-  border-top-color: var(--legendary);
+/* The verdict colours the window frame. */
+.ar-rewards .hx-window {
+  border-color: color-mix(in srgb, var(--bad) 55%, var(--hx-line));
+}
+
+.ar-rewards[data-won='true'] .hx-window {
+  border-color: color-mix(in srgb, var(--legendary) 60%, var(--hx-line));
 }
 
 .ar-rewards-title {
@@ -185,8 +174,10 @@
   bottom: calc(var(--space-4) * -1);
   display: grid;
   justify-items: center;
-  padding: var(--space-2) 0 var(--space-1);
-  background: linear-gradient(transparent, var(--surface) 35%);
+  margin: 0 calc(var(--space-4) * -1) calc(var(--space-4) * -1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--hx-glass-raised);
+  border-top: 2px solid var(--hx-line);
 }
 
 .ar-legend {
@@ -249,14 +240,15 @@
   color: var(--scene);
 }
 
-@container stage (max-width: 639px) {
-  .ar-rewards {
-    padding: var(--space-2);
-  }
-
+@container stage (max-width: 719px) {
   .ar-rewards-card {
     gap: var(--space-2);
-    padding: var(--space-3);
+  }
+
+  .ar-rewards-actions {
+    bottom: calc(var(--space-3) * -1);
+    margin: 0 calc(var(--space-3) * -1) calc(var(--space-3) * -1);
+    padding: var(--space-2) var(--space-3);
   }
 
   .ar-rewards-title {

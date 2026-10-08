@@ -1,23 +1,51 @@
-/* Habilidades tab: free points, the tree, node detail, active skills. */
+/* Habilidades window: the tree, the node detail beside it, the active skills under both. */
+
+.hk-skills {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-areas:
+    'tree side'
+    'active active';
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.hk-skills > .hk-tree {
+  grid-area: tree;
+  align-self: stretch;
+}
+
+.hk-skills-side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.hk-skills > .hk-active {
+  grid-area: active;
+}
+
+/* Free points (window header) */
 
 .hk-points {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-raised);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg);
   border: 2px solid var(--border);
-  box-shadow: 3px 3px 0 var(--shadow-color);
 }
 
 .hk-points[data-has='true'] {
   border-color: var(--warn);
-  background: color-mix(in srgb, var(--warn) 12%, var(--surface-raised));
+  background: color-mix(in srgb, var(--warn) 12%, var(--bg));
 }
 
 .hk-points-number {
   font-family: var(--font-display);
-  font-size: 40px;
+  font-size: 28px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -59,7 +87,10 @@
 .hk-tree {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg);
+  border: 2px solid var(--border);
 }
 
 .hk-tree-heads {
@@ -70,8 +101,8 @@
 
 .hk-tree-heads span {
   font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 12px;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--branch);
 }
@@ -79,12 +110,10 @@
 .hk-tree-board {
   position: relative;
   width: 100%;
-  aspect-ratio: 3 / 3.3;
-  background-color: var(--bg);
-  background-image: radial-gradient(color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px);
-  background-size: 12px 12px;
-  border: 2px solid var(--border);
-  box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--bg) 60%, #000);
+  flex: 1;
+  min-height: calc(var(--rows) * 104px);
+  background-image: radial-gradient(color-mix(in srgb, var(--border) 70%, transparent) 1px, transparent 1px);
+  background-size: 14px 14px;
 }
 
 .hk-tree-edges {
@@ -110,6 +139,7 @@
   stroke: var(--branch);
 }
 
+/* The slot is anchored on the tile centre, so the connectors meet the tiles and the name hangs under */
 .hk-node-slot {
   position: absolute;
   left: calc((var(--col) + 0.5) / var(--cols) * 100%);
@@ -119,7 +149,7 @@
   align-items: center;
   gap: 6px;
   width: calc(100% / var(--cols) - 12px);
-  translate: -50% -50%;
+  translate: -50% -32px;
 }
 
 .hk-node {
@@ -128,8 +158,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  width: min(100%, 72px);
+  gap: 3px;
+  width: min(100%, 64px);
   min-width: 52px;
   aspect-ratio: 1;
   padding: 0;
@@ -140,7 +170,7 @@
 }
 
 .hk-node-emoji {
-  font-size: clamp(20px, 7cqw, 28px);
+  font-size: 26px;
   line-height: 1;
 }
 
@@ -154,26 +184,26 @@
 
 .hk-node-lock {
   position: absolute;
-  top: 1px;
-  right: 1px;
+  top: 2px;
+  right: 2px;
   color: var(--text-muted);
 }
 
 .hk-node-active {
   position: absolute;
-  top: -1px;
-  left: 2px;
-  font-size: 11px;
+  top: 0;
+  left: 3px;
+  font-size: 12px;
   color: var(--warn);
 }
 
 .hk-node-name {
   max-width: 100%;
-  padding: 0 3px;
+  padding: 0 4px;
   background: var(--bg);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.2;
   text-align: center;
   color: var(--text-muted);
 }
@@ -187,7 +217,7 @@
 .hk-node[data-state='locked'] {
   border-style: dashed;
   box-shadow: none;
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 .hk-node[data-state='locked'] .hk-node-emoji {
@@ -244,82 +274,135 @@
 
 .hk-node-detail {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  grid-template-areas:
-    'emoji text'
-    'buy buy';
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background: var(--surface-raised);
-  border: 2px solid var(--branch);
-  box-shadow: 3px 3px 0 var(--shadow-color);
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-4);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.hk-node-detail > :not(.hk-node-detail-emoji, .hk-node-detail-title) {
+  grid-column: 1 / -1;
 }
 
 .hk-node-detail-emoji {
-  grid-area: emoji;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 52px;
-  background: var(--bg);
+  width: 60px;
+  height: 60px;
+  background: color-mix(in srgb, var(--branch) 14%, var(--surface-raised));
   border: 2px solid var(--branch);
-  font-size: 28px;
+  box-shadow: 2px 2px 0 var(--shadow-color);
+  font-size: 32px;
   line-height: 1;
-}
-
-.hk-node-detail-text {
-  grid-area: text;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
 }
 
 .hk-node-detail-title {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .hk-node-detail-title h3 {
-  font-size: 15px;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.hk-node-detail-level {
-  font-size: 12px;
-  font-weight: 800;
+.hk-node-badge {
+  color: var(--branch);
+  border-color: var(--branch);
+}
+
+.hk-node-detail-desc {
+  margin: var(--space-1) 0 0;
+  font-size: 13px;
+  line-height: 1.4;
   color: var(--text-muted);
 }
 
-.hk-node-detail-level strong {
-  color: var(--text);
+.hk-node-facts {
+  display: flex;
+  flex-direction: column;
+  margin: var(--space-1) 0 0;
+  border-top: 2px solid var(--border);
 }
 
-.hk-node-detail-effect {
-  font-size: 12px;
-  line-height: 1.4;
+.hk-node-facts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 5px 0;
+  border-bottom: 2px solid var(--border);
+  font-size: 13px;
 }
 
-.hk-node-detail-effect [data-next='true'] {
-  color: var(--good);
+.hk-node-facts dt {
+  flex-shrink: 0;
   font-weight: 800;
 }
 
-.hk-node-detail-buy {
-  grid-area: buy;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+.hk-node-facts dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
 }
 
-.hk-node-detail-buy .ui-button {
-  flex-shrink: 0;
-  min-width: 128px;
+.hk-node-facts dd[data-tone='good'] {
+  color: var(--good);
+}
+
+.hk-node-facts dd[data-tone='cost'] {
+  color: var(--accent-text);
+}
+
+.hk-node-detail-buy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hk-node-detail-buy .ui-button[aria-disabled='true'] {
+  opacity: 0.65;
 }
 
 .hk-node-detail-buy .hk-reason {
-  flex: 1;
+  text-align: center;
+}
+
+/* Respec */
+
+.hk-respec {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
+  background: var(--hx-glass-raised);
+  border: 2px solid var(--hx-line);
+}
+
+.hk-respec h3 {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hk-respec > .hk-note {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
+.hk-respec .hk-button-note {
+  align-items: flex-end;
+}
+
+.hk-respec .hk-reason {
+  text-align: right;
 }
 
 /* Active skills */
@@ -328,11 +411,27 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--hx-glass-raised);
+  border: 2px solid var(--hx-line);
+}
+
+.hk-active-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+}
+
+.hk-active-head h3 {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .hk-slots-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin: 0;
   padding: 0;
@@ -343,8 +442,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  min-height: 56px;
-  padding: var(--space-2) var(--space-3);
+  min-height: 40px;
+  padding: 4px var(--space-3);
   background: var(--bg);
   border: 2px dashed var(--border);
   font-size: 13px;
@@ -361,23 +460,21 @@
 
 .hk-skill-slot[data-extra='true'] {
   border-color: var(--legendary);
-  flex-wrap: wrap;
 }
 
 .hk-skill-slot small {
-  flex-basis: 100%;
   font-size: 10px;
   color: var(--legendary);
 }
 
 .hk-skill-emoji {
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
 }
 
 .hk-skill-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-2);
   margin: 0;
   padding: 0;
@@ -388,14 +485,19 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-1) var(--space-3);
   padding: var(--space-2) var(--space-3);
-  background: var(--surface-raised);
+  background: var(--bg);
   border: 2px solid var(--border);
 }
 
+.hk-skill-card > .hk-note {
+  grid-column: 1 / -1;
+  grid-row: 2;
+}
+
 .hk-skill-card[data-owned='false'] {
-  opacity: 0.6;
+  opacity: 0.65;
   border-style: dashed;
 }
 
@@ -405,6 +507,10 @@
 
 .hk-skill-card[data-on='true'] {
   border-color: var(--warn);
+}
+
+.hk-skill-card .hk-skill-emoji {
+  font-size: 26px;
 }
 
 .hk-skill-text {
@@ -424,20 +530,51 @@
   color: var(--text-muted);
 }
 
-.hk-skill-card .hk-reason {
-  max-width: 96px;
-  text-align: right;
+.hk-skill-card > .hk-reason {
+  align-self: end;
+  text-align: center;
 }
 
-/* Respec */
+@container stage (max-width: 1179px) {
+  .hk-skills {
+    grid-template-columns: minmax(0, 1fr) 300px;
+  }
 
-.hk-respec {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
+  .hk-skill-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.hk-respec h3 {
-  font-size: 14px;
+@container stage (max-width: 719px) {
+  .hk-skills {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'tree'
+      'side'
+      'active';
+  }
+
+  .hk-tree {
+    padding: var(--space-2);
+  }
+
+  .hk-tree-board {
+    height: calc(var(--rows) * 112px);
+  }
+
+  .hk-node-name {
+    font-size: 11px;
+  }
+
+  .hk-skill-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-points {
+    padding: var(--space-1) var(--space-2);
+  }
+
+  .hk-points-text small {
+    display: none;
+  }
 }

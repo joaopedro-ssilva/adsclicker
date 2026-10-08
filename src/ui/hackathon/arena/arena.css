@@ -1,4 +1,5 @@
-/* Hackathon arena, mode switch and moments. Owned by the arena engineer; import further files from here. */
+/* Hackathon fight, rewards and the screens around them. Owned by the arena engineer; import further files from here. */
 @import './arena-base.css';
 @import './arena-fight.css';
+@import './arena-controls.css';
 @import './arena-rewards.css';

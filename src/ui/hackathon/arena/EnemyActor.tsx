@@ -17,7 +17,7 @@ interface EnemyActorProps {
   covered: boolean;
 }
 
-/** One enemy: name, health bar, charge warning when it winds up a heavy hit, and its sprite. */
+/** One enemy: health bar (and its name when the wave has several), charge warning when it winds up a heavy hit, and its sprite. */
 export function EnemyActor({ entry, groupSize, scale, tick, covered }: EnemyActorProps) {
   const { enemy, slot, dying, spawned } = entry;
   const def = enemyById.get(enemy.def);
@@ -51,7 +51,7 @@ export function EnemyActor({ entry, groupSize, scale, tick, covered }: EnemyActo
               covered={covered}
             />
           ) : null}
-          <p className="ar-enemy-name">{def?.name ?? 'Bug'}</p>
+          {groupSize > 1 ? <p className="ar-enemy-name">{def?.name ?? 'Bug'}</p> : null}
           <HpBar hp={enemy.hp} maxHp={enemy.maxHp} tone={def?.boss ? 'boss' : 'enemy'} label={`Vida: ${def?.name ?? 'inimigo'}`} />
         </div>
       ) : null}

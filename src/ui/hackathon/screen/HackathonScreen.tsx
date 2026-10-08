@@ -1,6 +1,7 @@
 'use client';
 import { Scenery } from '@/ui/art/Scenery';
 import { Arena } from '../arena/Arena';
+import { ArenaHud } from '../arena/ArenaHud';
 import { NoticeView } from '../arena/NoticeView';
 import { RewardsScreen } from '../arena/RewardsScreen';
 import { StudentCreation } from '../arena/StudentCreation';
@@ -58,6 +59,7 @@ export function HackathonScreen() {
     view = (
       <NoticeView
         emoji="🔒"
+        icon="lock"
         title="Hackathon bloqueado"
         text={lockReason ?? 'O Hackathon ainda não está liberado.'}
         actionLabel="Verificar de novo"
@@ -69,6 +71,7 @@ export function HackathonScreen() {
     view = (
       <NoticeView
         emoji="📡"
+        icon="cloud"
         title="O Hackathon precisa de conexão"
         text="Seu aluno, itens e Commits ficam guardados no servidor. A sala de aula continua funcionando normalmente."
         actionLabel="Tentar de novo"
@@ -76,7 +79,7 @@ export function HackathonScreen() {
       />
     );
   } else {
-    view = <NoticeView emoji="☕" title="Abrindo o Hackathon..." text="Buscando o seu aluno." />;
+    view = <NoticeView emoji="☕" icon="clock" title="Abrindo o Hackathon..." text="Buscando o seu aluno." />;
   }
 
   const browsing = kind === 'hub' || kind === 'window';
@@ -86,7 +89,7 @@ export function HackathonScreen() {
     <section className="stage-root hx-screen" aria-label="Hackathon">
       <Scenery scenery={scenery} focusY={0.9} className="stage-scenery">
         <div className="hx-ui" data-view={kind}>
-          <TopBar>{browsing ? <TabNav placement="top" /> : null}</TopBar>
+          <TopBar>{run ? <ArenaHud run={run} /> : browsing ? <TabNav placement="top" /> : null}</TopBar>
           <div className="hx-body">{view}</div>
           {browsing ? <TabNav placement="bottom" /> : null}
         </div>

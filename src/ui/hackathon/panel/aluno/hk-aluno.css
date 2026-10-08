@@ -1,80 +1,23 @@
-/* Aluno tab. */
+/* Student blocks of the hub: the next cargo, the Café, the stats, the equipment, and the pieces of the details dialog. */
 
-.hk-student {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-3);
-  align-items: start;
-}
+/* ---------- Next cargo ---------- */
 
-.hk-bust {
-  display: grid;
-  justify-items: center;
-  align-items: start;
-  width: 112px;
-  height: 132px;
-  overflow: hidden;
-  background:
-    linear-gradient(transparent 70%, color-mix(in srgb, var(--accent) 16%, transparent)),
-    repeating-linear-gradient(0deg, transparent 0 7px, rgb(255 255 255 / 0.03) 7px 8px),
-    var(--bg);
-  border: 2px solid var(--border);
-  box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--bg) 60%, #000);
-}
-
-/* The head sits at the top of the sprite: nudge the crop so the face is centred */
-.hk-bust .character {
-  margin-top: 10px;
-}
-
-.hk-student-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-width: 0;
-}
-
-.hk-student-title {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.hk-student-title h2 {
-  min-width: 0;
-  overflow: hidden;
-  font-size: 17px;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-}
-
-.hk-goal {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: var(--space-2) var(--space-3);
-  background: var(--bg);
-  border: 2px solid var(--border);
-}
-
-.hk-goal-title {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.hk-goal-title strong {
-  color: var(--text);
+.hk-goal-name {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.04em;
 }
 
 .hk-goal ul {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   margin: 0;
-  padding: 0;
+  padding: var(--space-2) 0 0;
   list-style: none;
-  font-size: 12px;
+  border-top: 2px solid var(--border);
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -89,29 +32,19 @@
   color: var(--good);
 }
 
-/* Café */
+/* ---------- Café ---------- */
 
-.hk-cafe {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.hk-cafe-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.hk-cafe h3 {
-  font-size: 14px;
+.hk-cafe-count {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .hk-cups {
   display: flex;
-  gap: 2px;
-  font-size: 18px;
+  justify-content: center;
+  gap: 6px;
+  font-size: 22px;
   line-height: 1;
 }
 
@@ -119,7 +52,13 @@
   filter: grayscale(1) brightness(0.45);
 }
 
+.hk-cafe .hk-cups {
+  margin-bottom: var(--space-2);
+}
+
 .hk-cafe-timer {
+  margin: 0;
+  text-align: center;
   font-size: 13px;
   color: var(--text-muted);
 }
@@ -132,7 +71,17 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Stats */
+.hk-cafe .hk-note {
+  margin: 2px 0 var(--space-2);
+  text-align: center;
+  font-size: 11px;
+}
+
+.hk-cafe .ui-button {
+  width: 100%;
+}
+
+/* ---------- Stats ---------- */
 
 .hk-stats {
   display: grid;
@@ -169,7 +118,7 @@
 
 .hk-stat-value {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 400;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -205,7 +154,98 @@
   color: var(--uncommon);
 }
 
-/* Meta bonuses */
+/* ---------- Equipment ---------- */
+
+.hk-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hk-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: var(--space-2) 4px;
+  text-align: center;
+  background: var(--surface-raised);
+  border: 2px solid color-mix(in srgb, var(--rar, var(--border)) 60%, var(--border));
+  box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.hk-slot:hover {
+  filter: brightness(1.12);
+}
+
+.hk-slot[data-empty='true'] {
+  background: transparent;
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.hk-slot-frame {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+}
+
+.hk-slot-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.hk-slot-text small {
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.hk-slot-name {
+  font-size: 12px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.hk-slot[data-empty='true'] .hk-slot-name {
+  color: var(--text-muted);
+}
+
+.hk-slot-meta {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--rar);
+}
+
+/* ---------- Details dialog: meta bonuses, sets, classroom, totals ---------- */
+
+.hk-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.hk-details h3 {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
 
 .hk-metas {
   display: grid;
@@ -261,83 +301,9 @@
   color: var(--text-muted);
 }
 
-/* Equipment */
-
-.hk-slots {
+.hk-sets {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.hk-slot {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  width: 100%;
-  min-width: 0;
-  min-height: 72px;
-  padding: 6px;
-  text-align: left;
-  background: var(--surface-raised);
-  border: 2px solid color-mix(in srgb, var(--rar, var(--border)) 60%, var(--border));
-  box-shadow: 3px 3px 0 var(--shadow-color);
-}
-
-button.hk-slot:hover {
-  filter: brightness(1.12);
-}
-
-.hk-slot[data-empty='true'] {
-  background: transparent;
-  border-style: dashed;
-  box-shadow: none;
-}
-
-.hk-slot-frame {
-  width: 60px;
-  height: 60px;
-  flex-shrink: 0;
-}
-
-.hk-slot-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  line-height: 1.2;
-}
-
-.hk-slot-text small {
-  font-family: var(--font-display);
-  font-size: 9px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.hk-slot-name {
-  font-size: 12px;
-  font-weight: 900;
-  overflow-wrap: anywhere;
-}
-
-.hk-slot[data-empty='true'] .hk-slot-name {
-  color: var(--text-muted);
-}
-
-.hk-slot-meta {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--rar);
-}
-
-/* Sets */
-
-.hk-sets {
-  display: flex;
-  flex-direction: column;
   gap: var(--space-2);
 }
 
@@ -350,7 +316,12 @@ button.hk-slot:hover {
 }
 
 .hk-set h3 {
+  margin: 0;
+  font-family: var(--font-text);
   font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
 }
 
 .hk-set-count {
@@ -397,8 +368,6 @@ button.hk-slot:hover {
   border-color: var(--legendary);
 }
 
-/* Classroom and totals */
-
 .hk-classroom {
   display: flex;
   flex-direction: column;
@@ -409,6 +378,7 @@ button.hk-slot:hover {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  margin: 0;
   font-weight: 800;
 }
 
@@ -460,13 +430,29 @@ button.hk-slot:hover {
   font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 420px) {
-  .hk-student {
-    grid-template-columns: 1fr;
-    justify-items: center;
+@container stage (max-width: 719px) {
+  .hk-slots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .hk-student-info {
-    width: 100%;
+  .hk-slot {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .hk-slot-text {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .hk-metas,
+  .hk-sets,
+  .hk-classroom ul {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-totals dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

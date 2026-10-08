@@ -1,4 +1,4 @@
-/* Fases tab: the daily Hackathon, the path of stages, stage detail and start controls. */
+/* Stages window: the serpentine path, the daily Hackathon beside it, the selected stage's detail and the start controls. */
 
 .hk-error {
   padding: 4px var(--space-2);
@@ -10,21 +10,256 @@
   line-height: 1.35;
 }
 
-.hk-daily {
+.hk-chapter-count {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.hk-chapter-count b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  color: var(--text);
+}
+
+.hk-stages {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-areas:
+    'path detail'
+    'daily detail';
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.hk-stages > .hk-path {
+  grid-area: path;
+}
+
+.hk-stages > .hk-daily {
+  grid-area: daily;
+}
+
+.hk-stages > .hk-stage-detail {
+  grid-area: detail;
+  align-self: stretch;
+}
+
+/* ---------- Path ---------- */
+
+.hk-path {
+  --gx: 36px;
+  --gy: 24px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gy) var(--gx);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hk-stage-item {
+  position: relative;
+  grid-column: var(--col);
+  grid-row: var(--row);
+  display: flex;
+}
+
+/* The rail to the next stop; it lights up when this stage has been won. */
+.hk-stage-item::after {
+  content: '';
+  position: absolute;
+  background: var(--border);
+}
+
+.hk-stage-item[data-state='cleared']::after {
+  background: var(--good);
+}
+
+.hk-stage-item[data-link='none']::after {
+  display: none;
+}
+
+.hk-stage-item[data-link='right']::after {
+  left: 100%;
+  top: calc(50% - 2px);
+  width: var(--gx);
+  height: 4px;
+}
+
+.hk-stage-item[data-link='left']::after {
+  right: 100%;
+  top: calc(50% - 2px);
+  width: var(--gx);
+  height: 4px;
+}
+
+.hk-stage-item[data-link='down']::after {
+  left: calc(50% - 2px);
+  top: 100%;
+  width: 4px;
+  height: var(--gy);
+}
+
+.hk-stage {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 88px;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  text-align: left;
+  background: var(--hx-glass-raised);
+  border: 2px solid var(--border);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.hk-stage:hover {
+  filter: brightness(1.12);
+}
+
+.hk-stage[data-state='open'] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg));
+}
+
+.hk-stage[data-state='cleared'] {
+  border-color: color-mix(in srgb, var(--good) 70%, var(--border));
+  background: color-mix(in srgb, var(--good) 9%, var(--bg));
+}
+
+.hk-stage[data-state='locked'] {
+  border-style: dashed;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+.hk-stage[data-boss='true'] {
+  border-color: var(--legendary);
+}
+
+.hk-stage[data-boss='true'][data-state='locked'] {
+  border-color: color-mix(in srgb, var(--legendary) 55%, var(--border));
+}
+
+.hk-stage[aria-pressed='true'] {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.hk-stage-num {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.hk-stage[data-state='open'] .hk-stage-num {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.hk-stage[data-state='cleared'] .hk-stage-num {
+  border-color: var(--good);
+  background: color-mix(in srgb, var(--good) 18%, var(--bg));
+  color: var(--good);
+}
+
+.hk-stage[data-boss='true'] .hk-stage-num {
+  border-color: var(--legendary);
+  color: var(--legendary);
+}
+
+.hk-stage-text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.hk-stage-name {
+  font-size: 14px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.hk-stage-meta,
+.hk-stage-boss {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.hk-stage[data-state='locked'] .hk-stage-meta {
+  color: var(--warn);
+}
+
+.hk-stage[data-state='cleared'] .hk-stage-meta {
+  color: var(--good);
+}
+
+.hk-stage-boss {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--legendary);
+}
+
+/* ---------- Daily Hackathon ---------- */
+
+.hk-daily {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  min-width: 0;
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  border: 2px solid var(--accent);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.hk-daily-info,
+.hk-daily-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.hk-daily-side {
+  justify-content: space-between;
+}
+
+.hk-daily h3 {
+  font-size: 15px;
 }
 
 .hk-daily-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
 }
 
-.hk-daily-head h2 {
-  font-size: 15px;
+.hk-eyebrow {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-text);
 }
 
 .hk-rules {
@@ -39,11 +274,11 @@
 .hk-rules li {
   display: flex;
   flex-direction: column;
-  padding: 6px var(--space-3);
+  padding: 4px var(--space-3);
   background: var(--bg);
   border-left: 4px solid var(--warn);
   font-size: 12px;
-  line-height: 1.35;
+  line-height: 1.3;
   color: var(--text-muted);
 }
 
@@ -52,14 +287,21 @@
   font-size: 13px;
 }
 
+.hk-daily-lists {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
 .hk-rewards {
   display: flex;
   gap: var(--space-4);
+  margin: 0;
   font-family: var(--font-display);
   font-size: 12px;
 }
 
-/* Enemies and drops */
+/* ---------- Enemies and drops ---------- */
 
 .hk-enemies,
 .hk-drops {
@@ -115,154 +357,48 @@
   color: var(--text);
 }
 
-/* Path */
-
-.hk-path {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.hk-stage-item {
-  position: relative;
-}
-
-/* The rail between stops */
-.hk-stage-item:not(:last-child)::after {
-  content: '';
-  position: absolute;
-  left: 21px;
-  top: 100%;
-  width: 4px;
-  height: var(--space-2);
-  background: var(--border);
-}
-
-.hk-stage-item[data-state='cleared']:not(:last-child)::after {
-  background: var(--good);
-}
-
-.hk-stage {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 56px;
-  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
-  text-align: left;
-  background: var(--surface-raised);
-  border: 2px solid var(--border);
-  box-shadow: 2px 2px 0 var(--shadow-color);
-}
-
-.hk-stage[data-state='locked'] {
-  border-style: dashed;
-  box-shadow: none;
-  background: transparent;
-}
-
-.hk-stage[data-state='open'] {
-  border-color: var(--accent);
-}
-
-.hk-stage[data-state='cleared'] {
-  border-color: color-mix(in srgb, var(--good) 55%, var(--border));
-}
-
-.hk-stage[data-boss='true'] {
-  border-color: var(--legendary);
-  background: color-mix(in srgb, var(--legendary) 8%, var(--surface-raised));
-}
-
-.hk-stage[data-boss='true'][data-state='locked'] {
-  background: transparent;
-  border-color: color-mix(in srgb, var(--legendary) 40%, var(--border));
-}
-
-.hk-stage[aria-pressed='true'] {
-  outline: 3px solid var(--text);
-  outline-offset: 1px;
-  z-index: 1;
-}
-
-.hk-stage-dot {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  background: var(--bg);
-  border: 2px solid var(--border);
-  font-family: var(--font-display);
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.hk-stage[data-state='open'] .hk-stage-dot {
-  border-color: var(--accent);
-  color: var(--text);
-}
-
-.hk-stage[data-state='cleared'] .hk-stage-dot {
-  background: color-mix(in srgb, var(--good) 20%, var(--bg));
-  border-color: var(--good);
-  color: var(--good);
-}
-
-.hk-stage[data-boss='true'] .hk-stage-dot {
-  border-color: var(--legendary);
-  color: var(--legendary);
-}
-
-.hk-stage-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  line-height: 1.25;
-}
-
-.hk-stage-name {
-  font-size: 14px;
-  font-weight: 900;
-}
-
-.hk-stage-meta {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-}
-
-.hk-stage-lock {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--warn);
-}
-
-/* Detail */
+/* ---------- Selected stage ---------- */
 
 .hk-stage-detail {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  grid-template-areas:
+    'main'
+    'facts'
+    'lists'
+    'start';
   gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--hx-glass-raised);
+  border: 2px solid var(--hx-line);
+  border-left-width: 6px;
+  box-shadow: 3px 3px 0 var(--shadow-color);
 }
 
 .hk-stage-detail[data-boss='true'] {
   border-color: var(--legendary);
 }
 
+.hk-detail-main {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .hk-stage-detail h3 {
-  font-size: 16px;
+  font-size: 17px;
 }
 
 .hk-stage-detail h4 {
+  margin: 0 0 4px;
   font-family: var(--font-display);
   font-size: 10px;
   font-weight: 400;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
@@ -274,11 +410,19 @@
   gap: var(--space-2);
 }
 
+.hk-detail-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
 .hk-promo {
+  margin: 0;
   padding: var(--space-2) var(--space-3);
   background: color-mix(in srgb, var(--legendary) 12%, var(--bg));
   border: 2px solid var(--legendary);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   line-height: 1.4;
 }
@@ -291,18 +435,20 @@
 }
 
 .hk-stage-facts {
+  grid-area: facts;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-2);
+  align-content: start;
+  gap: var(--space-3) var(--space-2);
   margin: 0;
 }
 
-.hk-stage-facts div:last-child {
+.hk-fact-wide {
   grid-column: 1 / -1;
 }
 
 .hk-stage-facts dt {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--text-muted);
 }
@@ -311,16 +457,25 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 0;
+  margin: 2px 0 0;
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 15px;
 }
 
-/* Start controls */
+.hk-detail-lists {
+  grid-area: lists;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+}
+
+/* ---------- Start controls ---------- */
 
 .hk-start {
+  grid-area: start;
   display: flex;
   flex-direction: column;
+  align-self: end;
   gap: var(--space-3);
   padding-top: var(--space-3);
   border-top: 2px solid var(--border);
@@ -331,6 +486,7 @@
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
+  align-self: auto;
   padding-top: 0;
   border-top: 0;
 }
@@ -349,6 +505,7 @@
 }
 
 .hk-auto small {
+  max-width: 220px;
   font-size: 11px;
   line-height: 1.35;
   color: var(--text-muted);
@@ -360,4 +517,82 @@
 
 .hk-start .hk-button-note .ui-button[aria-disabled='true'] {
   opacity: 0.6;
+}
+
+/* ---------- Narrow: the daily Hackathon moves under the stage, the path keeps three columns down to phones ---------- */
+
+@container stage (max-width: 1179px) {
+  .hk-stages {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'path'
+      'detail'
+      'daily';
+  }
+
+  .hk-stage-detail {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto;
+    grid-template-areas:
+      'main facts'
+      'lists lists'
+      'start start';
+  }
+
+  .hk-start {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .hk-start .hk-button-note {
+    flex: 1;
+    min-width: 220px;
+  }
+}
+
+@container stage (max-width: 719px) {
+  /* One column: every link points down. */
+  .hk-path {
+    --gy: 16px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-stage-item {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .hk-stage-item[data-link='left']::after,
+  .hk-stage-item[data-link='right']::after,
+  .hk-stage-item[data-link='down']::after {
+    left: calc(50% - 2px);
+    right: auto;
+    top: 100%;
+    width: 4px;
+    height: var(--gy);
+  }
+
+  .hk-stage {
+    min-height: 68px;
+  }
+
+  .hk-daily {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hk-stage-detail {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'main'
+      'facts'
+      'lists'
+      'start';
+    padding: var(--space-3);
+  }
+
+  .hk-start .hk-button-note {
+    flex-basis: 100%;
+  }
 }

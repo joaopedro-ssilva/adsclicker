@@ -11,7 +11,7 @@ export function CollectionView({ profile }: { profile: HackathonProfile }) {
 
   return (
     <div className="hk-collection" data-qa="hk-collection">
-      <div className="hk-card">
+      <div className="hk-collection-total">
         <ProgressBar
           label="Capítulo 1"
           value={chapterFound}
@@ -22,35 +22,37 @@ export function CollectionView({ profile }: { profile: HackathonProfile }) {
           tone="good"
         />
       </div>
-      {CAMPAIGN.map((stage) => {
-        const stageFound = stage.drops.filter((id) => found.has(id)).length;
-        return (
-          <section key={stage.id} className="hk-collection-stage">
-            <header>
-              <h3>
-                {stage.order}. {stage.name}
-              </h3>
-              <span className="hk-note">
-                {stageFound}/{stage.drops.length}
-              </span>
-            </header>
-            <ul>
-              {stage.drops.map((id) => {
-                const base = baseById.get(id);
-                const known = found.has(id);
-                return (
-                  <li key={id} data-known={known}>
-                    <span className="hk-frame hk-collection-frame" data-empty={!known}>
-                      {base ? <ItemIcon asset={base.asset} scale={1} hidden={!known} /> : null}
-                    </span>
-                    <span className="hk-collection-name">{known ? base?.name : '???'}</span>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        );
-      })}
+      <div className="hk-collection-stages">
+        {CAMPAIGN.map((stage) => {
+          const stageFound = stage.drops.filter((id) => found.has(id)).length;
+          return (
+            <section key={stage.id} className="hk-collection-stage" data-done={stageFound === stage.drops.length}>
+              <header>
+                <h3>
+                  {stage.order}. {stage.name}
+                </h3>
+                <span>
+                  {stageFound}/{stage.drops.length}
+                </span>
+              </header>
+              <ul>
+                {stage.drops.map((id) => {
+                  const base = baseById.get(id);
+                  const known = found.has(id);
+                  return (
+                    <li key={id} data-known={known}>
+                      <span className="hk-frame hk-collection-frame" data-empty={!known}>
+                        {base ? <ItemIcon asset={base.asset} scale={2} hidden={!known} /> : null}
+                      </span>
+                      <span className="hk-collection-name">{known ? base?.name : '???'}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
     </div>
   );
 }

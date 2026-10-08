@@ -1,0 +1,340 @@
+/* The hub: the student on the arena floor with cards around them. DOM order is the phone order. */
+
+.hk-hub {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'goal name cafe'
+    'student student student'
+    'stats gear adventure';
+  gap: var(--hx-gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.hk-area-name {
+  grid-area: name;
+  justify-self: center;
+  align-self: start;
+  width: min(100%, 460px);
+}
+
+.hk-area-goal {
+  grid-area: goal;
+  justify-self: start;
+  align-self: start;
+  width: min(100%, 340px);
+}
+
+.hk-area-cafe {
+  grid-area: cafe;
+  justify-self: end;
+  align-self: start;
+  width: min(100%, 340px);
+}
+
+.hk-area-student {
+  grid-area: student;
+  min-height: 0;
+}
+
+.hk-area-stats {
+  grid-area: stats;
+}
+
+.hk-area-gear {
+  grid-area: gear;
+}
+
+.hk-area-adventure {
+  grid-area: adventure;
+}
+
+.hk-area-stats > *,
+.hk-area-gear > *,
+.hk-area-adventure > * {
+  height: 100%;
+}
+
+.hk-area-stats > .hx-card,
+.hk-area-gear > .hx-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.hk-area-stats .hk-stats,
+.hk-area-gear .hk-slots {
+  flex: 1;
+}
+
+.hk-hub-student {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100%;
+}
+
+/* ---------- Nameplate ---------- */
+
+.hk-nameplate {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+}
+
+.hk-bust {
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  width: 92px;
+  height: 92px;
+  overflow: hidden;
+  background: repeating-linear-gradient(0deg, transparent 0 7px, rgb(255 255 255 / 0.03) 7px 8px), var(--bg);
+  border: 2px solid var(--border);
+}
+
+/* The head sits at the top of the sprite: nudge the crop so the face is centred */
+.hk-bust .character {
+  margin-top: -14px;
+}
+
+.hk-nameplate-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.hk-nameplate-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hk-nameplate-title h2 {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 18px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+}
+
+.hk-details-button {
+  align-self: start;
+}
+
+/* ---------- Adventure ---------- */
+
+.hk-adventure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.hk-trail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0 0 var(--space-1);
+  padding: 0;
+  list-style: none;
+}
+
+.hk-trail li {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+/* The dashed rail to the next stop */
+.hk-trail li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(50% + 24px);
+  right: calc(-50% + 24px - var(--space-4));
+  top: 18px;
+  border-top: 2px dashed var(--border);
+}
+
+.hk-trail li[data-state='cleared']:not(:last-child)::after {
+  border-color: var(--good);
+}
+
+.hk-trail-num {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.hk-trail li[data-state='cleared'] .hk-trail-num {
+  border-color: var(--good);
+  color: var(--good);
+}
+
+.hk-trail li[data-current='true'] .hk-trail-num {
+  border-color: var(--accent);
+  color: var(--text);
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg));
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.hk-trail-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--text-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.hk-trail li[data-current='true'] .hk-trail-name {
+  color: var(--text);
+}
+
+.hk-next-stage {
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.hk-next-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.hk-next-name span {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+
+.hk-next-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.hk-daily-line {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.hk-daily-line strong {
+  color: var(--warn);
+}
+
+.hk-daily-line[data-won='true'] strong {
+  color: var(--good);
+}
+
+.hk-adventure-actions {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+}
+
+.hk-adventure-actions .ui-button[data-size='md'] {
+  justify-content: center;
+}
+
+.hk-adventure .ui-button[aria-disabled='true'] {
+  opacity: 0.6;
+}
+
+.hk-link {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.hk-link:hover {
+  color: var(--text);
+}
+
+.hk-link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---------- Under 1180px: one column, the body scrolls ---------- */
+
+@container stage (max-width: 1179px) {
+  .hk-hub {
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 680px);
+    margin-inline: auto;
+    height: 100%;
+    padding: 0 6px 6px 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .hk-hub > * {
+    flex-shrink: 0;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .hk-area-name,
+  .hk-area-goal,
+  .hk-area-cafe {
+    width: 100%;
+  }
+
+  .hk-area-student {
+    height: 250px;
+  }
+}
+
+@container stage (max-width: 719px) {
+  .hk-hub {
+    width: 100%;
+    gap: var(--space-2);
+  }
+
+  .hk-area-student {
+    height: 240px;
+  }
+
+  .hk-adventure-actions {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .hk-adventure-actions .ui-button[data-size='md'] {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+}

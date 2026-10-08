@@ -7,6 +7,7 @@ import { useSlowView } from '@/ui/game/panel/lib/useSlowView';
 import type { HackathonProfile } from '@/shared/hackathonApi';
 import { useHackathon } from '@/ui/hackathon/store';
 import { Button, Icon } from '@/ui/kit';
+import { Card } from '../../screen/Card';
 import { countdown } from '../lib/dateKey';
 import { HK } from '../lib/hk';
 import { useBusy } from '../lib/useBusy';
@@ -43,29 +44,34 @@ export function CafeCard({ profile }: { profile: HackathonProfile }) {
   const reason = full ? 'Café cheio' : !quote.affordable ? 'ADScoins insuficientes' : null;
 
   return (
-    <section className="hk-card hk-cafe" data-qa="hk-cafe">
-      <div className="hk-cafe-head">
-        <div>
-          <h3>Café</h3>
-          <p className="hk-note">Cada fase gasta 1. Volta 1 a cada {HK.config.cafe.regenMinutes} minutos.</p>
-        </div>
-        <div className="hk-cups" role="img" aria-label={`${count} de ${max} cafés`}>
-          {Array.from({ length: max }, (_, index) => (
-            <span key={index} data-on={index < count}>
-              ☕
-            </span>
-          ))}
-        </div>
+    <Card
+      title="Café"
+      icon="clock"
+      qa="hk-cafe"
+      className="hk-cafe"
+      aside={
+        <b className="hk-cafe-count">
+          {count}/{max}
+        </b>
+      }
+    >
+      <div className="hk-cups" role="img" aria-label={`${count} de ${max} cafés`}>
+        {Array.from({ length: max }, (_, index) => (
+          <span key={index} data-on={index < count}>
+            ☕
+          </span>
+        ))}
       </div>
       <p className="hk-cafe-timer">
         {full || nextAt === null ? (
           'Café cheio'
         ) : (
           <>
-            Próximo em <strong>{countdown(nextAt - now)}</strong>
+            Recarga em <strong>{countdown(nextAt - now)}</strong>
           </>
         )}
       </p>
+      <p className="hk-note">Cada fase gasta 1 · volta 1 a cada {HK.config.cafe.regenMinutes} min</p>
       <div className="hk-button-note">
         <Button
           variant={reason ? 'secondary' : 'primary'}
@@ -78,7 +84,7 @@ export function CafeCard({ profile }: { profile: HackathonProfile }) {
             buy();
           }}
         >
-          Comprar um café
+          Comprar
           <span className="hk-price">
             <Icon name="coin" size={12} />
             {quote.price}
@@ -87,6 +93,6 @@ export function CafeCard({ profile }: { profile: HackathonProfile }) {
         {reason ? <p className="hk-reason">{reason}</p> : null}
         <InlineError message={error} />
       </div>
-    </section>
+    </Card>
   );
 }

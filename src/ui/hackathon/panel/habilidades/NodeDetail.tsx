@@ -26,33 +26,51 @@ export function NodeDetail({ view }: { view: NodeView }) {
   const blocked = reason !== null || busy;
 
   return (
-    <div className="hk-node-detail" data-branch={node.branch} aria-live="polite" data-qa="hk-node-detail">
+    <section className="hk-node-detail" data-branch={node.branch} aria-live="polite" data-qa="hk-node-detail">
       <span className="hk-node-detail-emoji" aria-hidden="true">
         {node.emoji}
       </span>
-      <div className="hk-node-detail-text">
-        <div className="hk-node-detail-title">
-          <h3>{node.name}</h3>
-          <Badge>{BRANCH_LABEL[node.branch]}</Badge>
+      <div className="hk-node-detail-title">
+        <h3>{node.name}</h3>
+        <Badge className="hk-node-badge">{BRANCH_LABEL[node.branch]}</Badge>
+      </div>
+      <p className="hk-node-detail-desc">{node.description}</p>
+      <dl className="hk-node-facts">
+        <div>
+          <dt>Nível</dt>
+          <dd>
+            {level}/{node.maxLevel}
+          </dd>
         </div>
-        <p className="hk-note">{node.description}</p>
-        <p className="hk-node-detail-level">
-          Nível <strong>{level}</strong>/{node.maxLevel} · custa {node.cost} {node.cost === 1 ? 'ponto' : 'pontos'}
-        </p>
         {node.modifiers.length > 0 ? (
-          <p className="hk-node-detail-effect">
-            {level > 0 ? <span>Agora: {effectText(node.modifiers, level)}. </span> : null}
-            {!maxed ? <span data-next="true">Próximo nível: {effectText(node.modifiers, 1)}.</span> : null}
-          </p>
+          <>
+            <div>
+              <dt>Agora</dt>
+              <dd data-tone={level > 0 ? 'good' : undefined}>{level > 0 ? effectText(node.modifiers, level) : 'Nenhum'}</dd>
+            </div>
+            {!maxed ? (
+              <div>
+                <dt>Próximo</dt>
+                <dd data-tone="good">{effectText(node.modifiers, 1)}</dd>
+              </div>
+            ) : null}
+          </>
         ) : null}
         {skill ? (
-          <p className="hk-node-detail-effect">
-            <span>
-              {skill.emoji} {skill.name}: {skill.description}
-            </span>
-          </p>
+          <div>
+            <dt>Libera</dt>
+            <dd>
+              {skill.emoji} {skill.name}
+            </dd>
+          </div>
         ) : null}
-      </div>
+        <div>
+          <dt>Custo</dt>
+          <dd data-tone="cost">
+            {node.cost} {node.cost === 1 ? 'ponto' : 'pontos'}
+          </dd>
+        </div>
+      </dl>
       <div className="hk-node-detail-buy">
         <Button
           variant={blocked || maxed ? 'secondary' : 'primary'}
@@ -75,6 +93,6 @@ export function NodeDetail({ view }: { view: NodeView }) {
         {reason ? <p className="hk-reason">{reason}</p> : null}
         <InlineError message={error} />
       </div>
-    </div>
+    </section>
   );
 }

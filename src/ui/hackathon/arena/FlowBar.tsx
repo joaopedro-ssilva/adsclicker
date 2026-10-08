@@ -42,11 +42,15 @@ export function FlowBar({ run }: FlowBarProps) {
         if (event.key === ' ' || event.key === 'Enter') event.preventDefault();
       }}
     >
-      <span className="ar-flow-label">FLUXO</span>
+      <span className="ar-flow-head">
+        <span className="ar-flow-label">
+          <span aria-hidden="true">⚡</span> Fluxo
+        </span>
+        <span className="ar-flow-caption">{caption}</span>
+      </span>
       <span className="ar-flow-track" aria-hidden="true">
         <i style={{ width: `${Math.min(1, flowCharge) * 100}%` }} />
       </span>
-      <span className="ar-flow-caption">{caption}</span>
     </button>
   );
 }
