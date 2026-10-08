@@ -112,7 +112,7 @@
     "y": 61
   },
   "heads/edecio-gladiador": {
-    "x": 21,
+    "x": 22,
     "y": 74
   },
   "heads/edecio-samurai": {
@@ -160,19 +160,19 @@
     "y": 62
   },
   "heads/pablo": {
-    "x": 22,
+    "x": 20,
     "y": 55
   },
   "heads/pablo-galactico": {
-    "x": 28,
+    "x": 26,
     "y": 56
   },
   "heads/pablo-garagem": {
-    "x": 28,
+    "x": 26,
     "y": 56
   },
   "heads/pablo-mago": {
-    "x": 30,
+    "x": 28,
     "y": 80
   },
   "heads/wagner": {

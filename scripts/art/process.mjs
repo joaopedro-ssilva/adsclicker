@@ -13,6 +13,24 @@ import { ROOT, RAW_DIR, ASSETS_DIR, ANCHORS_FILE, SHEETS_FILE, KIND_FOLDER, read
 
 /** Target native heights per kind (px). */
 const TARGET_H = { skin: 48, head: 56 };
+/** Professors whose head came out more tanned than their bodies: green and blue added to the skin pixels. */
+const HEAD_SKIN_LIFT = { edecio: { g: 12, b: 36 } };
+/** Professors whose head reads better a little to the right of the measured face centre (owner's call), in pixels. */
+const HEAD_NUDGE_RIGHT = { pablo: 2 };
+
+/** Lightens the skin of a head toward the fair tone of the bodies. Shadows are lifted less, so the shading stays. */
+function liftSkin(img, { g, b }) {
+  const { data } = img;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 128) continue;
+    const { h, s, l } = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+    if (h < 15 || h > 40 || s < 0.35 || l < 0.45) continue;
+    const k = Math.min(1, (l - 0.45) / 0.2);
+    data[i + 1] = Math.min(255, Math.round(data[i + 1] + g * k));
+    data[i + 2] = Math.min(255, Math.round(data[i + 2] + b * k));
+  }
+}
+
 /** Heads whose hood or collar should hang over the neck: rows the head is lowered onto the body. */
 const HEAD_DROP = { 'gladimir-mestre': 4, 'pablo-galactico': 3 };
 /** Rows from the neck anchor to the feet that every professor body ends up with. */
@@ -715,8 +733,11 @@ async function processSheet(sheet, anchors) {
         console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - (anchor.top ?? anchor.y)}px`);
       }
     } else if (sheet.kind === 'head') {
+      const professor = key.split('-')[0];
+      if (!sheet.folder && HEAD_SKIN_LIFT[professor]) liftSkin(sprite, HEAD_SKIN_LIFT[professor]);
       anchor = headAnchor(sprite);
       anchor.y -= HEAD_DROP[key] ?? 0;
+      if (!sheet.folder) anchor.x -= HEAD_NUDGE_RIGHT[professor] ?? 0;
     }
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);
     if (sheet.noAnchor) anchor = undefined;
