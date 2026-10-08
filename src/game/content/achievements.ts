@@ -223,7 +223,7 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 46 skins.', { kind: 'skinsOwned', gte: 46 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 47 skins.', { kind: 'skinsOwned', gte: 46 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }),
