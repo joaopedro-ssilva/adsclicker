@@ -167,7 +167,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | pablo | `pablo-cientista` | Cientista | common | jaleco branco, prancheta com fórmulas | |
 | pablo | `pablo-enxadrista` | Enxadrista | rare | colete xadrez, peça de rei na mão | |
 | pablo | `pablo-mago` | Mago dos Algoritmos | epic | manto azul com estrelas, cajado com árvore binária | chapéu de mago |
-| pablo | `pablo-galactico` | Cérebro Galáctico | legendary | traje cósmico brilhante, aura de estrelas | |
+| pablo | `pablo-galactico` | Arquimago do Código | legendary | manto escuro com runas de prata, capuz e cajado de cristal | sim |
 
 ### Cenários (14)
 

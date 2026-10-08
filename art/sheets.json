@@ -4,9 +4,9 @@
       "file": "heads-1.png",
       "kind": "head",
       "keys": [
-        "edecio",
-        "gladimir",
-        "b2",
+        "_edecio",
+        "_gladimir",
+        "_b2",
         "wagner"
       ]
     },
@@ -14,10 +14,10 @@
       "file": "heads-2.png",
       "kind": "head",
       "keys": [
-        "guto",
+        "_guto",
         "b1",
-        "angelo",
-        "pablo"
+        "_angelo",
+        "_pablo"
       ]
     },
     {
@@ -34,7 +34,7 @@
       "file": "skins-2.png",
       "kind": "skin",
       "keys": [
-        "guto-default",
+        "_guto-default",
         "b1-default",
         "angelo-default",
         "pablo-default"
@@ -236,7 +236,8 @@
       "keys": [
         "_ref",
         "angelo-paraninfo",
-        "angelo-rei"
+        "angelo-rei",
+        "angelo-padel"
       ],
       "calibrate": true
     },
@@ -245,7 +246,8 @@
       "kind": "head",
       "keys": [
         "_ref",
-        "pablo-mago"
+        "pablo-mago",
+        "pablo-galactico"
       ],
       "calibrate": true
     },
@@ -265,16 +267,16 @@
       "keys": [
         "wagner-firewall",
         "wagner-cripto",
-        "guto-churrasqueiro",
-        "guto-pagodeiro"
+        "_guto-churrasqueiro",
+        "_guto-pagodeiro"
       ]
     },
     {
       "file": "skins-more-7.png",
       "kind": "skin",
       "keys": [
-        "guto-dj",
-        "guto-astronauta",
+        "_guto-dj",
+        "_guto-astronauta",
         "b1-po",
         "b1-flexbox"
       ]
@@ -304,7 +306,7 @@
       "kind": "skin",
       "keys": [
         "pablo-mago",
-        "pablo-galactico"
+        "_pablo-galactico"
       ]
     },
     {
@@ -449,6 +451,66 @@
         "capitulo-1"
       ],
       "folder": "hackathon/arenas"
+    },
+    {
+      "file": "heads-v2-1.png",
+      "kind": "head",
+      "keys": [
+        "_edecio",
+        "gladimir",
+        "guto"
+      ],
+      "shareScale": true
+    },
+    {
+      "file": "heads-v2-edecio.png",
+      "kind": "head",
+      "keys": [
+        "edecio",
+        "_gladimir",
+        "_guto"
+      ],
+      "shareScale": true
+    },
+    {
+      "file": "heads-v2-2.png",
+      "kind": "head",
+      "keys": [
+        "b2",
+        "_angelo",
+        "pablo"
+      ],
+      "shareScale": true
+    },
+    {
+      "file": "heads-v2-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_b2",
+        "angelo",
+        "_pablo"
+      ],
+      "shareScale": true
+    },
+    {
+      "file": "skins-guto.png",
+      "kind": "skin",
+      "keys": [
+        "guto-default",
+        "guto-churrasqueiro",
+        "guto-pagodeiro",
+        "guto-dj",
+        "guto-astronauta"
+      ],
+      "darkSkin": true
+    },
+    {
+      "file": "skins-v2.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-padel",
+        "pablo-galactico"
+      ]
     }
   ]
 }

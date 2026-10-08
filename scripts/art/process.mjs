@@ -13,6 +13,8 @@ import { ROOT, RAW_DIR, ASSETS_DIR, ANCHORS_FILE, SHEETS_FILE, KIND_FOLDER, read
 
 /** Target native heights per kind (px). */
 const TARGET_H = { skin: 48, head: 56 };
+/** Rows from the neck anchor to the feet that every professor body ends up with. */
+const BODY_BELOW_NECK = 46;
 /** Icons: their longest side. */
 const TARGET_MAX = { icon: 22 };
 /** Hats are sized by width so they match the heads (head width is about 42-60 px). */
@@ -501,10 +503,13 @@ function rgbToHsl(r, g, b) {
   return { h: hh, s, l };
 }
 
+/** Lowest lightness that still counts as skin. A sheet with darkSkin lowers it for its bodies (see processSheet). */
+let skinMinLightness = 0.5;
+
 function isSkin(data, i) {
   if (data[i + 3] < 128) return false;
   const { h, s, l } = rgbToHsl(data[i], data[i + 1], data[i + 2]);
-  return h >= 8 && h <= 45 && s >= 0.25 && s <= 1.01 && l >= 0.5 && l <= 0.92;
+  return h >= 8 && h <= 45 && s >= 0.25 && s <= 1.01 && l >= skinMinLightness && l <= 0.92;
 }
 
 /** Horizontal centre of the body: centroid of the opaque pixels in the lower 60% (torso and legs). */
@@ -619,6 +624,7 @@ async function processSheet(sheet, anchors) {
   // `img.data` keeps raw colours; the mask decides which pixels belong to sprites
   const groups = splitItems(comps, sheet.keys.length, img.w, sheet.file, sheet.layout);
   const folder = sheet.folder ?? KIND_FOLDER[sheet.kind];
+  skinMinLightness = sheet.darkSkin ? 0.3 : 0.5;
   // sheet.target = { axis: 'h' | 'w' | 'max', size } replaces the per-kind default; sheet.sizes[key] sets one item's size
   const target = sheet.target ?? (TARGET_W[sheet.kind] ? { axis: 'w', size: TARGET_W[sheet.kind] } : TARGET_MAX[sheet.kind] ? { axis: 'max', size: TARGET_MAX[sheet.kind] } : { axis: 'h', size: TARGET_H[sheet.kind] });
   // A calibrated sheet starts with a plain reference item (key "_ref"): its block size is used for the
@@ -648,8 +654,22 @@ async function processSheet(sheet, anchors) {
     removeIsolated(sprite);
     sprite = trim(sprite);
     let anchor;
-    if (sheet.kind === 'skin') anchor = skinAnchor(sprite);
-    else if (sheet.kind === 'head') anchor = headAnchor(sprite);
+    if (sheet.kind === 'skin') {
+      anchor = skinAnchor(sprite);
+      // Every body measures the same from the neck to the feet, whatever it holds or wears above the neck:
+      // sized by the whole sprite, a raised staff or a cape shrinks the body and the professor looks smaller.
+      const below = sprite.h - anchor.y;
+      // A neck found in the wrong place gives an absurd measure: leave such a body as it is.
+      const sane = below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3;
+      if (!sheet.target && sane && Math.abs(below - BODY_BELOW_NECK) >= 1) {
+        sprite = blockSample(item, (b * below) / BODY_BELOW_NECK, 0, 0);
+        removeFringe(sprite);
+        removeIsolated(sprite);
+        sprite = trim(sprite);
+        anchor = skinAnchor(sprite);
+        console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - anchor.y}px`);
+      }
+    } else if (sheet.kind === 'head') anchor = headAnchor(sprite);
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);
     if (sheet.noAnchor) anchor = undefined;
     const rel = `${folder}/${key}`;

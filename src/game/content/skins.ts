@@ -374,6 +374,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'black tailcoat with white bow tie and shirt, striped trousers, holding a conductor baton, black shoes',
     },
     {
+      id: 'angelo-padel',
+      name: 'Padel de Quinta',
+      rarity: 'rare',
+      description: 'Polo, viseira e raquete na mão. A reunião de quinta foi remarcada para a quadra.',
+      headgear: true,
+      palette: ['#f2f2f2', '#1e2a4a', '#f59e0b'],
+      artPrompt: 'padel sportswear: white and navy polo shirt, navy shorts, white sneakers, wristband, holding a padel racket',
+    },
+    {
       id: 'angelo-paraninfo',
       name: 'Paraninfo',
       rarity: 'epic',
@@ -429,11 +438,12 @@ export const skins: SkinDef[] = [
     },
     {
       id: 'pablo-galactico',
-      name: 'Cérebro Galáctico',
+      name: 'Arquimago do Código',
       rarity: 'legendary',
-      description: 'Traje cósmico brilhante com aura de estrelas. O universo cabe em uma linha de código.',
-      palette: ['#3b2f9e', '#8b5cf6', '#fde68a'],
-      artPrompt: 'shimmering cosmic bodysuit with a galaxy and starfield pattern, glowing star aura around the body, glowing boots',
+      description: 'Manto escuro com runas de prata e um cajado de cristal. Diz a lenda que ele compila de primeira.',
+      headgear: true,
+      palette: ['#1f2330', '#9aa3b5', '#8fd3ff'],
+      artPrompt: 'long dark charcoal and midnight-blue archmage robe with silver rune trim, hood, dark wooden staff topped with a pale-blue crystal',
     },
   ]),
 ];

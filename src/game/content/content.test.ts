@@ -53,6 +53,7 @@ const EXPECTED_SKIN_IDS = [
   'angelo-default',
   'angelo-terno',
   'angelo-maestro',
+  'angelo-padel',
   'angelo-paraninfo',
   'angelo-rei',
   'pablo-default',
@@ -102,6 +103,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'angelo-default': 'common',
   'angelo-terno': 'common',
   'angelo-maestro': 'rare',
+  'angelo-padel': 'rare',
   'angelo-paraninfo': 'epic',
   'angelo-rei': 'legendary',
   'pablo-default': 'common',
@@ -124,9 +126,11 @@ const SKINS_WITH_HEADGEAR = [
   'guto-pagodeiro',
   'guto-astronauta',
   'b1-rainha',
+  'angelo-padel',
   'angelo-paraninfo',
   'angelo-rei',
   'pablo-mago',
+  'pablo-galactico',
 ];
 
 const EXPECTED_SCENERY_IDS = [
@@ -560,7 +564,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 46 skins of the design, with their rarities', () => {
+  it('has exactly the 47 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);

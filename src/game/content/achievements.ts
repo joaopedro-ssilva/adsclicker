@@ -126,6 +126,9 @@ export const achievements: AchievementDef[] = [
   ach('lvl25-angelo', 'professor', 'Pauta Cumprida', '🎼', 'Deixe todas as disciplinas do Angelo no nível 25.', allLevel('angelo', 25), {
     skin: 'angelo-maestro',
   }),
+  ach('lvl50-angelo', 'professor', 'Bandeja Perfeita', '🎾', 'Deixe todas as disciplinas do Angelo no nível 50.', allLevel('angelo', 50), {
+    skin: 'angelo-padel',
+  }),
   ach('lvl25-pablo', 'professor', 'Complexidade Controlada', '♟️', 'Deixe todas as disciplinas do Pablo no nível 25.', allLevel('pablo', 25), {
     skin: 'pablo-enxadrista',
   }),

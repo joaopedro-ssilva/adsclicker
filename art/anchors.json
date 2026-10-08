@@ -1,10 +1,10 @@
 {
   "hackathon/bodies/estagiario": {
-    "x": 17,
+    "x": 16,
     "y": 1
   },
   "hackathon/bodies/estudante": {
-    "x": 15,
+    "x": 16,
     "y": 1
   },
   "hackathon/heads/barba-ruiva": {
@@ -56,16 +56,20 @@
     "y": 53
   },
   "heads/angelo": {
-    "x": 23,
+    "x": 20,
+    "y": 47
+  },
+  "heads/angelo-padel": {
+    "x": 24,
     "y": 55
   },
   "heads/angelo-paraninfo": {
-    "x": 30,
-    "y": 62
+    "x": 29,
+    "y": 67
   },
   "heads/angelo-rei": {
     "x": 25,
-    "y": 63
+    "y": 76
   },
   "heads/b1": {
     "x": 30,
@@ -73,67 +77,71 @@
   },
   "heads/b1-rainha": {
     "x": 31,
-    "y": 59
+    "y": 66
   },
   "heads/b2": {
-    "x": 28,
-    "y": 50
+    "x": 27,
+    "y": 54
   },
   "heads/edecio": {
     "x": 23,
-    "y": 52
+    "y": 57
   },
   "heads/edecio-cria": {
-    "x": 25,
-    "y": 62
+    "x": 22,
+    "y": 57
   },
   "heads/edecio-full-dima": {
-    "x": 25,
-    "y": 56
-  },
-  "heads/edecio-gladiador": {
-    "x": 24,
-    "y": 75
-  },
-  "heads/edecio-samurai": {
-    "x": 27,
-    "y": 69
-  },
-  "heads/gladimir": {
-    "x": 21,
-    "y": 51
-  },
-  "heads/gladimir-maker": {
     "x": 22,
-    "y": 51
-  },
-  "heads/gladimir-mestre": {
-    "x": 26,
-    "y": 53
-  },
-  "heads/gladimir-piloto": {
-    "x": 25,
     "y": 52
   },
-  "heads/guto": {
+  "heads/edecio-gladiador": {
+    "x": 22,
+    "y": 74
+  },
+  "heads/edecio-samurai": {
+    "x": 29,
+    "y": 63
+  },
+  "heads/gladimir": {
+    "x": 23,
+    "y": 54
+  },
+  "heads/gladimir-maker": {
+    "x": 23,
+    "y": 54
+  },
+  "heads/gladimir-mestre": {
+    "x": 25,
+    "y": 58
+  },
+  "heads/gladimir-piloto": {
     "x": 26,
+    "y": 58
+  },
+  "heads/guto": {
+    "x": 23,
     "y": 55
   },
   "heads/guto-astronauta": {
-    "x": 31,
-    "y": 57
+    "x": 28,
+    "y": 63
   },
   "heads/guto-pagodeiro": {
-    "x": 34,
-    "y": 57
+    "x": 31,
+    "y": 62
   },
   "heads/pablo": {
-    "x": 26,
+    "x": 22,
     "y": 55
   },
+  "heads/pablo-galactico": {
+    "x": 27,
+    "y": 59
+  },
   "heads/pablo-mago": {
-    "x": 34,
-    "y": 68
+    "x": 30,
+    "y": 80
   },
   "heads/wagner": {
     "x": 21,
@@ -152,8 +160,12 @@
     "y": 2
   },
   "skins/angelo-maestro": {
-    "x": 18,
+    "x": 19,
     "y": 5
+  },
+  "skins/angelo-padel": {
+    "x": 23,
+    "y": 2
   },
   "skins/angelo-paraninfo": {
     "x": 19,
@@ -184,19 +196,19 @@
     "y": 2
   },
   "skins/b1-rainha": {
-    "x": 25,
-    "y": 6
+    "x": 26,
+    "y": 7
   },
   "skins/b2-darkmode": {
     "x": 17,
     "y": 2
   },
   "skins/b2-default": {
-    "x": 18,
+    "x": 17,
     "y": 1
   },
   "skins/b2-paleta": {
-    "x": 15,
+    "x": 17,
     "y": 7
   },
   "skins/b2-postit": {
@@ -204,7 +216,7 @@
     "y": 2
   },
   "skins/b2-wireframe": {
-    "x": 20,
+    "x": 19,
     "y": 2
   },
   "skins/edecio-atleta": {
@@ -216,7 +228,7 @@
     "y": 2
   },
   "skins/edecio-ceo": {
-    "x": 22,
+    "x": 24,
     "y": 2
   },
   "skins/edecio-chad": {
@@ -228,7 +240,7 @@
     "y": 2
   },
   "skins/edecio-default": {
-    "x": 19,
+    "x": 17,
     "y": 1
   },
   "skins/edecio-full-dima": {
@@ -248,15 +260,15 @@
     "y": 2
   },
   "skins/edecio-samurai": {
-    "x": 20,
-    "y": 5
+    "x": 23,
+    "y": 7
   },
   "skins/gladimir-dba": {
     "x": 19,
     "y": 2
   },
   "skins/gladimir-default": {
-    "x": 18,
+    "x": 17,
     "y": 1
   },
   "skins/gladimir-maker": {
@@ -264,7 +276,7 @@
     "y": 2
   },
   "skins/gladimir-mestre": {
-    "x": 24,
+    "x": 25,
     "y": 9
   },
   "skins/gladimir-piloto": {
@@ -272,15 +284,15 @@
     "y": 2
   },
   "skins/guto-astronauta": {
-    "x": 18,
+    "x": 15,
     "y": 2
   },
   "skins/guto-churrasqueiro": {
-    "x": 19,
-    "y": 3
+    "x": 15,
+    "y": 2
   },
   "skins/guto-default": {
-    "x": 20,
+    "x": 15,
     "y": 2
   },
   "skins/guto-dj": {
@@ -288,7 +300,7 @@
     "y": 2
   },
   "skins/guto-pagodeiro": {
-    "x": 19,
+    "x": 16,
     "y": 2
   },
   "skins/pablo-cientista": {
@@ -304,27 +316,27 @@
     "y": 2
   },
   "skins/pablo-galactico": {
-    "x": 21,
-    "y": 7
+    "x": 17,
+    "y": 2
   },
   "skins/pablo-mago": {
-    "x": 28,
-    "y": 16
+    "x": 31,
+    "y": 18
   },
   "skins/wagner-agente": {
     "x": 14,
     "y": 2
   },
   "skins/wagner-cripto": {
-    "x": 17,
+    "x": 20,
     "y": 2
   },
   "skins/wagner-default": {
-    "x": 19,
+    "x": 17,
     "y": 1
   },
   "skins/wagner-firewall": {
-    "x": 18,
+    "x": 22,
     "y": 2
   },
   "skins/wagner-hacker": {
