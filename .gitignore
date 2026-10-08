@@ -30,3 +30,6 @@ npm-debug.log*
 
 # simulator scratch experiments
 /src/game/sim/_*.ts
+
+# Reference photos of real people: never committed
+/professores/
