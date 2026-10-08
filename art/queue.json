@@ -113,6 +113,86 @@
       "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a graduation auditorium with a stage, a curtain and a banner. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
     },
     {
+      "file": "scenery-cantina.png",
+      "kind": "scenery",
+      "keys": [
+        "cantina"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a college cafeteria with a snack counter, a glass display of pastries, a coffee machine and plastic tables and chairs. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-biblioteca.png",
+      "kind": "scenery",
+      "keys": [
+        "biblioteca"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a quiet library with tall wooden bookshelves, reading lamps and a ladder. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-quadra-de-padel.png",
+      "kind": "scenery",
+      "keys": [
+        "quadra-de-padel"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: an indoor padel court at night with glass walls, a net, blue turf and bright floodlights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-madrugada.png",
+      "kind": "scenery",
+      "keys": [
+        "madrugada"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a dark computer lab late at night, lights off, lit only by glowing monitors and a moonlit window. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-orla.png",
+      "kind": "scenery",
+      "keys": [
+        "orla"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a lakeside promenade at sunset with an orange sky reflected on calm water, a walkway with railings and an old brick power-plant chimney in the distance. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-servidor-antigo.png",
+      "kind": "scenery",
+      "keys": [
+        "servidor-antigo"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a vintage mainframe computer room with tall cabinets of blinking lights, tape reels and a raised tile floor. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-feira.png",
+      "kind": "scenery",
+      "keys": [
+        "feira"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a technology fair hall with colourful exhibition booths, banners without text and hanging lights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-estudio.png",
+      "kind": "scenery",
+      "keys": [
+        "estudio"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a podcast studio with acoustic foam walls, microphones on boom arms, a mixing desk and a glowing red sign without text. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-espaco.png",
+      "kind": "scenery",
+      "keys": [
+        "espaco"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: the inside of an orbital space station with a big round window showing planet Earth and stars, panels with small lights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
+      "file": "scenery-trofeus.png",
+      "kind": "scenery",
+      "keys": [
+        "trofeus"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a trophy hall with illuminated glass cabinets full of golden cups and a red carpet. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides."
+    },
+    {
       "file": "skins-more-1.png",
       "kind": "skin",
       "keys": [

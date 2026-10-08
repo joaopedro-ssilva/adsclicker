@@ -89,6 +89,16 @@ const SCENERIES = [
   ['datacenter', 'a datacenter corridor with server racks and blinking LEDs'],
   ['coordenacao', 'an office with a desk, a bookshelf and framed diplomas on the wall'],
   ['formatura', 'a graduation auditorium with a stage, a curtain and a banner'],
+  ['cantina', 'a college cafeteria with a snack counter, a glass display of pastries, a coffee machine and plastic tables and chairs'],
+  ['biblioteca', 'a quiet library with tall wooden bookshelves, reading lamps and a ladder'],
+  ['quadra-de-padel', 'an indoor padel court at night with glass walls, a net, blue turf and bright floodlights'],
+  ['madrugada', 'a dark computer lab late at night, lights off, lit only by glowing monitors and a moonlit window'],
+  ['orla', 'a lakeside promenade at sunset with an orange sky reflected on calm water, a walkway with railings and an old brick power-plant chimney in the distance'],
+  ['servidor-antigo', 'a vintage mainframe computer room with tall cabinets of blinking lights, tape reels and a raised tile floor'],
+  ['feira', 'a technology fair hall with colourful exhibition booths, banners without text and hanging lights'],
+  ['estudio', 'a podcast studio with acoustic foam walls, microphones on boom arms, a mixing desk and a glowing red sign without text'],
+  ['espaco', 'the inside of an orbital space station with a big round window showing planet Earth and stars, panels with small lights'],
+  ['trofeus', 'a trophy hall with illuminated glass cabinets full of golden cups and a red carpet'],
 ];
 
 /** Skins whose head wears something: the professor's head is redrawn with the headgear on, per skin. */

@@ -257,3 +257,43 @@ Every generation call, in order. Style base used in all prompts:
 ## heads-skin2-pablo.png (gpt-image-2, medium)
 
 > a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-pablo.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) big black over-ear headphones over the hair.
+
+## scenery-cantina.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a college cafeteria with a snack counter, a glass display of pastries, a coffee machine and plastic tables and chairs. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-biblioteca.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a quiet library with tall wooden bookshelves, reading lamps and a ladder. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-quadra-de-padel.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: an indoor padel court at night with glass walls, a net, blue turf and bright floodlights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-madrugada.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a dark computer lab late at night, lights off, lit only by glowing monitors and a moonlit window. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-orla.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a lakeside promenade at sunset with an orange sky reflected on calm water, a walkway with railings and an old brick power-plant chimney in the distance. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-servidor-antigo.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a vintage mainframe computer room with tall cabinets of blinking lights, tape reels and a raised tile floor. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-feira.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a technology fair hall with colourful exhibition booths, banners without text and hanging lights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-estudio.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a podcast studio with acoustic foam walls, microphones on boom arms, a mixing desk and a glowing red sign without text. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-espaco.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: the inside of an orbital space station with a big round window showing planet Earth and stars, panels with small lights. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-trofeus.png (gpt-image-2, medium)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Side view scene: a trophy hall with illuminated glass cabinets full of golden cups and a red carpet. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.

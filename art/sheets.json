@@ -139,6 +139,76 @@
       ]
     },
     {
+      "file": "scenery-cantina.png",
+      "kind": "scenery",
+      "keys": [
+        "cantina"
+      ]
+    },
+    {
+      "file": "scenery-biblioteca.png",
+      "kind": "scenery",
+      "keys": [
+        "biblioteca"
+      ]
+    },
+    {
+      "file": "scenery-quadra-de-padel.png",
+      "kind": "scenery",
+      "keys": [
+        "quadra-de-padel"
+      ]
+    },
+    {
+      "file": "scenery-madrugada.png",
+      "kind": "scenery",
+      "keys": [
+        "madrugada"
+      ]
+    },
+    {
+      "file": "scenery-orla.png",
+      "kind": "scenery",
+      "keys": [
+        "orla"
+      ]
+    },
+    {
+      "file": "scenery-servidor-antigo.png",
+      "kind": "scenery",
+      "keys": [
+        "servidor-antigo"
+      ]
+    },
+    {
+      "file": "scenery-feira.png",
+      "kind": "scenery",
+      "keys": [
+        "feira"
+      ]
+    },
+    {
+      "file": "scenery-estudio.png",
+      "kind": "scenery",
+      "keys": [
+        "estudio"
+      ]
+    },
+    {
+      "file": "scenery-espaco.png",
+      "kind": "scenery",
+      "keys": [
+        "espaco"
+      ]
+    },
+    {
+      "file": "scenery-trofeus.png",
+      "kind": "scenery",
+      "keys": [
+        "trofeus"
+      ]
+    },
+    {
       "file": "skins-more-1.png",
       "kind": "skin",
       "keys": [
