@@ -540,6 +540,161 @@
       "refs": [
         "skins-1.png"
       ]
+    },
+    {
+      "file": "skins-v3-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-gauchao",
+        "edecio-formando",
+        "edecio-lenda",
+        "gladimir-pescador"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 4 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a gaucho from southern Brazil: white shirt, red neckerchief, wide baggy brown bombacha trousers tucked into leather boots, a wide leather belt, holding a chimarrão gourd with a metal straw; (b) an elegant gentleman of the year 1900: dark vintage frock coat, waistcoat with a pocket-watch chain, bow tie, holding a walking cane; (c) a legendary golden outfit: shining gold suit with a gold cape, one hand is a giant golden thumbs-up glove; (d) a fisherman: olive fishing vest with many pockets over a plaid shirt, rubber boots, holding a fishing rod in one hand and a small bucket in the other.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v3-2.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-bibliotecario",
+        "gladimir-guardiao",
+        "b2-obra",
+        "b2-pixel"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 4 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a librarian: burgundy cardigan over a shirt and tie, brown trousers, carrying a tall stack of books; (b) a legendary guardian knight: steel-blue plate armor with a navy cape, holding a big square shield shaped like a floppy disk; (c) a construction-site designer: orange work overalls over a white t-shirt, work boots, holding a rolled blueprint; (d) an outfit made of neat coloured squares like big pixels in pink, teal and yellow, holding a giant ruler.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v3-3.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-detetive",
+        "wagner-cavaleiro",
+        "b1-scrum",
+        "b1-arquiteta"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 4 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a classic detective: long beige trench coat with the collar up, dark trousers, holding a magnifying glass; (b) a legendary dark knight: black plate armor with silver padlock emblems and a dark red cape, holding a sword whose blade is shaped like a big key; (c) an agile coach: a teal vest covered in colourful round pin buttons over a white shirt, jeans, a whistle on a cord around the neck stub, holding a stopwatch; (d) a master architect: an elegant dark teal long coat with a short cape and gold trim, holding a giant drawing compass.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v3-4.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-capitao",
+        "angelo-reitor",
+        "pablo-garagem",
+        "pablo-oraculo"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 4 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a padel team captain: navy and gold sports jacket with a captain armband, white shorts, white sneakers, holding a golden trophy cup; (b) a university rector: a long ceremonial academic gown in deep red and black with a wide golden sash and gold embroidery, holding a golden academic mace; (c) a garage hacker: a worn dark grey hoodie with the hood down, cargo trousers, sneakers, holding a green circuit board with wires; (d) a legendary oracle: a long pale ivory and soft gold tunic with a white sash, sandals, one hand raised with a floating translucent pale-blue sphere of data above it.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v3-guto.png",
+      "kind": "skin",
+      "keys": [
+        "guto-paladino",
+        "guto-capitao"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 2 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare MEDIUM BROWN skin (colour #9a6a45, clearly darker than the bodies of the reference image), and the hands and every other bit of visible skin have that same medium brown colour) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a noble medieval paladin: polished steel plate armor with gold trim, a long royal-blue cape, a longsword in one hand and a kite shield with a white cloud crest in the other; heroic and dignified, not comic; (b) a ship captain: a navy double-breasted captain coat with gold buttons and gold shoulder epaulettes, white trousers, black boots, holding a small wooden ship wheel.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-gauchao",
+        "edecio-formando"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-edecio.png in the current directory: it is this character's head. Draw that SAME character's head 3 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) a black wide-brim gaucho felt hat with a chin strap; (b) a tall black top hat.",
+      "refs": [
+        "ref-head-edecio.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-pescador",
+        "gladimir-guardiao"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-gladimir.png in the current directory: it is this character's head. Draw that SAME character's head 3 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) an olive-green fisherman bucket hat with a fishing lure pinned on it; (b) an open-face steel-blue knight helmet with a navy plume, face fully visible.",
+      "refs": [
+        "ref-head-gladimir.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-b2.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b2-obra"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-b2.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) a yellow construction hard hat.",
+      "refs": [
+        "ref-head-b2.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-detetive",
+        "wagner-cavaleiro"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-wagner.png in the current directory: it is this character's head. Draw that SAME character's head 3 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) a brown fedora hat; (b) an open-face black knight helmet with silver trim and a dark red plume, face fully visible.",
+      "refs": [
+        "ref-head-wagner.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-capitao"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-guto.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) a white ship captain peaked cap with a gold anchor badge.",
+      "refs": [
+        "ref-head-guto.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-reitor"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-angelo.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) a round dark red velvet doctoral tam cap with a gold tassel.",
+      "refs": [
+        "ref-head-angelo.png"
+      ]
+    },
+    {
+      "file": "heads-skin2-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-garagem"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-pablo.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: (a) big black over-ear headphones over the hair.",
+      "refs": [
+        "ref-head-pablo.png"
+      ]
     }
   ]
 }

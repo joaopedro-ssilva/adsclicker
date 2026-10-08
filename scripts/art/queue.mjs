@@ -405,6 +405,82 @@ calls.push(
   { label: 'skins-v2', images: [newBodies] },
 );
 
+// 8) Third pass: 18 new skins. Bodies four to a sheet, then one more row of headgear heads per professor.
+const V3_BODIES = [
+  ['edecio-gauchao', 'a gaucho from southern Brazil: white shirt, red neckerchief, wide baggy brown bombacha trousers tucked into leather boots, a wide leather belt, holding a chimarrão gourd with a metal straw'],
+  ['edecio-formando', 'an elegant gentleman of the year 1900: dark vintage frock coat, waistcoat with a pocket-watch chain, bow tie, holding a walking cane'],
+  ['edecio-lenda', 'a legendary golden outfit: shining gold suit with a gold cape, one hand is a giant golden thumbs-up glove'],
+  ['gladimir-pescador', 'a fisherman: olive fishing vest with many pockets over a plaid shirt, rubber boots, holding a fishing rod in one hand and a small bucket in the other'],
+  ['gladimir-bibliotecario', 'a librarian: burgundy cardigan over a shirt and tie, brown trousers, carrying a tall stack of books'],
+  ['gladimir-guardiao', 'a legendary guardian knight: steel-blue plate armor with a navy cape, holding a big square shield shaped like a floppy disk'],
+  ['b2-obra', 'a construction-site designer: orange work overalls over a white t-shirt, work boots, holding a rolled blueprint'],
+  ['b2-pixel', 'an outfit made of neat coloured squares like big pixels in pink, teal and yellow, holding a giant ruler'],
+  ['wagner-detetive', 'a classic detective: long beige trench coat with the collar up, dark trousers, holding a magnifying glass'],
+  ['wagner-cavaleiro', 'a legendary dark knight: black plate armor with silver padlock emblems and a dark red cape, holding a sword whose blade is shaped like a big key'],
+  ['b1-scrum', 'an agile coach: a teal vest covered in colourful round pin buttons over a white shirt, jeans, a whistle on a cord around the neck stub, holding a stopwatch'],
+  ['b1-arquiteta', 'a master architect: an elegant dark teal long coat with a short cape and gold trim, holding a giant drawing compass'],
+  ['angelo-capitao', 'a padel team captain: navy and gold sports jacket with a captain armband, white shorts, white sneakers, holding a golden trophy cup'],
+  ['angelo-reitor', 'a university rector: a long ceremonial academic gown in deep red and black with a wide golden sash and gold embroidery, holding a golden academic mace'],
+  ['pablo-garagem', 'a garage hacker: a worn dark grey hoodie with the hood down, cargo trousers, sneakers, holding a green circuit board with wires'],
+  ['pablo-oraculo', 'a legendary oracle: a long pale ivory and soft gold tunic with a white sash, sandals, one hand raised with a floating translucent pale-blue sphere of data above it'],
+];
+const v3BodySheet = (file, items, extra = {}) => ({
+  file,
+  kind: 'skin',
+  keys: items.map((i) => i[0]),
+  refs: ['skins-1.png'],
+  ...extra,
+  text: `${HK_BASE}. ${HK_STYLE} It shows ${items.length} separate HEADLESS chibi character bodies in a single row. ${extra.rules ?? BODY_RULES} All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: ${list(items.map((i) => i[1]))}.`,
+});
+const GUTO_RULES = BODY_RULES.replace('bare light tan skin', 'bare MEDIUM BROWN skin (colour #9a6a45, clearly darker than the bodies of the reference image), and the hands and every other bit of visible skin have that same medium brown colour');
+const V3_GUTO = [
+  ['guto-paladino', 'a noble medieval paladin: polished steel plate armor with gold trim, a long royal-blue cape, a longsword in one hand and a kite shield with a white cloud crest in the other; heroic and dignified, not comic'],
+  ['guto-capitao', 'a ship captain: a navy double-breasted captain coat with gold buttons and gold shoulder epaulettes, white trousers, black boots, holding a small wooden ship wheel'],
+];
+
+/** Headgear of the third pass, one extra row per professor (the first rows stay as they are). */
+const HEAD_VARIANTS_2 = {
+  edecio: [
+    ['edecio-gauchao', 'a black wide-brim gaucho felt hat with a chin strap'],
+    ['edecio-formando', 'a tall black top hat'],
+  ],
+  gladimir: [
+    ['gladimir-pescador', 'an olive-green fisherman bucket hat with a fishing lure pinned on it'],
+    ['gladimir-guardiao', 'an open-face steel-blue knight helmet with a navy plume, face fully visible'],
+  ],
+  b2: [['b2-obra', 'a yellow construction hard hat']],
+  wagner: [
+    ['wagner-detetive', 'a brown fedora hat'],
+    ['wagner-cavaleiro', 'an open-face black knight helmet with silver trim and a dark red plume, face fully visible'],
+  ],
+  guto: [['guto-capitao', 'a white ship captain peaked cap with a gold anchor badge']],
+  angelo: [['angelo-reitor', 'a round dark red velvet doctoral tam cap with a gold tassel']],
+  pablo: [['pablo-garagem', 'big black over-ear headphones over the hair']],
+};
+const headVariantSheet2 = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = HEAD_VARIANTS_2[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    file: `heads-skin2-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+HEAD_VARIANTS.b2 ??= [];
+
+calls.push(
+  { label: 'skins-v3-1', images: [v3BodySheet('skins-v3-1.png', V3_BODIES.slice(0, 4))] },
+  { label: 'skins-v3-2', images: [v3BodySheet('skins-v3-2.png', V3_BODIES.slice(4, 8))] },
+  { label: 'skins-v3-3', images: [v3BodySheet('skins-v3-3.png', V3_BODIES.slice(8, 12))] },
+  { label: 'skins-v3-4', images: [v3BodySheet('skins-v3-4.png', V3_BODIES.slice(12))] },
+  { label: 'skins-v3-guto', images: [v3BodySheet('skins-v3-guto.png', V3_GUTO, { rules: GUTO_RULES, sheet: { darkSkin: true } })] },
+  ...Object.keys(HEAD_VARIANTS_2).map((professor) => ({ label: `heads-skin2-${professor}`, images: [headVariantSheet2(professor)] })),
+);
+
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const professor of Object.keys(HEAD_VARIANTS)) {

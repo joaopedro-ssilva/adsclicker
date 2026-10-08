@@ -528,6 +528,128 @@
         "angelo-padel",
         "pablo-galactico"
       ]
+    },
+    {
+      "file": "skins-v3-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-gauchao",
+        "edecio-formando",
+        "edecio-lenda",
+        "gladimir-pescador"
+      ]
+    },
+    {
+      "file": "skins-v3-2.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-bibliotecario",
+        "gladimir-guardiao",
+        "b2-obra",
+        "b2-pixel"
+      ]
+    },
+    {
+      "file": "skins-v3-3.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-detetive",
+        "wagner-cavaleiro",
+        "b1-scrum",
+        "b1-arquiteta"
+      ]
+    },
+    {
+      "file": "skins-v3-4.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-capitao",
+        "angelo-reitor",
+        "pablo-garagem",
+        "pablo-oraculo"
+      ]
+    },
+    {
+      "file": "skins-v3-guto.png",
+      "kind": "skin",
+      "keys": [
+        "guto-paladino",
+        "guto-capitao"
+      ],
+      "darkSkin": true
+    },
+    {
+      "file": "heads-skin2-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-gauchao",
+        "edecio-formando"
+      ],
+      "calibrate": true,
+      "ref": "edecio"
+    },
+    {
+      "file": "heads-skin2-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-pescador",
+        "gladimir-guardiao"
+      ],
+      "calibrate": true,
+      "ref": "gladimir"
+    },
+    {
+      "file": "heads-skin2-b2.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b2-obra"
+      ],
+      "calibrate": true,
+      "ref": "b2"
+    },
+    {
+      "file": "heads-skin2-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-detetive",
+        "wagner-cavaleiro"
+      ],
+      "calibrate": true,
+      "ref": "wagner"
+    },
+    {
+      "file": "heads-skin2-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-capitao"
+      ],
+      "calibrate": true,
+      "ref": "guto"
+    },
+    {
+      "file": "heads-skin2-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-reitor"
+      ],
+      "calibrate": true,
+      "ref": "angelo"
+    },
+    {
+      "file": "heads-skin2-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-garagem"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
     }
   ]
 }

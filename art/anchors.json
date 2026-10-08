@@ -71,6 +71,10 @@
     "x": 21,
     "y": 65
   },
+  "heads/angelo-reitor": {
+    "x": 27,
+    "y": 53
+  },
   "heads/b1": {
     "x": 30,
     "y": 52
@@ -83,6 +87,10 @@
     "x": 27,
     "y": 54
   },
+  "heads/b2-obra": {
+    "x": 27,
+    "y": 52
+  },
   "heads/edecio": {
     "x": 23,
     "y": 57
@@ -91,9 +99,17 @@
     "x": 22,
     "y": 57
   },
+  "heads/edecio-formando": {
+    "x": 27,
+    "y": 69
+  },
   "heads/edecio-full-dima": {
     "x": 22,
     "y": 52
+  },
+  "heads/edecio-gauchao": {
+    "x": 31,
+    "y": 61
   },
   "heads/edecio-gladiador": {
     "x": 22,
@@ -107,6 +123,10 @@
     "x": 23,
     "y": 54
   },
+  "heads/gladimir-guardiao": {
+    "x": 25,
+    "y": 65
+  },
   "heads/gladimir-maker": {
     "x": 24,
     "y": 56
@@ -114,6 +134,10 @@
   "heads/gladimir-mestre": {
     "x": 27,
     "y": 62
+  },
+  "heads/gladimir-pescador": {
+    "x": 28,
+    "y": 55
   },
   "heads/gladimir-piloto": {
     "x": 27,
@@ -127,6 +151,10 @@
     "x": 28,
     "y": 63
   },
+  "heads/guto-capitao": {
+    "x": 25,
+    "y": 57
+  },
   "heads/guto-pagodeiro": {
     "x": 31,
     "y": 62
@@ -138,6 +166,10 @@
   "heads/pablo-galactico": {
     "x": 27,
     "y": 59
+  },
+  "heads/pablo-garagem": {
+    "x": 27,
+    "y": 56
   },
   "heads/pablo-mago": {
     "x": 30,
@@ -151,9 +183,21 @@
     "x": 21,
     "y": 52
   },
+  "heads/wagner-cavaleiro": {
+    "x": 23,
+    "y": 64
+  },
   "heads/wagner-cripto": {
     "x": 26,
     "y": 55
+  },
+  "heads/wagner-detetive": {
+    "x": 26,
+    "y": 55
+  },
+  "skins/angelo-capitao": {
+    "x": 17,
+    "y": 2
   },
   "skins/angelo-default": {
     "x": 20,
@@ -175,9 +219,17 @@
     "x": 19,
     "y": 2
   },
+  "skins/angelo-reitor": {
+    "x": 17,
+    "y": 6
+  },
   "skins/angelo-terno": {
     "x": 19,
     "y": 2
+  },
+  "skins/b1-arquiteta": {
+    "x": 19,
+    "y": 3
   },
   "skins/b1-default": {
     "x": 21,
@@ -199,6 +251,10 @@
     "x": 26,
     "y": 7
   },
+  "skins/b1-scrum": {
+    "x": 20,
+    "y": 4
+  },
   "skins/b2-darkmode": {
     "x": 17,
     "y": 2
@@ -207,9 +263,17 @@
     "x": 17,
     "y": 1
   },
+  "skins/b2-obra": {
+    "x": 14,
+    "y": 2
+  },
   "skins/b2-paleta": {
     "x": 17,
     "y": 8
+  },
+  "skins/b2-pixel": {
+    "x": 13,
+    "y": 2
   },
   "skins/b2-postit": {
     "x": 21,
@@ -243,12 +307,24 @@
     "x": 17,
     "y": 2
   },
+  "skins/edecio-formando": {
+    "x": 15,
+    "y": 2
+  },
   "skins/edecio-full-dima": {
     "x": 31,
     "y": 2
   },
+  "skins/edecio-gauchao": {
+    "x": 15,
+    "y": 3
+  },
   "skins/edecio-gladiador": {
     "x": 22,
+    "y": 2
+  },
+  "skins/edecio-lenda": {
+    "x": 16,
     "y": 2
   },
   "skins/edecio-prisioneiro": {
@@ -263,6 +339,10 @@
     "x": 23,
     "y": 7
   },
+  "skins/gladimir-bibliotecario": {
+    "x": 17,
+    "y": 2
+  },
   "skins/gladimir-dba": {
     "x": 19,
     "y": 2
@@ -270,6 +350,10 @@
   "skins/gladimir-default": {
     "x": 17,
     "y": 2
+  },
+  "skins/gladimir-guardiao": {
+    "x": 16,
+    "y": 1
   },
   "skins/gladimir-maker": {
     "x": 18,
@@ -279,12 +363,20 @@
     "x": 25,
     "y": 9
   },
+  "skins/gladimir-pescador": {
+    "x": 16,
+    "y": 9
+  },
   "skins/gladimir-piloto": {
     "x": 19,
     "y": 3
   },
   "skins/guto-astronauta": {
     "x": 15,
+    "y": 3
+  },
+  "skins/guto-capitao": {
+    "x": 17,
     "y": 3
   },
   "skins/guto-churrasqueiro": {
@@ -303,6 +395,10 @@
     "x": 16,
     "y": 3
   },
+  "skins/guto-paladino": {
+    "x": 22,
+    "y": 4
+  },
   "skins/pablo-cientista": {
     "x": 18,
     "y": 2
@@ -319,13 +415,25 @@
     "x": 17,
     "y": 2
   },
+  "skins/pablo-garagem": {
+    "x": 16,
+    "y": 1
+  },
   "skins/pablo-mago": {
     "x": 31,
     "y": 18
   },
+  "skins/pablo-oraculo": {
+    "x": 14,
+    "y": 5
+  },
   "skins/wagner-agente": {
     "x": 14,
     "y": 2
+  },
+  "skins/wagner-cavaleiro": {
+    "x": 21,
+    "y": 14
   },
   "skins/wagner-cripto": {
     "x": 20,
@@ -333,6 +441,10 @@
   },
   "skins/wagner-default": {
     "x": 17,
+    "y": 2
+  },
+  "skins/wagner-detetive": {
+    "x": 20,
     "y": 2
   },
   "skins/wagner-firewall": {
