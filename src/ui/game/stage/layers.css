@@ -6,7 +6,8 @@
   left: var(--space-4);
   display: grid;
   gap: var(--space-3);
-  width: min(300px, 36%);
+  /* Wide enough for a sprint title and its goal on one line each next to the accept button. */
+  width: min(360px, 42%);
   z-index: 2;
 }
 

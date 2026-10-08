@@ -8,7 +8,7 @@ interface PortraitProps {
   zoom?: number;
 }
 
-/** The top of a professor's head sprite, cropped to a square: a compact portrait at an integer pixel scale. */
+/** A professor's whole head in a square frame: a head taller or wider than the frame is scaled down to fit, never cropped. */
 export function Portrait({ professor, zoom = 1 }: PortraitProps) {
   const meta = ASSETS[`heads/${professor}`];
   if (!meta) {
@@ -25,7 +25,8 @@ export function Portrait({ professor, zoom = 1 }: PortraitProps) {
       className="panel-portrait"
       width={size * zoom}
       height={size * zoom}
-      viewBox={`${(meta.w - size) / 2} 0 ${size} ${size}`}
+      viewBox={`0 0 ${meta.w} ${meta.h}`}
+      preserveAspectRatio="xMidYMid meet"
       shapeRendering="crispEdges"
       aria-hidden="true"
     >
