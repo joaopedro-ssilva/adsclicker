@@ -6,7 +6,10 @@ interface HeadPortraitProps {
   fallback: string;
 }
 
-/** A professor's head at native size (crisp), cropped to a square. Falls back to the initial. */
+/**
+ * A professor's whole head, never cropped: at native size when it fits the frame, scaled down to fit when the
+ * head is taller or wider than it (long hair, a tall forehead). Falls back to the initial.
+ */
 export function HeadPortrait({ professorId, fallback }: HeadPortraitProps) {
   const key = `heads/${professorId}`;
   const meta = ASSETS[key];
@@ -17,13 +20,12 @@ export function HeadPortrait({ professorId, fallback }: HeadPortraitProps) {
       </span>
     );
   }
-  const size = Math.min(meta.w, meta.h);
   return (
     <svg
       className="roster-portrait"
-      width={size}
-      height={size}
-      viewBox={`${(meta.w - size) / 2} 0 ${size} ${size}`}
+      viewBox={`0 0 ${meta.w} ${meta.h}`}
+      preserveAspectRatio="xMidYMid meet"
+      style={{ width: '100%', height: '100%', maxWidth: meta.w, maxHeight: meta.h, padding: 2, boxSizing: 'border-box' }}
       shapeRendering="crispEdges"
       aria-hidden="true"
     >

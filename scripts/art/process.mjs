@@ -522,6 +522,22 @@ function bodyCentreX(img) {
   return count ? sum / count : w / 2;
 }
 
+/** Rows of neck left visible under the chin. Necks are drawn with different lengths; the head covers the rest. */
+const NECK_SHOWING = 1;
+
+/** First row under the neck top where the body widens into shoulders or a collar (the opaque run through x grows). */
+function shoulderRow(img, x, top, neckWidth) {
+  const { data, w, h } = img;
+  const limit = Math.min(h, top + 8);
+  for (let y = top; y < limit; y++) {
+    let left = x, right = x;
+    while (left > 0 && data[(y * w + left - 1) * 4 + 3]) left--;
+    while (right < w - 1 && data[(y * w + right + 1) * 4 + 3]) right++;
+    if (right - left + 1 > neckWidth + 6) return y;
+  }
+  return top + 1;
+}
+
 function skinAnchor(img) {
   const { data, w, h } = img;
   // Topmost row (within the top half) holding a run of >= 3 skin pixels near the body's centre line = neck stub top.
@@ -544,7 +560,10 @@ function skinAnchor(img) {
       const run = runs
         .filter((r) => r.length >= 3 && Math.abs((r[0] + r[r.length - 1]) / 2 - cx) <= reach)
         .sort((a, b) => b.length - a.length)[0];
-      if (run) return { x: Math.round((run[0] + run[run.length - 1]) / 2), y: y + 1, method: 'skin' };
+      if (run) {
+        const x = Math.round((run[0] + run[run.length - 1]) / 2);
+        return { x, y: Math.max(y + 1, shoulderRow(img, x, y, run.length) - NECK_SHOWING), top: y + 1, method: 'skin' };
+      }
     }
   }
   // fallback: the topmost opaque pixel on the body's centre line
@@ -630,7 +649,11 @@ async function processSheet(sheet, anchors) {
   // A calibrated sheet starts with a plain reference item (key "_ref"): its block size is used for the
   // whole row, so heads wearing tall headgear keep the same pixel scale as the plain head instead of
   // being squeezed into the target height. Keys starting with "_" are never written.
-  let shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), target, `${sheet.keys[0]} (calibration)`) : null;
+  // sheet.ref names the plain head the row was drawn from: the reference item is brought to that head's real
+  // height (a head with short hair is shorter than the default), so every variant keeps the plain head's face size.
+  const refFile = sheet.ref ? path.join(ASSETS_DIR, folder, `${sheet.ref}.png`) : null;
+  const calibration = refFile && fs.existsSync(refFile) ? { ...target, size: (await sharp(refFile).metadata()).height } : target;
+  let shared = sheet.calibrate ? detectBlock(cropItem(img, groups[0]), calibration, `${sheet.keys[0]} (calibration)`) : null;
   // sheet.shareScale: every item of the row was drawn at the same size, so they all get the same block size
   // (the one that brings the median item to the target), instead of each being stretched to the target alone.
   if (sheet.shareScale && !shared) {
@@ -658,7 +681,7 @@ async function processSheet(sheet, anchors) {
       anchor = skinAnchor(sprite);
       // Every body measures the same from the neck to the feet, whatever it holds or wears above the neck:
       // sized by the whole sprite, a raised staff or a cape shrinks the body and the professor looks smaller.
-      const below = sprite.h - anchor.y;
+      const below = sprite.h - (anchor.top ?? anchor.y);
       // A neck found in the wrong place gives an absurd measure: leave such a body as it is.
       const sane = below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3;
       if (!sheet.target && sane && Math.abs(below - BODY_BELOW_NECK) >= 1) {
@@ -667,7 +690,7 @@ async function processSheet(sheet, anchors) {
         removeIsolated(sprite);
         sprite = trim(sprite);
         anchor = skinAnchor(sprite);
-        console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - anchor.y}px`);
+        console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - (anchor.top ?? anchor.y)}px`);
       }
     } else if (sheet.kind === 'head') anchor = headAnchor(sprite);
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);

@@ -188,7 +188,8 @@
         "edecio-gladiador",
         "edecio-samurai"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "edecio"
     },
     {
       "file": "heads-skin-gladimir.png",
@@ -199,7 +200,8 @@
         "gladimir-piloto",
         "gladimir-mestre"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "gladimir"
     },
     {
       "file": "heads-skin-wagner.png",
@@ -209,7 +211,8 @@
         "wagner-agente",
         "wagner-cripto"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "wagner"
     },
     {
       "file": "heads-skin-guto.png",
@@ -219,7 +222,8 @@
         "guto-pagodeiro",
         "guto-astronauta"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "guto"
     },
     {
       "file": "heads-skin-b1.png",
@@ -228,7 +232,8 @@
         "_ref",
         "b1-rainha"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "b1"
     },
     {
       "file": "heads-skin-angelo.png",
@@ -239,7 +244,8 @@
         "angelo-rei",
         "angelo-padel"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "angelo"
     },
     {
       "file": "heads-skin-pablo.png",
@@ -249,7 +255,8 @@
         "pablo-mago",
         "pablo-galactico"
       ],
-      "calibrate": true
+      "calibrate": true,
+      "ref": "pablo"
     },
     {
       "file": "skins-more-5.png",
@@ -457,8 +464,18 @@
       "kind": "head",
       "keys": [
         "_edecio",
-        "gladimir",
+        "_gladimir",
         "guto"
+      ],
+      "shareScale": true
+    },
+    {
+      "file": "heads-v2-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_edecio",
+        "gladimir",
+        "_guto"
       ],
       "shareScale": true
     },

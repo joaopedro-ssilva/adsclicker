@@ -180,6 +180,7 @@ function headVariantSheet(professor) {
     kind: 'head',
     keys: ['_ref', ...items.map((i) => i[0])],
     calibrate: true,
+    sheet: { ref: professor },
     // For the API generator: the reference head travels with the request.
     refs: [`ref-head-${professor}.png`],
     text: `${BASE}. First open the reference image ref-head-${professor}.png in the current directory: it is this character's head. Draw that SAME character's head ${items.length + 1} times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: ${list(items.map((i) => i[1]))}.`,
@@ -370,6 +371,15 @@ const edecioHead = {
   sheet: { shareScale: true },
   text: `${HK_BASE} Redraw the reference image: the same three heads, same size, same positions, same pixel-art style. The middle and right heads stay exactly as they are. Change only the left head's hair colour: the same man, same face, same haircut and hair shape, but his hair is now salt-and-pepper, greying brown with clearly grey-white sides and temples and light grey streaks on top (a man in his late fifties going grey, not fully white).`,
 };
+// Gladimir came out too dark next to his fair bodies. Same row, only the middle head changes.
+const gladimirHead = {
+  file: 'heads-v2-gladimir.png',
+  kind: 'head',
+  keys: ['_edecio', 'gladimir', '_guto'],
+  refs: ['heads-v2-1.png'],
+  sheet: { shareScale: true },
+  text: `${HK_BASE} Redraw the reference image: the same three heads, same size, same positions, same pixel-art style. The left and right heads stay exactly as they are. Change only the middle head's skin colour: the same man, same face, same glasses, same very short grey hair, but his skin is now FAIR and light, the same light peach skin tone as the head on the left.`,
+};
 const gutoBodies = {
   file: 'skins-guto.png',
   kind: 'skin',
@@ -386,7 +396,8 @@ const newBodies = {
   text: `${HK_BASE}. ${HK_STYLE} It shows 2 separate HEADLESS chibi character bodies in a single row. ${BODY_RULES} Outfits left to right: ${list(['padel sportswear: a white and navy polo shirt, navy shorts, white sneakers and a wristband, holding a padel racket (a short solid paddle with round holes, no strings) down at the side', 'a legendary archmage: a long dark charcoal and midnight-blue robe with thin silver rune trim and a silver belt, the hood down around the neck stub, holding a dark wooden staff topped with one small pale-blue glowing crystal; sober, elegant, almost monochrome, no rainbow colours, no sparkles'])}.`,
 };
 calls.push(
-  { label: 'heads-v2-1', images: [{ ...v2HeadSheet('heads-v2-1.png', V2_HEADS.slice(0, 3)), keys: ['_edecio', 'gladimir', 'guto'] }] },
+  { label: 'heads-v2-1', images: [{ ...v2HeadSheet('heads-v2-1.png', V2_HEADS.slice(0, 3)), keys: ['_edecio', '_gladimir', 'guto'] }] },
+  { label: 'heads-v2-gladimir', images: [gladimirHead] },
   { label: 'heads-v2-edecio', images: [edecioHead] },
   { label: 'heads-v2-2', images: [{ ...v2HeadSheet('heads-v2-2.png', V2_HEADS.slice(3)), keys: ['b2', '_angelo', 'pablo'] }] },
   { label: 'heads-v2-angelo', images: [angeloHead] },

@@ -1,7 +1,7 @@
 {
   "hackathon/bodies/estagiario": {
     "x": 16,
-    "y": 1
+    "y": 3
   },
   "hackathon/bodies/estudante": {
     "x": 16,
@@ -60,16 +60,16 @@
     "y": 47
   },
   "heads/angelo-padel": {
-    "x": 24,
-    "y": 55
+    "x": 21,
+    "y": 47
   },
   "heads/angelo-paraninfo": {
-    "x": 29,
-    "y": 67
+    "x": 25,
+    "y": 57
   },
   "heads/angelo-rei": {
-    "x": 25,
-    "y": 76
+    "x": 21,
+    "y": 65
   },
   "heads/b1": {
     "x": 30,
@@ -108,16 +108,16 @@
     "y": 54
   },
   "heads/gladimir-maker": {
-    "x": 23,
-    "y": 54
+    "x": 24,
+    "y": 56
   },
   "heads/gladimir-mestre": {
-    "x": 25,
-    "y": 58
+    "x": 27,
+    "y": 62
   },
   "heads/gladimir-piloto": {
-    "x": 26,
-    "y": 58
+    "x": 27,
+    "y": 61
   },
   "heads/guto": {
     "x": 23,
@@ -157,15 +157,15 @@
   },
   "skins/angelo-default": {
     "x": 20,
-    "y": 2
+    "y": 3
   },
   "skins/angelo-maestro": {
     "x": 19,
-    "y": 5
+    "y": 6
   },
   "skins/angelo-padel": {
     "x": 23,
-    "y": 2
+    "y": 3
   },
   "skins/angelo-paraninfo": {
     "x": 19,
@@ -185,7 +185,7 @@
   },
   "skins/b1-flexbox": {
     "x": 17,
-    "y": 2
+    "y": 3
   },
   "skins/b1-lancamento": {
     "x": 21,
@@ -193,7 +193,7 @@
   },
   "skins/b1-po": {
     "x": 17,
-    "y": 2
+    "y": 3
   },
   "skins/b1-rainha": {
     "x": 26,
@@ -209,11 +209,11 @@
   },
   "skins/b2-paleta": {
     "x": 17,
-    "y": 7
+    "y": 8
   },
   "skins/b2-postit": {
     "x": 21,
-    "y": 2
+    "y": 3
   },
   "skins/b2-wireframe": {
     "x": 19,
@@ -241,7 +241,7 @@
   },
   "skins/edecio-default": {
     "x": 17,
-    "y": 1
+    "y": 2
   },
   "skins/edecio-full-dima": {
     "x": 31,
@@ -269,7 +269,7 @@
   },
   "skins/gladimir-default": {
     "x": 17,
-    "y": 1
+    "y": 2
   },
   "skins/gladimir-maker": {
     "x": 18,
@@ -281,27 +281,27 @@
   },
   "skins/gladimir-piloto": {
     "x": 19,
-    "y": 2
+    "y": 3
   },
   "skins/guto-astronauta": {
     "x": 15,
-    "y": 2
+    "y": 3
   },
   "skins/guto-churrasqueiro": {
     "x": 15,
-    "y": 2
+    "y": 3
   },
   "skins/guto-default": {
     "x": 15,
-    "y": 2
+    "y": 3
   },
   "skins/guto-dj": {
     "x": 17,
-    "y": 2
+    "y": 3
   },
   "skins/guto-pagodeiro": {
     "x": 16,
-    "y": 2
+    "y": 3
   },
   "skins/pablo-cientista": {
     "x": 18,
@@ -309,7 +309,7 @@
   },
   "skins/pablo-default": {
     "x": 20,
-    "y": 2
+    "y": 3
   },
   "skins/pablo-enxadrista": {
     "x": 18,
@@ -333,7 +333,7 @@
   },
   "skins/wagner-default": {
     "x": 17,
-    "y": 1
+    "y": 2
   },
   "skins/wagner-firewall": {
     "x": 22,
