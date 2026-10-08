@@ -642,12 +642,12 @@ describe('content: achievements', () => {
     expect(count('sprints')).toBeGreaterThanOrEqual(5);
     expect(count('graduation')).toBeGreaterThanOrEqual(6);
     expect(count('collection')).toBeGreaterThanOrEqual(5);
-    expect(count('secret')).toBe(8);
+    expect(count('secret')).toBe(6);
   });
 
   it('covers every secret trigger of the design and hides only the secret family', () => {
     const triggers = content.achievements.flatMap((a) => (a.condition.kind === 'secret' ? [a.condition.trigger] : []));
-    for (const trigger of ['logo-clicks', 'konami', 'night-owl', 'swap-spree', 'idle-watcher', 'joinha']) {
+    for (const trigger of ['logo-clicks', 'night-owl', 'swap-spree', 'idle-watcher']) {
       expect(triggers).toContain(trigger);
     }
     for (const achievement of content.achievements) {

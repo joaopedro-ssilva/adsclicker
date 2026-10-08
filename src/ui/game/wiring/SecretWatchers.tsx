@@ -3,44 +3,14 @@ import { useEffect, useRef } from 'react';
 import { useGame, useGameEvents } from '@/game/store';
 import { fireSecret } from './fireSecret';
 
-const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-const PHRASE = 'muito legal';
 const SWAP_LIMIT = 20;
 const SWAP_WINDOW_MS = 60_000;
 const IDLE_MS = 60_000;
 const NIGHT_OWL_CHECK_MS = 60_000;
 
-function isEditable(target: EventTarget | null): boolean {
-  return target instanceof HTMLElement && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
-}
-
-/** Keyboard, clock and idle based secrets. The logo secret lives next to the logo. Renders nothing. */
+/** Clock, swap and idle based secrets. The logo secret lives next to the logo. Renders nothing. */
 export function SecretWatchers() {
   const lastClick = useRef(0);
-
-  // Konami code and the "muito legal" phrase.
-  useEffect(() => {
-    let code: string[] = [];
-    let typed = '';
-    const onKey = (event: KeyboardEvent) => {
-      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || isEditable(event.target)) return;
-      const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
-      code = [...code, key].slice(-KONAMI.length);
-      if (code.length === KONAMI.length && code.every((value, index) => value === KONAMI[index])) {
-        code = [];
-        fireSecret('konami');
-      }
-      if (key.length === 1) {
-        typed = (typed + key).slice(-PHRASE.length);
-        if (typed === PHRASE) {
-          typed = '';
-          fireSecret('joinha');
-        }
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, []);
 
   // Playing between 3:00 and 5:00 local time.
   useEffect(() => {
