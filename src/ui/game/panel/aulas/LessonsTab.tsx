@@ -42,7 +42,7 @@ export function LessonsTab() {
         </Section>
       ) : null}
 
-      <p className="panel-hint">Cada marco de nível dobra a produção da aula.</p>
+      <p className="panel-hint">Cada marco de nível multiplica a produção da aula; os de nível alto valem mais.</p>
     </div>
   );
 }

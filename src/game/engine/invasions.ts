@@ -58,6 +58,7 @@ export function updateInvasions(state: GameState, content: GameContent, now: num
   const current = state.invasion;
   if (current && now >= current.expiresAt) {
     state.counters.eventsMissed += 1;
+    state.run.eventsMissed += 1;
     state.eventStreak = 0;
     state.invasion = null;
     emit({ type: 'invasionMissed', uid: current.uid, def: current.def });
@@ -87,6 +88,7 @@ export function hitInvasion(state: GameState, content: GameContent, now: number,
   state.invasion = null;
   state.eventStreak += 1;
   state.counters.eventsDefended += 1;
+  state.run.eventsDefended += 1;
   state.counters.bestEventStreak = Math.max(state.counters.bestEventStreak, state.eventStreak);
   recordSprintEvent(state, content, { kind: 'defendEvents', amount: 1 });
   const reward = grantReward(state, content, def.reward, 'invasion', now, emit);

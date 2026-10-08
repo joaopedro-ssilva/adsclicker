@@ -31,7 +31,8 @@ export function maxAffordable(coins: Decimal, baseCost: Decimal, level: number, 
 
 // ---------------------------------------------------------------------------
 // Milestones: the output of an upgrade doubles at levels 10, 25, 50, 100, 200 and then every
-// `milestoneStep` levels (BalanceConfig.milestones / milestoneStep / milestoneMult).
+// `milestoneStep` levels (BalanceConfig.milestones / milestoneStep / milestoneMult); the late ones
+// can be worth more (milestoneMults).
 // ---------------------------------------------------------------------------
 
 /** The n-th milestone level (0-based), or null when there is none. */
@@ -56,9 +57,25 @@ export function milestonesReached(level: number, balance: BalanceConfig): number
   return reached;
 }
 
-/** Output multiplier from milestones: milestoneMult ^ milestonesReached. */
+/** Multiplier of the milestone at `level`: milestoneMult, or the larger one set in milestoneMults. */
+export function milestoneMultAt(level: number, balance: BalanceConfig): number {
+  return balance.milestoneMults?.[level] ?? balance.milestoneMult;
+}
+
+/**
+ * Output multiplier from milestones: milestoneMult for each one reached, with the bigger late
+ * ones (milestoneMults) swapped in. The listed levels are few, so this stays cheap per call.
+ */
 export function milestoneMultiplier(level: number, balance: BalanceConfig): Decimal {
-  return Decimal.pow(balance.milestoneMult, milestonesReached(level, balance));
+  let result = Decimal.pow(balance.milestoneMult, milestonesReached(level, balance));
+  const boosts = balance.milestoneMults;
+  if (boosts) {
+    for (const key in boosts) {
+      const at = Number(key);
+      if (at <= level) result = result.mul((boosts[at] ?? balance.milestoneMult) / balance.milestoneMult);
+    }
+  }
+  return result;
 }
 
 /** Next level that doubles the output, or null. */

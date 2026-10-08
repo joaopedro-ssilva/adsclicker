@@ -3,9 +3,9 @@ import type { GameContent, ProfessorId } from '../content/types';
 import { grantAchievementRewards } from './achievements';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
-import { createInitialState } from './init';
+import { createInitialState, createRunStats } from './init';
 import { MAX_CARGO_BONUS, MAX_DEV_MULTIPLIER, MAX_MENTOR_BONUS, MIN_DEV_MULTIPLIER, SAVE_VERSION } from './state';
-import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, CloudBonus, GameState, Settings } from './state';
+import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, CloudBonus, GameState, LastRun, RunStats, Settings } from './state';
 
 export type RawSave = Record<string, unknown>;
 export type Migration = (raw: RawSave) => RawSave;
@@ -138,6 +138,44 @@ function readSprint(value: unknown, content: GameContent): GameState['sprint'] {
   return fresh;
 }
 
+function readRun(value: unknown): RunStats {
+  const run = createRunStats();
+  if (!isRecord(value)) return run;
+  run.seconds = readNumber(value.seconds, 0, 0);
+  run.clicks = Math.floor(readNumber(value.clicks, 0, 0));
+  run.levelsBought = Math.floor(readNumber(value.levelsBought, 0, 0));
+  run.clickCoins = readDecimal(value.clickCoins);
+  run.sprintsCompleted = Math.floor(readNumber(value.sprintsCompleted, 0, 0));
+  run.sprintsFailed = Math.floor(readNumber(value.sprintsFailed, 0, 0));
+  run.eventsDefended = Math.floor(readNumber(value.eventsDefended, 0, 0));
+  run.eventsMissed = Math.floor(readNumber(value.eventsMissed, 0, 0));
+  return run;
+}
+
+function readLastRun(value: unknown): LastRun | null {
+  if (!isRecord(value)) return null;
+  return {
+    seconds: readNumber(value.seconds, 0, 0),
+    clicks: Math.floor(readNumber(value.clicks, 0, 0)),
+    investedProfessors: Math.floor(readNumber(value.investedProfessors, 0, 0, PROFESSOR_IDS.length)),
+    clickShare: readNumber(value.clickShare, 0, 0, 1),
+    sprintsCompleted: Math.floor(readNumber(value.sprintsCompleted, 0, 0)),
+    sprintsFailed: Math.floor(readNumber(value.sprintsFailed, 0, 0)),
+    eventsDefended: Math.floor(readNumber(value.eventsDefended, 0, 0)),
+    eventsMissed: Math.floor(readNumber(value.eventsMissed, 0, 0)),
+  };
+}
+
+function readCalendar(value: unknown, fallback: GameState['calendar']): GameState['calendar'] {
+  if (!isRecord(value)) return fallback;
+  return {
+    day: Math.floor(readNumber(value.day, 0, 0)),
+    streak: Math.floor(readNumber(value.streak, 0, 0)),
+    gradDay: Math.floor(readNumber(value.gradDay, 0, 0)),
+    gradsToday: Math.floor(readNumber(value.gradsToday, 0, 0)),
+  };
+}
+
 export function readCloudBonus(value: unknown): CloudBonus {
   const bonus: CloudBonus = { cargo: 1, mentors: {} };
   if (!isRecord(value)) return bonus;
@@ -246,6 +284,16 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.eventStreak = Math.floor(readNumber(raw.eventStreak, 0, 0));
   state.sprint = readSprint(raw.sprint, content);
 
+  state.run = readRun(raw.run);
+  state.lastRun = readLastRun(raw.lastRun);
+  state.honoured = isProfessorId(raw.honoured) ? raw.honoured : null;
+  state.honouredBefore = readBooleans(raw.honouredBefore, isProfessorId);
+  state.abilitiesTried = readBooleans(raw.abilitiesTried, (id) => index.abilities.has(id));
+  if (isRecord(raw.session)) {
+    state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };
+  }
+  state.calendar = readCalendar(raw.calendar, state.calendar);
+
   const counters = isRecord(raw.counters) ? raw.counters : {};
   for (const key of Object.keys(state.counters) as (keyof GameState['counters'])[]) {
     state.counters[key] = readNumber(counters[key], 0, 0);
@@ -272,6 +320,7 @@ export function serializeState(state: GameState): string {
     coins: state.coins.toString(),
     runCoins: state.runCoins.toString(),
     lifetimeCoins: state.lifetimeCoins.toString(),
+    run: { ...state.run, clickCoins: state.run.clickCoins.toString() },
   });
 }
 

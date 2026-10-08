@@ -145,6 +145,31 @@ describe('judgeSave: the allowances are earned by waiting', () => {
   }, 60_000);
 });
 
+describe('judgeSave: the new Domínio and honour bonuses', () => {
+  it('allows bigger reward lumps when the state shows a faster pace of invasions', () => {
+    const { previous, next, elapsedMs } = lastWindow({ clicksPerSecond: 4, windows: 10, seed: 1 });
+    for (const state of [previous, next]) state.hired.wagner = true;
+    const plain = judgeSave({ previous, next: roundTrip(next), elapsedMs });
+    expect(plain.ok).toBe(true);
+
+    // Invasions twice as often (honoured Wagner): the lumps they pay can be 20% bigger.
+    const boosted = roundTrip(next);
+    boosted.honoured = 'wagner';
+    const verdict = judgeSave({ previous, next: boosted, elapsedMs });
+    const ratio = (v: typeof plain) => (v.ok ? v.ratio : Infinity);
+    expect(verdict.ok).toBe(true);
+    expect(ratio(verdict)).toBeLessThan(ratio(plain));
+  }, 60_000);
+
+  it('still refuses coins far beyond what the boosted state can make', () => {
+    const { previous, next, elapsedMs } = lastWindow({ clicksPerSecond: 4, windows: 10, seed: 1 });
+    next.honoured = 'edecio';
+    next.lifetimeCoins = next.lifetimeCoins.mul(1e9);
+    next.runCoins = next.runCoins.mul(1e9);
+    expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
+  }, 60_000);
+});
+
 describe('isRollback', () => {
   it('is true for older progress and false for newer', () => {
     const { previous, next } = lastWindow({ clicksPerSecond: 4, windows: 6, seed: 2 });

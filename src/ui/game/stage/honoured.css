@@ -1,0 +1,18 @@
+/* Mark on the roster slot of the professor honoured for this turma. */
+
+.roster-slot[data-honoured] {
+  position: relative;
+  border-color: var(--legendary);
+}
+
+.roster-honour {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  width: 16px;
+  height: 16px;
+  background: var(--legendary);
+  border: 2px solid var(--bg);
+  /* A five-point star cut out of the square. */
+  clip-path: polygon(50% 0, 62% 35%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 35%);
+}

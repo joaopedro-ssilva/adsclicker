@@ -301,6 +301,35 @@ describe('actions', () => {
     store.getState().shutdown();
   });
 
+  it('honours the professor picked at graduation, and starts each boot as a new sitting', () => {
+    const { store } = setup((state) => {
+      state.hired.gladimir = true;
+      state.hired.b2 = true;
+      state.hired.guto = true;
+      state.hired.angelo = true;
+      state.runCoins = new Decimal(1e6);
+      state.session = { seconds: 5000, activeAt: T0 - 10_000 };
+    });
+    store.getState().boot();
+    expect(store.getState().state.session.seconds).toBeLessThan(5);
+    expect(store.getState().graduate('pablo')).toBe(true); // not hired: nobody is honoured
+    expect(store.getState().state.honoured).toBeNull();
+    store.getState().shutdown();
+
+    const { store: other } = setup((state) => {
+      state.hired.gladimir = true;
+      state.hired.b2 = true;
+      state.hired.guto = true;
+      state.hired.angelo = true;
+      state.runCoins = new Decimal(1e6);
+    });
+    other.getState().boot();
+    expect(other.getState().graduate('gladimir')).toBe(true);
+    expect(other.getState().state.honoured).toBe('gladimir');
+    expect(other.getState().state.honouredBefore).toEqual({ gladimir: true });
+    other.getState().shutdown();
+  });
+
   it('unlocks secret achievements by trigger', () => {
     const content = createFixtureContent();
     const storage = memoryStorage();

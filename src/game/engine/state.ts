@@ -62,6 +62,35 @@ export interface ActiveSprint {
   refCps?: string;
 }
 
+/** Numbers about the current run only. Zeroed at every graduation. */
+export interface RunStats {
+  /** Seconds of play (offline time excluded). */
+  seconds: number;
+  /** Clicks on the professor. Automatic clicks do not count. */
+  clicks: number;
+  levelsBought: number;
+  /** Coins earned by clicks, manual and automatic. */
+  clickCoins: Decimal;
+  sprintsCompleted: number;
+  sprintsFailed: number;
+  eventsDefended: number;
+  eventsMissed: number;
+}
+
+/** What the run closed by the latest graduation looked like, for the achievements that judge a whole run. */
+export interface LastRun {
+  seconds: number;
+  clicks: number;
+  /** Professors with at least one discipline level. */
+  investedProfessors: number;
+  /** 0..1 share of the run's coins that came from clicks. */
+  clickShare: number;
+  sprintsCompleted: number;
+  sprintsFailed: number;
+  eventsDefended: number;
+  eventsMissed: number;
+}
+
 export interface Settings {
   /** 0..1 */
   sfxVolume: number;
@@ -149,6 +178,21 @@ export interface GameState {
   settings: Settings;
 
   cloudBonus: CloudBonus;
+
+  run: RunStats;
+  lastRun: LastRun | null;
+
+  /** Honoured professor of the current run, picked at the last graduation. */
+  honoured: ProfessorId | null;
+  /** Professors ever honoured. */
+  honouredBefore: Record<string, boolean>;
+  /** Abilities used at least once, ever. */
+  abilitiesTried: Record<string, boolean>;
+
+  /** The current sitting: seconds played and when the player last acted. Restarted at every boot. */
+  session: { seconds: number; activeAt: number };
+  /** Calendar days (local, as day numbers): the last day played, the streak and the graduations made on gradDay. */
+  calendar: { day: number; streak: number; gradDay: number; gradsToday: number };
 
   /** Throttles the full achievement scan done by the tick (about once per second). */
   lastAchievementCheckAt: number;

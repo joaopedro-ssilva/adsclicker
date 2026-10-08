@@ -24,7 +24,7 @@ const make = (seed: SceneSeed): SceneryDef => ({
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 14 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 24 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const sceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
@@ -138,5 +138,85 @@ export const sceneries: SceneryDef[] = [
     ambient: 'confetti',
     palette: ['#3a1f4f', '#7a2f5f', '#8a5a3a'],
     scene: 'graduation auditorium with a wide stage, deep red curtains, a congratulations banner and rows of seats, warm spotlights',
+  }),
+  make({
+    id: 'cantina',
+    name: 'Cantina',
+    description: 'Balcão, salgados na estufa e mesas de plástico. O café aqui custa mais que a aula.',
+    ambient: 'dust',
+    palette: ['#e8d9b8', '#c9a46a', '#7a5a3a'],
+    scene: 'college canteen with a long counter, a glass snack warmer, plastic tables and chairs and a menu board, warm lunchtime light',
+  }),
+  make({
+    id: 'biblioteca',
+    name: 'Biblioteca',
+    description: 'Estantes até o teto e silêncio quase total. O quase é do ar-condicionado.',
+    ambient: 'dust',
+    palette: ['#2a1e14', '#5a3d24', '#4a3220'],
+    scene: 'old university library with tall wooden bookshelves up to the ceiling, reading tables with green lamps and a rolling ladder, warm dim light',
+  }),
+  make({
+    id: 'quadra-de-padel',
+    name: 'Quadra de Padel',
+    description: 'Paredes de vidro, grade e rede no meio. A reunião de quinta acontece aqui.',
+    ambient: 'none',
+    palette: ['#bfe3f2', '#5fa8c9', '#2e6fa8'],
+    scene: 'padel court with glass walls, metal fencing and a net in the middle, blue court floor, bright afternoon sky',
+  }),
+  make({
+    id: 'madrugada',
+    name: 'Madrugada no Laboratório',
+    description: 'Monitores acesos, café frio e um bug que só aparece às 4h.',
+    ambient: 'code',
+    palette: ['#050a14', '#0d1b33', '#1a1d26'],
+    scene: 'dark computer lab at night, rows of glowing monitors, cold coffee mugs, a window showing a deep blue night sky, moody blue light',
+  }),
+  make({
+    id: 'orla',
+    name: 'Orla do Guaíba',
+    description: 'Pôr do sol na beira do rio, com ciclistas e gente tomando chimarrão.',
+    ambient: 'leaves',
+    palette: ['#f6a05a', '#e8704f', '#6b5a4a'],
+    scene: 'riverside promenade at sunset on a wide calm river, wooden pier, lamp posts and trees, orange and pink sky',
+  }),
+  make({
+    id: 'servidor-antigo',
+    name: 'Sala do Servidor Antigo',
+    description: 'Torre bege zumbindo no canto e cabos que ninguém sabe para onde vão.',
+    ambient: 'dust',
+    palette: ['#2b2b24', '#4a4a3a', '#3a3a30'],
+    scene: 'old server room with beige tower computers, tangled cables, a CRT monitor and dusty shelves, dim greenish light',
+  }),
+  make({
+    id: 'feira',
+    name: 'Feira de Tecnologia',
+    description: 'Estandes com robôs, faixas e gente apresentando projeto de última hora.',
+    ambient: 'confetti',
+    palette: ['#cfe8f7', '#8ab8d9', '#9a9aa5'],
+    scene: 'technology fair hall with colorful booths, small robots, banners and demo screens, bright indoor lighting',
+  }),
+  make({
+    id: 'estudio',
+    name: 'Estúdio de Podcast',
+    description: 'Microfones, espuma acústica e uma luz de gravação que não apaga.',
+    ambient: 'none',
+    palette: ['#1a0f24', '#3a1f4a', '#2a2030'],
+    scene: 'podcast studio with big microphones on arms, acoustic foam panels, a neon on-air sign and a mixing desk, purple and warm light',
+  }),
+  make({
+    id: 'espaco',
+    name: 'Estação Orbital',
+    description: 'Janelões para a Terra e zero gravidade para o prazo de entrega.',
+    ambient: 'stars',
+    palette: ['#02030c', '#0b1a3a', '#2a3042'],
+    scene: 'orbital space station interior with a big window showing planet Earth and stars, metal panels and glowing control consoles, cool light',
+  }),
+  make({
+    id: 'trofeus',
+    name: 'Sala dos Troféus',
+    description: 'Vitrines cheias de taças e medalhas. Falta só espaço para a próxima.',
+    ambient: 'confetti',
+    palette: ['#2c1c10', '#6b4a22', '#4a2e18'],
+    scene: 'trophy room with glass display cases full of golden cups, medals and framed certificates, polished wooden floor, warm golden light',
   }),
 ];

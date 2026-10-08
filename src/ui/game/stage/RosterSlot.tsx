@@ -17,26 +17,30 @@ export interface RosterSlotProps {
   affordable: boolean;
   /** Why the next professor cannot be hired yet, when it is not a matter of coins. */
   lockReason: string | null;
+  /** The professor honoured for this turma (picked at the last graduation). */
+  honoured: boolean;
   onSelect: (id: ProfessorId) => void;
   onHire: (id: ProfessorId) => void;
 }
 
-function HiredSlot({ id, name, color, state, onSelect }: RosterSlotProps) {
+function HiredSlot({ id, name, color, state, honoured, onSelect }: RosterSlotProps) {
   return (
     <button
       type="button"
       className="roster-slot"
       data-state={state}
       data-qa={`roster-${id}`}
+      data-honoured={honoured || undefined}
       style={cssVariables({ '--prof': color })}
       aria-pressed={state === 'active'}
-      aria-label={state === 'active' ? `${name}, selecionado` : `Selecionar ${name}`}
+      aria-label={`${state === 'active' ? `${name}, selecionado` : `Selecionar ${name}`}${honoured ? ', homenageado' : ''}`}
       onClick={() => onSelect(id)}
     >
       <span className="roster-face">
         <HeadPortrait professorId={id} fallback={name} />
       </span>
       <span className="roster-name">{name}</span>
+      {honoured ? <span className="roster-honour" title="Professor homenageado nesta turma" aria-hidden="true" /> : null}
     </button>
   );
 }

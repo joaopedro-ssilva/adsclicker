@@ -12,6 +12,7 @@ import type {
   Feature,
   GameContent,
   InvasionDef,
+  MasteryDef,
   PrestigeNodeDef,
   ProfessorDef,
   ProfessorId,
@@ -114,6 +115,7 @@ export const fixtureBalance: BalanceConfig = {
   milestones: [10, 25, 50, 100, 200],
   milestoneStep: 100,
   milestoneMult: 2,
+  mastery: { step: 25, cap: 40 },
   tierUnlockLevel: 10,
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 5 },
@@ -301,6 +303,15 @@ const achievements: AchievementDef[] = [
   achievement('a-secret', { kind: 'secret', trigger: 'konami' }, { skin: 'gladimir-dba' }, true),
 ];
 
+/** Domínio that changes nothing, so engine tests keep their plain numbers; the real content is tested on its own. */
+function neutralMastery(): Record<ProfessorId, MasteryDef> {
+  const result = {} as Record<ProfessorId, MasteryDef>;
+  for (const id of PROFESSOR_IDS) {
+    result[id] = { professor: id, perRank: [], line: '', units: [], honour: { name: id, description: id } };
+  }
+  return result;
+}
+
 /** Fresh copy each time, so a test can adjust the balance or lists without affecting others. */
 export function createFixtureContent(): GameContent {
   return {
@@ -316,6 +327,7 @@ export function createFixtureContent(): GameContent {
     skins: [...skins],
     sceneries: [scenery('sala', true), scenery('laboratorio')],
     themes: [theme('escuro', true), theme('claro')],
+    mastery: neutralMastery(),
     balance: { ...fixtureBalance, graduation: { ...fixtureBalance.graduation } },
   };
 }

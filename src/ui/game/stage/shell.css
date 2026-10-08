@@ -11,11 +11,17 @@
 
 .game {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(440px, 34vw, 500px);
+  grid-template-columns: minmax(0, 1fr) clamp(460px, 35vw, 520px);
   height: 100dvh;
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
+}
+
+/* Panel hidden by the player: the stage takes everything. */
+.game[data-panel='closed'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
 }
 
 .game-stage {

@@ -13,6 +13,7 @@ export function Roster() {
   const coins = useGameState((state) => state.coins);
   const setActive = useGame((store) => store.setActiveProfessor);
   const hire = useGame((store) => store.hireProfessor);
+  const honoured = useGameState((state) => state.honoured);
 
   const select = useCallback(
     (id: ProfessorId) => {
@@ -50,6 +51,7 @@ export function Roster() {
             progress={state === 'next' ? Math.floor(ratio(coins, view.hireCost) * 100) : 0}
             affordable={view.affordable}
             lockReason={state === 'next' && !view.canBeHired ? view.lockReason : null}
+            honoured={view.id === honoured}
             onSelect={select}
             onHire={hireOne}
           />

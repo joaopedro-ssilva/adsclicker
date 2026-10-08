@@ -21,46 +21,64 @@ const EXPECTED_SKIN_IDS = [
   'edecio-cria',
   'edecio-prisioneiro',
   'edecio-atleta',
+  'edecio-gauchao',
   'edecio-full-dima',
   'edecio-ceo',
   'edecio-gladiador',
+  'edecio-formando',
   'edecio-samurai',
+  'edecio-lenda',
   'gladimir-default',
   'gladimir-dba',
+  'gladimir-pescador',
   'gladimir-maker',
+  'gladimir-bibliotecario',
   'gladimir-piloto',
   'gladimir-mestre',
+  'gladimir-guardiao',
   'b2-default',
   'b2-postit',
+  'b2-obra',
   'b2-wireframe',
   'b2-darkmode',
+  'b2-pixel',
   'b2-paleta',
   'wagner-default',
   'wagner-hacker',
   'wagner-agente',
+  'wagner-detetive',
   'wagner-firewall',
   'wagner-cripto',
+  'wagner-cavaleiro',
   'guto-default',
   'guto-churrasqueiro',
   'guto-pagodeiro',
   'guto-dj',
+  'guto-paladino',
+  'guto-capitao',
   'guto-astronauta',
   'b1-default',
   'b1-po',
   'b1-flexbox',
+  'b1-scrum',
   'b1-lancamento',
+  'b1-arquiteta',
   'b1-rainha',
   'angelo-default',
   'angelo-terno',
   'angelo-maestro',
   'angelo-padel',
   'angelo-paraninfo',
+  'angelo-capitao',
   'angelo-rei',
+  'angelo-reitor',
   'pablo-default',
   'pablo-cientista',
   'pablo-enxadrista',
+  'pablo-garagem',
   'pablo-mago',
   'pablo-galactico',
+  'pablo-oraculo',
 ];
 
 const EXPECTED_SKIN_RARITY: Record<string, string> = {
@@ -71,64 +89,92 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'edecio-cria': 'rare',
   'edecio-prisioneiro': 'rare',
   'edecio-atleta': 'rare',
+  'edecio-gauchao': 'rare',
   'edecio-full-dima': 'epic',
   'edecio-ceo': 'epic',
   'edecio-gladiador': 'epic',
+  'edecio-formando': 'epic',
   'edecio-samurai': 'legendary',
+  'edecio-lenda': 'legendary',
   'gladimir-default': 'common',
   'gladimir-dba': 'common',
+  'gladimir-pescador': 'common',
   'gladimir-maker': 'rare',
+  'gladimir-bibliotecario': 'rare',
   'gladimir-piloto': 'epic',
   'gladimir-mestre': 'legendary',
+  'gladimir-guardiao': 'legendary',
   'b2-default': 'common',
   'b2-postit': 'common',
+  'b2-obra': 'common',
   'b2-wireframe': 'rare',
   'b2-darkmode': 'epic',
+  'b2-pixel': 'epic',
   'b2-paleta': 'legendary',
   'wagner-default': 'common',
   'wagner-hacker': 'common',
   'wagner-agente': 'rare',
+  'wagner-detetive': 'rare',
   'wagner-firewall': 'epic',
   'wagner-cripto': 'legendary',
+  'wagner-cavaleiro': 'legendary',
   'guto-default': 'common',
   'guto-churrasqueiro': 'common',
   'guto-pagodeiro': 'rare',
   'guto-dj': 'epic',
+  'guto-paladino': 'epic',
+  'guto-capitao': 'epic',
   'guto-astronauta': 'legendary',
   'b1-default': 'common',
   'b1-po': 'common',
   'b1-flexbox': 'rare',
+  'b1-scrum': 'rare',
   'b1-lancamento': 'epic',
+  'b1-arquiteta': 'epic',
   'b1-rainha': 'legendary',
   'angelo-default': 'common',
   'angelo-terno': 'common',
   'angelo-maestro': 'rare',
   'angelo-padel': 'rare',
   'angelo-paraninfo': 'epic',
+  'angelo-capitao': 'epic',
   'angelo-rei': 'legendary',
+  'angelo-reitor': 'legendary',
   'pablo-default': 'common',
   'pablo-cientista': 'common',
   'pablo-enxadrista': 'rare',
+  'pablo-garagem': 'rare',
   'pablo-mago': 'epic',
   'pablo-galactico': 'legendary',
+  'pablo-oraculo': 'legendary',
 };
 
 const SKINS_WITH_HEADGEAR = [
   'edecio-cria',
+  'edecio-gauchao',
   'edecio-full-dima',
   'edecio-gladiador',
+  'edecio-formando',
   'edecio-samurai',
+  'gladimir-pescador',
   'gladimir-maker',
   'gladimir-piloto',
   'gladimir-mestre',
+  'gladimir-guardiao',
+  'b2-obra',
   'wagner-agente',
+  'wagner-detetive',
   'wagner-cripto',
+  'wagner-cavaleiro',
   'guto-pagodeiro',
+  'guto-capitao',
   'guto-astronauta',
   'b1-rainha',
   'angelo-padel',
   'angelo-paraninfo',
   'angelo-rei',
+  'angelo-reitor',
+  'pablo-garagem',
   'pablo-mago',
   'pablo-galactico',
 ];
@@ -148,6 +194,16 @@ const EXPECTED_SCENERY_IDS = [
   'datacenter',
   'coordenacao',
   'formatura',
+  'cantina',
+  'biblioteca',
+  'quadra-de-padel',
+  'madrugada',
+  'orla',
+  'servidor-antigo',
+  'feira',
+  'estudio',
+  'espaco',
+  'trofeus',
 ];
 
 const EXPECTED_AMBIENT: Record<string, string> = {
@@ -165,6 +221,16 @@ const EXPECTED_AMBIENT: Record<string, string> = {
   datacenter: 'code',
   coordenacao: 'dust',
   formatura: 'confetti',
+  cantina: 'dust',
+  biblioteca: 'dust',
+  'quadra-de-padel': 'none',
+  madrugada: 'code',
+  orla: 'leaves',
+  'servidor-antigo': 'dust',
+  feira: 'confetti',
+  estudio: 'none',
+  espaco: 'stars',
+  trofeus: 'confetti',
 };
 
 const ORIGINAL_UPGRADE_NAMES = [
@@ -564,7 +630,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 47 skins of the design, with their rarities', () => {
+  it('has exactly the 65 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -591,7 +657,7 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has exactly the 14 sceneries of the design with one default', () => {
+  it('has exactly the 24 sceneries of the design with one default', () => {
     expect(sceneryIds).toEqual(EXPECTED_SCENERY_IDS);
     expect(content.sceneries.filter((scenery) => scenery.default === true).map((scenery) => scenery.id)).toEqual([
       'sala-de-aula',
@@ -635,9 +701,9 @@ describe('content: skins, sceneries and themes', () => {
 });
 
 describe('content: achievements', () => {
-  it('has about 90 achievements spread over the families of the design', () => {
-    expect(content.achievements.length).toBeGreaterThanOrEqual(88);
-    expect(content.achievements.length).toBeLessThanOrEqual(98);
+  it('has about 115 achievements spread over the families of the design', () => {
+    expect(content.achievements.length).toBeGreaterThanOrEqual(110);
+    expect(content.achievements.length).toBeLessThanOrEqual(120);
     const count = (family: string) => content.achievements.filter((a) => a.family === family).length;
     expect(count('click')).toBeGreaterThanOrEqual(10);
     expect(count('production')).toBeGreaterThanOrEqual(12);
@@ -678,8 +744,8 @@ describe('content: achievements', () => {
   it('gives rarer skins to harder achievements within each source family', () => {
     const byRarity = (rarity: string) =>
       content.achievements.filter((a) => a.reward?.skin && EXPECTED_SKIN_RARITY[a.reward.skin] === rarity);
-    // Legendary skins come only from the level 100 ladder; epic ones from research or big counters.
-    for (const achievement of byRarity('legendary')) expect(achievement.id).toMatch(/^lvl100-/);
+    // Legendary skins come from the level 100 ladder or from a long-haul challenge; never from hiring or early counters.
+    for (const achievement of byRarity('legendary')) expect(achievement.id).not.toMatch(/^hire-|^click-(100|500|1k|5k)$/);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });
@@ -728,6 +794,72 @@ describe('content: heritage and tone', () => {
     for (const professor of Object.values(content.professors)) {
       const lines = [professor.tagline, professor.quotes.hire, ...professor.quotes.click, ...professor.quotes.idle];
       for (const line of [...lines, ...professor.quotes.milestone]) expect(line).not.toMatch(banned);
+    }
+  });
+});
+
+describe('content: Domínio, milestones and the new skins', () => {
+  const RARITY_ORDER = ['common', 'rare', 'epic', 'legendary'];
+
+  it('keeps each professor skin list ordered by rarity', () => {
+    for (const id of PROFESSOR_IDS) {
+      const ranks = content.skins.filter((skin) => skin.professor === id).map((skin) => RARITY_ORDER.indexOf(skin.rarity));
+      expect(ranks, id).toEqual([...ranks].sort((a, b) => a - b));
+    }
+  });
+
+  it('gives every professor a Domínio with real effects and an honour boost', () => {
+    const { step, cap } = content.balance.mastery;
+    expect(step).toBe(25);
+    expect(cap).toBeGreaterThanOrEqual(30);
+    expect(cap).toBeLessThanOrEqual(50);
+    for (const id of PROFESSOR_IDS) {
+      const def = content.mastery[id];
+      expect(def.professor).toBe(id);
+      expect(def.perRank.length, id).toBeGreaterThan(0);
+      expect(def.line).toContain('{v}');
+      expect(def.units.length, id).toBe(def.perRank.length);
+      expect(`${def.honour.name} ${def.honour.description}`.length).toBeGreaterThan(10);
+      expect((def.honour.flat?.length ?? 0) + (def.honour.perRank?.length ?? 0), id).toBeGreaterThan(0);
+      const all = [...def.perRank, ...(def.honour.flat ?? []), ...(def.honour.perRank ?? [])];
+      for (const effect of all) {
+        // The only mult of zero is the honoured Edécio's combo, which never falls.
+        const allowZero = effect.stat === 'comboDecay' && effect.value === 0;
+        if (allowZero) continue;
+        expect(effectProblems(effect), `${id} ${effect.stat}`).toEqual([]);
+      }
+    }
+  });
+
+  it('puts the late milestones on real milestone levels, growing', () => {
+    const mults = content.balance.milestoneMults ?? {};
+    const milestones = [...content.balance.milestones];
+    for (let level = content.balance.milestones.at(-1)! + content.balance.milestoneStep; level <= 1000; level += content.balance.milestoneStep) {
+      milestones.push(level);
+    }
+    for (const level of Object.keys(mults).map(Number)) expect(milestones, `milestone ${level}`).toContain(level);
+    expect(mults[200]).toBeGreaterThan(content.balance.milestoneMult);
+    expect(mults[400]).toBeGreaterThanOrEqual(mults[300] ?? 0);
+    expect(mults[300]).toBeGreaterThanOrEqual(mults[200] ?? 0);
+  });
+
+  it('has a Domínio achievement at the real cap', () => {
+    const cap = content.achievements.find((a) => a.id === 'mastery-gladimir');
+    expect(cap?.condition).toEqual({ kind: 'mastery', professor: 'gladimir', rank: content.balance.mastery.cap });
+  });
+
+  it('counts every skin in the album achievement', () => {
+    const all = content.achievements.find((a) => a.id === 'skins-all');
+    expect(all?.condition).toEqual({ kind: 'skinsOwned', gte: content.skins.length });
+    expect(all?.description).toContain(String(content.skins.length));
+  });
+
+  it('only names professors, disciplines and rarities that exist in the new conditions', () => {
+    for (const achievement of content.achievements) {
+      const condition = achievement.condition;
+      if (condition.kind === 'professorLevels') expect(professorSet.has(condition.professor)).toBe(true);
+      if (condition.kind === 'mastery' && condition.professor) expect(professorSet.has(condition.professor)).toBe(true);
+      if (condition.kind === 'rarityOwned') expect(content.skins.some((s) => s.rarity === condition.rarity)).toBe(true);
     }
   });
 });

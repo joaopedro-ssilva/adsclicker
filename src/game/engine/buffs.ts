@@ -56,6 +56,7 @@ export function activateAbility(state: GameState, content: GameContent, id: stri
   const stats = computeStats(state, content);
   state.abilityReadyAt[id] = now + def.cooldownMs * stats.abilityCooldown;
   state.counters.abilitiesUsed += 1;
+  state.abilitiesTried[id] = true;
   emit({ type: 'abilityUsed', id });
   startBuff(state, def.buff, 'ability', stats, now, emit);
   return true;

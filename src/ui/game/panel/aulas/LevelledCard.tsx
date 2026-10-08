@@ -55,7 +55,7 @@ export const LevelledCard = memo(function LevelledCard({ id, kind }: LevelledCar
               </span>
               {kind === 'discipline' && data.share > 0 ? <span className="lesson-card-share">{data.share}% do total</span> : null}
             </p>
-            <MilestoneBar filledSegments={data.filledSegments} nextMilestone={data.nextMilestone} />
+            <MilestoneBar filledSegments={data.filledSegments} nextMilestone={data.nextMilestone} nextMult={data.nextMilestoneMult} />
           </>
         ) : (
           <p className="lesson-card-lock">{data.lockReason}</p>

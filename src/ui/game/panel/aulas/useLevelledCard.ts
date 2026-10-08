@@ -21,6 +21,7 @@ export interface CardData {
   output: string;
   gain: string;
   nextMilestone: number | null;
+  nextMilestoneMult: number;
   filledSegments: number;
   /** Percent of the total coins/second, whole number. */
   share: number;
@@ -46,6 +47,7 @@ export function useLevelledCard(id: string): CardData | null {
         output: fmt(view.output),
         gain: fmt(view.outputGain),
         nextMilestone: view.nextMilestone,
+        nextMilestoneMult: view.nextMilestoneMult,
         filledSegments: Math.floor(view.milestoneProgress * MILESTONE_SEGMENTS),
         share: Math.round(view.share * 100),
       };

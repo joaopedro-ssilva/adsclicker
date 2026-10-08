@@ -78,7 +78,7 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
   });
 
   /** Registers a guest with a few syncs and returns what the browser would hold. */
-  async function newPlayer(options: { nickname?: string; password?: string; windows?: number; seed?: number; ip?: string } = {}) {
+  async function newPlayer(options: { nickname?: string; password?: string; legacy?: boolean; windows?: number; seed?: number; ip?: string } = {}) {
     const states = savesOf(options.windows ?? 3, { seed: options.seed ?? 1 });
     let token: string | null = null;
     let rev = 0;
@@ -95,10 +95,12 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     if (!token) throw new Error('no token');
     const headers = new Headers({ cookie: `${SESSION_COOKIE}=${token}` });
     if (options.nickname) {
+      // Claiming a nickname sets the password in the same step.
       const authed = await requireSession(db, headers, now);
-      await setNickname(db, authed, { nickname: options.nickname }, now);
-    }
-    if (options.password) {
+      await setNickname(db, authed, { nickname: options.nickname, password: options.password ?? 'senha-padrao' }, now);
+      // An account made before the password became mandatory: a nickname and no password.
+      if (options.legacy) await db.update(players).set({ passwordHash: null }).where(eq(players.id, id));
+    } else if (options.password) {
       const authed = await requireSession(db, headers, now);
       await setPassword(db, authed, { password: options.password }, now);
     }
@@ -315,23 +317,44 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       const maria = await newPlayer({ nickname: 'Maria', seed: 1, ip: '10.0.1.1' });
       const other = await newPlayer({ seed: 2, ip: '10.0.1.2' });
       const authed = await requireSession(db, other.headers, other.now);
-      const taken = await expectFailure(setNickname(db, authed, { nickname: 'MÁRIA' }, other.now), 'nickname_taken');
+      const taken = await expectFailure(setNickname(db, authed, { nickname: 'MÁRIA', password: 'segredo1' }, other.now), 'nickname_taken');
       expect(taken.message).toBe('Esse apelido já está em uso.');
+      // A refused claim leaves the guest without a password too.
+      const [guestRow] = await db.select({ hash: players.passwordHash }).from(players).where(eq(players.id, other.id));
+      expect(guestRow!.hash).toBeNull();
 
       const [row] = await db.select({ nickname: players.nickname }).from(players).where(eq(players.id, maria.id));
       expect(row!.nickname).toBe('Maria');
 
-      // The owner may change the capitalisation of their own nickname.
+      // The owner may change the capitalisation of their own nickname, with their password.
       const owner = await requireSession(db, maria.headers, maria.now);
-      const changed = await setNickname(db, owner, { nickname: 'MARIA' }, maria.now);
+      await expectFailure(setNickname(db, owner, { nickname: 'MARIA', password: 'errada-123' }, maria.now), 'wrong_credentials');
+      const changed = await setNickname(db, owner, { nickname: 'MARIA', password: 'senha-padrao' }, maria.now);
       expect(changed.me.nickname).toBe('MARIA');
+    });
+
+    it('requires a password to claim a nickname and stores it with the claim', async () => {
+      const player = await newPlayer({ windows: 1 });
+      const authed = await requireSession(db, player.headers, player.now);
+      const claimed = await setNickname(db, authed, { nickname: 'Estrela', password: 'segredo1' }, player.now);
+      expect(claimed.me).toMatchObject({ nickname: 'Estrela', hasPassword: true });
+      const again = await login(db, { nickname: 'Estrela', password: 'segredo1' }, { ip: '10.0.9.1', currentToken: null, now: player.now });
+      expect(again.body.me.id).toBe(player.id);
+    });
+
+    it('keeps an account with a nickname and no password working, and lets it set one later', async () => {
+      const legacy = await newPlayer({ nickname: 'Sem Senha', legacy: true, windows: 1 });
+      expect((await getMe(db, legacy.headers, legacy.now)).body.me).toMatchObject({ nickname: 'Sem Senha', hasPassword: false, ranked: true });
+      const authed = await requireSession(db, legacy.headers, legacy.now);
+      const set = await setPassword(db, authed, { password: 'segredo1' }, legacy.now);
+      expect(set.me.hasPassword).toBe(true);
     });
 
     it('refuses blocked nicknames', async () => {
       const player = await newPlayer({ windows: 1 });
       const authed = await requireSession(db, player.headers, player.now);
       for (const nickname of ['Admin', 'Moderador', 'p.u.t.a']) {
-        await expectFailure(setNickname(db, authed, { nickname }, player.now), 'invalid');
+        await expectFailure(setNickname(db, authed, { nickname, password: 'segredo1' }, player.now), 'invalid');
       }
     });
 
@@ -339,7 +362,7 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       const player = await newPlayer({ windows: 2 });
       expect((await getMe(db, player.headers, player.now)).body.me).toMatchObject({ nickname: null, ranked: false });
       const authed = await requireSession(db, player.headers, player.now);
-      const result = await setNickname(db, authed, { nickname: 'Estrela' }, player.now);
+      const result = await setNickname(db, authed, { nickname: 'Estrela', password: 'segredo1' }, player.now);
       expect(result.me).toMatchObject({ nickname: 'Estrela', ranked: true, unrankedReason: null });
       const board = await getLeaderboard(db, 'coins', player.now);
       expect(board.entries.map((entry) => entry.nickname)).toEqual(['Estrela']);
@@ -350,8 +373,8 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     it('limits nickname changes to 5 an hour', async () => {
       const player = await newPlayer({ windows: 1 });
       const authed = await requireSession(db, player.headers, player.now);
-      for (let i = 0; i < 5; i += 1) await setNickname(db, authed, { nickname: `Nome${i}x` }, player.now + i);
-      await expectFailure(setNickname(db, authed, { nickname: 'Nome9x' }, player.now + 10), 'rate_limited');
+      for (let i = 0; i < 5; i += 1) await setNickname(db, authed, { nickname: `Nome${i}x`, password: 'segredo1' }, player.now + i);
+      await expectFailure(setNickname(db, authed, { nickname: 'Nome9x', password: 'segredo1' }, player.now + 10), 'rate_limited');
     });
 
     it('sets a password once and requires the current one to change it, signing out other devices', async () => {
@@ -390,7 +413,7 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
 
     it('answers identically for an unknown nickname, a wrong password and an account without a password', async () => {
       await newPlayer({ nickname: 'Maria Silva', password: 'segredo1', seed: 1, ip: '10.0.4.1' });
-      await newPlayer({ nickname: 'Sem Senha', seed: 2, ip: '10.0.4.2' });
+      await newPlayer({ nickname: 'Sem Senha', legacy: true, seed: 2, ip: '10.0.4.2' });
       const attempts = [
         { nickname: 'Maria Silva', password: 'errada1' },
         { nickname: 'Ninguem Aqui', password: 'segredo1' },

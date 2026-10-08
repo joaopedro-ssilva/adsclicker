@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 46 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 65 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -89,6 +89,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'white and blue football kit with shorts and long socks, football boots, soccer ball at his feet',
     },
     {
+      id: 'edecio-gauchao',
+      name: 'Gauchão',
+      rarity: 'rare',
+      description: 'Bombacha, lenço no pescoço e cuia de chimarrão. A aula só começa quando a água esquenta.',
+      headgear: true,
+      palette: ['#6b4a2b', '#c0392b', '#e8d7b5'],
+      artPrompt: 'gaucho outfit: baggy bombacha trousers tucked into boots, red neckerchief, rustic shirt, holding a chimarrao gourd with a metal straw, wide-brim gaucho hat',
+    },
+    {
       id: 'edecio-full-dima',
       name: 'Full Dima',
       rarity: 'epic',
@@ -115,6 +124,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'Roman gladiator armor with bronze chest plate, red cape, leather skirt strips, sandals, short sword in hand',
     },
     {
+      id: 'edecio-formando',
+      name: 'Formando de 1900',
+      rarity: 'epic',
+      description: 'Terno antigo, cartola e bengala. Formou-se em 1900 e ainda cumprimenta a turma toda.',
+      headgear: true,
+      palette: ['#2b2b33', '#8c6a3b', '#e8e0cc'],
+      artPrompt: 'old-fashioned black frock coat suit, waistcoat with a pocket watch chain, white shirt, holding a wooden cane, tall top hat',
+    },
+    {
       id: 'edecio-samurai',
       name: 'Samurai',
       rarity: 'legendary',
@@ -122,6 +140,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#1f5f6b', '#d7b44a', '#15212a'],
       artPrompt: 'deep teal samurai armor with gold trim, shoulder plates, katana at the hip, dark hakama pants, sandals',
+    },
+    {
+      id: 'edecio-lenda',
+      name: 'Lenda do Joinha',
+      rarity: 'legendary',
+      description: 'Traje dourado e uma mão gigante de joinha. Dizem que ele nunca errou um "muito legal".',
+      palette: ['#f5c542', '#b8860b', '#fff4c2'],
+      artPrompt: 'shiny golden suit, one arm raised holding a giant golden thumbs up hand',
     },
   ]),
   ...make('gladimir', [
@@ -143,6 +169,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'navy utility vest over a grey shirt, coiled network cable over one shoulder, mug printed with SELECT *, dark trousers',
     },
     {
+      id: 'gladimir-pescador',
+      name: 'Pescador de Dados',
+      rarity: 'common',
+      description: 'Colete de pesca, vara e balde. Joga o anzol no data lake e espera o peixe morder.',
+      headgear: true,
+      palette: ['#3f6b4a', '#d8b25a', '#7fa8c9'],
+      artPrompt: 'fishing vest with many pockets over a plaid shirt, cargo trousers, holding a fishing rod and a small bucket, bucket fishing hat',
+    },
+    {
       id: 'gladimir-maker',
       name: 'Maker IoT',
       rarity: 'rare',
@@ -150,6 +185,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#f2f2f2', '#2ec27e', '#3b82f6'],
       artPrompt: 'white lab coat covered in small sensors and blinking LEDs, holding a breadboard with wires, jeans, sneakers',
+    },
+    {
+      id: 'gladimir-bibliotecario',
+      name: 'Bibliotecário',
+      rarity: 'rare',
+      description: 'Cardigã e uma pilha de livros. Toda consulta vem com referência e índice remissivo.',
+      palette: ['#7b5a3c', '#e4d7b8', '#a33b3b'],
+      artPrompt: 'knit cardigan over a collared shirt, corduroy trousers, carrying a tall stack of books',
     },
     {
       id: 'gladimir-piloto',
@@ -168,6 +211,15 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#d9c7a0', '#6b5a3c', '#4aa8ff'],
       artPrompt: 'beige space knight robe tunic with a brown belt, glowing blue energy sword held in one hand, brown boots',
+    },
+    {
+      id: 'gladimir-guardiao',
+      name: 'Guardião do Backup',
+      rarity: 'legendary',
+      description: 'Armadura e escudo em forma de disquete. Nenhum dado passa sem backup.',
+      headgear: true,
+      palette: ['#6c7a89', '#2b4c8c', '#e6e9ef'],
+      artPrompt: 'full steel armor in blue and silver, large shield shaped like a floppy disk, plumed helmet',
     },
   ]),
   ...make('b2', [
@@ -189,6 +241,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'outfit covered with colorful sticky notes in yellow, pink and blue, marker pen in hand, plain trousers',
     },
     {
+      id: 'b2-obra',
+      name: 'Designer de Capacete',
+      rarity: 'common',
+      description: 'Macacão, capacete de obra e a planta na mão. Todo layout começa pela fundação.',
+      headgear: true,
+      palette: ['#f0a020', '#3a5a8a', '#f2f2f2'],
+      artPrompt: 'orange overalls over a pink tee, reflective stripes, holding a rolled blueprint, yellow hard hat',
+    },
+    {
       id: 'b2-wireframe',
       name: 'Wireframe',
       rarity: 'rare',
@@ -203,6 +264,14 @@ export const skins: SkinDef[] = [
       description: 'Toda de preto com detalhes neon roxos. Seus olhos agradecem à noite.',
       palette: ['#14141c', '#a855f7', '#22d3ee'],
       artPrompt: 'all black outfit with glowing neon purple trim and piping, black boots with neon soles',
+    },
+    {
+      id: 'b2-pixel',
+      name: 'Pixel Perfeita',
+      rarity: 'epic',
+      description: 'Roupa feita de quadrados e uma régua gigante. Aqui nenhum pixel sai do lugar.',
+      palette: ['#ec4899', '#4cc9f0', '#f2f2f2'],
+      artPrompt: 'outfit made of colorful square pixel blocks, holding a giant ruler',
     },
     {
       id: 'b2-paleta',
@@ -241,6 +310,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'slim black suit, thin black tie, white shirt, coiled earpiece cable, polished black shoes',
     },
     {
+      id: 'wagner-detetive',
+      name: 'Detetive',
+      rarity: 'rare',
+      description: 'Sobretudo, chapéu e lupa. O culpado é sempre a senha 123456.',
+      headgear: true,
+      palette: ['#6b5a45', '#2b2b2b', '#d9c9a3'],
+      artPrompt: 'long trench coat with a scarf, holding a large magnifying glass, fedora hat',
+    },
+    {
       id: 'wagner-firewall',
       name: 'Firewall',
       rarity: 'epic',
@@ -256,6 +334,15 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#c7ccd6', '#22c55e', '#f5c542'],
       artPrompt: 'shining silver knight armor with a big padlock emblem on the chest plate, shield decorated with a golden key, steel boots',
+    },
+    {
+      id: 'wagner-cavaleiro',
+      name: 'Cavaleiro do Cadeado',
+      rarity: 'legendary',
+      description: 'Armadura negra e espada em forma de chave. Defende o reino com autenticação em dois fatores.',
+      headgear: true,
+      palette: ['#23232b', '#22c55e', '#9aa0aa'],
+      artPrompt: 'black plate armor with green accents, sword shaped like a giant key, open-face helmet',
     },
   ]),
   ...make('guto', [
@@ -294,6 +381,23 @@ export const skins: SkinDef[] = [
       artPrompt: 'neon glowing jacket in purple and cyan, headphones around the neck, holding a small DJ controller, dark pants',
     },
     {
+      id: 'guto-paladino',
+      name: 'Paladino da Nuvem',
+      rarity: 'epic',
+      description: 'Armadura de placas, capa azul, espada e escudo com brasão de nuvem. Faz deploy em nome da luz.',
+      palette: ['#9bb4d0', '#2a63c9', '#f2f2f2'],
+      artPrompt: 'shining plate armor with a long blue cape, holding a sword and a shield with a cloud crest',
+    },
+    {
+      id: 'guto-capitao',
+      name: 'Capitão do Deploy',
+      rarity: 'epic',
+      description: 'Uniforme de capitão e quepe. No leme do deploy o mar está calmo (até sexta).',
+      headgear: true,
+      palette: ['#1f3a5f', '#f2f2f2', '#d4a017'],
+      artPrompt: 'navy ship captain uniform with gold buttons and epaulettes, white gloves, captain cap',
+    },
+    {
       id: 'guto-astronauta',
       name: 'Astronauta da Nuvem',
       rarity: 'legendary',
@@ -330,12 +434,28 @@ export const skins: SkinDef[] = [
       artPrompt: 'outfit made of neat aligned colored rectangular blocks in a row, evenly spaced like a CSS flex layout, matching boots',
     },
     {
+      id: 'b1-scrum',
+      name: 'Scrum Master',
+      rarity: 'rare',
+      description: 'Colete cheio de botões e um apito. A daily dura quinze minutos, juro.',
+      palette: ['#a855f7', '#f2f2f2', '#fbbf24'],
+      artPrompt: 'vest covered in colorful pin badges, whistle on a lanyard',
+    },
+    {
       id: 'b1-lancamento',
       name: 'Dia de Lançamento',
       rarity: 'epic',
       description: 'Macacão roxo de astronauta com foguete nas costas. Hoje vai ao ar.',
       palette: ['#7c3aed', '#f2f2f2', '#f97316'],
       artPrompt: 'purple astronaut jumpsuit with a small rocket backpack and flame, white patches, grey boots',
+    },
+    {
+      id: 'b1-arquiteta',
+      name: 'Arquiteta de Grid',
+      rarity: 'epic',
+      description: 'Capa e um compasso gigante. Desenha o grid antes de o café esfriar.',
+      palette: ['#6d3fb5', '#e9d5ff', '#f59e0b'],
+      artPrompt: 'long cape and a giant drafting compass held like a staff',
     },
     {
       id: 'b1-rainha',
@@ -392,6 +512,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'black graduation gown with an amber sash across the chest, rolled diploma tied with a ribbon in hand, black shoes',
     },
     {
+      id: 'angelo-capitao',
+      name: 'Capitão da Quadra',
+      rarity: 'epic',
+      description: 'Uniforme de capitão e troféu de padel. A bandeja é dele, e o ponto também.',
+      palette: ['#1e2a4a', '#f59e0b', '#f2f2f2'],
+      artPrompt: 'padel team captain uniform with a captain armband, holding a gold padel trophy',
+    },
+    {
       id: 'angelo-rei',
       name: 'Herança Real',
       rarity: 'legendary',
@@ -399,6 +527,15 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#b91c1c', '#f5c542', '#f5f5f4'],
       artPrompt: 'royal red velvet robe with white ermine fur trim, golden scepter in hand, ornate golden clasp, dark boots',
+    },
+    {
+      id: 'angelo-reitor',
+      name: 'Reitor',
+      rarity: 'legendary',
+      description: 'Toga com faixa dourada e capelo. Despacho assinado, assunto encerrado.',
+      headgear: true,
+      palette: ['#1a1a22', '#f5c542', '#e5e7eb'],
+      artPrompt: 'academic gown with a wide golden sash, ceremonial rector regalia, mortarboard',
     },
   ]),
   ...make('pablo', [
@@ -428,6 +565,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'black and white checkered vest over a white shirt, holding a chess king piece, dark trousers, dress shoes',
     },
     {
+      id: 'pablo-garagem',
+      name: 'Hacker de Garagem',
+      rarity: 'rare',
+      description: 'Moletom, placa de circuito e fone de ouvido. A startup nasceu antes do primeiro commit.',
+      headgear: true,
+      palette: ['#3a3f5a', '#6366f1', '#4ade80'],
+      artPrompt: 'oversized hoodie, holding a circuit board, big over-ear headphones',
+    },
+    {
       id: 'pablo-mago',
       name: 'Mago dos Algoritmos',
       rarity: 'epic',
@@ -444,6 +590,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#1f2330', '#9aa3b5', '#8fd3ff'],
       artPrompt: 'long dark charcoal and midnight-blue archmage robe with silver rune trim, hood, dark wooden staff topped with a pale-blue crystal',
+    },
+    {
+      id: 'pablo-oraculo',
+      name: 'Oráculo',
+      rarity: 'legendary',
+      description: 'Túnica clara e uma esfera de dados flutuando. Já sabe o resultado, só confere a complexidade.',
+      palette: ['#e8e6f5', '#6366f1', '#a5b4fc'],
+      artPrompt: 'light flowing robe, floating glowing orb of data',
     },
   ]),
 ];

@@ -7,6 +7,12 @@ export const balance: BalanceConfig = {
   milestones: [10, 25, 50, 100, 200],
   milestoneStep: 100,
   milestoneMult: 2,
+  // The old classes catch up with the new ones through the late milestones: x2 up to 100, then x3, x3, x4.
+  // Past 400 every 100 levels is x2 again (cost growth wins from there).
+  milestoneMults: { 200: 3, 300: 3, 400: 4 },
+  // Domínio: a rank per 25 levels summed over a professor's three disciplines. 40 ranks = 1,000 levels,
+  // about 333 each: just past the x3 milestone at 300 and short of the x4 at 400, so it is a late-game goal.
+  mastery: { step: 25, cap: 40 },
   tierUnlockLevel: 10,
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 4 },

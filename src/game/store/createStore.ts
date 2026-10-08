@@ -5,6 +5,7 @@ import type { GameContent } from '../content/types';
 import * as engine from '../engine/actions';
 import { createInitialState } from '../engine/init';
 import { applyOffline } from '../engine/offline';
+import { startSession } from '../engine/session';
 import { deserializeState, importSave as importSaveData, exportSave as exportSaveData, readCloudBonus, serializeState } from '../engine/save';
 import type { GameState } from '../engine/state';
 import { advance } from '../engine/tick';
@@ -175,6 +176,7 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
           const emit: Emit = (event) => events.push(event);
           const loaded = loadSaved(at);
           working = loaded ?? createInitialState(content, at);
+          startSession(working, at);
           if (loaded) events.push({ type: 'loaded' });
           const report = applyOffline(working, content, at, emit);
           advance(working, content, at, rng, emit);
@@ -225,8 +227,8 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       useAbility: (id) => run((state, emit) => engine.activateAbility(state, content, id, now(), emit), true),
       acceptSprint: (defId) => run((state, emit) => engine.acceptSprint(state, content, defId, now(), emit), true),
 
-      graduate() {
-        const done = run((state, emit) => engine.graduate(state, content, now(), emit));
+      graduate(honour = null) {
+        const done = run((state, emit) => engine.graduate(state, content, now(), emit, honour));
         if (done) get().save();
         return done;
       },

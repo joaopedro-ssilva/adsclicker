@@ -3,7 +3,7 @@
  * through `emit`. Time comes in as `now` (epoch ms) and randomness as `rng`; nothing here reads
  * a clock. Every action ends with afterAction(): settle the sprint and scan achievements.
  */
-import type { GameContent } from '../content/types';
+import type { GameContent, ProfessorId } from '../content/types';
 import type { Emit } from '../store/types';
 import { activateAbility as activateAbilityRaw } from './buffs';
 import { getIndex } from './contentIndex';
@@ -56,8 +56,15 @@ export function acceptSprint(state: GameState, content: GameContent, defId: stri
   return accepted;
 }
 
-export function graduate(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
-  const done = graduateRaw(state, content, emit);
+/** `honour`: the hired professor honoured for the next run, or null for none. */
+export function graduate(
+  state: GameState,
+  content: GameContent,
+  now: number,
+  emit: Emit,
+  honour: ProfessorId | null = null,
+): boolean {
+  const done = graduateRaw(state, content, emit, now, honour);
   if (done) afterAction(state, content, now, emit);
   return done;
 }

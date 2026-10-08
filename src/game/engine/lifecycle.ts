@@ -1,6 +1,7 @@
 import type { GameContent } from '../content/types';
 import type { Emit } from '../store/types';
 import { checkAchievements, checkAchievementsThrottled } from './achievements';
+import { markActive } from './session';
 import { settleSprint } from './sprints';
 import type { GameState } from './state';
 import { invalidateStats } from './stats';
@@ -21,6 +22,7 @@ export function afterAction(
   emit: Emit,
   options: AfterActionOptions = {},
 ): void {
+  markActive(state, now);
   invalidateStats(state);
   settleSprint(state, content, now, emit);
   if (options.throttle) checkAchievementsThrottled(state, content, now, emit);

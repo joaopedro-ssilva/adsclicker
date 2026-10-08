@@ -2,6 +2,7 @@ import { PROFESSOR_IDS } from '../content/types';
 import type { Effect, Feature, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import type { Decimal } from './decimal';
+import { masteryRank } from './mastery';
 import type { GameState } from './state';
 
 /** Synergy bonus per other hired professor once the `synergy` feature is on (BalanceConfig has no field for it). */
@@ -25,6 +26,7 @@ export const BASE_SYNERGY = 0.05;
  * | critMult           | balance.crit.baseMult                                                  |
  * | comboMax           | balance.combo.baseMax with the `combo` feature, else 0                 |
  * | comboStep          | balance.combo.baseStep                                                 |
+ * | comboDecay         | 1 (multiplies balance.combo.decayPerSecond; 0 = the combo never falls) |
  * | autoClicks         | 0                                                                      |
  * | offlineHours       | balance.offline.baseHours with the `offline` feature, else 0           |
  * | offlineRate        | balance.offline.baseRate with the `offline` feature, else 0 (clamped 0..1) |
@@ -49,6 +51,7 @@ export interface Stats {
   critMult: number;
   comboMax: number;
   comboStep: number;
+  comboDecay: number;
   autoClicks: number;
   offlineHours: number;
   offlineRate: number;
@@ -141,6 +144,18 @@ export function computeStats(state: GameState, content: GameContent): Stats {
   }
   for (const buff of state.buffs) acc.push(buff.effects);
 
+  // Domínio and the honoured professor. They only count while the professor is hired.
+  for (const id of PROFESSOR_IDS) {
+    if (!state.hired[id]) continue;
+    const def = content.mastery[id];
+    const rank = masteryRank(state, content, id);
+    if (rank > 0) acc.push(def.perRank, rank);
+    if (state.honoured === id) {
+      if (def.honour.flat) acc.push(def.honour.flat);
+      if (def.honour.perRank && rank > 0) acc.push(def.honour.perRank, rank);
+    }
+  }
+
   const on = (feature: Feature) => hasFeature(state, content, feature);
   const combo = on('combo');
   const offline = on('offline');
@@ -164,6 +179,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     critMult: Math.max(1, acc.value('critMult', balance.crit.baseMult)),
     comboMax: Math.max(0, acc.value('comboMax', combo ? balance.combo.baseMax : 0)),
     comboStep: Math.max(0, acc.value('comboStep', balance.combo.baseStep)),
+    comboDecay: Math.max(0, acc.value('comboDecay', 1)),
     autoClicks: Math.max(0, acc.value('autoClicks', 0)),
     offlineHours: Math.max(0, acc.value('offlineHours', offline ? balance.offline.baseHours : 0)),
     offlineRate: clamp(acc.value('offlineRate', offline ? balance.offline.baseRate : 0), 0, 1),

@@ -48,6 +48,22 @@ export const PRODUCTION_SLACK = 5;
 export const REWARD_LUMP_SECONDS = 450;
 
 /**
+ * REWARD_LUMP_SECONDS was sized for rewards about x2.5 the base (research and the tree). Domínio
+ * (Wagner, B1: up to x2 more) and the honoured professor (invasions twice as often, sprints x2)
+ * raise that, so the lump grows with the reward multiplier and with the invasion frequency the
+ * state itself shows, past these covered values.
+ */
+export const REWARD_FACTOR_COVERED = 2.5;
+export const EVENT_INTERVAL_COVERED = 0.6;
+
+/** How much bigger than REWARD_LUMP_SECONDS the lumps of a state can be: 1 up to the covered values. */
+function lumpFactor(stats: { eventReward: number; sprintReward: number; eventInterval: number }): number {
+  const reward = Math.max(stats.eventReward, stats.sprintReward) / REWARD_FACTOR_COVERED;
+  const frequency = EVENT_INTERVAL_COVERED / stats.eventInterval;
+  return Math.max(1, reward) * Math.max(1, frequency);
+}
+
+/**
  * Hand clicks per second a human can sustain (autoclick mice and two-finger tapping reach 15
  * to 20). Used for both the click counter and the coins clicks can produce.
  */
@@ -101,6 +117,7 @@ function rates(state: GameState, content: GameContent) {
     autoClicks: stats.autoClicks,
     offlineSeconds: stats.offlineHours * 3600 * stats.offlineRate,
     diplomaGain: stats.diplomaGain,
+    lumpFactor: lumpFactor(stats),
     // What a click is worth at best, as a multiple of the base click: full combo and the average crit.
     clickFactor: (1 + stats.comboMax * stats.comboStep) * (1 + stats.critChance * (stats.critMult - 1)),
   };
@@ -151,7 +168,8 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
 
   const returns = Math.min(offlineReturns, 1 + window / OFFLINE_RETURN_EVERY_SECONDS);
   const offlineSeconds = returns * bestNumber((r) => r.offlineSeconds);
-  const productionSeconds = window * PRODUCTION_SLACK + offlineSeconds + REWARD_LUMP_SECONDS * allowance;
+  const lumps = REWARD_LUMP_SECONDS * bestNumber((r) => r.lumpFactor) * allowance;
+  const productionSeconds = window * PRODUCTION_SLACK + offlineSeconds + lumps;
   const clickFactor = bestNumber((r) => r.clickFactor) * CLICK_BUFF_SLACK;
   const ceiling = best((r) => r.cps)
     .mul(productionSeconds)

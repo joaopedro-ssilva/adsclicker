@@ -48,6 +48,7 @@ export type StatKey =
   | 'critMult'
   | 'comboMax' // max combo steps
   | 'comboStep' // multiplier gained per combo step
+  | 'comboDecay' // multiplies how fast the combo falls (0 = it never does)
   | 'autoClicks' // automatic clicks per second
   | 'offlineHours' // cap of the offline bank
   | 'offlineRate' // 0..1 fraction of production kept while away
@@ -89,10 +90,17 @@ export type CounterKey =
   | 'researchBought'
   | 'graduations'
   | 'professorSwaps'
+  /** Most levels bought in one single purchase. */
+  | 'biggestPurchase'
+  /** Longest run of consecutive calendar days with the game played. */
+  | 'bestDayStreak'
   | 'playSeconds'
   | 'offlineCollections'
   /** Cafés bought for the Hackathon mode; the server credits the difference at each sync. */
   | 'cafesBought';
+
+/** Counters of the current run only: they start again at every graduation (GameState.run). */
+export type RunCounterKey = 'levelsBought';
 
 export type Requirement =
   | { kind: 'professorHired'; professor: ProfessorId }
@@ -114,6 +122,33 @@ export type Condition =
   | { kind: 'prestigeNodes'; gte: number }
   | { kind: 'achievements'; gte: number }
   | { kind: 'skinsOwned'; gte: number; professor?: ProfessorId }
+  /** Seconds of play in the current sitting (the tab open and the player acting). */
+  | { kind: 'session'; gte: number }
+  | { kind: 'runCounter'; counter: RunCounterKey; gte: number }
+  /** Sum of the levels of one professor's disciplines. */
+  | { kind: 'professorLevels'; professor: ProfessorId; gte: number }
+  /** Domínio rank of one professor, or of every professor when none is named. */
+  | { kind: 'mastery'; rank: number; professor?: ProfessorId }
+  /** Every discipline of some professor sits at exactly the same level, this one or higher. */
+  | { kind: 'alignedLevels'; level: number }
+  /** Every ability of the game was used at least once. */
+  | { kind: 'abilitiesTried' }
+  /** Every ability of the game is running at the same time. */
+  | { kind: 'abilitiesActive' }
+  /** Every research of the game is bought in the current run. */
+  | { kind: 'everyResearch' }
+  /** Every skin of that rarity is owned. */
+  | { kind: 'rarityOwned'; rarity: Rarity }
+  /** Different professors honoured at a graduation, ever. */
+  | { kind: 'honoured'; gte: number }
+  /** Graduations made on the same calendar day (the day of the last one). */
+  | { kind: 'graduationsToday'; gte: number }
+  /** The run closed by the last graduation: at most `lte` of the metric. Only true right after a graduation. */
+  | { kind: 'lastRun'; metric: 'seconds' | 'clicks' | 'investedProfessors'; lte: number }
+  /** The last run earned at least `gte` (0..1) of its coins from clicks. */
+  | { kind: 'lastRunClickShare'; gte: number }
+  /** The last run completed sprints and defended invasions, and failed or missed none. */
+  | { kind: 'lastRunClean' }
   /** Fired by name from the UI or engine (easter eggs): useGame.getState().triggerSecret(id). */
   | { kind: 'secret'; trigger: string };
 
@@ -184,6 +219,32 @@ export interface ResearchDef {
   requires: Requirement[];
   /** Unlocks an ability when bought. */
   unlocksAbility?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Domínio (mastery) and the honoured professor
+// ---------------------------------------------------------------------------
+
+export interface MasteryDef {
+  professor: ProfessorId;
+  /** Applied once per Domínio rank, like a prestige node level. The bonus reaches the whole game. */
+  perRank: Effect[];
+  /**
+   * Line shown in the UI. `{v}` is the value of the first perRank effect at the current rank and
+   * `{w}` the value of the second one. Each is formatted as the matching entry of `units`.
+   */
+  line: string;
+  units: ('percent' | 'hours')[];
+  /** What honouring the professor at a graduation adds for the following run. */
+  honour: {
+    /** Short label of the boost, e.g. "Combo que não cai". */
+    name: string;
+    description: string;
+    /** Applied once, whatever the rank. */
+    flat?: Effect[];
+    /** Applied once per rank, on top of perRank. */
+    perRank?: Effect[];
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -391,6 +452,11 @@ export interface BalanceConfig {
   milestones: number[];
   milestoneStep: number;
   milestoneMult: number;
+  /**
+   * Levels whose milestone multiplies by more than `milestoneMult` (level -> multiplier). Each key
+   * must be a milestone level. Lets the late milestones grow so an old class catches up.
+   */
+  milestoneMults?: Record<number, number>;
   /** Level a tier must reach to unlock the next one. */
   tierUnlockLevel: number;
   baseClick: number;
@@ -404,6 +470,8 @@ export interface BalanceConfig {
   sprints: { offers: number; cooldownMs: number };
   /** Minimum reward, in coins, for a Reward of kind 'coins' = floor * clickValue. */
   rewardClickFloor: number;
+  /** Domínio: one rank per `step` levels summed over a professor's disciplines, up to `cap` ranks. */
+  mastery: { step: number; cap: number };
   graduation: {
     /** Coins produced in the run that are worth the first diploma. */
     base: DecimalString;
@@ -429,5 +497,6 @@ export interface GameContent {
   skins: SkinDef[];
   sceneries: SceneryDef[];
   themes: ThemeDef[];
+  mastery: Record<ProfessorId, MasteryDef>;
   balance: BalanceConfig;
 }

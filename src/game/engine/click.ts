@@ -29,7 +29,7 @@ export function click(
   let crit = false;
 
   if (hasFeature(state, content, 'combo')) {
-    decayCombo(state, config, state.lastTickAt, now);
+    decayCombo(state, config, state.lastTickAt, now, stats.comboDecay);
     const { steps, lastClickAt } = state.combo;
     const continuing = steps > 0 || (lastClickAt > 0 && now - lastClickAt <= config.windowMs);
     if (continuing) state.combo.steps = Math.min(stats.comboMax, steps + 1);
@@ -40,6 +40,8 @@ export function click(
   const steps = state.combo.steps;
   const value = clickValueWith(state, content, stats, { comboSteps: steps, crit });
   gain(state, value);
+  state.run.clicks += 1;
+  state.run.clickCoins = state.run.clickCoins.add(value);
 
   const counters = state.counters;
   counters.clicks += 1;

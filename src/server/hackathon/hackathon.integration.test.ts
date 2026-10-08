@@ -19,7 +19,7 @@ import { clearLeaderboardCache, getLeaderboard } from '../community/leaderboard'
 import { resetEventMultiplierCache } from '../config/eventMultiplier';
 import { feedEvents, hackathonItems, hackathonProfiles, hackathonRuns, hackathonStages } from '../db/schema';
 import { ApiFailure } from '../http/errors';
-import { setNickname, setPassword } from '../players/account';
+import { setNickname } from '../players/account';
 import { getMe } from '../players/me';
 import { syncPlayer } from '../players/sync';
 import { connectTestDb } from '../testing/db';
@@ -99,7 +99,7 @@ describe.skipIf(!testDb)('Hackathon against Postgres', () => {
     if (!token) throw new Error('no session');
     const browser: Browser = { headers, token, id: result.body.me.id, rev: result.body.rev, nickname: null };
     if (options.nickname) {
-      await setNickname(db, await requireSession(db, headers, T0), { nickname: options.nickname }, T0);
+      await setNickname(db, await requireSession(db, headers, T0), { nickname: options.nickname, password: 'segredo123' }, T0);
       browser.nickname = options.nickname;
     }
     return browser;
@@ -732,8 +732,7 @@ describe.skipIf(!testDb)('Hackathon against Postgres', () => {
       const me = await getMe(db, target.browser.headers, T0 + 130_000, fake.deps);
       expect(me.body.bonus).toEqual({ cargo: 1.25, mentors: { edecio: 1.2 } });
 
-      await setNickname(db, await requireSession(db, target.browser.headers, T0), { nickname: 'Bonus' }, T0);
-      await setPassword(db, await requireSession(db, target.browser.headers, T0), { password: 'segredo123' }, T0);
+      await setNickname(db, await requireSession(db, target.browser.headers, T0), { nickname: 'Bonus', password: 'segredo123' }, T0);
       const loggedIn = await login(
         db,
         { nickname: 'Bonus', password: 'segredo123' },

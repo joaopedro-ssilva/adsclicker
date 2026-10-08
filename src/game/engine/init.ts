@@ -3,7 +3,7 @@ import type { CounterKey, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import { ZERO } from './decimal';
 import { SAVE_VERSION } from './state';
-import type { GameState, Settings } from './state';
+import type { GameState, RunStats, Settings } from './state';
 
 export function createCounters(): Record<CounterKey, number> {
   return {
@@ -20,9 +20,24 @@ export function createCounters(): Record<CounterKey, number> {
     researchBought: 0,
     graduations: 0,
     professorSwaps: 0,
+    biggestPurchase: 0,
+    bestDayStreak: 0,
     playSeconds: 0,
     offlineCollections: 0,
     cafesBought: 0,
+  };
+}
+
+export function createRunStats(): RunStats {
+  return {
+    seconds: 0,
+    clicks: 0,
+    levelsBought: 0,
+    clickCoins: ZERO,
+    sprintsCompleted: 0,
+    sprintsFailed: 0,
+    eventsDefended: 0,
+    eventsMissed: 0,
   };
 }
 
@@ -89,6 +104,14 @@ export function createInitialState(content: GameContent, now: number): GameState
     invasionSeq: 0,
     eventStreak: 0,
     sprint: { offers: [], active: null, nextOffersAt: 0 },
+
+    run: createRunStats(),
+    lastRun: null,
+    honoured: null,
+    honouredBefore: {},
+    abilitiesTried: {},
+    session: { seconds: 0, activeAt: now },
+    calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 
     counters: createCounters(),
     settings: defaultSettings(),

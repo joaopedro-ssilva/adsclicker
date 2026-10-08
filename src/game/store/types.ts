@@ -64,6 +64,8 @@ export interface LevelledView {
   outputGain: Decimal;
   /** Next level that doubles the output, or null. */
   nextMilestone: number | null;
+  /** What the output is multiplied by when that milestone arrives. */
+  nextMilestoneMult: number;
   /** 0..1 progress from the previous milestone to the next. */
   milestoneProgress: number;
   /** Share of the total coins/second (disciplines only), 0..1. */
@@ -184,7 +186,8 @@ export interface GameActions {
   useAbility(id: string): boolean;
   acceptSprint(defId: string): boolean;
 
-  graduate(): boolean;
+  /** `honour`: the hired professor honoured for the next run (optional). */
+  graduate(honour?: ProfessorId | null): boolean;
   buyPrestigeNode(id: string): boolean;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */

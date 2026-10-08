@@ -93,6 +93,7 @@ export function settleSprint(state: GameState, content: GameContent, now: number
     state.sprint.offers = [];
     state.sprint.nextOffersAt = now + cooldown;
     state.counters.sprintsCompleted += 1;
+    state.run.sprintsCompleted += 1;
     const reward = grantReward(state, content, def.reward, 'sprint', now, emit);
     emit({ type: 'sprintDone', def: def.id, reward });
   } else if (now >= active.endsAt) {
@@ -100,6 +101,7 @@ export function settleSprint(state: GameState, content: GameContent, now: number
     state.sprint.offers = [];
     state.sprint.nextOffersAt = now + cooldown;
     state.counters.sprintsFailed += 1;
+    state.run.sprintsFailed += 1;
     emit({ type: 'sprintFailed', def: def.id });
   }
 }

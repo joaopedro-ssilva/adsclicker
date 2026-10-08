@@ -5,6 +5,7 @@ import { expireBuffs } from './buffs';
 import { decayCombo } from './combo';
 import { clickValueWith, coinsPerSecondWith, gain } from './economy';
 import { updateInvasions } from './invasions';
+import { countSession, touchCalendar } from './session';
 import { offerSprints, settleSprint } from './sprints';
 import type { GameState } from './state';
 import { computeStats, hasFeature, invalidateStats } from './stats';
@@ -23,7 +24,7 @@ function runSegment(state: GameState, content: GameContent, from: number, to: nu
   const seconds = (to - from) / 1000;
   const stats = computeStats(state, content);
 
-  if (hasFeature(state, content, 'combo')) decayCombo(state, content.balance.combo, from, to);
+  if (hasFeature(state, content, 'combo')) decayCombo(state, content.balance.combo, from, to, stats.comboDecay);
 
   gain(state, coinsPerSecondWith(state, content, stats).mul(seconds));
 
@@ -34,11 +35,14 @@ function runSegment(state: GameState, content: GameContent, from: number, to: nu
     if (clicks > 0) {
       const value = clickValueWith(state, content, stats).mul(clicks);
       gain(state, value);
+      state.run.clickCoins = state.run.clickCoins.add(value);
       emit({ type: 'click', value, crit: false, comboSteps: 0, auto: true });
     }
   }
 
   state.counters.playSeconds += seconds;
+  state.run.seconds += seconds;
+  countSession(state, seconds, to);
   expireBuffs(state, to, emit);
   invalidateStats(state);
   settleSprint(state, content, to, emit);
@@ -66,6 +70,7 @@ export function advance(state: GameState, content: GameContent, now: number, rng
   updateInvasions(state, content, now, rng, emit);
   offerSprints(state, content, now, rng, emit);
   state.lastTickAt = now;
+  touchCalendar(state, now);
   invalidateStats(state);
   checkAchievementsThrottled(state, content, now, emit);
   invalidateStats(state);

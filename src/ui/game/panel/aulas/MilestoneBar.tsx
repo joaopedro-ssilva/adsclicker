@@ -4,10 +4,12 @@ import { MILESTONE_SEGMENTS } from './useLevelledCard';
 interface MilestoneBarProps {
   filledSegments: number;
   nextMilestone: number | null;
+  /** What the milestone multiplies the output by. */
+  nextMult: number;
 }
 
 /** Progress to the next level that doubles the output. */
-export function MilestoneBar({ filledSegments, nextMilestone }: MilestoneBarProps) {
+export function MilestoneBar({ filledSegments, nextMilestone, nextMult }: MilestoneBarProps) {
   return (
     <div className="milestone">
       <ProgressBar
@@ -19,7 +21,7 @@ export function MilestoneBar({ filledSegments, nextMilestone }: MilestoneBarProp
         segments={MILESTONE_SEGMENTS}
         tone="good"
       />
-      <span className="milestone-text">{nextMilestone === null ? 'Marcos completos' : `×2 no nível ${nextMilestone}`}</span>
+      <span className="milestone-text">{nextMilestone === null ? 'Marcos completos' : `×${nextMult} no nível ${nextMilestone}`}</span>
     </div>
   );
 }

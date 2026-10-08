@@ -4,6 +4,7 @@ import type { ProfessorId } from '@/game/content/types';
 import { Icon } from '@/ui/kit';
 import { themeVariables } from '@/ui/ThemeProvider';
 import { fmt } from '../lib/numbers';
+import { MasteryLine } from './MasteryLine';
 
 /** Who the list below belongs to: name, subject and what their lessons produce. */
 export function ProfessorHeader({ professor }: { professor: ProfessorId }) {
@@ -24,6 +25,7 @@ export function ProfessorHeader({ professor }: { professor: ProfessorId }) {
         <strong>{production}</strong>
         <span>/s</span>
       </p>
+      <MasteryLine professor={professor} />
     </header>
   );
 }

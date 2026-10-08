@@ -22,6 +22,7 @@ export function applyOffline(state: GameState, content: GameContent, now: number
   if (awayMs < content.balance.offline.minAwayMs) return null;
 
   state.lastTickAt = now;
+  state.session.seconds = 0; // coming back from being away ends the sitting
   state.buffs = [];
   state.invasion = null;
   state.nextInvasionAt = 0;

@@ -25,7 +25,9 @@ import {
   hiredCount,
   levelOf,
 } from './economy';
-import { nextMilestone, previousMilestone } from './formulas';
+import { milestoneMultAt, nextMilestone, previousMilestone } from './formulas';
+export { masteryLevels, masteryLine, masteryRank, masteryView, masteryViews } from './mastery';
+export type { MasteryView } from './mastery';
 import { diplomasFor, prestigeNodeAvailable, prestigeNodeCost, runCoinsFor } from './prestige';
 import { effectiveBuyAmount, quoteLevels } from './purchases';
 import { hireLock, isAbilityUnlocked, levelledLock, researchLock } from './requirements';
@@ -112,6 +114,7 @@ function buildLevelled(state: GameState, content: GameContent, entry: LevelledDe
     output,
     outputGain: gainAfter,
     nextMilestone: next,
+    nextMilestoneMult: next === null ? 1 : milestoneMultAt(next, balance),
     milestoneProgress: next === null ? 1 : Math.min(1, Math.max(0, (level - previous) / (next - previous))),
     share: entry.kind === 'discipline' && cps.gt(0) ? ratio(output, cps) : 0,
   };

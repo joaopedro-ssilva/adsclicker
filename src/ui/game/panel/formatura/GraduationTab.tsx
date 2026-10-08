@@ -1,5 +1,6 @@
 import { Section } from '../lib/Section';
 import { GraduationSummary } from './GraduationSummary';
+import { HonourPicker } from './HonourPicker';
 import { PrestigeTree } from './PrestigeTree';
 import { ResetInfo } from './ResetInfo';
 
@@ -8,6 +9,7 @@ export function GraduationTab() {
   return (
     <div className="graduation-tab">
       <GraduationSummary />
+      <HonourPicker />
       <ResetInfo />
       <Section title="Árvore de diplomas" note="Toque num nó">
         <PrestigeTree />

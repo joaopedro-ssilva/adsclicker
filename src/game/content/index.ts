@@ -4,6 +4,7 @@ import { balance } from './balance';
 import { clickUpgrades } from './clickUpgrades';
 import { disciplines } from './disciplines';
 import { invasions } from './invasions';
+import { mastery } from './mastery';
 import { prestigeNodes } from './prestige';
 import { professors } from './professors';
 import { research } from './research';
@@ -29,5 +30,6 @@ export const content: GameContent = {
   skins,
   sceneries,
   themes,
+  mastery,
   balance,
 };

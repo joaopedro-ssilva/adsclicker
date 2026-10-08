@@ -27,6 +27,23 @@ function SettingsShortcut() {
   return <IconButton icon="settings" label="Abrir as configurações" variant="secondary" size="sm" onClick={() => setTab('config')} />;
 }
 
+/** Hides the side panel so the scenery takes the whole screen, and brings it back. */
+function PanelToggle() {
+  const open = useUi((store) => store.panelOpen);
+  const togglePanel = useUi((store) => store.togglePanel);
+  return (
+    <IconButton
+      icon={open ? 'image' : 'book'}
+      label={open ? 'Esconder o painel e ver o cenário inteiro' : 'Mostrar o painel'}
+      variant="secondary"
+      size="sm"
+      aria-pressed={!open}
+      data-qa="panel-toggle"
+      onClick={togglePanel}
+    />
+  );
+}
+
 /** Logo and tools on the edges, the mode switch in the middle and the ADScoin balance below them on wide stages. */
 export const StageHeader = memo(function StageHeader() {
   return (
@@ -37,6 +54,7 @@ export const StageHeader = memo(function StageHeader() {
       <div className="stage-tools">
         <SoundToggle />
         <SettingsShortcut />
+        <PanelToggle />
       </div>
     </header>
   );

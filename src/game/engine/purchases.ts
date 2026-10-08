@@ -55,6 +55,8 @@ export function buyLevelled(state: GameState, content: GameContent, id: string, 
   spend(state, cost);
   state.levels[id] = from + count;
   state.counters.levelsBought += count;
+  state.counters.biggestPurchase = Math.max(state.counters.biggestPurchase, count);
+  state.run.levelsBought += count;
   recordSprintEvent(state, content, { kind: 'buyLevels', amount: count });
 
   emit({ type: 'purchase', kind: entry.kind, id, levels: count });

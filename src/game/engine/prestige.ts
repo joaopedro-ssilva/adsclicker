@@ -2,7 +2,9 @@ import { PROFESSOR_IDS } from '../content/types';
 import type { GameContent, PrestigeNodeDef, ProfessorId } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
-import { Decimal, ZERO, parseDecimal } from './decimal';
+import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
+import { createRunStats } from './init';
+import { recordGraduationDay } from './session';
 import type { GameState } from './state';
 import { computeStats, hasFeature } from './stats';
 import type { Stats } from './stats';
@@ -44,13 +46,37 @@ export function keptProfessors(state: GameState, content: GameContent): Set<Prof
  * Graduation: pays diplomas and resets the run. Resets coins, runCoins, levels, research, hires
  * (except the first professor and those kept by prestige nodes), buffs, invasion and streak, sprint,
  * combo and cooldowns. Keeps diplomas, the tree, achievements, cosmetics, counters and settings.
+ *
+ * `honour` is the hired professor the player picked to honour for the next run (none by default); it
+ * replaces the previous pick. `now` only dates the graduation for the calendar achievements.
  */
-export function graduate(state: GameState, content: GameContent, emit: Emit): boolean {
+export function graduate(
+  state: GameState,
+  content: GameContent,
+  emit: Emit,
+  now: number = state.lastTickAt,
+  honour: ProfessorId | null = null,
+): boolean {
   const stats = computeStats(state, content);
   if (!canGraduate(state, content, stats)) return false;
   const diplomas = diplomasFor(state.runCoins, content, stats);
   const index = getIndex(content);
   const kept = keptProfessors(state, content);
+
+  state.lastRun = {
+    seconds: state.run.seconds,
+    clicks: state.run.clicks,
+    investedProfessors: PROFESSOR_IDS.filter((id) => index.disciplinesOf[id].some((def) => (state.levels[def.id] ?? 0) > 0)).length,
+    clickShare: state.runCoins.gt(0) ? Math.min(1, ratio(state.run.clickCoins, state.runCoins)) : 0,
+    sprintsCompleted: state.run.sprintsCompleted,
+    sprintsFailed: state.run.sprintsFailed,
+    eventsDefended: state.run.eventsDefended,
+    eventsMissed: state.run.eventsMissed,
+  };
+  state.run = createRunStats();
+  state.honoured = honour !== null && state.hired[honour] ? honour : null;
+  if (state.honoured) state.honouredBefore[state.honoured] = true;
+  recordGraduationDay(state, now);
 
   state.diplomas += diplomas;
   state.diplomasEarned += diplomas;

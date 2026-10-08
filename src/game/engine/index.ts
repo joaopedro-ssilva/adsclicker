@@ -15,7 +15,9 @@ export {
   milestonesReached,
   milestoneMultiplier,
   nextMilestone,
+  milestoneMultAt,
 } from './formulas';
+export { startSession } from './session';
 export * from './actions';
 export { advance } from './tick';
 export { applyOffline } from './offline';

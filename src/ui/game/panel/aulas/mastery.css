@@ -1,0 +1,86 @@
+/* Domínio inside the professor header of the Aulas tab. Imported after aulas.css. */
+
+/* The header gets a second row for the Domínio. */
+.professor-header {
+  flex-wrap: wrap;
+}
+
+.mastery {
+  display: grid;
+  flex: 1 1 100%;
+  gap: 4px;
+  min-width: 0;
+  padding-top: var(--space-2);
+  border-top: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.mastery-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.mastery-rank {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.mastery-rank strong {
+  margin-left: 4px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.mastery-rank small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mastery-honour {
+  padding: 0 5px;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 16px;
+  color: var(--bg);
+  background: var(--legendary);
+  white-space: nowrap;
+}
+
+.mastery-levels {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mastery-bar {
+  height: 4px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--accent) 18%, var(--bg));
+}
+
+.mastery-bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.mastery[data-maxed='true'] .mastery-bar i {
+  background: var(--legendary);
+}
+
+.mastery-line {
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}

@@ -3,6 +3,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, parseDecimal, ratio } from './decimal';
 import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
+import { masteryLevels, masteryRank } from './mastery';
 import type { GameState } from './state';
 import { achievementCount, computeStats } from './stats';
 import type { Stats } from './stats';
@@ -103,6 +104,78 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'secret':
       return { progress: null, met: state.secrets[condition.trigger] === true };
+    case 'session':
+      return measureAtLeast(state.session.seconds, condition.gte);
+    case 'runCounter':
+      return measureAtLeast(state.run[condition.counter], condition.gte);
+    case 'professorLevels':
+      return measureAtLeast(masteryLevels(state, content, condition.professor), condition.gte);
+    case 'mastery': {
+      const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
+      let reached = 0;
+      let met = true;
+      for (const id of professors) {
+        const rank = masteryRank(state, content, id);
+        reached += Math.min(rank, condition.rank);
+        if (rank < condition.rank) met = false;
+      }
+      return { progress: fraction(reached, condition.rank * professors.length), met };
+    }
+    case 'alignedLevels': {
+      let best = 0;
+      let met = false;
+      for (const professor of index.professorList) {
+        const list = index.disciplinesOf[professor.id];
+        if (list.length === 0) continue;
+        const levels = list.map((def) => levelOf(state, def.id));
+        const lowest = Math.min(...levels);
+        best = Math.max(best, lowest);
+        if (lowest >= condition.level && levels.every((level) => level === lowest)) met = true;
+      }
+      return { progress: met ? 1 : fraction(best, condition.level), met };
+    }
+    case 'abilitiesTried': {
+      const total = content.abilities.length;
+      const tried = content.abilities.filter((def) => state.abilitiesTried[def.id]).length;
+      return { progress: total === 0 ? 0 : tried / total, met: total > 0 && tried === total };
+    }
+    case 'abilitiesActive': {
+      const total = content.abilities.length;
+      const running = content.abilities.filter((def) => state.buffs.some((buff) => buff.id === def.buff.id)).length;
+      return { progress: total === 0 ? 0 : running / total, met: total > 0 && running === total };
+    }
+    case 'everyResearch': {
+      const total = content.research.length;
+      const bought = content.research.filter((def) => state.research[def.id]).length;
+      return { progress: total === 0 ? 0 : bought / total, met: total > 0 && bought === total };
+    }
+    case 'rarityOwned': {
+      const list = content.skins.filter((skin) => skin.rarity === condition.rarity);
+      const owned = list.filter((skin) => state.skins[skin.id]).length;
+      return { progress: list.length === 0 ? 0 : owned / list.length, met: list.length > 0 && owned === list.length };
+    }
+    case 'honoured':
+      return measureAtLeast(Object.keys(state.honouredBefore).filter((id) => id in content.professors).length, condition.gte);
+    case 'graduationsToday':
+      return measureAtLeast(state.calendar.gradsToday, condition.gte);
+    case 'lastRun': {
+      const last = state.lastRun;
+      if (!last) return measureBoolean(false);
+      const value = condition.metric === 'seconds' ? last.seconds : condition.metric === 'clicks' ? last.clicks : last.investedProfessors;
+      return measureBoolean(value <= condition.lte);
+    }
+    case 'lastRunClickShare':
+      return measureBoolean(state.lastRun !== null && state.lastRun.clickShare >= condition.gte);
+    case 'lastRunClean': {
+      const last = state.lastRun;
+      return measureBoolean(
+        last !== null &&
+          last.sprintsFailed === 0 &&
+          last.eventsMissed === 0 &&
+          last.sprintsCompleted >= 1 &&
+          last.eventsDefended >= 1,
+      );
+    }
   }
 }
 
