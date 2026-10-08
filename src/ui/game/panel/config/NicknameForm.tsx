@@ -6,29 +6,29 @@ import { AccountField } from './AccountField';
 import { useAccountAction } from './useAccountAction';
 import { firstIssue } from './validate';
 
-/** Guest without a nickname: pick one to enter the ranking, with an optional password for other devices. */
-export function NicknameForm({ onPasswordFailed }: { onPasswordFailed: (message: string) => void }) {
+/** Guest without a nickname: creating the account takes a nickname and a password, typed twice. */
+export function NicknameForm() {
   const setNickname = useCloud((store) => store.setNickname);
-  const setPassword = useCloud((store) => store.setPassword);
   const [nickname, setNicknameValue] = useState('');
   const [password, setPasswordValue] = useState('');
+  const [confirmation, setConfirmation] = useState('');
   const { pending, error, run } = useAccountAction();
 
   const nicknameIssue = nickname.length > 0 ? firstIssue(nicknameSchema, nickname) : null;
   const passwordIssue = password.length > 0 ? firstIssue(passwordSchema, password) : null;
-  const ready = nickname.trim().length > 0 && !nicknameIssue && !passwordIssue;
+  const confirmationIssue =
+    confirmation.length > 0 && confirmation !== password ? 'As duas senhas precisam ser iguais.' : null;
+  const ready =
+    nickname.trim().length > 0 &&
+    !nicknameIssue &&
+    password.length > 0 &&
+    !passwordIssue &&
+    confirmation === password;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!ready || pending) return;
-    await run(async () => {
-      const named = await setNickname(nickname.trim());
-      if (!named.ok || password.length === 0) return named;
-      // The nickname is taken now: if only the password fails, say so instead of undoing the first step.
-      const protectedAccount = await setPassword(password);
-      if (!protectedAccount.ok) onPasswordFailed(protectedAccount.error.message);
-      return { ok: true } as const;
-    });
+    await run(() => setNickname(nickname.trim(), password));
   };
 
   const serverOnNickname = error && (error.code === 'nickname_taken' || error.code === 'invalid');
@@ -36,8 +36,8 @@ export function NicknameForm({ onPasswordFailed }: { onPasswordFailed: (message:
   const formError = error && !serverOnNickname ? error.message : null;
 
   return (
-    <form className="account-form" onSubmit={submit} noValidate>
-      <p className="setting-label">Escolha um apelido para entrar no ranking</p>
+    <form className="account-form" onSubmit={submit} noValidate data-qa="account-create-form">
+      <p className="setting-label">Crie sua conta para entrar no ranking</p>
       <AccountField
         label="Apelido"
         value={nickname}
@@ -49,15 +49,25 @@ export function NicknameForm({ onPasswordFailed }: { onPasswordFailed: (message:
         testId="account-nickname-input"
       />
       <AccountField
-        label="Senha (opcional)"
+        label="Senha"
         type="password"
         value={password}
         onChange={setPasswordValue}
         autoComplete="new-password"
         maxLength={PASSWORD_MAX}
         error={passwordIssue}
-        hint="Para jogar em outro aparelho. Pode deixar em branco e criar depois."
+        hint="De 6 a 72 caracteres. Com ela você entra em outro aparelho."
         testId="account-password-input"
+      />
+      <AccountField
+        label="Confirme a senha"
+        type="password"
+        value={confirmation}
+        onChange={setConfirmation}
+        autoComplete="new-password"
+        maxLength={PASSWORD_MAX}
+        error={confirmationIssue}
+        testId="account-password-confirm-input"
       />
       {formError ? (
         <p className="save-warning" data-tone="bad" role="alert">
@@ -65,7 +75,7 @@ export function NicknameForm({ onPasswordFailed }: { onPasswordFailed: (message:
         </p>
       ) : null}
       <Button size="sm" type="submit" disabled={!ready || pending} data-qa="account-save-nickname">
-        {pending ? 'Salvando…' : 'Entrar no ranking'}
+        {pending ? 'Criando…' : 'Criar conta'}
       </Button>
     </form>
   );

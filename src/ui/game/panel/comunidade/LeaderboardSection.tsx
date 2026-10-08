@@ -3,6 +3,7 @@ import type { Board, LeaderboardResponse, Me } from '@/shared/api';
 import { Button, EmptyState, Icon } from '@/ui/kit';
 import { Section } from '../lib/Section';
 import { BOARD_INFO } from './boards';
+import { GuestNotice } from './GuestNotice';
 import { LeaderboardRow } from './LeaderboardRow';
 import { OwnRankLine } from './OwnRankLine';
 
@@ -31,6 +32,7 @@ export function LeaderboardSection({ board, onBoard, data, loading, me, ranks }:
 
   return (
     <Section title="Ranking" note={entries.length > 0 ? `Top ${entries.length}` : undefined}>
+      {!me?.nickname ? <GuestNotice /> : null}
       <div className="community-boards" role="group" aria-label="Ranking por">
         {BOARD_INFO.map((item) => (
           <Button
@@ -55,7 +57,7 @@ export function LeaderboardSection({ board, onBoard, data, loading, me, ranks }:
         </ul>
       ) : entries.length === 0 ? (
         <EmptyState title="Ninguém no ranking ainda" icon="trophy">
-          Escolha um apelido e seja o primeiro da turma a aparecer aqui.
+          Crie sua conta e seja o primeiro da turma a aparecer aqui.
         </EmptyState>
       ) : (
         <>

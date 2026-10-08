@@ -6,6 +6,7 @@ import { Section } from '../lib/Section';
 import { LoginForm } from './LoginForm';
 import { NicknameForm } from './NicknameForm';
 import { PasswordForm } from './PasswordForm';
+import { dismissPasswordNudge, usePasswordNudgeDismissed } from './passwordNudge';
 
 type Panel = 'password' | 'login' | null;
 
@@ -16,7 +17,7 @@ export function AccountSection() {
   const unavailable = useCloud((store) => store.unavailable);
   const logout = useCloud((store) => store.logout);
   const [panel, setPanel] = useState<Panel>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const nudgeDismissed = usePasswordNudgeDismissed(me?.id ?? '');
   const [loggingOut, setLoggingOut] = useState(false);
   const [logoutFailed, setLogoutFailed] = useState(false);
 
@@ -50,7 +51,7 @@ export function AccountSection() {
   } else if (!me.nickname) {
     body = (
       <>
-        <NicknameForm onPasswordFailed={setNotice} />
+        <NicknameForm />
         {loginEntry}
       </>
     );
@@ -65,21 +66,25 @@ export function AccountSection() {
           {!me.ranked && me.unrankedReason ? <p className="setting-hint">{me.unrankedReason}</p> : null}
         </div>
 
-        {notice && !me.hasPassword ? (
-          <p className="save-warning" role="alert">
-            Apelido salvo, mas a senha não: {notice}
-          </p>
+        {!me.hasPassword && !nudgeDismissed && panel === null ? (
+          <div className="account-nudge" role="status" data-qa="account-password-nudge">
+            <p>
+              <strong>Sua conta ainda não tem senha.</strong> Sem ela, você não consegue entrar de novo se perder este
+              aparelho nem jogar em outro.
+            </p>
+            <div className="account-actions">
+              <Button size="sm" onClick={() => setPanel('password')} data-qa="account-nudge-set">
+                Criar senha
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => dismissPasswordNudge(me.id)} data-qa="account-nudge-dismiss">
+                Agora não
+              </Button>
+            </div>
+          </div>
         ) : null}
 
         {panel === 'password' ? (
-          <PasswordForm
-            change={me.hasPassword}
-            onDone={() => {
-              setPanel(null);
-              setNotice(null);
-            }}
-            onCancel={() => setPanel(null)}
-          />
+          <PasswordForm change={me.hasPassword} onDone={() => setPanel(null)} onCancel={() => setPanel(null)} />
         ) : (
           <>
             <p className="setting-hint">

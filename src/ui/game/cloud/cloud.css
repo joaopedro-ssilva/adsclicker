@@ -97,9 +97,8 @@
 .conflict-rows dd {
   margin: 0;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+  text-align: right;
   font-family: var(--font-display);
   font-size: 13px;
   font-variant-numeric: tabular-nums;

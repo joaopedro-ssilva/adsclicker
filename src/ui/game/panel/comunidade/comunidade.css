@@ -235,15 +235,16 @@
 .community-sub {
   display: flex;
   align-items: center;
-  gap: 6px;
-  overflow: hidden;
+  flex-wrap: wrap;
+  gap: 0 6px;
   color: var(--text-muted);
   font-size: 11px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.35;
 }
 
 .community-value {
+  max-width: 40cqw;
+  overflow-wrap: anywhere;
   font-family: var(--font-display);
   font-size: 13px;
   text-align: right;
@@ -270,6 +271,25 @@
 .community-own p {
   flex: 1;
   min-width: 160px;
+  margin: 0;
+}
+
+.community-guest {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface-raised));
+  border: 2px solid color-mix(in srgb, var(--warn) 60%, var(--border));
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.community-guest p {
+  flex: 1;
+  min-width: 180px;
   margin: 0;
 }
 

@@ -1,6 +1,4 @@
 import type { Board, Me } from '@/shared/api';
-import { Button } from '@/ui/kit';
-import { useUi } from '../../shared/uiStore';
 import { BOARD_INFO } from './boards';
 
 interface OwnRankLineProps {
@@ -21,16 +19,7 @@ export function OwnRankLine({ me, board, rank }: OwnRankLineProps) {
       </div>
     );
   }
-  if (!me.nickname) {
-    return (
-      <div className="community-own" data-qa="community-own">
-        <p>Escolha um apelido para aparecer no ranking.</p>
-        <Button size="sm" onClick={() => useUi.getState().setTab('config')} data-qa="community-pick-nickname">
-          Escolher apelido
-        </Button>
-      </div>
-    );
-  }
+  if (!me.nickname) return null; // the guest notice at the top of the ranking already says how to join
   if (!me.ranked || rank == null) {
     return (
       <div className="community-own" data-qa="community-own">

@@ -11,7 +11,12 @@ import { RATE_RULES, consume } from '../http/rateLimit';
 import { NICKNAME_REFUSED_MESSAGE, checkNickname, nicknameKey } from './nickname';
 import { toMe } from './summary';
 
-/** POST /api/account/nickname: picking one puts the player on the boards and announces them in the feed. */
+/**
+ * POST /api/account/nickname: picking one puts the player on the boards and announces them in the
+ * feed. The password travels with it and is stored in the same transaction, so a nickname never
+ * exists without one. An account that already has a password (its nickname was removed by the
+ * admin, say) must send that password instead; it is kept as is.
+ */
 export async function setNickname(db: Db, authed: Authed, request: NicknameRequest, now: number = Date.now()): Promise<AccountResponse> {
   const { player } = authed;
   await consume(db, RATE_RULES.nickname, player.id, now);
@@ -19,9 +24,20 @@ export async function setNickname(db: Db, authed: Authed, request: NicknameReque
   if (!checkNickname(request.nickname).ok) throw new ApiFailure('invalid', NICKNAME_REFUSED_MESSAGE);
   const key = nicknameKey(request.nickname);
 
+  let passwordHash = player.passwordHash;
+  const settingPassword = passwordHash === null;
+  if (passwordHash === null) {
+    passwordHash = await hashPassword(request.password);
+  } else if (!(await verifyPassword(request.password, passwordHash))) {
+    throw new ApiFailure('wrong_credentials', 'A senha informada não confere com a senha desta conta.');
+  }
+
   try {
     await db.transaction(async (tx) => {
-      await tx.update(players).set({ nickname: request.nickname, nicknameKey: key }).where(eq(players.id, player.id));
+      await tx
+        .update(players)
+        .set({ nickname: request.nickname, nicknameKey: key, ...(settingPassword ? { passwordHash } : {}) })
+        .where(eq(players.id, player.id));
       if (player.nickname === null) {
         await tx.insert(feedEvents).values({ playerId: player.id, kind: 'joined', detail: '', createdAt: new Date(now) }).onConflictDoNothing();
       }
@@ -30,7 +46,8 @@ export async function setNickname(db: Db, authed: Authed, request: NicknameReque
     if (isUniqueViolation(error)) throw new ApiFailure('nickname_taken');
     throw error;
   }
-  return { me: toMe({ ...player, nickname: request.nickname }) };
+  if (settingPassword) await deleteOtherSessions(db, player.id, authed.tokenHash);
+  return { me: toMe({ ...player, nickname: request.nickname, passwordHash }) };
 }
 
 /** POST /api/account/password: sets it the first time; changing it needs the current one and signs out other devices. */

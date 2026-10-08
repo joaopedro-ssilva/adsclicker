@@ -43,7 +43,8 @@ export interface CloudActions {
   useCloudSave(): void;
   /** Conflict answer: keep this device's progress and overwrite the cloud. */
   keepLocalSave(): Promise<void>;
-  setNickname(nickname: string): Promise<ActionResult>;
+  /** Claims a nickname; the password is mandatory and is stored with it. */
+  setNickname(nickname: string, password: string): Promise<ActionResult>;
   setPassword(password: string, currentPassword?: string): Promise<ActionResult>;
   login(nickname: string, password: string): Promise<ActionResult>;
   /** Ends the session. The local save stays on the device and becomes a new guest on the next sync. */

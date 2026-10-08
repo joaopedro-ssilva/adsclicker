@@ -160,8 +160,12 @@ export type MeResponse = z.infer<typeof meResponseSchema>;
 // Account
 // ---------------------------------------------------------------------------
 
-/** POST /api/account/nickname */
-export const nicknameRequestSchema = z.object({ nickname: nicknameSchema });
+/**
+ * POST /api/account/nickname — claiming a nickname sets the account's password in the same step
+ * (the confirmation field is checked by the client only). An account that already has a password
+ * must send that same password, which proves the claim is made by its owner.
+ */
+export const nicknameRequestSchema = z.object({ nickname: nicknameSchema, password: passwordSchema });
 export type NicknameRequest = z.infer<typeof nicknameRequestSchema>;
 
 /** POST /api/account/password — sets it the first time; changing it requires the current one. */

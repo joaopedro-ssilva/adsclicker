@@ -457,7 +457,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         plan();
       },
 
-      setNickname: (nickname) => accountCall(() => api.setNickname({ nickname })),
+      setNickname: (nickname, password) => accountCall(() => api.setNickname({ nickname, password })),
 
       setPassword: (password, currentPassword) =>
         accountCall(() => api.setPassword({ password, currentPassword: currentPassword || undefined })),

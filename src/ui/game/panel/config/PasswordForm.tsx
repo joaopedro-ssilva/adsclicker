@@ -18,10 +18,13 @@ export function PasswordForm({ change, onDone, onCancel }: PasswordFormProps) {
   const setPassword = useCloud((store) => store.setPassword);
   const [current, setCurrent] = useState('');
   const [password, setPasswordValue] = useState('');
+  const [confirmation, setConfirmation] = useState('');
   const { pending, error, run } = useAccountAction();
 
   const issue = password.length > 0 ? firstIssue(passwordSchema, password) : null;
-  const ready = password.length > 0 && !issue && (!change || current.length > 0);
+  const confirmationIssue =
+    confirmation.length > 0 && confirmation !== password ? 'As duas senhas precisam ser iguais.' : null;
+  const ready = password.length > 0 && !issue && confirmation === password && (!change || current.length > 0);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -52,6 +55,16 @@ export function PasswordForm({ change, onDone, onCancel }: PasswordFormProps) {
         error={issue}
         hint={change ? undefined : 'Com ela você entra em outro aparelho usando seu apelido. De 6 a 72 caracteres.'}
         testId="account-new-password-input"
+      />
+      <AccountField
+        label={change ? 'Confirme a nova senha' : 'Confirme a senha'}
+        type="password"
+        value={confirmation}
+        onChange={setConfirmation}
+        autoComplete="new-password"
+        maxLength={PASSWORD_MAX}
+        error={confirmationIssue}
+        testId="account-new-password-confirm-input"
       />
       {error ? (
         <p className="save-warning" data-tone="bad" role="alert">

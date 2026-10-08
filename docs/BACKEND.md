@@ -45,8 +45,9 @@ drizzle/                   migrações SQL geradas
 ## Identidade e autenticação
 
 - **Convidado automático.** No primeiro sync sem sessão, o servidor cria um jogador convidado e devolve um cookie de sessão. O jogador não vê formulário nenhum.
-- **Apelido.** Escolher um apelido (3 a 16 caracteres, único sem diferenciar maiúsculas) coloca o jogador no ranking e no feed.
-- **Senha opcional.** Definir uma senha torna a conta utilizável em outro aparelho: lá o jogador entra com apelido + senha. Sem e-mail, sem confirmação, sem rede social.
+- **Conta = apelido + senha.** Criar a conta é escolher um apelido (3 a 16 caracteres, único sem diferenciar maiúsculas) **e** uma senha (6 a 72 caracteres) no mesmo passo: `POST /api/account/nickname` recebe `{ nickname, password }`, e a senha é obrigatória. Apelido e hash da senha são gravados na mesma transação, então não existe apelido novo sem senha. O campo de confirmação da senha é conferido só pelo cliente. Com a conta criada o jogador entra no ranking e no feed e, em outro aparelho, entra com apelido + senha. Sem e-mail, sem rede social.
+- **Trocar o apelido** de uma conta que já tem senha também exige essa senha no corpo (`wrong_credentials` se não conferir); a senha não muda.
+- **Contas antigas** (apelido sem senha, de antes da obrigatoriedade) continuam funcionando e no ranking. O cliente mostra um aviso dispensável na seção Conta convidando a criar a senha (`POST /api/account/password`, sem senha atual). Nada bloqueia o jogo.
 - **Sessão.** Token aleatório de 256 bits em cookie `adsclicker_session` (`HttpOnly`, `SameSite=Lax`, `Secure` em produção, 1 ano, renovado a cada uso). O banco guarda só o SHA-256 do token.
 - **Senha.** `scrypt` (do `node:crypto`) com sal por conta; comparação em tempo constante.
 - **Sair.** Encerra a sessão. O save local fica no aparelho e vira um convidado novo no próximo sync.

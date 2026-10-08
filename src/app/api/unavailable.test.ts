@@ -35,7 +35,7 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
     ['sync', () => sync(post('/api/sync', { save: '{"version":1}', baseRev: 0 }))],
     ['me', () => me(get('/api/me'))],
     ['ranks', () => ranks(get('/api/me/ranks'))],
-    ['nickname', () => account(post('/api/account/nickname', { nickname: 'Maria' }))],
+    ['nickname', () => account(post('/api/account/nickname', { nickname: 'Maria', password: 'segredo1' }))],
     ['login', () => login(post('/api/auth/login', { nickname: 'maria', password: 'segredo1' }))],
     ['logout', () => logout(post('/api/auth/logout', {}))],
     ['leaderboard', () => leaderboard(get('/api/leaderboard?board=coins'))],

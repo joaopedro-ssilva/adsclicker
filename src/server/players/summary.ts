@@ -13,7 +13,7 @@ function unrankedReason(player: Pick<PlayerCore, 'nickname' | 'flagged' | 'banne
   if (isRanked(player)) return null;
   if (player.banned) return 'Esta conta foi suspensa do ranking.';
   if (player.testAccount) return 'Conta de teste: fica fora do ranking.';
-  if (player.nickname === null) return 'Escolha um apelido para aparecer no ranking.';
+  if (player.nickname === null) return 'Crie uma conta, com apelido e senha, para aparecer no ranking.';
   return 'Seu progresso está em verificação e fica fora do ranking por enquanto.';
 }
 

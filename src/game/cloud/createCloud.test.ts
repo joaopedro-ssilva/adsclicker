@@ -655,7 +655,7 @@ describe('cloud store', () => {
       const t = setup();
       await t.start();
       t.nicknameResult.value = failure('internal', 409, 'Esse apelido já está em uso.');
-      const result = await t.store.getState().setNickname('Ana');
+      const result = await t.store.getState().setNickname('Ana', 'segredo1');
       expect(result.ok).toBe(false);
       expect(t.store.getState().me?.nickname).toBeNull();
     });
@@ -663,8 +663,8 @@ describe('cloud store', () => {
     it('updates the identity and syncs soon when a nickname is set', async () => {
       const t = setup();
       await t.start();
-      t.nicknameResult.value = ok({ me: { ...guest, nickname: 'Ana', ranked: true, unrankedReason: null } });
-      expect(await t.store.getState().setNickname('Ana')).toEqual({ ok: true });
+      t.nicknameResult.value = ok({ me: { ...guest, nickname: 'Ana', hasPassword: true, ranked: true, unrankedReason: null } });
+      expect(await t.store.getState().setNickname('Ana', 'segredo1')).toEqual({ ok: true });
       expect(t.store.getState().me?.nickname).toBe('Ana');
       await t.advance(10_000);
       expect(t.syncCalls).toHaveLength(2);

@@ -15,7 +15,7 @@ export function LeaderboardRow({ entry, own }: LeaderboardRowProps) {
       <span className="community-rank">{entry.rank}º</span>
       <PlayerAvatar professor={entry.professor} skin={entry.skin} />
       <span className="community-name">
-        <span className="community-nick">
+        <span className="community-nick" title={entry.nickname}>
           {entry.nickname}
           {own ? <span className="community-you">você</span> : null}
         </span>
