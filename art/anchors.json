@@ -16,7 +16,7 @@
     "y": 55
   },
   "hackathon/heads/cabelo-rosa": {
-    "x": 23,
+    "x": 27,
     "y": 55
   },
   "hackathon/heads/cacheado": {
@@ -24,11 +24,11 @@
     "y": 54
   },
   "hackathon/heads/cacho-longo": {
-    "x": 27,
-    "y": 59
+    "x": 30,
+    "y": 52
   },
   "hackathon/heads/chanel": {
-    "x": 23,
+    "x": 24,
     "y": 49
   },
   "hackathon/heads/coque": {
@@ -40,7 +40,7 @@
     "y": 51
   },
   "hackathon/heads/oculos-redondos": {
-    "x": 22,
+    "x": 23,
     "y": 58
   },
   "hackathon/heads/raspado": {
@@ -60,7 +60,7 @@
     "y": 47
   },
   "heads/angelo-padel": {
-    "x": 21,
+    "x": 20,
     "y": 47
   },
   "heads/angelo-paraninfo": {
@@ -72,20 +72,20 @@
     "y": 65
   },
   "heads/angelo-reitor": {
-    "x": 27,
+    "x": 24,
     "y": 53
   },
   "heads/b1": {
-    "x": 30,
+    "x": 29,
     "y": 52
   },
   "heads/b1-rainha": {
-    "x": 31,
+    "x": 30,
     "y": 66
   },
   "heads/b2": {
-    "x": 27,
-    "y": 54
+    "x": 28,
+    "y": 50
   },
   "heads/b2-obra": {
     "x": 27,
@@ -108,15 +108,15 @@
     "y": 52
   },
   "heads/edecio-gauchao": {
-    "x": 31,
+    "x": 30,
     "y": 61
   },
   "heads/edecio-gladiador": {
-    "x": 22,
+    "x": 21,
     "y": 74
   },
   "heads/edecio-samurai": {
-    "x": 29,
+    "x": 28,
     "y": 63
   },
   "heads/gladimir": {
@@ -124,27 +124,27 @@
     "y": 54
   },
   "heads/gladimir-guardiao": {
-    "x": 25,
+    "x": 23,
     "y": 65
   },
   "heads/gladimir-maker": {
-    "x": 24,
+    "x": 23,
     "y": 56
   },
   "heads/gladimir-mestre": {
-    "x": 27,
-    "y": 62
+    "x": 26,
+    "y": 58
   },
   "heads/gladimir-pescador": {
-    "x": 28,
+    "x": 27,
     "y": 55
   },
   "heads/gladimir-piloto": {
-    "x": 27,
+    "x": 26,
     "y": 61
   },
   "heads/guto": {
-    "x": 23,
+    "x": 22,
     "y": 55
   },
   "heads/guto-astronauta": {
@@ -152,7 +152,7 @@
     "y": 63
   },
   "heads/guto-capitao": {
-    "x": 25,
+    "x": 24,
     "y": 57
   },
   "heads/guto-pagodeiro": {
@@ -164,11 +164,11 @@
     "y": 55
   },
   "heads/pablo-galactico": {
-    "x": 27,
-    "y": 59
+    "x": 28,
+    "y": 56
   },
   "heads/pablo-garagem": {
-    "x": 27,
+    "x": 28,
     "y": 56
   },
   "heads/pablo-mago": {
@@ -184,11 +184,11 @@
     "y": 52
   },
   "heads/wagner-cavaleiro": {
-    "x": 23,
+    "x": 22,
     "y": 64
   },
   "heads/wagner-cripto": {
-    "x": 26,
+    "x": 25,
     "y": 55
   },
   "heads/wagner-detetive": {

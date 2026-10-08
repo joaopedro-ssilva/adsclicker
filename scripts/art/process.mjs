@@ -13,6 +13,8 @@ import { ROOT, RAW_DIR, ASSETS_DIR, ANCHORS_FILE, SHEETS_FILE, KIND_FOLDER, read
 
 /** Target native heights per kind (px). */
 const TARGET_H = { skin: 48, head: 56 };
+/** Heads whose hood or collar should hang over the neck: rows the head is lowered onto the body. */
+const HEAD_DROP = { 'gladimir-mestre': 4, 'pablo-galactico': 3 };
 /** Rows from the neck anchor to the feet that every professor body ends up with. */
 const BODY_BELOW_NECK = 46;
 /** Icons: their longest side. */
@@ -577,12 +579,32 @@ function skinAnchor(img) {
   return { x: w >> 1, y: 1, method: 'none' };
 }
 
+/** Horizontal centre of the face: the median column of the lighter skin-coloured pixels (hair and hoods of a similar hue are darker). */
+function faceCentreX(img) {
+  const { data, w, h } = img;
+  const found = [];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (data[i + 3] < 128) continue;
+      const { h: hue, s, l } = rgbToHsl(data[i], data[i + 1], data[i + 2]);
+      if (hue >= 8 && hue <= 45 && s >= 0.25 && l >= 0.3 && l <= 0.92) found.push({ x, l });
+    }
+  }
+  if (found.length < 30) return (w - 1) / 2;
+  const lights = found.map((p) => p.l).sort((p, q) => p - q);
+  const threshold = lights[Math.floor(lights.length * 0.7)] - 0.07;
+  const columns = found.filter((p) => p.l >= threshold).map((p) => p.x).sort((p, q) => p - q);
+  return columns[columns.length >> 1];
+}
+
 function headAnchor(img) {
   const { data, w, h } = img;
-  // x: middle of the sprite; y: lowest opaque pixel in the central column band (chin or beard tip),
-  // so long hair falling past the chin does not drag the anchor down
-  const cx = (w - 1) / 2;
-  const band = Math.max(2, Math.round(w * 0.1));
+  // x: the centre of the face, not of the sprite: hair that sticks out to one side makes the sprite wider on that
+  // side, and a head centred on the sprite would sit off the neck. y: lowest opaque pixel in a column band around
+  // that centre (chin or beard tip), so long hair falling past the chin does not drag the anchor down.
+  const cx = faceCentreX(img);
+  const band = Math.max(2, Math.round(w * 0.08));
   let yb = h - 1;
   for (let y = h - 1; y >= 0; y--) {
     let hit = false;
@@ -692,7 +714,10 @@ async function processSheet(sheet, anchors) {
         anchor = skinAnchor(sprite);
         console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - (anchor.top ?? anchor.y)}px`);
       }
-    } else if (sheet.kind === 'head') anchor = headAnchor(sprite);
+    } else if (sheet.kind === 'head') {
+      anchor = headAnchor(sprite);
+      anchor.y -= HEAD_DROP[key] ?? 0;
+    }
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);
     if (sheet.noAnchor) anchor = undefined;
     const rel = `${folder}/${key}`;

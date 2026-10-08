@@ -1,5 +1,6 @@
 // Builds a "dev account" save with everything unlocked, to look at late-game screens.
 // Usage: npm run dev:save   →   writes dev-save.txt; paste its contents in Config → Importar save.
+// Everything comes from the content lists, so new skins, sceneries, themes and achievements are included by themselves.
 import { writeFileSync } from 'node:fs';
 import { content } from '@/game/content';
 import { PROFESSOR_IDS } from '@/game/content/types';
@@ -15,11 +16,16 @@ state.diplomas = 5000;
 state.diplomasEarned = 5000;
 
 for (const id of PROFESSOR_IDS) state.hired[id] = true;
-for (const discipline of content.disciplines) state.levels[discipline.id] = 200;
-for (const upgrade of content.clickUpgrades) state.levels[upgrade.id] = 200;
+for (const discipline of content.disciplines) state.levels[discipline.id] = 400; // past the last strong milestone, and enough for the Domínio cap
+for (const upgrade of content.clickUpgrades) state.levels[upgrade.id] = 400;
 for (const research of content.research) state.research[research.id] = true;
 for (const node of content.prestigeNodes) state.prestige[node.id] = node.maxLevel;
 state.buyAmount = 'max';
+
+// Honoured professor: one is honoured now and every professor was honoured before.
+state.honoured = 'edecio';
+for (const id of PROFESSOR_IDS) state.honouredBefore[id] = true;
+for (const ability of content.abilities) state.abilitiesTried[ability.id] = true;
 
 for (const achievement of content.achievements) {
   state.achievements[achievement.id] = now;
@@ -30,16 +36,18 @@ for (const scenery of content.sceneries) state.sceneries[scenery.id] = true;
 for (const theme of content.themes) state.themes[theme.id] = true;
 
 Object.assign(state.counters, {
-  clicks: 250_000,
+  clicks: 1_500_000,
   crits: 9_000,
   maxCombo: 60,
   eventsDefended: 400,
-  bestEventStreak: 40,
+  bestEventStreak: 120,
+  biggestPurchase: 500,
+  bestDayStreak: 7,
   abilitiesUsed: 120,
   sprintsCompleted: 150,
   levelsBought: 6_000,
   researchBought: content.research.length,
-  graduations: 12,
+  graduations: 30,
   playSeconds: 40 * 3600,
 });
 
