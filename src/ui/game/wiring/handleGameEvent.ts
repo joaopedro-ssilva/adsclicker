@@ -7,7 +7,7 @@ import { toast } from '@/ui/kit';
 import { useMoments } from '../moments/momentsStore';
 import { forgetLayers } from '../stage/LayerReveal';
 import { achievementGrants, invasionById, rewardText, sprintById } from './describe';
-import { handleMaestriaEvent, onGoldenClick } from './maestriaEvents';
+import { handleMaestriaEvent } from './maestriaEvents';
 import { anchorElement, anchorPoint } from './stageRefs';
 
 const GOLD = '#f7ca75';
@@ -44,14 +44,16 @@ function onClick(event: Extract<GameEvent, { type: 'click' }>): void {
     return;
   }
 
-  if (event.golden) {
-    onGoldenClick(event);
-    return;
-  }
-
   const point = event.x !== undefined && event.y !== undefined ? { x: event.x, y: event.y } : anchorPoint('actor', 0.28);
   if (settings.floatingNumbers) {
-    fx.floatingNumber({ ...point, text: `+${formatNumber(event.value)}`, crit: event.crit, thumbsUp: event.crit });
+    // In the golden mode every number is gold; the mode's own flourish plays once, when it starts (see maestriaEvents).
+    fx.floatingNumber({
+      ...point,
+      text: `+${formatNumber(event.value)}`,
+      crit: event.crit,
+      thumbsUp: event.crit,
+      ...(event.golden ? { color: GOLD } : {}),
+    });
   }
   const balance = anchorElement('balance');
   if (balance && (event.crit || now - lastCoins > COIN_GAP_MS)) {
@@ -185,6 +187,7 @@ export function handleGameEvent(event: GameEvent): void {
       break;
     }
     case 'maestria':
+    case 'joinhaStart':
     case 'rollforward':
     case 'swarmStart':
     case 'swarmHit':

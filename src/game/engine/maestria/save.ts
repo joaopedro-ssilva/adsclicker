@@ -110,7 +110,8 @@ export function readMaestria(value: unknown, content: GameContent): MaestriaStat
       if (level > 0) maestria.levels[id] = level;
     }
   }
-  if (isRecord(value.joinha)) maestria.joinha.clicks = whole(value.joinha.clicks);
+  // The old shape (`clicks`) is ignored: both times start at 0.
+  if (isRecord(value.joinha)) maestria.joinha = { activeUntil: num(value.joinha.activeUntil, 0, 0), readyAt: num(value.joinha.readyAt, 0, 0) };
   if (isRecord(value.rollforward)) {
     maestria.rollforward = {
       clicks: whole(value.rollforward.clicks, 0, Math.max(0, content.maestrias.rollforward.clicksToFill - 1)),

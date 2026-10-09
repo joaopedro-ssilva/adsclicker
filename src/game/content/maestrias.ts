@@ -23,7 +23,7 @@ const defs: Record<ProfessorId, MaestriaDef> = {
   edecio: def(
     'edecio',
     'Joinha de Ouro',
-    'A cada tantos cliques, o próximo clique é de ouro e vale segundos da produção da turma inteira.',
+    'Combo no máximo ativa o modo ouro: por alguns segundos, cada clique vale várias vezes mais e o combo não cai. Depois, uma recarga.',
     true,
   ),
   gladimir: def(
@@ -163,11 +163,14 @@ const assets: BolsaAssetDef[] = [
 export const maestrias: MaestriasConfig = {
   defs,
   joinha: {
-    // A golden click is big (seconds of the whole class) and rare: at 10 clicks per second, level 5 adds about a third
-    // to production. With the old 100 to 60 clicks it more than tripled it, and the server could not tell it from cheating.
-    clicksNeeded: [1000, 900, 800, 700, 600],
-    seconds: [6, 9, 12, 16, 20],
-    critFromLevel: 3,
+    // A full combo starts a golden mode that multiplies every hand click, then a recharge. Someone who keeps clicking holds the
+    // combo at its maximum through the mode and the recharge, so the cycle is seconds + rechargeSeconds and the gain over it is
+    // (multiplier - 1) x seconds / (seconds + rechargeSeconds). At level 5 (10 clicks per second): 2 x 20 / 110 = +36% of click
+    // income, in the 30% to 40% the design asks for (level 1 gives +5%). The multiplier grows slowly and the recharge stays
+    // long on purpose: x4 with a 45 s recharge would be +90%, almost doubling click income, and the server could not tell it from cheating.
+    seconds: [8, 11, 14, 17, 20],
+    multiplier: [2, 2.25, 2.5, 2.75, 3],
+    rechargeSeconds: [150, 135, 120, 105, 90],
     holdFromLevel: 5,
     holdPerSecond: 10,
   },

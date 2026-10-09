@@ -15,7 +15,7 @@ import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
-import { maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
+import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
  * Seconds added to every time window. Covers network latency, the browser throttling timers,
@@ -186,7 +186,12 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
     previous && prevRates ? maestriaLumpSeconds(previous, content, prevRates.stats, maestriaWindow) : 0,
   );
   const productionSeconds = window * PRODUCTION_SLACK + offlineSeconds + lumps + maestriaSeconds;
-  const clickFactor = bestNumber((r) => r.clickFactor) * CLICK_BUFF_SLACK;
+  // Edécio's golden mode multiplies hand clicks for part of the window (see joinhaClickFactor).
+  const goldenFactor = Math.max(
+    joinhaClickFactor(next, content, maestriaWindow),
+    previous ? joinhaClickFactor(previous, content, maestriaWindow) : 1,
+  );
+  const clickFactor = bestNumber((r) => r.clickFactor) * CLICK_BUFF_SLACK * goldenFactor;
   const ceiling = best((r) => r.cps)
     .mul(productionSeconds)
     .add(best((r) => r.click).mul(clicksAllowed * clickFactor));

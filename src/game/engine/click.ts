@@ -1,11 +1,10 @@
 import type { GameContent } from '../content/types';
 import type { Emit } from '../store/types';
 import { decayCombo } from './combo';
-import { Decimal } from './decimal';
 import { acceptClick } from './clickLimit';
 import { clickValueWith, gain } from './economy';
 import { afterAction } from './lifecycle';
-import { goldenCanCrit, goldenReady, goldenValue, recordJoinhaClick } from './maestria/joinha';
+import { goldenFactor, maybeStartGolden } from './maestria/joinha';
 import { recordHoras } from './maestria/horas';
 import { recordRollforwardClick } from './maestria/rollforward';
 import { recordSprintEvent } from './sprints';
@@ -43,15 +42,15 @@ export function click(
   }
   state.combo.lastClickAt = now;
 
-  // Joinha de Ouro: after enough manual clicks the next one is golden. It crits only from the level that allows it.
-  const golden = goldenReady(state, content);
-  if (golden && !goldenCanCrit(state, content)) crit = false;
+  // Joinha de Ouro: a full combo starts the golden mode (this click already counts), which multiplies the final value of a hand click.
+  maybeStartGolden(state, content, stats, now, emit);
+  const factor = goldenFactor(state, content, now);
+  const golden = factor > 1;
 
   const steps = state.combo.steps;
   let value = clickValueWith(state, content, stats, { comboSteps: steps, crit });
-  if (golden) value = Decimal.max(value, goldenValue(state, content, stats, crit));
+  if (golden) value = value.mul(factor);
   gain(state, value);
-  recordJoinhaClick(state, content, golden);
   recordRollforwardClick(state, content);
   recordHoras(state, content, 'clicks');
   state.run.clicks += 1;

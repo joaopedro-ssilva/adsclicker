@@ -8,7 +8,7 @@ import { assetOpen, bolsaInvested, bolsaLevel, bolsaLimit, bolsaLimitSeconds, bo
 import { activeFesta, festaCharge, festaRechargeMs } from './festa';
 import { horasBands, horasCapacity, horasCounted } from './horas';
 import { releaseBonusPerVersion, releaseSprintsPerVersion, releaseVersions } from './releases';
-import { goldenCanCrit, goldenReady, goldenSeconds, joinhaClicksNeeded } from './joinha';
+import { goldenActive, goldenReady, joinhaMultiplier, joinhaRechargeSeconds, joinhaSeconds } from './joinha';
 import { atLevel } from './production';
 import { rollforwardJumpMs, rollforwardMaxCharges } from './rollforward';
 import { freeSlots, maestriaLevel, maestriaNextCost, unlockedMaestrias } from './slots';
@@ -55,8 +55,7 @@ export function maestriaLevelLines(content: GameContent, professor: ProfessorId)
   for (let level = 1; level <= MAESTRIA_MAX_LEVEL; level += 1) {
     if (professor === 'edecio') {
       const j = cfg.joinha;
-      let line = `A cada ${whole(atLevel(j.clicksNeeded, level))} cliques, um clique de ouro vale ${whole(atLevel(j.seconds, level))} s da produção.`;
-      if (level === j.critFromLevel) line += ' Ele pode ser crítico.';
+      let line = `Combo cheio ativa o modo ouro: ${times(atLevel(j.multiplier, level))} por ${whole(atLevel(j.seconds, level))} s. Recarga de ${whole(atLevel(j.rechargeSeconds, level))} s.`;
       if (level === j.holdFromLevel) line += ` Segure o mouse: ${whole(j.holdPerSecond)} cliques por segundo.`;
       lines.push(line);
     } else if (professor === 'gladimir') {
@@ -139,29 +138,36 @@ export function maestriasView(state: GameState, content: GameContent): Maestrias
 
 export interface JoinhaView {
   level: number;
-  /** Manual clicks since the last golden one, and how many the next one needs. */
-  clicks: number;
-  needed: number;
-  /** The next click is golden. */
+  /** The golden mode is on, with the time left and its length; null otherwise. */
+  active: { leftMs: number; totalMs: number } | null;
+  /** The recharge after the mode, with the time left and its length; null when there is none running. */
+  recharge: { leftMs: number; totalMs: number } | null;
+  /** A full combo would start the mode now. */
   ready: boolean;
   seconds: number;
-  canCrit: boolean;
+  multiplier: number;
+  rechargeSeconds: number;
   /** Holding the pointer on the professor clicks by itself. */
   canHold: boolean;
   holdPerSecond: number;
 }
 
-export function joinhaView(state: GameState, content: GameContent): JoinhaView | null {
+export function joinhaView(state: GameState, content: GameContent, now: number = state.lastTickAt): JoinhaView | null {
   const level = maestriaLevel(state, 'edecio');
   if (level <= 0) return null;
-  const needed = joinhaClicksNeeded(state, content);
+  const { activeUntil, readyAt } = state.maestria.joinha;
+  const seconds = joinhaSeconds(state, content);
+  const rechargeSeconds = joinhaRechargeSeconds(state, content);
+  const active = goldenActive(state, now);
+  const recharging = !active && now < readyAt;
   return {
     level,
-    clicks: Math.min(needed, state.maestria.joinha.clicks),
-    needed,
-    ready: goldenReady(state, content),
-    seconds: goldenSeconds(state, content),
-    canCrit: goldenCanCrit(state, content),
+    active: active ? { leftMs: activeUntil - now, totalMs: seconds * 1000 } : null,
+    recharge: recharging ? { leftMs: readyAt - now, totalMs: rechargeSeconds * 1000 } : null,
+    ready: goldenReady(state, now),
+    seconds,
+    multiplier: joinhaMultiplier(state, content),
+    rechargeSeconds,
     canHold: level >= content.maestrias.joinha.holdFromLevel,
     holdPerSecond: content.maestrias.joinha.holdPerSecond,
   };

@@ -9,7 +9,9 @@ import { createRng } from '../rng';
 import { deserializeState, serializeState } from '../save';
 import { advance } from '../tick';
 import { angeloCapFactor, diplomaCap, maxAngeloCapFactor } from '../prestige';
-import { buyMaestriaLevel, fireRollforward, freeSlots, hitSwarmBug, startSwarm, unlockMaestria, updateSwarm } from './index';
+import { computeStats } from '../stats';
+import { joinhaView } from '../views';
+import { buyMaestriaLevel, fireRollforward, freeSlots, goldenActive, hitSwarmBug, resetMaestriasForGraduation, startSwarm, unlockMaestria, updateSwarm } from './index';
 
 const T0 = 1_700_000_000_000;
 
@@ -76,25 +78,154 @@ describe('slots and levels', () => {
 });
 
 describe('Joinha de Ouro', () => {
-  it('the click after enough clicks is golden: seconds of production, once', () => {
+  const cfg = content.maestrias.joinha;
+  const never = () => 0.99; // no crit
+
+  /** A game with Edécio's Maestria at `level`, clicking every 100 ms until the combo is full. */
+  function nearFull(level = 1) {
+    const g = game();
+    g.state.maestria.levels = { edecio: level };
+    const max = computeStats(g.state, content).comboMax;
+    let t = T0;
+    for (let i = 0; i <= max; i += 1) {
+      t += 100; // the first click only opens the combo, each one after it adds a step
+      click(g.state, content, t, never, g.emit);
+    }
+    return { g, t, max };
+  }
+  const lastClick = (g: ReturnType<typeof game>) => g.events.filter((e) => e.type === 'click').at(-1);
+
+  it('a full combo starts the golden mode: the clicks are worth the multiplier and the recharge counts from its end', () => {
+    const { g, t, max } = nearFull();
+    expect(g.state.combo.steps).toBe(max);
+    const seconds = (cfg.seconds[0] ?? 0) * 1000;
+    const mult = cfg.multiplier[0] ?? 1;
+    expect(g.state.maestria.joinha.activeUntil).toBeGreaterThan(0);
+    expect(goldenActive(g.state, t)).toBe(true);
+    const startedAt = g.state.maestria.joinha.activeUntil - seconds;
+    expect(g.state.maestria.joinha.readyAt).toBe(g.state.maestria.joinha.activeUntil + (cfg.rechargeSeconds[0] ?? 0) * 1000);
+    expect(g.events.some((e) => e.type === 'joinhaStart')).toBe(true);
+
+    // The next click pays the multiplier times what the same click pays on the same save without the Maestria.
+    const twin = deserializeState(serializeState(g.state), content, t);
+    if (!twin) throw new Error('twin did not load');
+    twin.maestria.levels = {};
+    const before = g.state.coins;
+    click(g.state, content, t + 100, never, g.emit);
+    const paid = g.state.coins.sub(before);
+    expect(lastClick(g)).toMatchObject({ golden: true });
+    const twinBefore = twin.coins;
+    click(twin, content, t + 100, never, () => {});
+    expect(paid.div(twin.coins.sub(twinBefore)).toNumber()).toBeCloseTo(mult, 5);
+    expect(startedAt).toBeLessThanOrEqual(t);
+  });
+
+  it('the combo does not fall while the mode lasts, then falls from its end', () => {
+    const { g, t, max } = nearFull();
+    const { activeUntil } = g.state.maestria.joinha;
+    advance(g.state, content, activeUntil - 500, g.rng, g.emit);
+    expect(g.state.combo.steps).toBe(max);
+    advance(g.state, content, activeUntil + 1500, g.rng, g.emit);
+    expect(g.state.combo.steps).toBeLessThan(max);
+    expect(t).toBeLessThan(activeUntil);
+  });
+
+  it('it does not start again before the recharge is over, and a full combo starts it after', () => {
+    const { g, max } = nearFull();
+    const { activeUntil, readyAt } = g.state.maestria.joinha;
+    // Clicks after the mode ended, inside the recharge: golden is off and the mode keeps its times.
+    let t = activeUntil + 100;
+    g.state.combo.steps = max;
+    g.state.combo.lastClickAt = t - 50;
+    g.state.lastTickAt = t - 50;
+    click(g.state, content, t, never, g.emit);
+    expect(lastClick(g)).toMatchObject({ golden: false });
+    expect(g.state.maestria.joinha).toEqual({ activeUntil, readyAt });
+    // Once the recharge is over a full combo starts a new one.
+    t = readyAt + 100;
+    g.state.combo.steps = max;
+    g.state.combo.lastClickAt = t - 50;
+    g.state.lastTickAt = t - 50;
+    click(g.state, content, t, never, g.emit);
+    expect(lastClick(g)).toMatchObject({ golden: true });
+    expect(g.state.maestria.joinha.activeUntil).toBeGreaterThan(readyAt);
+  });
+
+  it("with Edécio's honour the combo limit doubles, so the trigger waits for the new maximum", () => {
     const g = game();
     g.state.maestria.levels = { edecio: 1 };
-    const needed = content.maestrias.joinha.clicksNeeded[0] ?? 100;
+    g.state.honoured = 'edecio';
+    const stats = computeStats(g.state, content);
+    expect(stats.comboMax).toBeGreaterThan(content.balance.combo.baseMax);
     let t = T0;
-    for (let i = 0; i < needed; i += 1) {
+    for (let i = 0; i < content.balance.combo.baseMax + 3; i += 1) {
       t += 100;
-      click(g.state, content, t, g.rng, g.emit);
+      click(g.state, content, t, never, g.emit);
     }
-    g.events.length = 0;
-    t += 100;
-    click(g.state, content, t, g.rng, g.emit);
-    const golden = g.events.find((e) => e.type === 'click');
-    expect(golden).toMatchObject({ golden: true });
-    expect(g.state.maestria.joinha.clicks).toBe(0);
-    t += 100;
-    g.events.length = 0;
-    click(g.state, content, t, g.rng, g.emit);
-    expect(g.events.find((e) => e.type === 'click')).toMatchObject({ golden: false });
+    expect(goldenActive(g.state, t)).toBe(false);
+    for (let i = 0; i < stats.comboMax; i += 1) {
+      t += 100;
+      click(g.state, content, t, never, g.emit);
+    }
+    expect(goldenActive(g.state, t)).toBe(true);
+  });
+
+  it('a Rollforward advances the recharge but never the running mode', () => {
+    const { g } = nearFull();
+    g.state.maestria.levels.gladimir = 1;
+    g.state.maestria.rollforward = { clicks: 0, charges: 1 };
+    const before = { ...g.state.maestria.joinha };
+    // Pretend the mode already ended and the recharge has a long way to go.
+    g.state.maestria.joinha = { activeUntil: before.activeUntil, readyAt: before.activeUntil + 500_000 };
+    const jump = (content.maestrias.rollforward.jumpSeconds[0] ?? 0) * 1000;
+    expect(fireRollforward(g.state, content, g.emit)).toBe(true);
+    expect(g.state.maestria.joinha.activeUntil).toBe(before.activeUntil);
+    expect(g.state.maestria.joinha.readyAt).toBe(before.activeUntil + 500_000 - jump);
+    // A jump bigger than the recharge stops at the end of the mode.
+    g.state.maestria.joinha.readyAt = before.activeUntil + 1000;
+    g.state.maestria.rollforward.charges = 1;
+    fireRollforward(g.state, content, g.emit);
+    expect(g.state.maestria.joinha).toEqual({ activeUntil: before.activeUntil, readyAt: before.activeUntil });
+  });
+
+  it('graduating ends an active mode and clears the recharge', () => {
+    const { g } = nearFull();
+    resetMaestriasForGraduation(g.state);
+    expect(g.state.maestria.joinha).toEqual({ activeUntil: 0, readyAt: 0 });
+  });
+
+  it('a save in the old shape loads with the new fields at their defaults, the new shape round-trips', () => {
+    const g = game();
+    g.state.maestria.levels = { edecio: 2 };
+    const raw = JSON.parse(serializeState(g.state)) as { maestria: { joinha: unknown } };
+    raw.maestria.joinha = { clicks: 321 };
+    const old = deserializeState(JSON.stringify(raw), content, T0);
+    expect(old?.maestria.joinha).toEqual({ activeUntil: 0, readyAt: 0 });
+    raw.maestria.joinha = { activeUntil: T0 + 5000, readyAt: 'x' };
+    expect(deserializeState(JSON.stringify(raw), content, T0)?.maestria.joinha).toEqual({ activeUntil: T0 + 5000, readyAt: 0 });
+    g.state.maestria.joinha = { activeUntil: T0 + 5000, readyAt: T0 + 9000 };
+    expect(deserializeState(serializeState(g.state), content, T0)?.maestria.joinha).toEqual({ activeUntil: T0 + 5000, readyAt: T0 + 9000 });
+  });
+
+  it('the levels only get better, and level 5 adds 30% to 40% of click income over a full cycle', () => {
+    const gain = (i: number) => (((cfg.multiplier[i] ?? 1) - 1) * (cfg.seconds[i] ?? 0)) / ((cfg.seconds[i] ?? 0) + (cfg.rechargeSeconds[i] ?? 0));
+    for (let i = 1; i < 5; i += 1) {
+      expect(cfg.seconds[i]).toBeGreaterThan(cfg.seconds[i - 1] ?? 0);
+      expect(cfg.multiplier[i]).toBeGreaterThan(cfg.multiplier[i - 1] ?? 0);
+      expect(cfg.rechargeSeconds[i]).toBeLessThan(cfg.rechargeSeconds[i - 1] ?? 0);
+    }
+    expect(gain(4)).toBeGreaterThanOrEqual(0.3);
+    expect(gain(4)).toBeLessThanOrEqual(0.4);
+  });
+
+  it('the view shows each state: ready, active, recharging', () => {
+    const g = game();
+    g.state.maestria.levels = { edecio: 1 };
+    expect(joinhaView(g.state, content, T0)).toMatchObject({ ready: true, active: null, recharge: null });
+    g.state.maestria.joinha = { activeUntil: T0 + 8000, readyAt: T0 + 158_000 };
+    expect(joinhaView(g.state, content, T0 + 2000)).toMatchObject({ ready: false, active: { leftMs: 6000 }, recharge: null });
+    expect(joinhaView(g.state, content, T0 + 10_000)).toMatchObject({ ready: false, active: null, recharge: { leftMs: 148_000 } });
+    expect(joinhaView(g.state, content, T0 + 200_000)).toMatchObject({ ready: true, active: null, recharge: null });
   });
 });
 
@@ -105,7 +236,6 @@ describe('click limit', () => {
     const limit = content.balance.clickLimit?.perSecond ?? 15;
     for (let i = 0; i < limit * 4; i += 1) click(g.state, content, T0 + i, g.rng, g.emit);
     expect(g.state.counters.clicks).toBe(limit);
-    expect(g.state.maestria.joinha.clicks).toBe(limit);
     expect(g.state.maestria.rollforward.clicks).toBe(limit);
     expect(g.events.filter((e) => e.type === 'click')).toHaveLength(limit);
     click(g.state, content, T0 + 1500, g.rng, g.emit); // the window moved on

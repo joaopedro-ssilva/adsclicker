@@ -33,6 +33,8 @@ export type GameEvent =
   | { type: 'monitorAct'; monitor: MonitorId; id: string }
   /** A Maestria was unlocked (level 1) or raised. */
   | { type: 'maestria'; professor: ProfessorId; level: number }
+  /** A full combo started the golden mode of Joinha de Ouro; it ends at `endsAt` (epoch ms). */
+  | { type: 'joinhaStart'; endsAt: number }
   | { type: 'rollforward'; ms: number; coins: Decimal }
   | { type: 'swarmStart'; uid: number }
   | { type: 'swarmHit'; uid: number; bug: number; x: number; y: number; hp: number; boss: boolean; killed: boolean; auto: boolean }

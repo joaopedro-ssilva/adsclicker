@@ -9,6 +9,7 @@ import { simulate } from '@/game/sim/simulate';
 import type { SimOptions } from '@/game/sim/simulate';
 import { roundTrip } from '../testing/play';
 import type { Window } from '../testing/play';
+import { joinhaClickFactor } from './maestriaBounds';
 import { judgeSave } from './plausibility';
 
 /** Plays with all eight Maestrias at the top level (the simulator uses every charge as soon as it is ready and trades the Bolsa). */
@@ -70,6 +71,34 @@ describe('judgeSave: Maestrias', () => {
     next.diplomasEarned = 100;
     next.diplomas = 0;
     expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
+  });
+
+  it("Edécio's golden mode raises the click ceiling by the part of the window it can be on, and only with the Maestria", () => {
+    const { previous, next, elapsedMs } = last();
+    const window = { clicks: 10 * 75, seconds: 75 };
+    const cfg = content.maestrias.joinha;
+    const solo = roundTrip(next);
+    solo.maestria.levels = { edecio: 5 }; // no Rollforward to shorten the recharge
+    const level5 = joinhaClickFactor(solo, content, window);
+    // 75 s hold one run of 20 s (the mode may already be on at the start): 1 + (3 - 1) x 20 / 75.
+    expect(level5).toBeCloseTo(1 + ((cfg.multiplier[4] ?? 1) - 1) * ((cfg.seconds[4] ?? 0) / 75), 3);
+    expect(level5).toBeLessThan(cfg.multiplier[4] ?? 1);
+    // A long window gets more runs but a smaller share of it; a window shorter than the mode is capped at the multiplier.
+    expect(joinhaClickFactor(solo, content, { clicks: 10 * 630, seconds: 630 })).toBeLessThan(level5);
+    expect(joinhaClickFactor(solo, content, { clicks: 10, seconds: 5 })).toBeCloseTo(cfg.multiplier[4] ?? 1, 5);
+    // With the Rollforward's charges the recharge can be skipped, which counts as more time.
+    expect(joinhaClickFactor(next, content, window)).toBeGreaterThan(level5);
+    const without = roundTrip(next);
+    delete without.maestria.levels.edecio;
+    expect(joinhaClickFactor(without, content, window)).toBe(1);
+
+    // The same save is judged against a lower ceiling without the Maestria.
+    const prevWithout = roundTrip(previous);
+    delete prevWithout.maestria.levels.edecio;
+    const withMaestria = judgeSave({ previous, next: roundTrip(next), elapsedMs });
+    const withoutMaestria = judgeSave({ previous: prevWithout, next: without, elapsedMs });
+    if (!withMaestria.ok || !withoutMaestria.ok) throw new Error('both should pass');
+    expect(withoutMaestria.ratio).toBeGreaterThan(withMaestria.ratio);
   });
 
   it('coins from a jump the Maestria cannot pay', () => {

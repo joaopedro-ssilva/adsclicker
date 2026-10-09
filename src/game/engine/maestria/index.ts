@@ -7,7 +7,7 @@ import { updateFesta } from './festa';
 import { updateSwarm } from './swarm';
 
 export { createMaestriaState, buyMaestriaLevel, freeSlots, maestriaLevel, maestriaNextCost, maestriaSpent, unlockMaestria, unlockedMaestrias } from './slots';
-export { goldenCanCrit, goldenReady, goldenSeconds, goldenValue, joinhaClicksNeeded, recordJoinhaClick } from './joinha';
+export { goldenActive, goldenFactor, goldenReady, joinhaMultiplier, joinhaRechargeSeconds, joinhaSeconds, maybeStartGolden } from './joinha';
 export { fireRollforward, recordRollforwardClick, rollforwardJumpMs, rollforwardMaxCharges } from './rollforward';
 export { hitSwarmBug, startSwarm, swarmCharge, swarmChargeMs, swarmMaxSeconds, swarmReady, swarmSeconds, updateSwarm } from './swarm';
 export { applyDesignSystem, designSystemChance, designSystemReach } from './designSystem';
@@ -49,7 +49,7 @@ export function updateMaestrias(state: GameState, content: GameContent, now: num
  * are kept. Hours are paid by graduate() before this runs; the Bolsa's holdings were sold by it.
  */
 export function resetMaestriasForGraduation(state: GameState): void {
-  state.maestria.joinha = { clicks: 0 };
+  state.maestria.joinha = { activeUntil: 0, readyAt: 0 };
   state.maestria.rollforward = { clicks: 0, charges: 0 };
   state.maestria.swarm.active = null;
   state.maestria.horas = { clicks: 0, invasions: 0, sprints: 0, abilities: 0, levels: 0 };

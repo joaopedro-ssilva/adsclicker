@@ -10,9 +10,7 @@ import { anchorElement, anchorPoint } from './stageRefs';
 const GOLD = '#ffd23f';
 const GOOD = '#78d9a5';
 const BAD = '#ff6b6b';
-const COIN_GAP_MS = 60;
 
-let lastGoldenCoins = 0;
 let lastKillSound = 0;
 
 /** Where a bug of the swarm sits in the viewport. The bugs' positions are 0..1 of the stage, as for invasions. */
@@ -23,21 +21,13 @@ function bugPoint(x: number, y: number): { x: number; y: number } {
   return { x: rect.left + rect.width * (0.08 + x * 0.84), y: rect.top + rect.height * (0.18 + y * 0.5) };
 }
 
-/** A golden click: a bigger gold number, a burst of coins and a short shake. The ordinary click effects are skipped. */
-export function onGoldenClick(event: Extract<GameEvent, { type: 'click' }>): void {
+/** The golden mode starts: a gold flourish over the professor and the sound. The clicks after it only get gold numbers. */
+function onJoinhaStart(): void {
   const { settings } = useGame.getState().state;
-  const point = event.x !== undefined && event.y !== undefined ? { x: event.x, y: event.y } : anchorPoint('actor', 0.28);
-  if (settings.floatingNumbers) {
-    fx.floatingNumber({ ...point, text: `OURO +${formatNumber(event.value)}`, crit: true, color: GOLD, thumbsUp: true });
-  }
-  const balance = anchorElement('balance');
-  const now = performance.now();
-  if (balance && now - lastGoldenCoins > COIN_GAP_MS) {
-    lastGoldenCoins = now;
-    fx.coins({ ...point, target: balance, count: 26, color: GOLD });
-  }
+  const point = anchorPoint('actor', 0.28);
+  if (settings.floatingNumbers) fx.floatingNumber({ ...point, text: 'MODO OURO', crit: true, color: GOLD, thumbsUp: true });
   fx.sparkles({ ...point, count: 40, color: GOLD });
-  fx.shake({ intensity: event.crit ? 9 : 5, duration: 320 });
+  fx.shake({ intensity: 5, duration: 320 });
   audio.play('golden');
 }
 
@@ -129,7 +119,7 @@ function onSwarmEnd(event: Extract<GameEvent, { type: 'swarmEnd' }>): void {
   });
 }
 
-/** Sound, effects and toasts of the Maestrias. The golden click arrives as a `click` event and goes to onGoldenClick. */
+/** Sound, effects and toasts of the Maestrias. The golden mode's clicks are ordinary `click` events (gold numbers); its start is `joinhaStart`. */
 export function handleMaestriaEvent(event: GameEvent): void {
   switch (event.type) {
     case 'maestria': {
@@ -144,6 +134,9 @@ export function handleMaestriaEvent(event: GameEvent): void {
       });
       break;
     }
+    case 'joinhaStart':
+      onJoinhaStart();
+      break;
     case 'rollforward':
       onRollforward(event);
       break;

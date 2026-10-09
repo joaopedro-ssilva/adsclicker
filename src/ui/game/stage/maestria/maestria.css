@@ -1,4 +1,4 @@
-/* Maestrias on the stage: the golden click meter, the Rollforward and Super invasão buttons, and the swarm. */
+/* Maestrias on the stage: the golden mode indicator, the Rollforward and Super invasão buttons, and the swarm. */
 
 /* Buttons: they reuse the ability look, below the abilities column */
 
@@ -47,7 +47,7 @@
   border-color: var(--legendary);
 }
 
-/* Joinha de Ouro: the counter beside the professor */
+/* Joinha de Ouro: the state of the golden mode beside the professor */
 
 .golden-slot {
   position: absolute;
@@ -76,25 +76,17 @@
   color: var(--text);
 }
 
-.golden-cells {
-  display: grid;
-  grid-template-columns: repeat(var(--cells), 1fr);
-  gap: 2px;
+.golden-bar {
   width: 100%;
   padding: 3px;
   background: var(--bg);
   border: 2px solid var(--border);
 }
 
-.golden-cells i {
+.golden-bar b {
   display: block;
   height: 9px;
-  background: color-mix(in srgb, var(--border) 70%, var(--bg));
-}
-
-.golden-cells i[data-on='true'] {
-  background: var(--gold);
-  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35);
+  background: color-mix(in srgb, var(--border) 20%, var(--text-muted));
 }
 
 .golden-label {
@@ -113,13 +105,27 @@
   font-weight: 700;
 }
 
-.golden[data-ready='true'] {
+.golden[data-state='ready'] {
+  border-color: color-mix(in srgb, var(--gold) 60%, var(--border));
+}
+
+.golden[data-state='ready'] .golden-bar b {
+  background: var(--gold);
+  opacity: 0.55;
+}
+
+.golden[data-state='active'] {
   border-color: var(--gold);
   animation: golden-throb 560ms steps(2) infinite;
 }
 
-.golden[data-ready='true'] .golden-title,
-.golden[data-ready='true'] .golden-label {
+.golden[data-state='active'] .golden-bar b {
+  background: var(--gold);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35);
+}
+
+.golden[data-state='active'] .golden-title,
+.golden[data-state='active'] .golden-label {
   color: var(--gold);
 }
 
@@ -131,7 +137,17 @@
   }
 }
 
-/* The professor glows while the next click is golden */
+@media (prefers-reduced-motion: reduce) {
+  .golden[data-state='active'] {
+    animation: none;
+  }
+}
+
+[data-reduced-motion='true'] .golden[data-state='active'] {
+  animation: none;
+}
+
+/* The professor glows for the whole golden mode */
 .clicker[data-golden='true'] .character {
   filter: drop-shadow(0 0 6px #f5c542) drop-shadow(0 0 14px rgb(245 197 66 / 0.7));
 }
@@ -363,21 +379,27 @@
 }
 
 @container stage (max-width: 639px) {
+  /* The combo thermometer takes the side of the professor here, so the state sits over the feet, as a small pill the clicks go through. */
   .golden-slot {
-    left: calc(100% + 8px);
+    inset-inline: 0;
+    bottom: 0;
+    width: max-content;
+    margin-inline: auto;
+    pointer-events: none;
   }
 
   .golden {
-    min-width: 72px;
-    padding: 6px 6px 4px;
+    min-width: 84px;
+    gap: 4px;
+    padding: 5px 6px 4px;
   }
 
   .golden-title {
-    font-size: 11px;
+    display: none;
   }
 
   .golden-label {
-    max-width: 76px;
+    max-width: 96px;
   }
 
   /* Side by side (the stage is short): two 54 px buttons fit the 116 px column. */

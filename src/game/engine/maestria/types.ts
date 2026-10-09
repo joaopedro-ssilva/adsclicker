@@ -46,8 +46,8 @@ export interface SwarmResult {
 export interface MaestriaState {
   /** Professor -> level (1..5) of the Maestria that got a slot. Missing = not unlocked. */
   levels: Partial<Record<ProfessorId, number>>;
-  /** Joinha de Ouro. `clicks` = manual clicks since the last golden one. Reset at graduation. */
-  joinha: { clicks: number };
+  /** Joinha de Ouro (epoch ms). `activeUntil` = when the golden mode ends; `readyAt` = when the recharge after it ends. 0 = none. Reset at graduation. */
+  joinha: { activeUntil: number; readyAt: number };
   /** Rollforward. `clicks` fills the next charge, `charges` are the full ones stored. Reset at graduation. */
   rollforward: { clicks: number; charges: number };
   /** Super invasão. `since` = when the charge started filling (epoch ms); it survives graduation. */

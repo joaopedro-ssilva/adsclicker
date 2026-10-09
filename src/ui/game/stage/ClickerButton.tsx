@@ -23,8 +23,8 @@ export const ClickerButton = memo(function ClickerButton({ scale, floating = fal
   const professorId = useGameState((state) => state.activeProfessor);
   const skinId = useGameState((state) => state.equippedSkin[state.activeProfessor]);
   const click = useGame((store) => store.click);
-  // Joinha de Ouro: the next click is golden.
-  const golden = useGame((store) => joinhaView(store.state, content)?.ready ?? false);
+  // Joinha de Ouro: the golden mode is on.
+  const golden = useGame((store) => joinhaView(store.state, content)?.active != null);
   const [bump, setBump] = useState(0);
   const button = useRef<HTMLButtonElement>(null);
 

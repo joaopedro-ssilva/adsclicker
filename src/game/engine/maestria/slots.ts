@@ -8,7 +8,7 @@ import type { MaestriaState } from './types';
 export function createMaestriaState(): MaestriaState {
   return {
     levels: {},
-    joinha: { clicks: 0 },
+    joinha: { activeUntil: 0, readyAt: 0 },
     rollforward: { clicks: 0, charges: 0 },
     swarm: { since: 0, seq: 0, active: null },
     festa: { since: 0 },

@@ -10,7 +10,9 @@ import {
   atLevel,
   bolsaMaxSeconds,
   festaRechargeMs,
-  goldenCanCrit,
+  joinhaMultiplier,
+  joinhaRechargeSeconds,
+  joinhaSeconds,
   maestriaLevel,
   maestriaSpent,
   rollforwardJumpMs,
@@ -34,26 +36,37 @@ export interface MaestriaWindow {
   seconds: number;
 }
 
+/** Seconds the Rollforward can jump in the window: the charges stored plus the ones the window's clicks can fill. */
+function rollforwardSeconds(state: GameState, content: GameContent, window: MaestriaWindow): number {
+  if (maestriaLevel(state, 'gladimir') <= 0) return 0;
+  const uses = rollforwardMaxCharges(state, content) + window.clicks / content.maestrias.rollforward.clicksToFill;
+  return uses * (rollforwardJumpMs(state, content) / 1000);
+}
+
+/**
+ * Joinha de Ouro multiplies hand clicks, so it is not a lump of seconds: it is a factor on the click income of the window.
+ * The factor is 1 + (multiplier - 1) x the largest part of the window the mode can be on: it can already be running at the
+ * start, and each cycle (mode plus recharge) gives it another run. A Rollforward shortens the recharge by its jump, which
+ * counts as extra time for the cycles. A save without the Maestria gets 1.
+ */
+export function joinhaClickFactor(state: GameState, content: GameContent, window: MaestriaWindow): number {
+  if (maestriaLevel(state, 'edecio') <= 0) return 1;
+  const mode = joinhaSeconds(state, content);
+  const cycle = Math.max(1, mode + joinhaRechargeSeconds(state, content));
+  const time = Math.max(1, window.seconds);
+  const runs = Math.floor((time + rollforwardSeconds(state, content, window)) / cycle) + 1;
+  const fraction = Math.min(1, (runs * mode) / time);
+  return 1 + (joinhaMultiplier(state, content) - 1) * fraction;
+}
+
 /** Seconds of production the Maestrias of `state` can pay in the window. */
 export function maestriaLumpSeconds(state: GameState, content: GameContent, stats: Stats, window: MaestriaWindow): number {
-  const cfg = content.maestrias;
   let total = 0;
 
-  // Joinha de Ouro: one golden click per (needed + 1) clicks, plus one already waiting, each worth its seconds (crit included).
-  const joinha = maestriaLevel(state, 'edecio');
-  if (joinha > 0) {
-    const needed = atLevel(cfg.joinha.clicksNeeded, joinha);
-    const each = atLevel(cfg.joinha.seconds, joinha) * (goldenCanCrit(state, content) ? stats.critMult : 1);
-    total += (window.clicks / (needed + 1) + 1) * each;
-  }
-
   // Rollforward: the charges stored plus the ones the window's clicks can fill, each a jump of production.
-  let rollforward = 0;
-  if (maestriaLevel(state, 'gladimir') > 0) {
-    const uses = rollforwardMaxCharges(state, content) + window.clicks / cfg.rollforward.clicksToFill;
-    rollforward = uses * (rollforwardJumpMs(state, content) / 1000);
-    total += rollforward;
-  }
+  // (Joinha de Ouro pays no lump: it multiplies hand clicks, see joinhaClickFactor.)
+  const rollforward = rollforwardSeconds(state, content, window);
+  total += rollforward;
 
   // Super invasão: one per charge time of the window (the Rollforward also moves the charge), and one already full.
   const swarm = maestriaLevel(state, 'wagner');

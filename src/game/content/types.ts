@@ -371,12 +371,12 @@ export interface MaestriasConfig {
   defs: Record<ProfessorId, MaestriaDef>;
   /** Edécio, Joinha de Ouro. */
   joinha: {
-    /** Manual clicks before the golden one. */
-    clicksNeeded: number[];
-    /** Seconds of the class's coins/second a golden click is worth. */
+    /** Seconds the golden mode lasts once a full combo starts it. */
     seconds: number[];
-    /** The golden click can crit from this level. */
-    critFromLevel: number;
+    /** What a hand click is worth while it lasts (times its final value). */
+    multiplier: number[];
+    /** Seconds after the mode ends before a full combo can start it again. */
+    rechargeSeconds: number[];
     /** Holding the pointer on the professor clicks by itself from this level. */
     holdFromLevel: number;
     holdPerSecond: number;

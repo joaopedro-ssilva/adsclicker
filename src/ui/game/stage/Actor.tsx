@@ -4,7 +4,7 @@ import { skinById } from '../shared/characterProps';
 import { ClickerButton } from './ClickerButton';
 import { ComboMeter } from './ComboMeter';
 import { FirstNudge } from './FirstNudge';
-import { GoldenMeter } from './maestria/GoldenMeter';
+import { GoldenState } from './maestria/GoldenState';
 import { MythicAura } from './MythicAura';
 import { SpeechBubble } from './SpeechBubble';
 
@@ -20,7 +20,7 @@ export function Actor({ scale }: { scale: number }) {
       <SpeechBubble />
       <ClickerButton scale={scale} floating={floating} />
       <ComboMeter />
-      <GoldenMeter />
+      <GoldenState />
       <FirstNudge />
     </div>
   );
