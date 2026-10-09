@@ -14,7 +14,7 @@ import type { GameContent } from '@/game/content/types';
 import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
-import { maxAngeloCapFactor } from '@/game/engine/prestige';
+import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
 import { maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
@@ -200,14 +200,13 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   // Diplomas only come from graduating, and one graduation pays at most what the run's coins are worth.
   if (diplomasDone > 0) {
     if (graduationsDone <= 0) return fail('diplomas without a graduation');
-    const cap = content.balance.graduation.cap;
-    if (cap) {
-      // Each graduation pays at most base x growth ^ (graduations done before it), stretched by Angelo's Domínio
-      // (maxed) and, if he was ever honoured, his honour: both raise the cap by the proportion they add to the diplomas.
-      const before = next.counters.graduations - graduationsDone;
+    const before = next.counters.graduations - graduationsDone;
+    if (content.balance.graduation.cap) {
+      // Each graduation pays at most capBase (the engine's rule) for the graduations done before it, stretched by
+      // Angelo's Domínio (maxed) and, if he was ever honoured, his honour: both raise the cap by the proportion they add to the diplomas.
       const angelo = maxAngeloCapFactor(content, Boolean(next.honouredBefore.angelo || previous?.honouredBefore.angelo));
       let allowed = 0;
-      for (let i = 0; i < Math.min(graduationsDone, 1000); i += 1) allowed += cap.base * cap.growth ** (before + i) * angelo;
+      for (let i = 0; i < Math.min(graduationsDone, 1000); i += 1) allowed += (capBase(content, before + i) ?? 0) * angelo;
       // Angelo's Horas complementares pay up to one diploma per band on top, outside the cap.
       allowed += horasMaxDiplomas(content, Math.max(maestriaLevel(next, 'angelo'), previous ? maestriaLevel(previous, 'angelo') : 0)) * Math.min(graduationsDone, 1000);
       if (diplomasDone > allowed) return fail('more diplomas than the cap allows');

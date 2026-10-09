@@ -668,7 +668,7 @@ describe('content: professors, disciplines and numbers', () => {
     expect(balance.events).toEqual({ minIntervalMs: 75_000, maxIntervalMs: 150_000 });
     expect(balance.sprints).toEqual({ offers: 3, cooldownMs: 150_000 });
     expect(balance.rewardClickFloor).toBe(50);
-    expect(balance.graduation).toEqual({ base: '8e20', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.15 } });
+    expect(balance.graduation).toEqual({ base: '8e20', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.18, afterGraduation: 40, lateGrowth: 1.02 } });
   });
 });
 

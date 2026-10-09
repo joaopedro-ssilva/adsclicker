@@ -446,14 +446,14 @@ describe('new achievement conditions (real content)', () => {
       return g;
     }
 
-    it('Sem Mouse and O(1): zero clicks, under 10 minutes', () => {
-      const quick = graduated((g) => (g.state.run.seconds = 599));
+    it('Sem Mouse and O(1): zero clicks, under 15 minutes', () => {
+      const quick = graduated((g) => (g.state.run.seconds = 899));
       expect(quick.state.achievements['grad-fast']).toBeDefined();
       expect(quick.state.achievements['grad-no-mouse']).toBeDefined();
       expect(quick.state.skins['pablo-singularidade']).toBe(true);
 
       const slow = graduated((g) => {
-        g.state.run.seconds = 601;
+        g.state.run.seconds = 901;
         g.state.run.clicks = 1;
       });
       expect(slow.state.achievements['grad-fast']).toBeUndefined();

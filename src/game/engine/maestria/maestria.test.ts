@@ -231,7 +231,7 @@ describe('diploma cap', () => {
     expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * (1 + perRank * 20) * honour + 1e-9));
     // the cap grows with the graduations as before
     g.state.counters.graduations = 1;
-    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * 1.15 * (1 + perRank * 20) * honour + 1e-9));
+    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * 1.18 * (1 + perRank * 20) * honour + 1e-9));
   });
 
   it('lets Angelo pay the stretched cap at graduation, and nobody else stretches it', () => {

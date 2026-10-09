@@ -55,11 +55,24 @@ export function maxAngeloCapFactor(content: GameContent, honoured: boolean): num
   return angeloGain(content, content.balance.mastery.cap, honoured);
 }
 
-/** Most diplomas the next graduation can pay: base x growth ^ graduations done, stretched by Angelo. Null when the content sets no cap. */
-export function diplomaCap(state: GameState, content: GameContent): number | null {
+/**
+ * The diploma cap of a graduation made after `graduations` have been done, before Angelo's stretch:
+ * base x growth ^ min(graduations, afterGraduation) x lateGrowth ^ (graduations past afterGraduation).
+ * Null when the content sets no cap. Used by the engine and by the server's plausibility check.
+ */
+export function capBase(content: GameContent, graduations: number): number | null {
   const cap = content.balance.graduation.cap;
   if (!cap) return null;
-  const value = cap.base * cap.growth ** state.counters.graduations * angeloCapFactor(state, content);
+  const flat = cap.afterGraduation ?? Number.POSITIVE_INFINITY;
+  const late = cap.lateGrowth ?? cap.growth;
+  return cap.base * cap.growth ** Math.min(graduations, flat) * late ** Math.max(0, graduations - flat);
+}
+
+/** Most diplomas the next graduation can pay: capBase for the graduations done, stretched by Angelo. Null when the content sets no cap. */
+export function diplomaCap(state: GameState, content: GameContent): number | null {
+  const base = capBase(content, state.counters.graduations);
+  if (base === null) return null;
+  const value = base * angeloCapFactor(state, content);
   return Number.isFinite(value) ? Math.floor(value + 1e-9) : Number.MAX_SAFE_INTEGER;
 }
 

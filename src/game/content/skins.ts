@@ -320,7 +320,7 @@ export const skins: SkinDef[] = [
   ...make('wagner', [
     {
       id: 'wagner-default',
-      name: 'Preto Básico',
+      name: 'All Black',
       rarity: 'common',
       description: 'Camiseta preta, calça cargo e crachá. Discreto como um bom firewall.',
       default: true,

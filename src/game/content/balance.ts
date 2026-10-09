@@ -26,7 +26,8 @@ export const balance: BalanceConfig = {
   rewardClickFloor: 50,
   // A fast human drums about 10-14 clicks a second; a script goes well past 15. Hold-to-click (Joinha de Ouro) is 10.
   clickLimit: { perSecond: 15, windowMs: 1000 },
-  // The cap makes sitting on a run pointless: at most 10 diplomas on the first graduation, 11 on the second, 13, 15...
-  // (x1.15 each, with Angelo's Domínio and honour stretching it: tuned with the simulator so late runs settle around 15-25 min for an active player instead of collapsing, and a bigger factor makes late runs balloon).
-  graduation: { base: '8e20', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.15 } },
+  // The cap makes sitting on a run pointless: at most 10 diplomas on the first graduation, 12 on the second, 14, 16...
+  // (x1.18 each, stretched by Angelo's Domínio and honour). From the 40th graduation on it grows only 2% each: by then
+  // everything diplomas buy is owned, production stops growing, and a cap that kept climbing made late runs take hours.
+  graduation: { base: '8e20', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.18, afterGraduation: 40, lateGrowth: 1.02 } },
 };

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buyPrestigeNode, graduate, setBuyAmount } from './actions';
 import { Decimal } from './decimal';
 import { requirementMet } from './requirements';
-import { diplomasFor, prestigeNodeCost, runCoinsFor } from './prestige';
+import { capBase, diplomaCap, diplomasFor, prestigeNodeCost, runCoinsFor } from './prestige';
 import { computeStats } from './stats';
 import { graduationPreview, prestigeNodeViews } from './views';
 import { eventsOf, hire, newCleanGame, num, T0 } from './__fixtures__/helpers';
@@ -248,4 +248,34 @@ describe('prestige tree', () => {
     g.state.prestige['core-power'] = 3;
     expect(prestigeNodeViews(g.state, g.content).find((v) => v.id === 'core-power')).toMatchObject({ maxed: true, affordable: false, cost: 4 });
   });
+});
+
+describe('late game rules (diploma cap flattening and cost escalation)', () => {
+  it('grows the cap by growth up to afterGraduation, then by lateGrowth', () => {
+    const g = newCleanGame();
+    const content = structuredClone(g.content);
+    content.balance.graduation.cap = { base: 10, growth: 1.15, afterGraduation: 2, lateGrowth: 1.03 };
+    expect(capBase(content, 0)).toBeCloseTo(10, 9);
+    expect(capBase(content, 2)).toBeCloseTo(10 * 1.15 ** 2, 9);
+    expect(capBase(content, 3)).toBeCloseTo(10 * 1.15 ** 2 * 1.03, 9);
+    expect(capBase(content, 10)).toBeCloseTo(10 * 1.15 ** 2 * 1.03 ** 8, 9);
+  });
+
+  it('keeps the old rule when the cap has no late growth', () => {
+    const g = newCleanGame();
+    const content = structuredClone(g.content);
+    content.balance.graduation.cap = { base: 10, growth: 1.15 };
+    expect(capBase(content, 7)).toBeCloseTo(10 * 1.15 ** 7, 9);
+    content.balance.graduation.cap = undefined;
+    expect(capBase(content, 7)).toBeNull();
+  });
+
+  it('makes the diploma cap follow capBase, stretched by Angelo', () => {
+    const g = newCleanGame();
+    const content = structuredClone(g.content);
+    content.balance.graduation.cap = { base: 10, growth: 1.15, afterGraduation: 1, lateGrowth: 1.03 };
+    g.state.counters.graduations = 4;
+    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * 1.15 * 1.03 ** 3 + 1e-9));
+  });
+
 });

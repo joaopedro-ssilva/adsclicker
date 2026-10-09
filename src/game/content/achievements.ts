@@ -280,10 +280,10 @@ export const achievements: AchievementDef[] = [
   ach('grad-day-6', 'graduation', 'Set Fechado', '📅', 'Faça 6 Formaturas no mesmo dia. Ganhou o set, fecha o jogo.', { kind: 'graduationsToday', gte: 6 }, {
     skin: 'angelo-capitao',
   }),
-  ach('grad-fast', 'graduation', 'O(1)', '⚡', 'Forme uma turma em menos de 10 minutos de jogo. Tempo constante, ou quase.', {
+  ach('grad-fast', 'graduation', 'O(1)', '⚡', 'Forme uma turma em menos de 15 minutos de jogo. Tempo constante, ou quase.', {
     kind: 'lastRun',
     metric: 'seconds',
-    lte: 600,
+    lte: 900,
   }, { skin: 'pablo-singularidade' }),
   ach('grad-quick', 'graduation', 'O(log n)', '🚀', 'Forme uma turma em menos de 30 minutos de jogo. Cada semestre pela metade do anterior.', {
     kind: 'lastRun',

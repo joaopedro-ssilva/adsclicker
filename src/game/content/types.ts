@@ -680,8 +680,10 @@ export interface BalanceConfig {
     /**
      * Most diplomas one graduation can pay: base x growth ^ graduations already done (10, 20, 40...
      * with 10 and 2). Coins past it count for nothing, so sitting on a run stops paying. Omitted = no cap.
+     * From `afterGraduation` on, the cap grows by `lateGrowth` per graduation instead of `growth`
+     * (omitted = `growth` for all of them, the old rule).
      */
-    cap?: { base: number; growth: number };
+    cap?: { base: number; growth: number; afterGraduation?: number; lateGrowth?: number };
   };
 }
 

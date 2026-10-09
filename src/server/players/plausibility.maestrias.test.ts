@@ -3,7 +3,7 @@ import { content } from '@/game/content';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { coinsPerSecond } from '@/game/engine';
 import { bolsaMaxSeconds, horasMaxDiplomas } from '@/game/engine/maestria';
-import { maxAngeloCapFactor } from '@/game/engine/prestige';
+import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
 import type { GameState } from '@/game/engine/state';
 import { simulate } from '@/game/sim/simulate';
 import type { SimOptions } from '@/game/sim/simulate';
@@ -105,7 +105,7 @@ describe('judgeSave: Maestrias', () => {
     const cap = content.balance.graduation.cap;
     if (!cap) throw new Error('no cap');
     next.counters.graduations = previous.counters.graduations + 1;
-    const allowed = cap.base * cap.growth ** previous.counters.graduations * maxAngeloCapFactor(content, false) + horasMaxDiplomas(content, 5);
+    const allowed = (capBase(content, previous.counters.graduations) ?? 0) * maxAngeloCapFactor(content, false) + horasMaxDiplomas(content, 5);
     next.diplomasEarned = previous.diplomasEarned + Math.ceil(allowed) + 10;
     next.lifetimeCoins = previous.lifetimeCoins.mul(1e60);
     expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
@@ -115,7 +115,7 @@ describe('judgeSave: Maestrias', () => {
     const { previous, next, elapsedMs } = last();
     const cap = content.balance.graduation.cap;
     if (!cap) throw new Error('no cap');
-    const base = cap.base * cap.growth ** previous.counters.graduations;
+    const base = capBase(content, previous.counters.graduations) ?? 0;
     const horas = horasMaxDiplomas(content, 5);
     const stretched = Math.floor(base * maxAngeloCapFactor(content, true)) + horas;
     const plain = Math.ceil(base * maxAngeloCapFactor(content, false)) + horas;

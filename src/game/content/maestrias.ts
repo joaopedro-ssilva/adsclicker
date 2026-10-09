@@ -163,15 +163,19 @@ const assets: BolsaAssetDef[] = [
 export const maestrias: MaestriasConfig = {
   defs,
   joinha: {
-    clicksNeeded: [100, 90, 80, 70, 60],
-    seconds: [1, 1, 2, 2, 3],
+    // A golden click is big (seconds of the whole class) and rare: at 10 clicks per second, level 5 adds about a third
+    // to production. With the old 100 to 60 clicks it more than tripled it, and the server could not tell it from cheating.
+    clicksNeeded: [1000, 900, 800, 700, 600],
+    seconds: [6, 9, 12, 16, 20],
     critFromLevel: 3,
     holdFromLevel: 5,
     holdPerSecond: 10,
   },
   rollforward: {
-    clicksToFill: 300,
-    jumpSeconds: [2, 4, 5, 7, 10],
+    // A long jump that takes a while to charge (5 minutes of fast clicking): about a quarter more production at
+    // level 5. Charged every 300 clicks, the same jump was worth several times the production itself.
+    clicksToFill: 3000,
+    jumpSeconds: [15, 25, 35, 50, 70],
     maxCharges: [1, 1, 2, 2, 3],
   },
   swarm: {
