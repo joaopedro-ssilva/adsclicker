@@ -16,7 +16,9 @@ const TARGET_H = { skin: 48, head: 56 };
 /** Professors whose head came out more tanned than their bodies: green and blue added to the skin pixels. */
 const HEAD_SKIN_LIFT = { edecio: { g: 12, b: 36 } };
 /** Professors whose head reads better a little to the right of the measured face centre (owner's call), in pixels. */
-const HEAD_NUDGE_RIGHT = { pablo: 2 };
+const HEAD_NUDGE_RIGHT = { pablo: 1 };
+/** Heads that the professor's nudge pushes too far (a hood or a visor is already centred): their own value wins. */
+const HEAD_NUDGE_RIGHT_BY_SKIN = { 'pablo-garagem': -2, 'pablo-singularidade': -1 };
 
 /** Lightens the skin of a head toward the fair tone of the bodies. Shadows are lifted less, so the shading stays. */
 function liftSkin(img, { g, b }) {
@@ -741,7 +743,7 @@ async function processSheet(sheet, anchors) {
       if (!sheet.folder && HEAD_SKIN_LIFT[professor]) liftSkin(sprite, HEAD_SKIN_LIFT[professor]);
       anchor = headAnchor(sprite);
       anchor.y -= HEAD_DROP[key] ?? 0;
-      if (!sheet.folder) anchor.x -= HEAD_NUDGE_RIGHT[professor] ?? 0;
+      if (!sheet.folder) anchor.x -= HEAD_NUDGE_RIGHT_BY_SKIN[key] ?? HEAD_NUDGE_RIGHT[professor] ?? 0;
     }
     else if (sheet.kind === 'hat') anchor = hatAnchor(sprite);
     if (sheet.noAnchor) anchor = undefined;
