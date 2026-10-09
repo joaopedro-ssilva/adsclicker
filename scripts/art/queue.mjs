@@ -99,6 +99,12 @@ const SCENERIES = [
   ['estudio', 'a podcast studio with acoustic foam walls, microphones on boom arms, a mixing desk and a glowing red sign without text'],
   ['espaco', 'the inside of an orbital space station with a big round window showing planet Earth and stars, panels with small lights'],
   ['trofeus', 'a trophy hall with illuminated glass cabinets full of golden cups and a red carpet'],
+  ['jardim', 'a college campus garden in spring with big leafy trees, flower beds, a stone bench and a brick building in the background'],
+  ['grafica', 'a print shop with big printers spitting out stacks of rolled diplomas, paper piles and conveyor belts'],
+  ['por-do-sol', 'a college campus courtyard at sunset with long shadows, an orange and pink sky, lamp posts turning on and a clock tower'],
+  ['neve', 'a snowy college campus in winter with snow-covered pine trees, falling snowflakes, a frozen fountain and cold blue light'],
+  ['castelo', 'a wide green medieval meadow with a grand stone castle with towers and flying banners in the background, a dirt path and a blue sky with clouds, fantasy RPG style'],
+  ['masmorra', 'a fantasy RPG dungeon corridor with stone brick walls, lit torches, iron chains and a wooden treasure chest'],
 ];
 
 /** Skins whose head wears something: the professor's head is redrawn with the headgear on, per skin. */
@@ -489,6 +495,82 @@ calls.push(
   { label: 'skins-v3-4', images: [v3BodySheet('skins-v3-4.png', V3_BODIES.slice(12))] },
   { label: 'skins-v3-guto', images: [v3BodySheet('skins-v3-guto.png', V3_GUTO, { rules: GUTO_RULES, sheet: { darkSkin: true } })] },
   ...Object.keys(HEAD_VARIANTS_2).map((professor) => ({ label: `heads-skin2-${professor}`, images: [headVariantSheet2(professor)] })),
+);
+
+// 9) Fourth pass: one mythic skin per professor (the rarest tier, so they get more ornate), three more skins,
+//    and a scenery without a floor (the professor floats in it).
+const WIDE = 'Every body is as broad and stocky as the bodies in the reference image (not slimmer), with the same height and proportions. No glow, no aura, no particles and no light effects outside the outline: the richness is in ornate detail, trim and layered cloth.';
+const V4_MYTHIC_A = [
+  ['edecio-primordial', 'a divine being of the thumbs-up: flowing white and gold celestial robes with a golden sash and sun emblems, one hand in a big golden gauntlet giving a thumbs-up'],
+  ['gladimir-arquivista', 'an eternal archivist of data: a long deep-blue robe whose cloth shows glowing cyan table grids and rows, silver trim, holding an ancient glowing tome, two small data cubes floating by the shoulder'],
+  ['b2-prisma', 'a muse of light: an elegant white dress that splits into a soft spectrum of colours toward the hem like light through a prism, crystal shoulder pieces, holding a crystal prism'],
+  ['wagner-sentinela', 'an elite sentinel: sleek black plate armor with thin glowing red circuit lines, a dark red half-cape, a hexagonal red energy shield on one arm'],
+];
+const V4_MYTHIC_B = [
+  ['b1-imperatriz', 'an empress of the roadmap: an imperial deep-purple and gold gown with a long mantle embroidered with a constellation map of stars joined by thin lines, holding a golden scepter'],
+  ['angelo-chanceler', 'a supreme chancellor: immaculate white and gold ceremonial regalia with a long white cape, a wide gold sash, medals and a golden chain of office, holding a rolled diploma with a gold seal'],
+  ['pablo-singularidade', 'the singularity: a long black robe whose cloth is a starfield with tiny stars and a faint purple nebula, thin silver trim, a small neural-network diagram of joined nodes glowing on the chest, one hand holding a small black sphere with a bright rim'],
+];
+const V4_GUTO = [
+  ['guto-tempestade', 'a lord of the storm: dark steel-blue plate armor with gold lightning-bolt engravings, a long cape shaped like a dark storm cloud, holding a spear shaped like a lightning bolt; heroic and serious, not comic'],
+];
+const V4_MORE = [
+  ['wagner-ferias', 'a tourist on holiday: an open colourful floral shirt over a white tank top, swim shorts, flip-flops, a yellow rubber-duck float ring around the waist, holding a coconut drink with a straw'],
+  ['gladimir-drone', 'a relaxed engineer with his arms crossed over a grey polo shirt and jeans, a small quadcopter drone hovering by his shoulder holding a tiny computer mouse'],
+  ['pablo-garagem', 'a cyberpunk hacker: a black techwear jacket with glowing cyan and magenta LED strips, fingerless gloves, cargo trousers, high-top sneakers, holding a glowing holographic tablet'],
+];
+const v4BodySheet = (file, items, extra = {}) => ({
+  ...v3BodySheet(file, items, extra),
+  text: `${v3BodySheet(file, items, extra).text} ${WIDE}`,
+});
+
+/** Headgear of the fourth pass. */
+const HEAD_VARIANTS_3 = {
+  edecio: [['edecio-primordial', 'a golden halo ring floating just above the hair with small sun rays, touching the top of the hair']],
+  gladimir: [['gladimir-arquivista', 'the deep hood of a dark blue robe with a glowing cyan trim, hood up, face fully visible']],
+  b2: [['b2-prisma', 'a crystal tiara with a rainbow-tinted gem on the forehead']],
+  wagner: [
+    ['wagner-sentinela', 'a sleek black open-face helmet with thin glowing red lines and a raised red visor, face fully visible'],
+    ['wagner-ferias', 'a straw sun hat and dark sunglasses'],
+  ],
+  guto: [['guto-tempestade', 'a dark steel circlet crown with a small gold lightning bolt at the front']],
+  b1: [['b1-imperatriz', 'a tall imperial gold crown with purple gems and small stars']],
+  angelo: [['angelo-chanceler', 'a golden laurel wreath on the hair']],
+  pablo: [
+    ['pablo-singularidade', 'the deep hood of a black starfield robe with tiny stars on it, hood up, face fully visible'],
+    ['pablo-garagem', 'a slim cyberpunk visor pushed up on the forehead and one small earpiece'],
+  ],
+};
+HEAD_VARIANTS.b1 ??= [];
+const headVariantSheet3 = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = HEAD_VARIANTS_3[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    file: `heads-skin3-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+
+const galaxy = {
+  file: 'scenery-galaxia.png',
+  kind: 'scenery',
+  keys: ['galaxia'],
+  refs: ['scenery-espaco.png'],
+  text: `a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. ${HK_STYLE} Open outer space with no ground and no floor at all: a deep purple and blue nebula, a large ringed planet on one side, two smaller planets, a distant spiral galaxy and many stars. The centre of the image is calmer and darker, where a character will float.`,
+};
+
+calls.push(
+  { label: 'skins-v4-mythic-1', images: [v4BodySheet('skins-v4-mythic-1.png', V4_MYTHIC_A)] },
+  { label: 'skins-v4-mythic-2', images: [v4BodySheet('skins-v4-mythic-2.png', V4_MYTHIC_B)] },
+  { label: 'skins-v4-guto', images: [v4BodySheet('skins-v4-guto.png', V4_GUTO, { rules: GUTO_RULES, sheet: { darkSkin: true } })] },
+  { label: 'skins-v4-more', images: [v4BodySheet('skins-v4-more.png', V4_MORE)] },
+  ...Object.keys(HEAD_VARIANTS_3).map((professor) => ({ label: `heads-skin3-${professor}`, images: [headVariantSheet3(professor)] })),
+  { label: 'scenery-galaxia', images: [galaxy] },
 );
 
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.

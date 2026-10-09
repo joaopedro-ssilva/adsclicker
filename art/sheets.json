@@ -209,6 +209,48 @@
       ]
     },
     {
+      "file": "scenery-jardim.png",
+      "kind": "scenery",
+      "keys": [
+        "jardim"
+      ]
+    },
+    {
+      "file": "scenery-grafica.png",
+      "kind": "scenery",
+      "keys": [
+        "grafica"
+      ]
+    },
+    {
+      "file": "scenery-por-do-sol.png",
+      "kind": "scenery",
+      "keys": [
+        "por-do-sol"
+      ]
+    },
+    {
+      "file": "scenery-neve.png",
+      "kind": "scenery",
+      "keys": [
+        "neve"
+      ]
+    },
+    {
+      "file": "scenery-castelo.png",
+      "kind": "scenery",
+      "keys": [
+        "castelo"
+      ]
+    },
+    {
+      "file": "scenery-masmorra.png",
+      "kind": "scenery",
+      "keys": [
+        "masmorra"
+      ]
+    },
+    {
       "file": "skins-more-1.png",
       "kind": "skin",
       "keys": [
@@ -720,6 +762,131 @@
       ],
       "calibrate": true,
       "ref": "pablo"
+    },
+    {
+      "file": "skins-v4-mythic-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-primordial",
+        "gladimir-arquivista",
+        "b2-prisma",
+        "wagner-sentinela"
+      ]
+    },
+    {
+      "file": "skins-v4-mythic-2.png",
+      "kind": "skin",
+      "keys": [
+        "b1-imperatriz",
+        "angelo-chanceler",
+        "pablo-singularidade"
+      ]
+    },
+    {
+      "file": "skins-v4-guto.png",
+      "kind": "skin",
+      "keys": [
+        "guto-tempestade"
+      ],
+      "darkSkin": true
+    },
+    {
+      "file": "skins-v4-more.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-ferias",
+        "gladimir-drone",
+        "pablo-garagem"
+      ]
+    },
+    {
+      "file": "heads-skin3-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-primordial"
+      ],
+      "calibrate": true,
+      "ref": "edecio"
+    },
+    {
+      "file": "heads-skin3-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-arquivista"
+      ],
+      "calibrate": true,
+      "ref": "gladimir"
+    },
+    {
+      "file": "heads-skin3-b2.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b2-prisma"
+      ],
+      "calibrate": true,
+      "ref": "b2"
+    },
+    {
+      "file": "heads-skin3-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-sentinela",
+        "wagner-ferias"
+      ],
+      "calibrate": true,
+      "ref": "wagner"
+    },
+    {
+      "file": "heads-skin3-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-tempestade"
+      ],
+      "calibrate": true,
+      "ref": "guto"
+    },
+    {
+      "file": "heads-skin3-b1.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b1-imperatriz"
+      ],
+      "calibrate": true,
+      "ref": "b1"
+    },
+    {
+      "file": "heads-skin3-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-chanceler"
+      ],
+      "calibrate": true,
+      "ref": "angelo"
+    },
+    {
+      "file": "heads-skin3-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-singularidade",
+        "pablo-garagem"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
+    },
+    {
+      "file": "scenery-galaxia.png",
+      "kind": "scenery",
+      "keys": [
+        "galaxia"
+      ]
     }
   ]
 }

@@ -59,6 +59,10 @@
     "x": 20,
     "y": 47
   },
+  "heads/angelo-chanceler": {
+    "x": 22,
+    "y": 47
+  },
   "heads/angelo-padel": {
     "x": 20,
     "y": 47
@@ -79,6 +83,10 @@
     "x": 29,
     "y": 52
   },
+  "heads/b1-imperatriz": {
+    "x": 30,
+    "y": 72
+  },
   "heads/b1-rainha": {
     "x": 30,
     "y": 66
@@ -90,6 +98,10 @@
   "heads/b2-obra": {
     "x": 27,
     "y": 52
+  },
+  "heads/b2-prisma": {
+    "x": 28,
+    "y": 50
   },
   "heads/edecio": {
     "x": 23,
@@ -112,8 +124,12 @@
     "y": 61
   },
   "heads/edecio-gladiador": {
-    "x": 22,
+    "x": 21,
     "y": 74
+  },
+  "heads/edecio-primordial": {
+    "x": 24,
+    "y": 73
   },
   "heads/edecio-samurai": {
     "x": 28,
@@ -122,6 +138,10 @@
   "heads/gladimir": {
     "x": 23,
     "y": 54
+  },
+  "heads/gladimir-arquivista": {
+    "x": 30,
+    "y": 59
   },
   "heads/gladimir-guardiao": {
     "x": 23,
@@ -159,6 +179,10 @@
     "x": 31,
     "y": 62
   },
+  "heads/guto-tempestade": {
+    "x": 22,
+    "y": 55
+  },
   "heads/pablo": {
     "x": 20,
     "y": 55
@@ -168,12 +192,16 @@
     "y": 56
   },
   "heads/pablo-garagem": {
-    "x": 26,
-    "y": 56
+    "x": 19,
+    "y": 55
   },
   "heads/pablo-mago": {
     "x": 28,
     "y": 80
+  },
+  "heads/pablo-singularidade": {
+    "x": 25,
+    "y": 57
   },
   "heads/wagner": {
     "x": 21,
@@ -195,8 +223,20 @@
     "x": 26,
     "y": 55
   },
+  "heads/wagner-ferias": {
+    "x": 27,
+    "y": 51
+  },
+  "heads/wagner-sentinela": {
+    "x": 23,
+    "y": 53
+  },
   "skins/angelo-capitao": {
     "x": 17,
+    "y": 2
+  },
+  "skins/angelo-chanceler": {
+    "x": 16,
     "y": 2
   },
   "skins/angelo-default": {
@@ -239,6 +279,10 @@
     "x": 17,
     "y": 3
   },
+  "skins/b1-imperatriz": {
+    "x": 20,
+    "y": 4
+  },
   "skins/b1-lancamento": {
     "x": 21,
     "y": 2
@@ -277,6 +321,10 @@
   },
   "skins/b2-postit": {
     "x": 21,
+    "y": 3
+  },
+  "skins/b2-prisma": {
+    "x": 17,
     "y": 3
   },
   "skins/b2-wireframe": {
@@ -327,6 +375,10 @@
     "x": 16,
     "y": 2
   },
+  "skins/edecio-primordial": {
+    "x": 16,
+    "y": 3
+  },
   "skins/edecio-prisioneiro": {
     "x": 24,
     "y": 2
@@ -339,6 +391,10 @@
     "x": 23,
     "y": 7
   },
+  "skins/gladimir-arquivista": {
+    "x": 15,
+    "y": 2
+  },
   "skins/gladimir-bibliotecario": {
     "x": 17,
     "y": 2
@@ -350,6 +406,10 @@
   "skins/gladimir-default": {
     "x": 17,
     "y": 2
+  },
+  "skins/gladimir-drone": {
+    "x": 13,
+    "y": 6
   },
   "skins/gladimir-guardiao": {
     "x": 16,
@@ -399,6 +459,10 @@
     "x": 22,
     "y": 4
   },
+  "skins/guto-tempestade": {
+    "x": 27,
+    "y": 10
+  },
   "skins/pablo-cientista": {
     "x": 18,
     "y": 2
@@ -417,7 +481,7 @@
   },
   "skins/pablo-garagem": {
     "x": 16,
-    "y": 1
+    "y": 2
   },
   "skins/pablo-mago": {
     "x": 31,
@@ -426,6 +490,10 @@
   "skins/pablo-oraculo": {
     "x": 14,
     "y": 5
+  },
+  "skins/pablo-singularidade": {
+    "x": 17,
+    "y": 2
   },
   "skins/wagner-agente": {
     "x": 14,
@@ -447,11 +515,19 @@
     "x": 20,
     "y": 2
   },
+  "skins/wagner-ferias": {
+    "x": 20,
+    "y": 2
+  },
   "skins/wagner-firewall": {
     "x": 22,
     "y": 2
   },
   "skins/wagner-hacker": {
+    "x": 17,
+    "y": 2
+  },
+  "skins/wagner-sentinela": {
     "x": 17,
     "y": 2
   }

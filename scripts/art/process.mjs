@@ -26,8 +26,9 @@ function liftSkin(img, { g, b }) {
     const { h, s, l } = rgbToHsl(data[i], data[i + 1], data[i + 2]);
     if (h < 15 || h > 40 || s < 0.35 || l < 0.45) continue;
     const k = Math.min(1, (l - 0.45) / 0.2);
-    data[i + 1] = Math.min(255, Math.round(data[i + 1] + g * k));
-    data[i + 2] = Math.min(255, Math.round(data[i + 2] + b * k));
+    // Only up to the fair tone (green 79% and blue 60% of red): a head drawn fair already is left alone.
+    data[i + 1] = Math.max(data[i + 1], Math.min(Math.round(data[i + 1] + g * k), Math.round(data[i] * 0.79)));
+    data[i + 2] = Math.max(data[i + 2], Math.min(Math.round(data[i + 2] + b * k), Math.round(data[i] * 0.6)));
   }
 }
 
