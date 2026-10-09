@@ -19,7 +19,8 @@
 
 /* ---------- Mode switch: the classroom header lays it out in the middle (the Hackathon top bar places it itself) ---------- */
 
-.stage-head {
+/* Only while the mode button exists: without it the header keeps its own layout (one row on phones). */
+.stage-head:has(.ar-mode) {
   grid-template-areas:
     'logo mode tools'
     'balance balance balance';

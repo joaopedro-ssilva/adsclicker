@@ -179,7 +179,8 @@
   .stage-head {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: 'logo balance tools';
-    align-items: center;
+    /* At the top: the tools stack three buttons high, and a balance centred on them would sit on the professor's face. */
+    align-items: start;
     column-gap: var(--space-2);
     padding: var(--space-2) var(--space-2) 0;
   }
