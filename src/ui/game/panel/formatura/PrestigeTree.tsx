@@ -26,44 +26,52 @@ export function PrestigeTree() {
 
   return (
     <div className="prestige">
-      <div className="prestige-board" style={cssVariables({ '--cols': String(TREE_COLS), '--rows': String(TREE_ROWS) })}>
-        <svg
-          className="prestige-edges"
-          viewBox={`0 0 ${TREE_COLS} ${TREE_ROWS}`}
-          preserveAspectRatio="none"
-          shapeRendering="crispEdges"
-          aria-hidden="true"
+      <div className="prestige-board">
+        <div
+          className="prestige-field"
+          style={cssVariables({
+            '--cols': String(TREE_COLS),
+            '--rows': String(TREE_ROWS),
+          })}
         >
-          {treeEdges.map((edge) => {
-            const reached = (byId.get(edge.parent.id)?.level ?? 0) > 0;
-            const taken = reached && (byId.get(edge.child.id)?.level ?? 0) > 0;
+          <svg
+            className="prestige-edges"
+            viewBox={`0 0 ${TREE_COLS} ${TREE_ROWS}`}
+            preserveAspectRatio="none"
+            shapeRendering="crispEdges"
+            aria-hidden="true"
+          >
+            {treeEdges.map((edge) => {
+              const reached = (byId.get(edge.parent.id)?.level ?? 0) > 0;
+              const taken = reached && (byId.get(edge.child.id)?.level ?? 0) > 0;
+              return (
+                <polyline
+                  key={`${edge.parent.id}>${edge.child.id}`}
+                  points={edge.points}
+                  data-branch={edge.child.branch}
+                  data-edge={taken ? 'taken' : reached ? 'open' : 'closed'}
+                  vectorEffect="non-scaling-stroke"
+                />
+              );
+            })}
+          </svg>
+          {content.prestigeNodes.map((node) => {
+            const view = byId.get(node.id);
+            if (!view) return null;
             return (
-              <polyline
-                key={`${edge.parent.id}>${edge.child.id}`}
-                points={edge.points}
-                data-branch={edge.child.branch}
-                data-edge={taken ? 'taken' : reached ? 'open' : 'closed'}
-                vectorEffect="non-scaling-stroke"
+              <PrestigeTile
+                key={node.id}
+                node={node}
+                level={view.level}
+                maxLevel={view.maxLevel}
+                cost={view.cost}
+                state={tileState(view)}
+                selected={node.id === selectedId}
+                onSelect={setPicked}
               />
             );
           })}
-        </svg>
-        {content.prestigeNodes.map((node) => {
-          const view = byId.get(node.id);
-          if (!view) return null;
-          return (
-            <PrestigeTile
-              key={node.id}
-              node={node}
-              level={view.level}
-              maxLevel={view.maxLevel}
-              cost={view.cost}
-              state={tileState(view)}
-              selected={node.id === selectedId}
-              onSelect={setPicked}
-            />
-          );
-        })}
+        </div>
       </div>
 
       {selectedNode && selectedView ? <PrestigeDetail node={selectedNode} view={selectedView} /> : null}

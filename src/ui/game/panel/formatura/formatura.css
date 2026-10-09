@@ -166,6 +166,23 @@
   font-size: 11px;
 }
 
+/* Folded sections: the fold's header carries the title, so the section component's own heading goes. */
+
+.ui-collapsible-body .panel-section-head {
+  display: none;
+}
+
+.ui-collapsible-body .panel-section + .panel-section {
+  margin-top: 0;
+}
+
+.formatura-hint {
+  margin: 0 0 var(--space-3);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 /* Prestige tree */
 
 .prestige {
@@ -192,16 +209,24 @@
   --branch: var(--good);
 }
 
+/* The board is the framed box; the field inside it is the grid, kept clear of the frame by the board's padding. */
 .prestige-board {
+  --pad: 14px;
+
   position: relative;
   width: 100%;
-  aspect-ratio: var(--ratio);
-  padding: 0;
+  padding: var(--pad);
   background-color: var(--bg);
   background-image: radial-gradient(color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px);
   background-size: 12px 12px;
   border: 2px solid var(--border);
   box-shadow: inset 3px 3px 0 color-mix(in srgb, var(--bg) 60%, #000);
+}
+
+.prestige-field {
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--ratio);
 }
 
 .prestige-edges {
@@ -232,6 +257,10 @@
   left: calc((var(--col) + 0.5) / var(--cols) * 100%);
   top: calc((var(--row) + 0.5) / var(--rows) * 100%);
   width: calc(100% / var(--cols) - 8px);
+  /* Whole pixels where the browser can round: even widths keep the centring translate on the pixel grid. */
+  left: round(nearest, calc((var(--col) + 0.5) / var(--cols) * 100%), 1px);
+  top: round(nearest, calc((var(--row) + 0.5) / var(--rows) * 100%), 1px);
+  width: round(down, calc(100% / var(--cols) - 8px), 2px);
   translate: -50% -50%;
 }
 
@@ -441,5 +470,13 @@
 
   .prestige-tile {
     min-width: 0;
+  }
+
+  .prestige-board {
+    --pad: 10px;
+  }
+
+  .graduation-tab .ui-collapsible-body {
+    padding: var(--space-3);
   }
 }

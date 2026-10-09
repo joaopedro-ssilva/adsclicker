@@ -1,0 +1,106 @@
+.ui-collapsible {
+  min-width: 0;
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.ui-collapsible-heading {
+  margin: 0;
+  font-size: inherit;
+}
+
+.ui-collapsible-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 52px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.ui-collapsible-head:hover {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+
+.ui-collapsible-head:focus-visible {
+  outline-offset: -5px;
+}
+
+.ui-collapsible-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ui-collapsible-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ui-collapsible-summary {
+  font-family: var(--font-text);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.ui-collapsible-dot {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--warn);
+  border: 2px solid var(--surface-raised);
+  box-shadow: 0 0 0 2px var(--warn);
+  animation: collapsible-dot 1.2s steps(2, end) infinite;
+}
+
+@keyframes collapsible-dot {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+.ui-collapsible-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.ui-collapsible[data-open='true'] .ui-collapsible-chevron {
+  rotate: 180deg;
+  color: var(--text);
+}
+
+.ui-collapsible[data-open='true'] > .ui-collapsible-heading .ui-collapsible-head {
+  border-bottom: 2px solid var(--border);
+}
+
+.ui-collapsible-body {
+  padding: var(--space-4);
+}
+
+[data-reduced-motion='true'] .ui-collapsible-dot {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-collapsible-dot {
+    animation: none;
+  }
+}

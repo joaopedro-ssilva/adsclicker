@@ -3,6 +3,7 @@ export { Button, type ButtonProps } from './Button';
 export { IconButton, type IconButtonProps } from './IconButton';
 export { Tabs, type TabItem, type TabsProps } from './Tabs';
 export { ProgressBar, type ProgressBarProps } from './ProgressBar';
+export { Collapsible, type CollapsibleProps } from './Collapsible';
 export { Badge, type BadgeProps } from './Badge';
 export { RarityBadge } from './RarityBadge';
 export { Tooltip, type TooltipProps } from './Tooltip';
