@@ -117,7 +117,7 @@ const under3 = firstUnder(3);
 const under10 = firstUnder(10);
 console.log('\nCandidates:');
 const line = (label: string, value: string) => console.log(`  ${label.padEnd(34)} ${value}`);
-for (const id of ['click-1m', 'mastery-gladimir', 'rares-all', 'streak-100', 'grad-perfect', 'maestrias-all', 'research-all', 'grad-fast', 'honour-all', 'grad-25', 'skins-all']) {
+for (const id of ['click-1m', 'mastery-gladimir', 'rares-all', 'streak-100', 'grad-perfect', 'maestrias-all', 'research-all', 'grad-fast', 'honour-all', 'grad-20', 'skins-all']) {
   line(id, h(result.achievementTimes[id]));
 }
 line('25 / 30 / 40 / 50 graduations', [25, 30, 40, 50].map((n) => h(first[`grads-${n}`])).join(' / '));

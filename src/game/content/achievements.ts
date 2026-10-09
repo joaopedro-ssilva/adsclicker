@@ -254,10 +254,10 @@ export const achievements: AchievementDef[] = [
   ach('streak-25', 'events', 'Firewall Humano', '🧱', 'Defenda 25 invasões seguidas.', counter('bestEventStreak', 25), {
     skin: 'wagner-cavaleiro',
   }),
-  ach('streak-50', 'events', 'Sentinela', '🛰️', 'Defenda 50 invasões seguidas. Nem um pacote passou.', counter('bestEventStreak', 50), {
+  ach('streak-50', 'events', 'Sentinela', '🛰️', 'Defenda 50 invasões seguidas. Nem um pacote passou.', counter('bestEventStreak', 50)),
+  ach('streak-100', 'events', 'Zero Dia', '🏰', 'Defenda 100 invasões seguidas. Nenhuma vulnerabilidade foi explorada.', counter('bestEventStreak', 100), {
     skin: 'wagner-sentinela',
   }),
-  ach('streak-100', 'events', 'Zero Dia', '🏰', 'Defenda 100 invasões seguidas. Nenhuma vulnerabilidade foi explorada.', counter('bestEventStreak', 100)),
   ach('missed-10', 'events', 'Senha 123456 Aprovada', '🔑', 'Deixe 10 invasões escaparem. A segurança agradece a sinceridade.', counter('eventsMissed', 10), {
     skin: 'wagner-ferias',
   }),
@@ -276,7 +276,7 @@ export const achievements: AchievementDef[] = [
   }),
   ach('grad-5', 'graduation', 'Cinco Turmas', '📜', 'Faça 5 Formaturas.', counter('graduations', 5), { scenery: 'quadra-de-padel' }),
   ach('grad-10', 'graduation', 'Decano', '🏅', 'Faça 10 Formaturas.', counter('graduations', 10), { skin: 'edecio-formando' }),
-  ach('grad-25', 'graduation', 'Patrono do Curso', '🏆', 'Faça 25 Formaturas.', counter('graduations', 25), { skin: 'angelo-chanceler' }),
+  ach('grad-20', 'graduation', 'Patrono do Curso', '🏆', 'Faça 20 Formaturas.', counter('graduations', 20), { skin: 'angelo-chanceler' }),
   ach('grad-day-6', 'graduation', 'Set Fechado', '📅', 'Faça 6 Formaturas no mesmo dia. Ganhou o set, fecha o jogo.', { kind: 'graduationsToday', gte: 6 }, {
     skin: 'angelo-capitao',
   }),
@@ -284,12 +284,12 @@ export const achievements: AchievementDef[] = [
     kind: 'lastRun',
     metric: 'seconds',
     lte: 600,
-  }, { skin: 'pablo-garagem' }),
-  ach('grad-blitz', 'graduation', 'O(0)', '🚀', 'Forme uma turma em menos de 3 minutos de jogo. Já chegou formado.', {
+  }, { skin: 'pablo-singularidade' }),
+  ach('grad-quick', 'graduation', 'O(log n)', '🚀', 'Forme uma turma em menos de 30 minutos de jogo. Cada semestre pela metade do anterior.', {
     kind: 'lastRun',
     metric: 'seconds',
-    lte: 180,
-  }, { skin: 'pablo-singularidade' }),
+    lte: 1800,
+  }, { skin: 'pablo-garagem' }),
   ach('grad-no-mouse', 'graduation', 'Sem Mouse', '🐭', 'Forme uma turma sem clicar no professor nenhuma vez. Os cliques automáticos valem.', {
     kind: 'lastRun',
     metric: 'clicks',

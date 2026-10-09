@@ -450,7 +450,7 @@ describe('new achievement conditions (real content)', () => {
       const quick = graduated((g) => (g.state.run.seconds = 599));
       expect(quick.state.achievements['grad-fast']).toBeDefined();
       expect(quick.state.achievements['grad-no-mouse']).toBeDefined();
-      expect(quick.state.skins['pablo-garagem']).toBe(true);
+      expect(quick.state.skins['pablo-singularidade']).toBe(true);
 
       const slow = graduated((g) => {
         g.state.run.seconds = 601;
