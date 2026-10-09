@@ -26,9 +26,10 @@ export function unlockedMaestrias(state: GameState): ProfessorId[] {
   return PROFESSOR_IDS.filter((id) => maestriaLevel(state, id) > 0);
 }
 
-/** Slots not spent yet: one per graduation ever made, minus the Maestrias unlocked. */
+/** Slots not spent yet: one per graduation ever made, up to one per professor, minus the Maestrias unlocked. */
 export function freeSlots(state: GameState): number {
-  return Math.max(0, state.counters.graduations - unlockedMaestrias(state).length);
+  const earned = Math.min(state.counters.graduations, PROFESSOR_IDS.length);
+  return Math.max(0, earned - unlockedMaestrias(state).length);
 }
 
 /** Diplomas for the next level, or null when the Maestria is at the top (or not unlocked). */

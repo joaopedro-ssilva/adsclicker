@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PROFESSOR_IDS } from '../../content/types';
 import { content } from '../../content';
 import type { Emit, GameEvent } from '../../store/types';
 import { click, graduate } from '../actions';
@@ -22,6 +23,14 @@ function game() {
 }
 
 describe('slots and levels', () => {
+  it('stops handing out slots once every professor has one', () => {
+    const g = game();
+    g.state.counters.graduations = 30;
+    expect(freeSlots(g.state)).toBe(PROFESSOR_IDS.length);
+    for (const id of PROFESSOR_IDS) g.state.maestria.levels[id] = 1;
+    expect(freeSlots(g.state)).toBe(0);
+  });
+
   it('one slot per graduation, level 1 is free, the rest cost diplomas', () => {
     const g = game();
     expect(freeSlots(g.state)).toBe(0);
