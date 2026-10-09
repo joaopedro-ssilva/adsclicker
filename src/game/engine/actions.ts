@@ -27,9 +27,17 @@ export {
   setBuyAmount,
 } from './purchases';
 
-export function buyDiscipline(state: GameState, content: GameContent, id: string, now: number, emit: Emit): boolean {
+/** `rng` only matters to B2's Design System; without it that Maestria never rolls. */
+export function buyDiscipline(
+  state: GameState,
+  content: GameContent,
+  id: string,
+  now: number,
+  emit: Emit,
+  rng?: () => number,
+): boolean {
   if (getIndex(content).levelled.get(id)?.kind !== 'discipline') return false;
-  return buyLevelled(state, content, id, now, emit);
+  return buyLevelled(state, content, id, now, emit, rng);
 }
 
 export function buyClickUpgrade(state: GameState, content: GameContent, id: string, now: number, emit: Emit): boolean {
@@ -84,7 +92,18 @@ export function buyMonitor(state: GameState, content: GameContent, id: MonitorId
 
 export { setMonitorOn, setMonitorSettings } from './monitors';
 
-export { buyMaestriaLevel, fireRollforward, hitBug, startSwarm, unlockMaestria } from './maestria/actions';
+export {
+  buyBolsaAsset,
+  buyMaestriaLevel,
+  depositBolsaFund,
+  fireRollforward,
+  hitBug,
+  sellBolsaAsset,
+  startFesta,
+  startSwarm,
+  unlockMaestria,
+  withdrawBolsaFund,
+} from './maestria/actions';
 
 export { buyCafe, cafeCost } from './cafe';
 

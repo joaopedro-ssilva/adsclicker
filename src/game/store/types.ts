@@ -38,7 +38,13 @@ export type GameEvent =
   | { type: 'swarmHit'; uid: number; bug: number; x: number; y: number; hp: number; boss: boolean; killed: boolean; auto: boolean }
   | { type: 'swarmEscape'; uid: number; bug: number; x: number; y: number }
   | { type: 'swarmEnd'; uid: number; defeated: number; total: number; bossDefeated: boolean; cleared: boolean; seconds: number; coins: Decimal }
-  | { type: 'graduate'; diplomas: number }
+  /** B2's Design System gave free levels to cheaper classes after the purchase of `from`. */
+  | { type: 'designSystem'; from: string; gifts: { id: string; levels: number }[] }
+  | { type: 'festaStart'; seconds: number; abilities: number }
+  /** A trade in the Bolsa. `asset` is an asset id or 'fundo'. `coins` is what was spent (buy) or received (sell). */
+  | { type: 'bolsa'; side: 'buy' | 'sell'; asset: string; coins: Decimal; profit: Decimal; capped: boolean }
+  /** `diplomas` is the whole payment; `bonus` is the part from Horas complementares. */
+  | { type: 'graduate'; diplomas: number; bonus?: number }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -183,6 +189,8 @@ export interface GraduationPreview {
   cap: number | null;
   /** The run is worth `cap` diplomas or more: further coins count for nothing. */
   atCap: boolean;
+  /** Extra diplomas from Angelo's Horas complementares (bands filled), outside the cap. */
+  bonus: number;
 }
 
 export interface AchievementView {
@@ -250,6 +258,13 @@ export interface GameActions {
   startSwarm(): boolean;
   /** One click on a bug (or the boss) of the swarm. */
   hitBug(uid: number): void;
+  /** Starts the Festa de lançamento when it is recharged. */
+  startFesta(): boolean;
+  /** Bolsa de tokens. `fraction` is the share (0..1) of the room under the limit to spend, or of the holding to sell. */
+  buyBolsaAsset(id: string, fraction: number): boolean;
+  sellBolsaAsset(id: string, fraction: number): boolean;
+  depositBolsaFund(fraction: number): boolean;
+  withdrawBolsaFund(fraction: number): boolean;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;

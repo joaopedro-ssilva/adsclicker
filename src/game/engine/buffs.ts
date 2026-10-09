@@ -1,6 +1,7 @@
 import type { BuffDef, GameContent } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
+import { recordHoras } from './maestria/horas';
 import { isAbilityUnlocked } from './requirements';
 import type { ActiveBuff, GameState } from './state';
 import { computeStats } from './stats';
@@ -57,6 +58,7 @@ export function activateAbility(state: GameState, content: GameContent, id: stri
   state.abilityReadyAt[id] = now + def.cooldownMs * stats.abilityCooldown;
   state.counters.abilitiesUsed += 1;
   state.abilitiesTried[id] = true;
+  recordHoras(state, content, 'abilities');
   emit({ type: 'abilityUsed', id });
   startBuff(state, def.buff, 'ability', stats, now, emit);
   return true;

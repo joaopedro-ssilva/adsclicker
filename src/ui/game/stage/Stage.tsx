@@ -8,7 +8,10 @@ import { Abilities } from './Abilities';
 import { Actor } from './Actor';
 import { BuffChips } from './BuffChips';
 import { InvasionLayer } from './InvasionLayer';
+import { BolsaPanel } from './maestria/bolsa/BolsaPanel';
+import { FestaLayer } from './maestria/FestaLayer';
 import { MaestriaDock } from './maestria/MaestriaDock';
+import { ReleaseTag } from './maestria/ReleaseTag';
 import { SwarmLayer } from './maestria/SwarmLayer';
 import { SwarmSummary } from './maestria/SwarmSummary';
 import { Roster } from './Roster';
@@ -44,6 +47,7 @@ export function Stage() {
           <div className="stage-play">
             <div className="stage-left">
               <SprintCard />
+              <ReleaseTag />
               <BuffChips />
             </div>
             <div className="stage-right">
@@ -53,10 +57,12 @@ export function Stage() {
             <Actor scale={scale} />
             <InvasionLayer />
             <SwarmLayer />
+            <FestaLayer />
           </div>
           <Roster />
         </div>
         <SwarmSummary />
+        <BolsaPanel />
       </Scenery>
     </section>
   );

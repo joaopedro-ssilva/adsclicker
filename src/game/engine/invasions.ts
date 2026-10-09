@@ -1,6 +1,7 @@
 import type { GameContent, InvasionDef } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
+import { recordHoras } from './maestria/horas';
 import { grantReward } from './rewards';
 import { recordSprintEvent } from './sprints';
 import type { GameState } from './state';
@@ -91,6 +92,7 @@ export function hitInvasion(state: GameState, content: GameContent, now: number,
   state.run.eventsDefended += 1;
   state.counters.bestEventStreak = Math.max(state.counters.bestEventStreak, state.eventStreak);
   recordSprintEvent(state, content, { kind: 'defendEvents', amount: 1 });
+  recordHoras(state, content, 'invasions');
   const reward = grantReward(state, content, def.reward, 'invasion', now, emit);
   emit({ type: 'invasionDefended', uid: current.uid, def: def.id, reward, streak: state.eventStreak });
   scheduleNextInvasion(state, content, now, rng);

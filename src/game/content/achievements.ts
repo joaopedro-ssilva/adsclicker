@@ -28,7 +28,7 @@ const ach = (
 });
 
 /**
- * 114 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
+ * 116 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
  * Every non-default cosmetic is granted by exactly one achievement, and harder ones give rarer skins:
  * common = hire / early clicks, rare = discipline level 25, epic = all research, legendary = level 100
  * or a long-haul challenge (a million clicks, a Domínio at the cap, 25 graduations...).
@@ -287,6 +287,8 @@ export const achievements: AchievementDef[] = [
   ach('diplomas-100', 'graduation', 'Parede de Diplomas', '🖼️', 'Ganhe 100 diplomas no total.', { kind: 'diplomasEarned', gte: 100 }),
   ach('diplomas-10000', 'graduation', 'Gráfica Sobrecarregada', '🖨️', 'Ganhe 10.000 diplomas no total.', { kind: 'diplomasEarned', gte: 10000 }),
   ach('tree-5', 'graduation', 'Raízes Fundas', '🌱', 'Tenha 5 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 5 }),
+  ach('maestrias-all', 'graduation', 'Oito Mestres', '🎓', 'Libere a Maestria dos 8 professores. Cada um com a sua especialidade e nenhum com tempo livre.', { kind: 'maestrias', unlocked: 8 }),
+  ach('maestrias-max', 'graduation', 'Mestre dos Mestres', '🧙', 'Leve uma Maestria ao nível 5. O resto da turma que espere o próximo diploma.', { kind: 'maestrias', unlocked: 1, level: 5 }),
   ach('tree-15', 'graduation', 'Árvore Frondosa', '🌳', 'Tenha 15 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 15 }),
 
   // ------------------------------------------------------------------ collection (6)

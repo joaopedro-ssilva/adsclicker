@@ -1,9 +1,11 @@
 'use client';
-import { formatDuration } from '@/game/engine/format';
-import { useGame, useRollforwardView, useSwarmView } from '@/game/store';
-import type { RollforwardView, SwarmView } from '@/game/engine/views';
+import { formatDuration, formatNumber } from '@/game/engine/format';
+import { festaText } from '@/game/engine/views';
+import { useBolsaView, useFestaView, useGame, useRollforwardView, useSwarmView } from '@/game/store';
+import type { BolsaView, FestaView, RollforwardView, SwarmView } from '@/game/engine/views';
 import { Meter, Tooltip } from '@/ui/kit';
 import { LayerReveal } from '../LayerReveal';
+import { useBolsaPanel } from './bolsa/bolsaPanelStore';
 
 function RollforwardButton({ view }: { view: RollforwardView }) {
   const fire = useGame((store) => store.fireRollforward);
@@ -68,18 +70,86 @@ function SwarmButton({ view }: { view: SwarmView }) {
   );
 }
 
-/** The buttons of the Maestrias that need the player to press them: Gladimir's Rollforward and Wagner's Super invasão. */
+function FestaButton({ view }: { view: FestaView }) {
+  const start = useGame((store) => store.startFesta);
+  const running = view.active !== null;
+  const state = running ? 'running' : view.ready ? 'ready' : 'cooldown';
+  const caption = running ? formatDuration(view.active?.leftMs ?? 0) : view.ready ? 'Pronta' : formatDuration(view.chargeLeftMs);
+
+  return (
+    <Tooltip content={`Festa de lançamento: ${festaText(view)}`}>
+      <button
+        type="button"
+        className="ability maestria-button"
+        data-qa="festa-start"
+        data-state={state}
+        disabled={!view.ready}
+        onClick={() => void start()}
+        aria-label={`Festa de lançamento, ${caption}`}
+      >
+        <Meter value={running || view.ready ? 1 : view.charge} max={1} label="Festa de lançamento" size="md" showLabel={false}>
+          <span aria-hidden="true">🎉</span>
+        </Meter>
+        <span className="ability-name">Festa de lançamento</span>
+        <span className="ability-caption">{caption}</span>
+      </button>
+    </Tooltip>
+  );
+}
+
+function BolsaButton({ view }: { view: BolsaView }) {
+  const open = useBolsaPanel((store) => store.show);
+  const held = view.totalValue.gt(0);
+  const caption = held ? `${formatNumber(view.totalValue, { integer: true })} Oc` : 'Abrir';
+
+  return (
+    <Tooltip content="Bolsa de tokens: compre ativos de IA com ADScoins e venda quando o preço subir. Tem também um fundo lento e seguro.">
+      <button
+        type="button"
+        className="ability maestria-button"
+        data-qa="bolsa-open"
+        data-state={held ? 'running' : 'ready'}
+        onClick={open}
+        aria-label={`Abrir a Bolsa de tokens, ${caption}`}
+      >
+        <Meter value={view.limit.gt(0) ? Math.min(1, view.invested.div(view.limit).toNumber()) : 0} max={1} label="Bolsa de tokens" size="md" showLabel={false}>
+          <span aria-hidden="true">📈</span>
+        </Meter>
+        <span className="ability-name">Bolsa de tokens</span>
+        <span className="ability-caption">{caption}</span>
+      </button>
+    </Tooltip>
+  );
+}
+
+/**
+ * The buttons of the Maestrias that need the player to press them. Gladimir's Rollforward and Wagner's Super invasão
+ * sit bottom left; Guto's Festa de lançamento and Pablo's Bolsa sit bottom right, under the abilities.
+ */
 export function MaestriaDock() {
   const roll = useRollforwardView();
   const swarm = useSwarmView();
-  if (!roll && !swarm) return null;
+  const festa = useFestaView();
+  const bolsa = useBolsaView();
 
   return (
-    <LayerReveal layer="maestrias" className="maestria-dock">
-      <div className="abilities" role="group" aria-label="Maestrias">
-        {roll ? <RollforwardButton view={roll} /> : null}
-        {swarm ? <SwarmButton view={swarm} /> : null}
-      </div>
-    </LayerReveal>
+    <>
+      {roll || swarm ? (
+        <LayerReveal layer="maestrias" className="maestria-dock">
+          <div className="abilities" role="group" aria-label="Maestrias">
+            {roll ? <RollforwardButton view={roll} /> : null}
+            {swarm ? <SwarmButton view={swarm} /> : null}
+          </div>
+        </LayerReveal>
+      ) : null}
+      {festa || bolsa ? (
+        <LayerReveal layer="maestrias-2" className="maestria-dock maestria-dock-right">
+          <div className="abilities" role="group" aria-label="Maestrias de Guto e Pablo">
+            {festa ? <FestaButton view={festa} /> : null}
+            {bolsa ? <BolsaButton view={bolsa} /> : null}
+          </div>
+        </LayerReveal>
+      ) : null}
+    </>
   );
 }

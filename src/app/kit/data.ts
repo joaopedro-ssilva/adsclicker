@@ -77,6 +77,7 @@ export const soundLabels: Record<SoundName, string> = {
   uiTap: 'Toque',
   golden: 'Clique de ouro',
   rollforward: 'Rollforward',
+  festa: 'Festa de lançamento',
 };
 
 export const iconLabels: Record<IconName, string> = {

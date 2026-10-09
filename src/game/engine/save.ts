@@ -89,7 +89,7 @@ function readString(value: unknown): string | null {
   return typeof value === 'string' ? value : null;
 }
 
-const BUFF_SOURCES: ActiveBuff['source'][] = ['ability', 'invasion', 'sprint'];
+const BUFF_SOURCES: ActiveBuff['source'][] = ['ability', 'invasion', 'sprint', 'maestria'];
 
 function readBuffs(value: unknown, content: GameContent): ActiveBuff[] {
   const index = getIndex(content);

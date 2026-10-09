@@ -2,6 +2,7 @@ import { PROFESSOR_IDS } from '../content/types';
 import type { Effect, Feature, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import type { Decimal } from './decimal';
+import { releaseMultiplier } from './maestria/releases';
 import { masteryRank } from './mastery';
 import type { GameState } from './state';
 
@@ -16,7 +17,7 @@ export const BASE_SYNERGY = 0.05;
  *
  * | StatKey            | Base                                                                   |
  * | ------------------ | ---------------------------------------------------------------------- |
- * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) x settings.devMultiplier x cloudBonus.cargo |
+ * | globalPower        | 1, then x (1 + achievementBonus * achievements) x (1 + diplomaBonus) x B1's Releases (versions of the run) x settings.devMultiplier x cloudBonus.cargo |
  * | clickPower         | 1                                                                      |
  * | idlePower          | 1                                                                      |
  * | prof:<id>          | 1                                                                      |
@@ -170,6 +171,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
       acc.value('globalPower', 1) *
       (1 + balance.achievementBonus * achievementCount(state)) *
       (1 + diplomaBonus(state, content)) *
+      releaseMultiplier(state, content) *
       state.settings.devMultiplier *
       state.cloudBonus.cargo,
     clickPower: acc.value('clickPower', 1),

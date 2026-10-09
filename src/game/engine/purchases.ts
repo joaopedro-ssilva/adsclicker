@@ -5,6 +5,8 @@ import { Decimal, parseDecimal } from './decimal';
 import { levelOf, spend } from './economy';
 import { bulkCost, maxAffordable, milestonesCrossed } from './formulas';
 import { afterAction } from './lifecycle';
+import { applyDesignSystem } from './maestria/designSystem';
+import { recordHoras } from './maestria/horas';
 import { hireLock, levelledLock, researchLock } from './requirements';
 import { recordSprintEvent } from './sprints';
 import type { BuyAmount, GameState } from './state';
@@ -43,7 +45,17 @@ export function quoteLevels(
 }
 
 /** Buys disciplines and click upgrades alike, respecting the buy amount and the unlock rules. */
-export function buyLevelled(state: GameState, content: GameContent, id: string, now: number, emit: Emit): boolean {
+/** An rng that never rolls: the Design System does nothing for callers that do not pass one. */
+const NEVER = () => 1;
+
+export function buyLevelled(
+  state: GameState,
+  content: GameContent,
+  id: string,
+  now: number,
+  emit: Emit,
+  rng: () => number = NEVER,
+): boolean {
   const entry = getIndex(content).levelled.get(id);
   if (!entry || levelledLock(state, content, entry) !== null) return false;
 
@@ -58,11 +70,13 @@ export function buyLevelled(state: GameState, content: GameContent, id: string, 
   state.counters.biggestPurchase = Math.max(state.counters.biggestPurchase, count);
   state.run.levelsBought += count;
   recordSprintEvent(state, content, { kind: 'buyLevels', amount: count });
+  recordHoras(state, content, 'levels', count);
 
   emit({ type: 'purchase', kind: entry.kind, id, levels: count });
   for (const level of milestonesCrossed(from, from + count, content.balance)) {
     emit({ type: 'milestone', id, level });
   }
+  if (entry.kind === 'discipline') applyDesignSystem(state, content, id, from, count, rng, emit);
   afterAction(state, content, now, emit);
   return true;
 }

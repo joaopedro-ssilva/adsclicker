@@ -4,7 +4,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
-import { resetMaestriasForGraduation } from './maestria';
+import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { recordGraduationDay } from './session';
 import type { GameState } from './state';
 import { computeStats, hasFeature } from './stats';
@@ -75,7 +75,11 @@ export function graduate(
 ): boolean {
   const stats = computeStats(state, content);
   if (!canGraduate(state, content, stats)) return false;
+  // The Bolsa is cashed in first: its profit is part of the run, and nothing it holds carries over.
+  liquidateBolsa(state, content);
   const diplomas = diplomasForRun(state, content, stats);
+  // Horas complementares: one diploma per band filled, outside the cap.
+  const bonus = horasBandsFilled(state, content);
   const index = getIndex(content);
   const kept = keptProfessors(state, content);
 
@@ -94,8 +98,8 @@ export function graduate(
   if (state.honoured) state.honouredBefore[state.honoured] = true;
   recordGraduationDay(state, now);
 
-  state.diplomas += diplomas;
-  state.diplomasEarned += diplomas;
+  state.diplomas += diplomas + bonus;
+  state.diplomasEarned += diplomas + bonus;
   state.counters.graduations += 1;
 
   state.coins = ZERO;
@@ -116,7 +120,7 @@ export function graduate(
   resetMaestriasForGraduation(state);
   if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
 
-  emit({ type: 'graduate', diplomas });
+  emit(bonus > 0 ? { type: 'graduate', diplomas: diplomas + bonus, bonus } : { type: 'graduate', diplomas });
   return true;
 }
 

@@ -13,6 +13,7 @@ import { content as gameContent } from '@/game/content';
 import type { GameContent } from '@/game/content/types';
 import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
+import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
@@ -204,11 +205,14 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
       const before = next.counters.graduations - graduationsDone;
       let allowed = 0;
       for (let i = 0; i < Math.min(graduationsDone, 1000); i += 1) allowed += cap.base * cap.growth ** (before + i);
+      // Angelo's Horas complementares pay up to one diploma per band on top, outside the cap.
+      allowed += horasMaxDiplomas(content, Math.max(maestriaLevel(next, 'angelo'), previous ? maestriaLevel(previous, 'angelo') : 0)) * Math.min(graduationsDone, 1000);
       if (diplomasDone > allowed) return fail('more diplomas than the cap allows');
     }
     const { base, exponent } = content.balance.graduation;
     const perRun = runPool.div(Decimal.max(parseDecimal(base), 1)).pow(exponent);
-    const bound = perRun.mul(bestNumber((r) => r.diplomaGain) * DIPLOMA_GAIN_SLACK).toNumber() * graduationsDone ** (1 - exponent) + 1;
+    const horasBonus = horasMaxDiplomas(content, Math.max(maestriaLevel(next, 'angelo'), previous ? maestriaLevel(previous, 'angelo') : 0)) * graduationsDone;
+    const bound = perRun.mul(bestNumber((r) => r.diplomaGain) * DIPLOMA_GAIN_SLACK).toNumber() * graduationsDone ** (1 - exponent) + 1 + horasBonus;
     if (Number.isFinite(bound) && diplomasDone > bound) return fail('more diplomas than the run was worth');
   }
 

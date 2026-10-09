@@ -220,7 +220,7 @@ export function serveSprint(env: Env): void {
     const previous = state.buyAmount;
     state.buyAmount = 1;
     const ok = pick.kind === 'discipline'
-      ? engine.buyDiscipline(state, content, pick.id, env.now, env.emit)
+      ? engine.buyDiscipline(state, content, pick.id, env.now, env.emit, env.rng)
       : engine.buyClickUpgrade(state, content, pick.id, env.now, env.emit);
     state.buyAmount = previous;
     if (!ok) return;
@@ -394,7 +394,7 @@ function buy(env: Env, candidate: Candidate, base: Decimal): boolean {
     bought = true;
     for (let i = 0; i < candidate.levels; i += 1) {
       const ok = candidate.kind === 'discipline'
-        ? engine.buyDiscipline(state, content, candidate.id, now, emit)
+        ? engine.buyDiscipline(state, content, candidate.id, now, emit, env.rng)
         : engine.buyClickUpgrade(state, content, candidate.id, now, emit);
       if (!ok) {
         bought = i > 0;

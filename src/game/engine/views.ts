@@ -31,6 +31,7 @@ export type { MasteryView } from './mastery';
 export { monitorsView } from './monitors';
 import { diplomaCap, diplomasFor, diplomasForRun, prestigeNodeAvailable, prestigeNodeCost, runCoinsFor } from './prestige';
 export { diplomaBonus } from './stats';
+import { horasBandsFilled } from './maestria/horas';
 export * from './maestria/views';
 import { effectiveBuyAmount, quoteLevels } from './purchases';
 import { hireLock, isAbilityUnlocked, levelledLock, researchLock } from './requirements';
@@ -255,6 +256,7 @@ export function graduationPreview(state: GameState, content: GameContent): Gradu
     canGraduate: unlocked && diplomas >= 1,
     cap,
     atCap,
+    bonus: horasBandsFilled(state, content),
   };
 }
 

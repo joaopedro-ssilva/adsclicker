@@ -8,11 +8,12 @@
  *   npm run sim -- --profile casual --seed 3 --audit
  *
  * Flags: --profile active|casual|idle|all, --cps, --defend, --hours, --seed, --graduate-min,
- * --graduate-ratio, --graduate-until, --no-graduate, --no-maestrias, --away play,away (seconds), --audit (research
+ * --graduate-ratio, --graduate-until, --no-graduate, --no-maestrias, --picks edecio,gladimir (the only Maestrias that get slots), --away play,away (seconds), --audit (research
  * table), --sprints (sprint table), --sprint-audit h1,h2,... (can the active player, and one who does
  * nothing, finish each sprint at those hours of an active run?), --every (timeline step, minutes).
  */
 import { content } from '@/game/content';
+import type { ProfessorId } from '@/game/content/types';
 import { formatDuration } from '../engine/format';
 import { auditSprints } from './audit';
 import { PROFILES, PROFILE_IDS } from './profiles';
@@ -82,6 +83,8 @@ function main(): void {
     if (graduateUntil !== undefined) options.graduateUntil = graduateUntil;
     if (flags.has('no-graduate')) options.graduate = false;
     if (flags.has('no-maestrias')) options.maestrias = false;
+    const picks = flags.get('picks');
+    if (picks) options.maestriaPicks = picks.split(',') as ProfessorId[];
     const away = flags.get('away');
     if (away) {
       const [play, gone] = away.split(',').map(Number);

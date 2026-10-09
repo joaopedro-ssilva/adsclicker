@@ -1,6 +1,7 @@
 import { MAESTRIA_MAX_LEVEL, PROFESSOR_IDS } from '../../content/types';
 import type { GameContent, ProfessorId } from '../../content/types';
 import type { Emit } from '../../store/types';
+import { ZERO } from '../decimal';
 import type { GameState } from '../state';
 import type { MaestriaState } from './types';
 
@@ -10,6 +11,9 @@ export function createMaestriaState(): MaestriaState {
     joinha: { clicks: 0 },
     rollforward: { clicks: 0, charges: 0 },
     swarm: { since: 0, seq: 0, active: null },
+    festa: { since: 0 },
+    horas: { clicks: 0, invasions: 0, sprints: 0, abilities: 0, levels: 0 },
+    bolsa: { at: 0, step: 0, fundIndex: 1, fund: { units: ZERO, cost: ZERO }, liquidity: 0, assets: {} },
   };
 }
 

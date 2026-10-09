@@ -1,7 +1,8 @@
 import { MAESTRIA_MAX_LEVEL, PROFESSOR_IDS } from '../../content/types';
 import type { GameContent } from '../../content/types';
+import { ZERO, parseDecimal } from '../decimal';
 import { createMaestriaState } from './slots';
-import type { ActiveSwarm, MaestriaState, SwarmBug } from './types';
+import type { ActiveSwarm, BolsaAssetState, BolsaHolding, BolsaState, HorasState, MaestriaState, SwarmBug } from './types';
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -55,6 +56,48 @@ function readSwarm(value: unknown, content: GameContent): ActiveSwarm | null {
   };
 }
 
+function readHolding(value: unknown): BolsaHolding {
+  if (!isRecord(value)) return { units: ZERO, cost: ZERO };
+  const read = (raw: unknown) => {
+    const parsed = typeof raw === 'string' ? parseDecimal(raw) : typeof raw === 'number' && Number.isFinite(raw) ? parseDecimal(String(raw)) : ZERO;
+    return Number.isNaN(parsed.toNumber()) || parsed.lt(0) ? ZERO : parsed;
+  };
+  const units = read(value.units);
+  const cost = read(value.cost);
+  // A holding with shares but no cost (or the reverse) is nothing.
+  return units.gt(0) && cost.gt(0) ? { units, cost } : { units: ZERO, cost: ZERO };
+}
+
+function readHoras(value: unknown): HorasState {
+  const horas = isRecord(value) ? value : {};
+  const hours = (raw: unknown) => num(raw, 0, 0, 1e9);
+  return { clicks: hours(horas.clicks), invasions: hours(horas.invasions), sprints: hours(horas.sprints), abilities: hours(horas.abilities), levels: hours(horas.levels) };
+}
+
+function readBolsa(value: unknown, content: GameContent, fallback: BolsaState): BolsaState {
+  if (!isRecord(value)) return fallback;
+  const cfg = content.maestrias.bolsa;
+  const assets: Record<string, BolsaAssetState> = {};
+  const saved = isRecord(value.assets) ? value.assets : {};
+  for (const def of cfg.assets) {
+    const entry = saved[def.id];
+    if (!isRecord(entry)) continue;
+    const price = num(entry.price, def.start, def.lo, def.hi);
+    const history = Array.isArray(entry.history)
+      ? entry.history.filter((p): p is number => typeof p === 'number' && Number.isFinite(p)).map((p) => Math.min(def.hi, Math.max(def.lo, p))).slice(-cfg.historyLength)
+      : [];
+    assets[def.id] = { price, history: history.length > 0 ? history : [price], held: readHolding(entry.held) };
+  }
+  return {
+    at: num(value.at, 0, 0),
+    step: whole(value.step),
+    fundIndex: num(value.fundIndex, 1, 1, 1e6),
+    fund: readHolding(value.fund),
+    liquidity: num(value.liquidity, 0, 0, Math.max(...cfg.limitMinutes) * 60),
+    assets,
+  };
+}
+
 /** Tolerant reader: a missing or broken piece falls back to its default, an unknown Maestria is dropped. */
 export function readMaestria(value: unknown, content: GameContent): MaestriaState {
   const maestria = createMaestriaState();
@@ -82,5 +125,8 @@ export function readMaestria(value: unknown, content: GameContent): MaestriaStat
     };
     if (maestria.swarm.active) maestria.swarm.seq = Math.max(maestria.swarm.seq, maestria.swarm.active.uid);
   }
+  if (isRecord(value.festa)) maestria.festa = { since: num(value.festa.since, 0, 0) };
+  maestria.horas = readHoras(value.horas);
+  maestria.bolsa = readBolsa(value.bolsa, content, maestria.bolsa);
   return maestria;
 }

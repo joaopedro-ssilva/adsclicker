@@ -29,7 +29,7 @@ One special mechanic per professor: you pay once, it works by itself, and whoeve
 
 Rewards are measured in seconds of production so they scale with the save, and they must be bounded so the server's plausibility check (`src/server/players/plausibility.ts`) can account for them.
 
-**Second wave (designed, not built yet; Angelo and Pablo still wait for the owner's yes):**
+**Second wave (built; the numbers live in `content/maestrias.ts`, the rules in GAME_DESIGN):**
 
 - Bruna B2, Design System: buying a level gives free levels only in classes whose next level costs less than what was just paid (it only flows down to cheaper classes).
 - Guto, Festa de lançamento: a long-cooldown button (about 30 min) that makes one minute of chaos: every ability fires at once, everything is boosted, invasions come more often and abilities recharge faster while it lasts.

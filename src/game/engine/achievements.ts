@@ -1,8 +1,10 @@
+import { PROFESSOR_IDS } from '../content/types';
 import type { AchievementDef, Condition, GameContent } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, parseDecimal, ratio } from './decimal';
 import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
+import { maestriaLevel } from './maestria/slots';
 import { masteryLevels, masteryRank } from './mastery';
 import type { GameState } from './state';
 import { achievementCount, computeStats } from './stats';
@@ -141,7 +143,8 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'abilitiesActive': {
       const total = content.abilities.length;
-      const running = content.abilities.filter((def) => state.buffs.some((buff) => buff.id === def.buff.id)).length;
+      // Only buffs the player started by hand: the Festa de lançamento fires every ability by itself.
+      const running = content.abilities.filter((def) => state.buffs.some((buff) => buff.id === def.buff.id && buff.source === 'ability')).length;
       return { progress: total === 0 ? 0 : running / total, met: total > 0 && running === total };
     }
     case 'everyResearch': {
@@ -166,6 +169,11 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'lastRunClickShare':
       return measureBoolean(state.lastRun !== null && state.lastRun.clickShare >= condition.gte);
+    case 'maestrias': {
+      const needed = condition.level ?? 1;
+      const count = PROFESSOR_IDS.filter((id) => maestriaLevel(state, id) >= needed).length;
+      return measureAtLeast(count, condition.unlocked);
+    }
     case 'lastRunClean': {
       const last = state.lastRun;
       return measureBoolean(

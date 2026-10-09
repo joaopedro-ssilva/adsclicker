@@ -6,6 +6,7 @@ import { acceptClick } from './clickLimit';
 import { clickValueWith, gain } from './economy';
 import { afterAction } from './lifecycle';
 import { goldenCanCrit, goldenReady, goldenValue, recordJoinhaClick } from './maestria/joinha';
+import { recordHoras } from './maestria/horas';
 import { recordRollforwardClick } from './maestria/rollforward';
 import { recordSprintEvent } from './sprints';
 import type { GameState } from './state';
@@ -52,6 +53,7 @@ export function click(
   gain(state, value);
   recordJoinhaClick(state, content, golden);
   recordRollforwardClick(state, content);
+  recordHoras(state, content, 'clicks');
   state.run.clicks += 1;
   state.run.clickCoins = state.run.clickCoins.add(value);
 

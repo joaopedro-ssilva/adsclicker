@@ -28,12 +28,14 @@ import {
   takeSprint,
   trackLevels,
 } from './strategy';
-import { clickSwarm, holdsPointer, spendMaestrias, fireChargedMaestrias } from './maestrias';
+import { DEFAULT_PICKS, clickSwarm, holdsPointer, spendMaestrias, fireChargedMaestrias } from './maestrias';
 import type { Env, InvasionDecisions, PurchaseRecord, StrategyOptions } from './strategy';
 
 export interface SimOptions extends Partial<StrategyOptions> {
   /** Play the Maestrias: slots on Edécio, Gladimir and Wagner, charges used as soon as they are ready. Default true. */
   maestrias?: boolean;
+  /** Which professors get the Maestria slots, in order. Default: all eight (see DEFAULT_PICKS). */
+  maestriaPicks?: ProfessorId[];
   /** Simulated play time limit, in seconds. Default 6 hours. */
   maxSeconds?: number;
   /** Engine step, in ms. Default 500. */
@@ -163,6 +165,7 @@ const DEFAULTS = {
   stopWhenDone: true,
   sampleSeconds: 300,
   maestrias: true,
+  maestriaPicks: DEFAULT_PICKS,
 } as const;
 
 /** Arbitrary but non-zero epoch for the simulated clock. */
@@ -372,7 +375,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       const runCoins = state.runCoins;
       const outcome = graduateIfWorth(env, strategy);
       if (outcome) {
-        if (opts.maestrias) spendMaestrias(env);
+        if (opts.maestrias) spendMaestrias(env, opts.maestriaPicks);
         run.endedAt = (now - START) / 1000;
         run.diplomas = outcome.diplomas;
         run.diplomasTotal = state.diplomasEarned;

@@ -33,7 +33,7 @@ export interface ActiveBuff {
   effects: Effect[];
   startedAt: number;
   endsAt: number;
-  source: 'ability' | 'invasion' | 'sprint';
+  source: 'ability' | 'invasion' | 'sprint' | 'maestria';
 }
 
 export interface ActiveInvasion {

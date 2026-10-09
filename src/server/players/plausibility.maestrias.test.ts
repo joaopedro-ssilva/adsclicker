@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { content } from '@/game/content';
+import { PROFESSOR_IDS } from '@/game/content/types';
+import { coinsPerSecond } from '@/game/engine';
+import { bolsaMaxSeconds, horasMaxDiplomas } from '@/game/engine/maestria';
 import type { GameState } from '@/game/engine/state';
 import { simulate } from '@/game/sim/simulate';
 import type { SimOptions } from '@/game/sim/simulate';
@@ -7,7 +10,7 @@ import { roundTrip } from '../testing/play';
 import type { Window } from '../testing/play';
 import { judgeSave } from './plausibility';
 
-/** Plays with Edécio, Gladimir and Wagner at the top level (the simulator uses every charge as soon as it is ready). */
+/** Plays with all eight Maestrias at the top level (the simulator uses every charge as soon as it is ready and trades the Bolsa). */
 function maestriaWindows(options: SimOptions & { windows: number; windowSeconds?: number }): Window[] {
   const { windows, windowSeconds = 45, ...sim } = options;
   const result: Window[] = [];
@@ -20,7 +23,7 @@ function maestriaWindows(options: SimOptions & { windows: number; windowSeconds?
       setup: (state) => {
         state.counters.graduations = 30;
         state.diplomasEarned = 20_000;
-        for (const id of ['edecio', 'gladimir', 'wagner'] as const) state.maestria.levels[id] = 5;
+        for (const id of PROFESSOR_IDS) state.maestria.levels[id] = 5;
       },
       maxSeconds: windowSeconds * (i + 1),
       stopWhenDone: false,
@@ -34,7 +37,7 @@ function maestriaWindows(options: SimOptions & { windows: number; windowSeconds?
 }
 
 describe('judgeSave: Maestrias', () => {
-  it('honest play with every built Maestria maxed passes, windows of 45 s and of 10 min', () => {
+  it('honest play with all eight Maestrias maxed passes, windows of 45 s and of 10 min', () => {
     for (const options of [
       { clicksPerSecond: 14, windows: 60, seed: 3 },
       { clicksPerSecond: 4, windows: 8, windowSeconds: 600, seed: 5, graduate: false },
@@ -82,6 +85,27 @@ describe('judgeSave: Maestrias', () => {
     next.diplomasEarned = previous.diplomasEarned + 1_000_000;
     next.diplomas = next.diplomasEarned;
     next.runCoins = previous.runCoins;
+    next.lifetimeCoins = previous.lifetimeCoins.mul(1e60);
+    expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
+  });
+
+  it('Bolsa profit far beyond what the market can pay in the window', () => {
+    const { previous, next, elapsedMs } = last();
+    const cps = coinsPerSecond(next, content);
+    const window = elapsedMs / 1000 + 30;
+    const lump = cps.mul(bolsaMaxSeconds(content, 5, window) * 40);
+    next.lifetimeCoins = next.lifetimeCoins.add(lump);
+    next.runCoins = next.runCoins.add(lump);
+    expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
+  });
+
+  it('more diplomas than the cap plus the Horas complementares bands', () => {
+    const { previous, next, elapsedMs } = last();
+    const cap = content.balance.graduation.cap;
+    if (!cap) throw new Error('no cap');
+    next.counters.graduations = previous.counters.graduations + 1;
+    const allowed = cap.base * cap.growth ** previous.counters.graduations + horasMaxDiplomas(content, 5);
+    next.diplomasEarned = previous.diplomasEarned + Math.ceil(allowed) + 10;
     next.lifetimeCoins = previous.lifetimeCoins.mul(1e60);
     expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
   });

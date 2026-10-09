@@ -1,3 +1,4 @@
+import type { Decimal } from '../decimal';
 import type { ProfessorId } from '../../content/types';
 
 /** One bug of a Super invasão. Positions are 0..1 on each axis of the stage. */
@@ -51,4 +52,45 @@ export interface MaestriaState {
   rollforward: { clicks: number; charges: number };
   /** Super invasão. `since` = when the charge started filling (epoch ms); it survives graduation. */
   swarm: { since: number; seq: number; active: ActiveSwarm | null };
+  /** Festa de lançamento. `since` = when the recharge started (epoch ms); it survives graduation. The party itself is a buff. */
+  festa: { since: number };
+  /** Horas complementares: hours counted in the run, by activity. Paid and cleared at graduation. */
+  horas: HorasState;
+  /** Bolsa de tokens: the market and what the player holds. Prices survive graduation; the holdings are cashed in. */
+  bolsa: BolsaState;
+}
+
+export interface HorasState {
+  clicks: number;
+  invasions: number;
+  sprints: number;
+  abilities: number;
+  levels: number;
+}
+
+export interface BolsaHolding {
+  /** Shares: coins paid divided by the price of each purchase. Worth `units x price` now. */
+  units: Decimal;
+  /** Coins paid and not taken back yet. */
+  cost: Decimal;
+}
+
+export interface BolsaAssetState {
+  price: number;
+  /** The last prices, oldest first, for the sparkline. */
+  history: number[];
+  held: BolsaHolding;
+}
+
+export interface BolsaState {
+  /** Game time of the last price step (epoch ms). 0 = the market never opened. */
+  at: number;
+  /** Price steps so far; the cyclic assets follow it. */
+  step: number;
+  /** Growth index of the Fundo (1 at the start, it only goes up). */
+  fundIndex: number;
+  fund: BolsaHolding;
+  /** Profit the market can still pay, in seconds of the class's production. It refills with time. */
+  liquidity: number;
+  assets: Record<string, BolsaAssetState>;
 }

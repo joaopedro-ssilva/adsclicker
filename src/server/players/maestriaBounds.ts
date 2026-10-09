@@ -8,6 +8,8 @@ import { MAESTRIA_MAX_LEVEL, PROFESSOR_IDS } from '@/game/content/types';
 import type { GameContent } from '@/game/content/types';
 import {
   atLevel,
+  bolsaMaxSeconds,
+  festaRechargeMs,
   goldenCanCrit,
   maestriaLevel,
   maestriaSpent,
@@ -19,6 +21,11 @@ import {
 } from '@/game/engine/maestria';
 import type { GameState } from '@/game/engine/state';
 import type { Stats } from '@/game/engine/stats';
+
+/** Seconds of production the abilities a party fires at once can add (their buffs, beyond the boost itself). */
+const FESTA_ABILITY_SECONDS = 400;
+/** The most one invasion pays, in seconds of production, before the event bonus. */
+const INVASION_MAX_SECONDS = 150;
 
 export interface MaestriaWindow {
   /** Most manual clicks the window can hold (the engine's click limit over the window, plus the grace). */
@@ -55,6 +62,22 @@ export function maestriaLumpSeconds(state: GameState, content: GameContent, stat
     const uses = 1 + (window.seconds + rollforward) / chargeSeconds;
     total += uses * swarmMaxSeconds(content, swarm) * Math.max(1, stats.eventReward);
   }
+
+  // Festa de lançamento: one party per recharge (and one already waiting). Each pays its boost over its duration, the
+  // abilities it fires at once (a flat allowance for their buffs), and the invasions it brings: one per interval, up to 150 s each.
+  const festa = maestriaLevel(state, 'guto');
+  if (festa > 0) {
+    const cfg = content.maestrias.festa;
+    const rechargeSeconds = Math.max(1, festaRechargeMs(state, content) / 1000);
+    const uses = 1 + (window.seconds + rollforward) / rechargeSeconds;
+    const duration = atLevel(cfg.seconds, festa);
+    const invasions = Math.ceil(duration / (content.balance.events.minIntervalMs / 1000 * atLevel(cfg.invasions, festa))) + 1;
+    const each = duration * Math.max(0, atLevel(cfg.power, festa) - 1) + FESTA_ABILITY_SECONDS + invasions * INVASION_MAX_SECONDS * Math.max(1, stats.eventReward);
+    total += uses * each;
+  }
+
+  // Bolsa de tokens: the market pays at most a full bucket of profit plus what refills in the window (see engine/maestria/bolsa.ts).
+  total += bolsaMaxSeconds(content, maestriaLevel(state, 'pablo'), window.seconds);
   return total;
 }
 

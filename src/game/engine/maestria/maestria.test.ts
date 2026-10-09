@@ -30,7 +30,9 @@ describe('slots and levels', () => {
     expect(freeSlots(g.state)).toBe(2);
     expect(unlockMaestria(g.state, content, 'edecio', g.emit)).toBe(true);
     expect(unlockMaestria(g.state, content, 'edecio', g.emit)).toBe(false);
-    expect(unlockMaestria(g.state, content, 'b2', g.emit)).toBe(false); // not built yet
+    const unbuilt = structuredClone(content);
+    unbuilt.maestrias.defs.b2.built = false;
+    expect(unlockMaestria(g.state, unbuilt, 'b2', g.emit)).toBe(false); // not built
     expect(freeSlots(g.state)).toBe(1);
 
     expect(buyMaestriaLevel(g.state, content, 'edecio', g.emit)).toBe(false);
@@ -57,7 +59,9 @@ describe('slots and levels', () => {
   it('a save cannot hold levels above 5 or of a Maestria that is not built', () => {
     const raw = JSON.parse(serializeState(createInitialState(content, T0))) as Record<string, unknown>;
     raw.maestria = { levels: { edecio: 99, b2: 3, nobody: 2 } };
-    const loaded = deserializeState(JSON.stringify(raw), content, T0);
+    const unbuilt = structuredClone(content);
+    unbuilt.maestrias.defs.b2.built = false;
+    const loaded = deserializeState(JSON.stringify(raw), unbuilt, T0);
     expect(loaded?.maestria.levels).toEqual({ edecio: 5 });
   });
 });

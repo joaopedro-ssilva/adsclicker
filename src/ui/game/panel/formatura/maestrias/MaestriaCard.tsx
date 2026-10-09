@@ -5,6 +5,7 @@ import { themeVariables, useReducedMotion } from '@/ui/ThemeProvider';
 import { Badge, Button, Icon } from '@/ui/kit';
 import { playLimited, shake } from '../../lib/feedback';
 import { Portrait } from '../../lib/Portrait';
+import { MaestriaLive } from './MaestriaLive';
 
 interface MaestriaCardProps {
   card: MaestriaCardView;
@@ -58,6 +59,7 @@ export function MaestriaCard({ card, slotFree, onPickSlot }: MaestriaCardProps) 
                 </li>
               ))}
             </ul>
+            <MaestriaLive professor={card.professor} />
           </>
         ) : null}
         {card.built && !card.unlocked ? (

@@ -105,6 +105,7 @@ function build(content: GameContent): ContentIndex {
   for (const invasion of content.invasions) {
     if (invasion.reward.kind === 'buff') buffs.set(invasion.reward.buff.id, invasion.reward.buff);
   }
+  for (const buff of content.maestrias.festa.buffs) buffs.set(buff.id, buff);
   for (const sprint of content.sprints) {
     if (sprint.reward.kind === 'buff') buffs.set(sprint.reward.buff.id, sprint.reward.buff);
   }

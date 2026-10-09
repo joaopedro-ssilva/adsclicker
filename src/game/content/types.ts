@@ -149,6 +149,8 @@ export type Condition =
   | { kind: 'lastRunClickShare'; gte: number }
   /** The last run completed sprints and defended invasions, and failed or missed none. */
   | { kind: 'lastRunClean' }
+  /** At least `unlocked` Maestrias are unlocked, each at level `level` or more (default 1). */
+  | { kind: 'maestrias'; unlocked: number; level?: number }
   /** Fired by name from the UI or engine (easter eggs): useGame.getState().triggerSecret(id). */
   | { kind: 'secret'; trigger: string };
 
@@ -237,7 +239,7 @@ export interface MasteryDef {
   units: ('percent' | 'hours')[];
   /** What honouring the professor at a graduation adds for the following run. */
   honour: {
-    /** Short label of the boost, e.g. "Combo que não cai". */
+    /** Short label of the boost, e.g. "Combo em dobro". */
     name: string;
     description: string;
     /** Applied once, whatever the rank. */
@@ -350,6 +352,9 @@ export interface MonitorDef {
 
 export const MAESTRIA_MAX_LEVEL = 5;
 
+/** Ids of the Festa de lançamento buffs start with this, followed by the level. */
+export const FESTA_BUFF_PREFIX = 'buff-festa-';
+
 export interface MaestriaDef {
   professor: ProfessorId;
   name: string;
@@ -410,6 +415,91 @@ export interface MaestriasConfig {
     /** The firewall's pace by level: one bug dies every N ms. 0 = no firewall. */
     firewallEveryMs: number[];
   };
+  /** B2, Design System. */
+  designSystem: {
+    /** Chance, per level bought by hand, that the purchase reaches other classes. */
+    chance: number[];
+    /** Classes reached when it does (each gets one free level). */
+    reach: number[];
+    /** Most levels of one purchase that roll (bulk purchases). */
+    maxRolls: number;
+  };
+  /** Guto, Festa de lançamento. */
+  festa: {
+    /** Real minutes for the button to recharge. */
+    rechargeMinutes: number[];
+    /** How long the party lasts. */
+    seconds: number[];
+    /** Multiplier on every source of coins (globalPower). */
+    power: number[];
+    /** Multiplier on ability recharge time (below 1 = faster). */
+    cooldown: number[];
+    /** Multiplier on the time between invasions (below 1 = more often). */
+    invasions: number[];
+    /** The party's buff by level, built from the numbers above (the save reads them by id). */
+    buffs: BuffDef[];
+  };
+  /** B1, Releases. */
+  releases: {
+    /** Sprints completed in the run for each version. */
+    sprintsPerVersion: number[];
+    /** Production added by each version (0.03 = +3%). */
+    bonus: number[];
+    /** Versions per run. Never grows with the level. */
+    maxVersions: number;
+  };
+  /** Angelo, Horas complementares. */
+  horas: {
+    /** Hours that fill one band. */
+    hoursPerBand: number;
+    /** Bands open by level; each filled band is one diploma at graduation, outside the cap. */
+    bands: number[];
+    /** No single activity counts for more than this share of the whole bar. */
+    sourceShare: number;
+    /** Hours per activity. */
+    weights: { click: number; invasion: number; sprint: number; ability: number; level: number };
+  };
+  /** Pablo, Bolsa de tokens. */
+  bolsa: {
+    /** Game time between two price steps. */
+    stepMs: number;
+    /** Most steps a long gap catches up (the rest is skipped). */
+    catchUpSteps: number;
+    /** Prices kept for the sparkline. */
+    historyLength: number;
+    /** Most the player can have invested, in minutes of the class's production. It is also what the market pays in profit per hour. */
+    limitMinutes: number[];
+    /** Growth of the Fundo per minute (0.004 = 0.4%). */
+    fundPerMinute: number[];
+    assets: BolsaAssetDef[];
+  };
+}
+
+export type BolsaTemperament = 'calm' | 'cyclic' | 'spiky';
+
+/** One asset of the Bolsa de tokens. Prices are an index around 1, kept between `lo` and `hi`. */
+export interface BolsaAssetDef {
+  id: string;
+  name: string;
+  emoji: string;
+  blurb: string;
+  temperament: BolsaTemperament;
+  /** Level of the Maestria that opens it. */
+  unlockLevel: number;
+  lo: number;
+  hi: number;
+  /** Price at the first step. */
+  start: number;
+  /** Pull towards the mean, per step (0..1). */
+  revert: number;
+  /** Size of the random wobble, in log price per step. */
+  noise: number;
+  /** Cyclic: swing around the mean (0.3 = ±30%) and steps per cycle. */
+  amplitude?: number;
+  periodSteps?: number;
+  /** Spiky: chance per step of a jump and the size of it in log price. */
+  spikeChance?: number;
+  spikeSize?: number;
 }
 
 // ---------------------------------------------------------------------------

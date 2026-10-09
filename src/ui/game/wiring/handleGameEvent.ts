@@ -190,6 +190,9 @@ export function handleGameEvent(event: GameEvent): void {
     case 'swarmHit':
     case 'swarmEscape':
     case 'swarmEnd':
+    case 'designSystem':
+    case 'festaStart':
+    case 'bolsa':
       handleMaestriaEvent(event);
       break;
     case 'monitorAct':

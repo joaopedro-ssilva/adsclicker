@@ -3,6 +3,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal } from './decimal';
 import { clickValueWith, coinsPerSecondWith } from './economy';
+import { recordHoras } from './maestria/horas';
 import { firstUnmet } from './requirements';
 import { grantReward } from './rewards';
 import type { ActiveSprint, GameState } from './state';
@@ -94,6 +95,7 @@ export function settleSprint(state: GameState, content: GameContent, now: number
     state.sprint.nextOffersAt = now + cooldown;
     state.counters.sprintsCompleted += 1;
     state.run.sprintsCompleted += 1;
+    recordHoras(state, content, 'sprints');
     const reward = grantReward(state, content, def.reward, 'sprint', now, emit);
     emit({ type: 'sprintDone', def: def.id, reward });
   } else if (now >= active.endsAt) {

@@ -1,23 +1,22 @@
-import { PROFESSOR_IDS } from '../content/types';
 import type { ProfessorId } from '../content/types';
 import * as engine from '../engine/actions';
 import { freeSlots, maestriaLevel, maestriaNextCost } from '../engine/maestria';
-import { joinhaView, swarmView } from '../engine/views';
+import { bolsaView, festaView, joinhaView, swarmView } from '../engine/views';
 import type { Env } from './strategy';
 
-/** The Maestrias that exist, in the order a player is likely to pick them. */
-const PICKS: ProfessorId[] = ['edecio', 'gladimir', 'wagner'];
+/** The order a player is likely to pick them: the three of the first wave, then the second wave. */
+export const DEFAULT_PICKS: ProfessorId[] = ['edecio', 'gladimir', 'wagner', 'b2', 'guto', 'b1', 'angelo', 'pablo'];
 
 /** After a graduation: puts each new slot on the next built Maestria, then spends leftover diplomas on the cheapest level. */
-export function spendMaestrias(env: Env): void {
+export function spendMaestrias(env: Env, picks: ProfessorId[] = DEFAULT_PICKS): void {
   const { state, content } = env;
-  for (const id of PICKS) {
+  for (const id of picks) {
     if (freeSlots(state) <= 0) break;
     if (maestriaLevel(state, id) === 0) engine.unlockMaestria(state, content, id, env.now, env.emit);
   }
   for (let guard = 0; guard < 40; guard += 1) {
     let best: { id: ProfessorId; cost: number } | null = null;
-    for (const id of PROFESSOR_IDS) {
+    for (const id of picks) {
       const cost = maestriaNextCost(state, content, id);
       if (cost !== null && state.diplomas >= cost && (!best || cost < best.cost)) best = { id, cost };
     }
@@ -39,6 +38,25 @@ export function fireChargedMaestrias(env: Env): void {
   }
   const swarm = swarmView(state, content, env.now);
   if (swarm?.ready) engine.startSwarm(state, content, env.now, env.emit);
+  if (festaView(state, content, env.now)?.ready) engine.startFesta(state, content, env.now, env.emit);
+  tradeBolsa(env);
+}
+
+/**
+ * A simple trader: buys an asset below the low end of its range, sells above the high end. It leaves the Fundo alone: in a run the
+ * economy grows faster than the Fundo does, so a player who is buying upgrades is better off not parking coins there.
+ */
+function tradeBolsa(env: Env): void {
+  const { state, content } = env;
+  const view = bolsaView(state, content);
+  if (!view?.open) return;
+  for (const asset of view.assets) {
+    if (!asset.open) continue;
+    const sellAt = 1 + 0.6 * (asset.hi - 1);
+    const buyAt = 1 - 0.4 * (1 - asset.lo);
+    if (asset.held && asset.price >= sellAt) engine.sellBolsaAsset(state, content, asset.id, 1, env.now, env.emit);
+    else if (!asset.held && asset.price <= buyAt) engine.buyBolsaAsset(state, content, asset.id, 0.5, env.now, env.emit);
+  }
 }
 
 /** One click on the swarm: the bug about to escape first, the boss when nothing else is left. Returns false with no swarm. */

@@ -9,6 +9,7 @@ const SOURCE_LABEL: Record<ActiveBuff['source'], string> = {
   ability: 'Habilidade',
   invasion: 'Recompensa de invasão',
   sprint: 'Recompensa de sprint',
+  maestria: 'Maestria',
 };
 
 const BuffChip = memo(function BuffChip({ buff, now }: { buff: ActiveBuff; now: number }) {

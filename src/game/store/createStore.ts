@@ -203,7 +203,7 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       setBuyAmount(amount) {
         run((state) => engine.setBuyAmount(state, content, amount), true);
       },
-      buyDiscipline: (id) => run((state, emit) => engine.buyDiscipline(state, content, id, now(), emit), true),
+      buyDiscipline: (id) => run((state, emit) => engine.buyDiscipline(state, content, id, now(), emit, rng), true),
       buyClickUpgrade: (id) => run((state, emit) => engine.buyClickUpgrade(state, content, id, now(), emit), true),
       buyResearch: (id) => run((state, emit) => engine.buyResearch(state, content, id, now(), emit), true),
       hireProfessor: (id) => run((state, emit) => engine.hireProfessor(state, content, id, now(), emit), true),
@@ -246,6 +246,11 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       buyMaestriaLevel: (professor) => run((state, emit) => engine.buyMaestriaLevel(state, content, professor, now(), emit), true),
       fireRollforward: () => run((state, emit) => engine.fireRollforward(state, content, now(), emit), true),
       startSwarm: () => run((state, emit) => engine.startSwarm(state, content, now(), emit), true),
+      startFesta: () => run((state, emit) => engine.startFesta(state, content, now(), emit), true),
+      buyBolsaAsset: (id, fraction) => run((state, emit) => engine.buyBolsaAsset(state, content, id, fraction, now(), emit), true),
+      sellBolsaAsset: (id, fraction) => run((state, emit) => engine.sellBolsaAsset(state, content, id, fraction, now(), emit), true),
+      depositBolsaFund: (fraction) => run((state, emit) => engine.depositBolsaFund(state, content, fraction, now(), emit), true),
+      withdrawBolsaFund: (fraction) => run((state, emit) => engine.withdrawBolsaFund(state, content, fraction, now(), emit), true),
       hitBug(uid) {
         run((state, emit) => engine.hitBug(state, content, uid, now(), emit));
       },

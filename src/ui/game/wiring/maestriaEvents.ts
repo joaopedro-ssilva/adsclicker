@@ -57,6 +57,44 @@ function onRollforward(event: Extract<GameEvent, { type: 'rollforward' }>): void
   });
 }
 
+let lastDesign = 0;
+
+/** B2's free levels: a quiet mark (they can be frequent), at most one toast every few seconds. */
+function onDesignSystem(event: Extract<GameEvent, { type: 'designSystem' }>): void {
+  audio.play('uiTap');
+  fx.sparkles({ ...anchorPoint('actor', 0.5), count: 16, color: content.professors.b2.color });
+  const now = performance.now();
+  if (now - lastDesign < 2500) return;
+  lastDesign = now;
+  const names = event.gifts.map((gift) => content.disciplines.find((def) => def.id === gift.id)?.name ?? gift.id);
+  toast({ title: '🎨 Design System', description: `Nível grátis: ${names.join(', ')}.`, tone: 'good', duration: 2500 });
+}
+
+function onFesta(event: Extract<GameEvent, { type: 'festaStart' }>): void {
+  audio.play('festa');
+  fx.confetti({ ...anchorPoint('stage', 0.3), count: 120 });
+  fx.shake({ intensity: 7, duration: 400 });
+  toast({
+    title: '🎉 Festa de lançamento!',
+    description: `${formatDuration(event.seconds * 1000)} de caos: ${event.abilities > 0 ? 'todas as habilidades disparadas, ' : ''}tudo mais forte e mais invasões.`,
+    tone: 'good',
+    duration: 4500,
+  });
+}
+
+function onBolsa(event: Extract<GameEvent, { type: 'bolsa' }>): void {
+  if (event.side === 'buy') {
+    audio.play('buy');
+    return;
+  }
+  audio.play(event.profit.gt(0) ? 'milestone' : 'uiTap');
+  const balance = anchorElement('balance');
+  if (balance && event.profit.gt(0)) fx.coins({ ...anchorPoint('actor', 0.5), target: balance, count: 16, color: GOLD });
+  if (event.capped) {
+    toast({ title: '📈 Liquidez esgotada', description: 'O mercado não pagou todo o lucro. Ela volta aos poucos.', tone: 'warn', duration: 3500 });
+  }
+}
+
 function onSwarmHit(event: Extract<GameEvent, { type: 'swarmHit' }>): void {
   const point = bugPoint(event.x, event.y);
   const now = performance.now();
@@ -108,6 +146,15 @@ export function handleMaestriaEvent(event: GameEvent): void {
     }
     case 'rollforward':
       onRollforward(event);
+      break;
+    case 'designSystem':
+      onDesignSystem(event);
+      break;
+    case 'festaStart':
+      onFesta(event);
+      break;
+    case 'bolsa':
+      onBolsa(event);
       break;
     case 'swarmStart':
       audio.play('invasionSpawn');
