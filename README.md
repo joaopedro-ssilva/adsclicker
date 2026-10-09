@@ -4,9 +4,13 @@
 
 **Um clicker em pixel art sobre os professores do curso de Análise e Desenvolvimento de Sistemas.**
 
-![Os oito professores do ADSClicker em frente a um castelo](docs/readme/banner.png)
+![Os oito professores do ADSClicker na sala de aula](docs/readme/banner.png)
 
 Clique, contrate o corpo docente, forme turmas e colecione skins.
+
+### [▶ Jogar agora](https://adsclicker.biigstudio.com.br/)
+
+<sub>Endereço provisório.</sub>
 
 ⭐ **Gostou do jogo? Deixe uma estrela no repositório.** ⭐
 

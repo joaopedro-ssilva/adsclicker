@@ -106,6 +106,9 @@ export function SaveTools() {
 
         <div className="save-block">
           <h3>Importar</h3>
+          <p className="save-warning" data-qa="save-import-notice">
+            Cuidado: o servidor confere cada save. Um save editado ou vindo de outra conta pode marcar a sua conta como suspeita e tirá-la do ranking.
+          </p>
           <textarea
             className="save-text"
             rows={3}
