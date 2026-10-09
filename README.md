@@ -1,10 +1,45 @@
+<div align="center">
+
 # ADSClicker
 
-Jogo clicker e idle em pixel art sobre os professores do curso de Análise e Desenvolvimento de Sistemas. Remaster do [Edécio Clicker](https://github.com/joaopedro-ssilva/edecioclicker), de 2023.
+**Um clicker em pixel art sobre os professores do curso de Análise e Desenvolvimento de Sistemas.**
 
-Se você gostou do jogo, deixe uma estrela no repositório. Ajuda bastante.
+![Os oito professores do ADSClicker em frente a um castelo](docs/readme/banner.png)
 
-## Rodando
+Clique, contrate o corpo docente, forme turmas e colecione skins.
+
+⭐ **Gostou do jogo? Deixe uma estrela no repositório.** ⭐
+
+</div>
+
+## O jogo
+
+Você começa com o Edécio e um café. Cada clique rende ADScoins, cada aula rende sozinha, e cada professor contratado traz uma mecânica própria: combo, ganho offline, invasões para defender, habilidades, sprints e formatura. Formar a turma zera a sala e rende diplomas, que deixam a próxima mais forte.
+
+## Para colecionar
+
+| | |
+| --- | --- |
+| 🎭 **75 skins** | Das comuns às míticas, uma mítica para cada professor |
+| 🏞️ **31 cenários** | Da sala de aula à galáxia |
+| 🎨 **9 temas** | Cores diferentes para a interface |
+| 🏆 **129 conquistas** | Algumas secretas |
+
+Tudo é liberado jogando. Não há compras.
+
+## Também tem
+
+- Oito professores, cada um com sua **Maestria**, uma mecânica especial que você escolhe a cada formatura.
+- **Monitores** que automatizam compras, pesquisas, invasões e sprints.
+- Save na nuvem, ranking e estatísticas da turma.
+
+## Créditos
+
+Criado por [João Pedro](https://github.com/joaopedro-ssilva). Remaster do [Edécio Clicker](https://github.com/joaopedro-ssilva/edecioclicker), de 2023.
+
+---
+
+## Para desenvolvedores
 
 ```bash
 npm install
@@ -19,16 +54,6 @@ npm run db:up                # Postgres no Docker, porta 5439
 npm run db:migrate
 ```
 
-## Feito com
+Feito com Next.js, React, TypeScript, Zustand, Drizzle e Postgres.
 
-Next.js, React, TypeScript, Zustand, Drizzle e Postgres.
-
-## Documentação
-
-- [Design do jogo](docs/GAME_DESIGN.md)
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [Backend](docs/BACKEND.md)
-
-## Créditos
-
-Criado por [João Pedro](https://github.com/joaopedro-ssilva).
+Documentação: [design do jogo](docs/GAME_DESIGN.md), [arquitetura](docs/ARCHITECTURE.md) e [backend](docs/BACKEND.md).
