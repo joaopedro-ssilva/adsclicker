@@ -12,6 +12,7 @@ import { MomentsHost } from './moments/MomentsHost';
 import { useUi } from './shared/uiStore';
 import { SidePanel } from './panel/SidePanel';
 import { LoadingScreen } from './stage/LoadingScreen';
+import { MobileNotice } from './stage/MobileNotice';
 import { Stage } from './stage/Stage';
 import { GameEffects } from './wiring/GameEffects';
 import { ThemedRoot } from './wiring/ThemedRoot';
@@ -21,6 +22,7 @@ function GameScreen() {
   const panelOpen = useUi((store) => store.panelOpen);
   return (
     <>
+      <MobileNotice />
       {/* The Hackathon takes the whole screen; the classroom splits it between stage and panel. */}
       <main className="game" data-mode={hackathon ? 'hackathon' : 'classroom'} data-panel={panelOpen ? 'open' : 'closed'} data-shake-root>
         <div className="game-stage">{hackathon ? <HackathonScreen /> : <Stage />}</div>
