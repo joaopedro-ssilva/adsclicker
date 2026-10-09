@@ -162,11 +162,12 @@ describe('honoured professor', () => {
     check('angelo', (s) => s.diplomaGain, 1.25);
     g.state.honoured = 'gladimir';
     expect(computeStats(g.state, content).offlineRate).toBe(1);
-    g.state.honoured = 'edecio';
-    expect(computeStats(g.state, content).comboDecay).toBe(0);
+    check('wagner', (s) => s.eventReward, 1.5);
+    check('gladimir', (s) => s.offlineHours - plain.offlineHours + 1, 5);
+    check('edecio', (s) => s.comboMax, 2);
   });
 
-  it('doubles the Domínio bonus of B2 and Pablo', () => {
+  it('doubles the Domínio bonus of B2 and adds half of Pablo\'s again', () => {
     const g = game();
     setLevels(g.state, 'b2', 500); // rank 20
     setLevels(g.state, 'pablo', 500);
@@ -174,7 +175,7 @@ describe('honoured professor', () => {
     g.state.honoured = 'b2';
     expect(computeStats(g.state, content).costMult / plain.costMult).toBeCloseTo(0.99 ** 20, 6);
     g.state.honoured = 'pablo';
-    expect(computeStats(g.state, content).globalPower / plain.globalPower).toBeCloseTo(1.0075 ** 20, 6);
+    expect(computeStats(g.state, content).globalPower / plain.globalPower).toBeCloseTo(1.00375 ** 20, 6);
   });
 
   it('does not boost a professor who is no longer hired', () => {
@@ -183,17 +184,12 @@ describe('honoured professor', () => {
     expect(computeStats(g.state, content).eventInterval).toBe(1);
   });
 
-  it('keeps the combo from falling for the honoured Edécio', () => {
+  it('still lets the combo fall for the honoured Edécio: the honour raises the limit, it does not freeze it', () => {
     const g = game();
     g.state.honoured = 'edecio';
     g.state.combo = { steps: 12, lastClickAt: T0 };
     advance(g.state, content, T0 + 60_000, g.rng, g.emit);
-    expect(g.state.combo.steps).toBe(12);
-
-    const h = game();
-    h.state.combo = { steps: 12, lastClickAt: T0 };
-    advance(h.state, content, T0 + 60_000, h.rng, h.emit);
-    expect(h.state.combo.steps).toBe(0);
+    expect(g.state.combo.steps).toBe(0);
   });
 
   it('pays 25% more diplomas to the honoured Angelo at the end of the run', () => {

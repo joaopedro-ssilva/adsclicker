@@ -18,7 +18,8 @@ import type { MasteryDef, ProfessorId } from './types';
  * | Pablo     | all production x1.0075    | x1.35 (compounds)                    |
  *
  * The honoured professor (picked at graduation, for the next run) gets a stronger version of the
- * same mechanic; Pablo's and B2's doubling is the same effect pushed a second time per rank.
+ * same mechanic: B2's doubling is the same effect pushed a second time per rank, Pablo's is half of it
+ * again (a full doubling of a compounding global multiplier was the strongest pick by far).
  */
 export const mastery: Record<ProfessorId, MasteryDef> = {
   edecio: {
@@ -27,9 +28,9 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     line: 'Cada clique rende a mais {v} do que a turma inteira produz por segundo',
     units: ['percent'],
     honour: {
-      name: 'Combo que não cai',
-      description: 'O combo nunca diminui durante a turma: clicou uma vez, segura o ritmo.',
-      flat: [{ stat: 'comboDecay', op: 'mult', value: 0 }],
+      name: 'Combo em dobro',
+      description: 'O limite do combo dobra durante a turma. Quem clica sem parar vai bem mais longe.',
+      flat: [{ stat: 'comboMax', op: 'mult', value: 2 }],
     },
   },
   gladimir: {
@@ -42,8 +43,11 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     units: ['hours', 'percent'],
     honour: {
       name: 'Backup completo',
-      description: 'O ganho offline paga 100% do que a turma produz enquanto você estiver fora.',
-      flat: [{ stat: 'offlineRate', op: 'add', value: 1 }],
+      description: 'O ganho offline paga 100% do que a turma produz e conta 4 h a mais de ausência.',
+      flat: [
+        { stat: 'offlineRate', op: 'add', value: 1 },
+        { stat: 'offlineHours', op: 'add', value: 4 },
+      ],
     },
   },
   b2: {
@@ -64,8 +68,11 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     units: ['percent'],
     honour: {
       name: 'Alerta máximo',
-      description: 'As invasões aparecem duas vezes mais seguido durante a turma.',
-      flat: [{ stat: 'eventInterval', op: 'mult', value: 0.5 }],
+      description: 'As invasões aparecem duas vezes mais seguido e pagam 50% a mais durante a turma.',
+      flat: [
+        { stat: 'eventInterval', op: 'mult', value: 0.5 },
+        { stat: 'eventReward', op: 'mult', value: 1.5 },
+      ],
     },
   },
   guto: {
@@ -110,9 +117,9 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     line: 'Toda a produção da turma sobe {v}',
     units: ['percent'],
     honour: {
-      name: 'Complexidade dobrada',
-      description: 'O bônus de produção do Domínio do Pablo vale duas vezes na turma.',
-      perRank: [{ stat: 'globalPower', op: 'mult', value: 1.0075 }],
+      name: 'Complexidade refinada',
+      description: 'O bônus de produção do Domínio do Pablo vale uma vez e meia na turma.',
+      perRank: [{ stat: 'globalPower', op: 'mult', value: 1.00375 }],
     },
   },
 };
