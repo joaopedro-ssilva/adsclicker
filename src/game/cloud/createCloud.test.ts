@@ -8,6 +8,7 @@ import {
   BACKOFF_BASE_MS,
   BACKOFF_MAX_MS,
   CLOUD_KEY,
+  PRE_RESET_SAVE_KEY,
   EVENT_DELAY_MS,
   UNAVAILABLE_RETRY_MS,
   createCloudStore,
@@ -68,7 +69,7 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
     removeItem: (key) => void data.delete(key),
   };
 
-  const syncCalls: { body: { save: string; baseRev: number; force?: boolean }; keepalive: boolean | undefined }[] = [];
+  const syncCalls: { body: { save: string; baseRev: number; force?: boolean; epoch?: number }; keepalive: boolean | undefined }[] = [];
   const queues = {
     me: [] as (() => Promise<unknown> | unknown)[],
     sync: [] as (() => Promise<ApiResult<SyncResponse>> | ApiResult<SyncResponse>)[],
@@ -83,7 +84,7 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
       const next = queues.me.shift();
       return (next ? await next() : ok({ me: guest, multiplier: 1, cloud: null })) as Awaited<ReturnType<CloudDeps['api']['me']>>;
     },
-    sync: async (body: { save: string; baseRev: number; force?: boolean }, opts: { keepalive?: boolean } = {}) => {
+    sync: async (body: { save: string; baseRev: number; force?: boolean; epoch?: number }, opts: { keepalive?: boolean } = {}) => {
       syncCalls.push({ body, keepalive: opts.keepalive });
       const next = queues.sync.shift();
       return next ? await next() : syncOk(body.baseRev + 1);
@@ -101,9 +102,13 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
   } satisfies CloudDeps['api'];
 
   const listeners = new Set<(event: GameEvent) => void>();
-  const gameState = { bonus: { cargo: 1, mentors: {} } as CloudBonusPayload, multiplier: 1, local: summary({ playSeconds: 600 }), adopted: [] as string[], adoptOk: true };
+  const gameState = { bonus: { cargo: 1, mentors: {} } as CloudBonusPayload, multiplier: 1, local: summary({ playSeconds: 600 }), adopted: [] as string[], adoptOk: true, resets: 0 };
   const game: CloudDeps['game'] = {
     serialize: () => '{"local":true}',
+    resetProgress: () => {
+      gameState.resets += 1;
+      listeners.forEach((l) => l({ type: 'reset' }));
+    },
     adopt: (text) => {
       gameState.adopted.push(text);
       // The real store announces the replaced save.
@@ -695,5 +700,60 @@ describe('cloud store', () => {
     t.pageHide();
     await t.advance(SYNC_INTERVAL_MS * 2);
     expect(t.syncCalls).toHaveLength(1);
+  });
+});
+
+describe('progress epoch (launch reset)', () => {
+  const resetReply = (epoch: number): ApiResult<SyncResponse> => ok({ status: 'reset', epoch, multiplier: 1, me: guest });
+
+  it('sends epoch 0 until it learns another: the test phase', async () => {
+    const t = setup({ stored: JSON.stringify({ rev: 4, force: false }) });
+    await t.start();
+    expect(t.syncCalls[0]?.body.epoch).toBe(0);
+  });
+
+  it('keeps the old save aside, starts over and tells the player when the server was reset', async () => {
+    const t = setup({ stored: JSON.stringify({ rev: 4, force: false }) });
+    t.queues.sync.push(() => resetReply(1));
+    await t.start();
+    expect(t.gameState.resets).toBe(1);
+    expect(t.data.get(PRE_RESET_SAVE_KEY)).toBe('{"local":true}');
+    const state = t.store.getState();
+    expect(state.launchReset).toEqual({ savedAside: true });
+    expect(state.status).toBe('idle');
+    expect(JSON.parse(t.data.get(CLOUD_KEY) ?? '{}')).toMatchObject({ rev: 0, epoch: 1 });
+    // The next sync carries the new epoch and no revision from before.
+    await t.advance(10_000);
+    expect(t.syncCalls[1]?.body.epoch).toBe(1);
+    expect(t.syncCalls[1]?.body.baseRev).toBe(0);
+    state.dismissLaunchReset();
+    expect(t.store.getState().launchReset).toBeNull();
+  });
+
+  it('starts over quietly when the device had no real progress', async () => {
+    const t = setup();
+    t.gameState.local = summary({ playSeconds: 10 });
+    t.queues.sync.push(() => resetReply(2));
+    await t.start();
+    expect(t.gameState.resets).toBe(1);
+    expect(t.data.get(PRE_RESET_SAVE_KEY)).toBeUndefined();
+    expect(t.store.getState().launchReset).toBeNull();
+  });
+
+  it('joins the server epoch without a notice when a fresh device has never synced', async () => {
+    const t = setup();
+    t.gameState.local = summary({ playSeconds: 5 });
+    t.queues.me.push(() => ok({ me: null, multiplier: 1, cloud: null, epoch: 3 }));
+    await t.start();
+    expect(t.syncCalls[0]?.body.epoch).toBe(3);
+    expect(t.gameState.resets).toBe(0);
+    expect(t.store.getState().launchReset).toBeNull();
+  });
+
+  it('does not join the server epoch with a save that has progress: that is a returning tester', async () => {
+    const t = setup(); // 600 s of play, never synced
+    t.queues.me.push(() => ok({ me: null, multiplier: 1, cloud: null, epoch: 3 }));
+    await t.start();
+    expect(t.syncCalls[0]?.body.epoch).toBe(0);
   });
 });

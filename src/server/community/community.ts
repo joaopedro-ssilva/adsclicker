@@ -5,6 +5,7 @@ import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { feedEvents, players, rankedCondition } from '../db/schema';
 import { flaggedAreRanked } from '../players/ranking';
+import { titlesForWire } from '../players/titles';
 import { createTtlCache } from './cache';
 
 export const FEED_SIZE = 30;
@@ -50,6 +51,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
       .select({
         id: feedEvents.id,
         nickname: players.nickname,
+        titles: players.titles,
         kind: feedEvents.kind,
         detail: feedEvents.detail,
         createdAt: feedEvents.createdAt,
@@ -65,6 +67,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
   const row = totals[0];
   const feed: FeedItem[] = [];
   for (const event of feedRows) {
+    const titles = titlesForWire(event.titles);
     if (event.nickname !== null && isFeedKind(event.kind)) {
       feed.push({
         id: event.id,
@@ -72,6 +75,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
         kind: event.kind,
         detail: event.detail === '' ? null : event.detail,
         at: event.createdAt.getTime(),
+        ...(titles ? { titles } : {}),
       });
     }
   }

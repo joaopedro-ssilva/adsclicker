@@ -9,6 +9,7 @@ export const liveGame: CloudGame = {
   serialize: () => useGame.getState().serialize(),
   adopt: (serialized) => useGame.getState().importSave(serialized),
   summary: () => summarizeState(useGame.getState().state),
+  resetProgress: () => useGame.getState().hardReset(),
   multiplier: () => useGame.getState().state.settings.devMultiplier,
   setMultiplier: (value) => useGame.getState().updateSettings({ devMultiplier: value }),
   bonus: () => useGame.getState().state.cloudBonus,

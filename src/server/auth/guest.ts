@@ -3,6 +3,7 @@ import { players } from '../db/schema';
 import type { PlayerRow } from '../db/schema';
 import { hashIp } from '../http/ip';
 import { RATE_RULES, consume } from '../http/rateLimit';
+import { readProgressEpoch } from '../players/progressEpoch';
 import { createSession, sweepExpiredSessionsLater } from './session';
 
 /**
@@ -14,7 +15,7 @@ export async function createGuest(db: Db, ip: string, now: number = Date.now()):
   const created = await db.transaction(async (tx) => {
     const [player] = await tx
       .insert(players)
-      .values({ createdAt: new Date(now), lastSeenAt: new Date(now) })
+      .values({ createdAt: new Date(now), lastSeenAt: new Date(now), progressEpoch: await readProgressEpoch(tx) })
       .returning();
     if (!player) throw new Error('guest insert returned no row');
     const token = await createSession(tx, player.id, now);

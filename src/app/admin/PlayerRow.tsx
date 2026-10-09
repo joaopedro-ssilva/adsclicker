@@ -3,6 +3,7 @@ import { formatDuration, formatNumber } from '@/game/engine/format';
 import type { AdminPlayer } from '@/shared/api';
 import { Button } from '@/ui/kit';
 import { relativeTime } from '@/ui/game/panel/comunidade/relativeTime';
+import { TitleBadge } from '@/ui/game/panel/comunidade/TitleBadge';
 import { PlayerActions } from './PlayerActions';
 import { PlayerMarks } from './PlayerMarks';
 
@@ -28,6 +29,7 @@ export function PlayerRow({ player, now, open, onToggle, onChanged }: PlayerRowP
           <span className="admin-cell-player">
             <span className="admin-dot" data-on={player.online} role="img" aria-label={player.online ? 'online' : 'offline'} />
             {player.nickname ? <strong>{player.nickname}</strong> : <em className="muted">convidado</em>}
+            <TitleBadge titles={player.titles} />
           </span>
         </td>
         <td data-label="Último acesso">{player.online ? 'online agora' : relativeTime(player.lastSeenAt, now)}</td>

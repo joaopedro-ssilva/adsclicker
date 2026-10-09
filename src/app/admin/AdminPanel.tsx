@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/ui/ThemeProvider';
 import { logout } from './actions';
 import { BrowserCard } from './BrowserCard';
 import { EventCard } from './EventCard';
+import { LaunchCard } from './LaunchCard';
 import { PlayersCard } from './PlayersCard';
 import { TotalsBar } from './TotalsBar';
 import { useAdminPlayers } from './useAdminPlayers';
@@ -54,6 +55,13 @@ export function AdminPanel() {
           />
           <BrowserCard player={self.player} loading={self.loading} onChanged={onPlayerChanged} />
         </div>
+
+        <LaunchCard
+          onChanged={() => {
+            list.reload();
+            setTotalsKey((value) => value + 1);
+          }}
+        />
 
         <PlayersCard list={list} onChanged={onPlayerChanged} />
       </main>

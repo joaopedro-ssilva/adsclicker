@@ -9,6 +9,7 @@ import type { Db } from '../db/client';
 import { players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { nicknameKey } from '../players/nickname';
+import { assertTitleFree, grantTitleSql, revokeTitleSql, titleIdsOf } from '../players/titles';
 import type { PlayerCore } from '../players/summary';
 
 export const ADMIN_PAGE_SIZE = 25;
@@ -34,6 +35,7 @@ export function toAdminPlayer(row: PlayerCore, selfId: string | null, now: numbe
     flagReason: row.flagReason,
     banned: row.banned,
     self: row.id === selfId,
+    titles: titleIdsOf(row.titles),
   };
 }
 
@@ -107,6 +109,8 @@ export function patchToColumns(patch: AdminPlayerPatch): PgUpdateSetSource<typeo
     set.nickname = null;
     set.nicknameKey = null;
   }
+  if (patch.grantTitle !== undefined) set.titles = grantTitleSql(patch.grantTitle);
+  else if (patch.revokeTitle !== undefined) set.titles = revokeTitleSql(patch.revokeTitle);
   return set;
 }
 
@@ -119,6 +123,10 @@ export async function patchPlayer(
   now: number = Date.now(),
 ): Promise<AdminPlayerResponse> {
   if (!z.uuid().safeParse(id).success) throw new ApiFailure('not_found');
+  if (patch.grantTitle !== undefined && patch.revokeTitle !== undefined) {
+    throw new ApiFailure('invalid', 'Dê ou tire um título por vez.');
+  }
+  if (patch.grantTitle !== undefined) await assertTitleFree(db, patch.grantTitle, id);
   const set = patchToColumns(patch);
   const rows =
     Object.keys(set).length === 0

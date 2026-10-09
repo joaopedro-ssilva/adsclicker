@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { formatNumber } from '@/game/engine/format';
 import { api } from '@/shared/apiClient';
 import type { AdminPlayer, AdminPlayerPatch } from '@/shared/api';
+import { TITLES } from '@/shared/titles';
 import { Button } from '@/ui/kit';
 import { ActionResultText } from './ActionResultText';
 import { MultiplierPicker } from './MultiplierPicker';
@@ -95,6 +96,35 @@ export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
             Remover apelido
           </Button>
         </div>
+      </div>
+
+      <div className="admin-actions-group">
+        <h4>Títulos</h4>
+        <div className="admin-action-buttons">
+          {TITLES.map((title) => {
+            const held = player.titles?.includes(title.id) ?? false;
+            return (
+              <Button
+                key={title.id}
+                size="sm"
+                variant={held ? 'secondary' : 'primary'}
+                disabled={busy}
+                title={title.description}
+                data-qa={`admin-title-${title.id}`}
+                data-held={held || undefined}
+                onClick={() =>
+                  patch(
+                    held ? { revokeTitle: title.id } : { grantTitle: title.id },
+                    held ? `Título "${title.label}" removido.` : `Título "${title.label}" concedido.`,
+                  )
+                }
+              >
+                {held ? `Tirar "${title.label}"` : `Dar "${title.label}"`}
+              </Button>
+            );
+          })}
+        </div>
+        <p className="admin-hint">Títulos aparecem como selo ao lado do apelido nos rankings e no mural. Valem para sempre, inclusive depois do reset de lançamento.</p>
       </div>
 
       {pending ? (

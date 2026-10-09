@@ -1,6 +1,7 @@
 import type { CloudSave, Me, SaveSummary } from '@/shared/api';
 import type { PlayerRow } from '../db/schema';
 import { flaggedAreRanked } from './ranking';
+import { titlesForWire } from './titles';
 
 /** The columns every "who is this" answer needs; the save text is not among them. */
 export type PlayerCore = Omit<PlayerRow, 'save'>;
@@ -17,13 +18,18 @@ function unrankedReason(player: Pick<PlayerCore, 'nickname' | 'flagged' | 'banne
   return 'Seu progresso está em verificação e fica fora do ranking por enquanto.';
 }
 
-export function toMe(player: Pick<PlayerCore, 'id' | 'nickname' | 'passwordHash' | 'flagged' | 'banned' | 'testAccount'>): Me {
+export function toMe(
+  player: Pick<PlayerCore, 'id' | 'nickname' | 'passwordHash' | 'flagged' | 'banned' | 'testAccount'> &
+    Partial<Pick<PlayerCore, 'titles'>>,
+): Me {
+  const titles = titlesForWire(player.titles);
   return {
     id: player.id,
     nickname: player.nickname,
     hasPassword: player.passwordHash !== null,
     ranked: isRanked(player),
     unrankedReason: unrankedReason(player),
+    ...(titles ? { titles } : {}),
   };
 }
 

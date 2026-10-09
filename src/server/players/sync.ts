@@ -75,6 +75,10 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
   const student = await readProfileRow(db, player.id);
   const bonus = student ? bonusOf(student, hackathon) : undefined;
 
+  // A device that holds another progress epoch than the account (a save from before the launch reset)
+  // writes nothing: the ranking stays clean. It is told to start over (docs/BACKEND.md).
+  if ((request.epoch ?? 0) !== player.progressEpoch) return { body: resetBody(player, multiplier, bonus), cookies };
+
   if (player.rev > request.baseRev && !request.force) {
     return { body: conflictBody(player, multiplier, bonus), cookies };
   }
@@ -103,13 +107,18 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
     flagReason,
     ...projectState(parsed),
   };
-  const where = request.force ? eq(players.id, player.id) : and(eq(players.id, player.id), eq(players.rev, player.rev));
+  // The epoch is part of the write: a reset that commits between our read and our write makes it match nothing.
+  const sameEpoch = eq(players.progressEpoch, player.progressEpoch);
+  const where = request.force
+    ? and(eq(players.id, player.id), sameEpoch)
+    : and(eq(players.id, player.id), eq(players.rev, player.rev), sameEpoch);
 
   const newRev = await writeSync(db, player.id, values, where, drafts);
   if (newRev === null) {
     // Another device synced between our read and our write: treat it as the conflict it is.
     const [fresh] = await db.select().from(players).where(eq(players.id, player.id)).limit(1);
     if (!fresh) throw new ApiFailure('unauthorized');
+    if (fresh.progressEpoch !== player.progressEpoch) return { body: resetBody(fresh, multiplier, bonus), cookies };
     return { body: conflictBody(fresh, multiplier, bonus), cookies };
   }
 
@@ -145,4 +154,8 @@ async function writeSync(
       .onConflictDoNothing();
     return row.rev;
   });
+}
+
+function resetBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined): SyncResponse {
+  return { status: 'reset', epoch: player.progressEpoch, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player) };
 }

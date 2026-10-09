@@ -104,6 +104,7 @@ Protegido pelo login que já existe (`ADMIN_USER` / `ADMIN_PASSWORD`, cookie `ad
 - Lista de jogadores com busca e paginação: apelido, online, último acesso, progresso, marcas.
 - Evento global: multiplicador para todos.
 - Por jogador: multiplicador, conta de teste, marcar/desmarcar, banir, remover apelido ofensivo.
+- Títulos por jogador e em massa, e o reset de lançamento: ver "Títulos e reset de lançamento" abaixo.
 - "Este navegador": o jogador da sessão atual aparece destacado, para aplicar ×10 ou ×50 em si mesmo numa demonstração.
 
 ## Camadas de segurança
@@ -139,3 +140,54 @@ npm run dev
 ```
 
 Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `npm run db:migrate` apontando para ele e fazer o deploy.
+
+## Títulos e reset de lançamento
+
+### Títulos
+
+- Um jogador pode ter zero ou mais títulos de um catálogo fixo em código, [`src/shared/titles.ts`](../src/shared/titles.ts): `id`, nome, descrição, cor e, se for o caso, `single` (só um jogador pode tê-lo). O catálogo está em ordem de prioridade. Hoje: `primeiro-platinado` ("Primeiro Platinado", `single`) e `turma-zero` ("Turma Zero", para quem jogou a fase de testes).
+- **Armazenamento:** coluna `players.titles text[]` (padrão vazio), não uma tabela à parte. O ranking e o mural já leem a linha do jogador, então os títulos vêm junto, sem join e sem consulta nova (o ranking continua com seu cache de 10 s). Ninguém consulta "quem tem o título X" com frequência a ponto de precisar de índice. Ids que saírem do catálogo são ignorados na leitura.
+- **Contrato (só campos opcionais):** `titles?: string[]` em `me`, em cada linha do ranking e em cada item do mural (ids, do de maior prioridade para o de menor; ausente = nenhum). Clientes antigos ignoram o campo.
+- **Interface:** selo pequeno ao lado do apelido (o de maior prioridade; os demais, com a descrição, no atributo `title`), no ranking, na linha "você está em Nº lugar" e no mural.
+- **Admin, por jogador** (`POST /api/admin/players/[id]` com `grantTitle` ou `revokeTitle`): conceder e remover são idempotentes. Conceder um título `single` a um segundo jogador é recusado com o nome de quem o tem.
+- **Admin, em massa** (`GET/POST /api/admin/titles/turma-zero`): "Dar Turma Zero a todos os jogadores atuais" dá o título a toda conta **com apelido e com ao menos um sync aceito** (`rev > 0`). O GET mostra a contagem (elegíveis, que já têm, que receberão) antes de confirmar. Repetir não faz nada (a segunda execução concede 0). Mantém os outros títulos de cada jogador.
+
+### Reset de lançamento
+
+`POST /api/admin/launch-reset` com a frase `ZERAR PROGRESSO` (o GET devolve a contagem do que seria tocado). Numa **única transação**:
+
+| O que | Efeito |
+| --- | --- |
+| Save na nuvem, revisão, resumo de progresso (ADScoins, diplomas, formaturas, cliques, conquistas, professores, tempo de jogo, avatar) | voltam ao valor de quem nunca jogou, para **todas** as contas |
+| Posição no ranking e totais da comunidade | somem junto (são calculados sobre essas colunas) |
+| Marcas de suspeito (`flagged`, motivo) | limpas |
+| Mural (`feed_events`) | esvaziado |
+| Hackathon (perfis, itens, partidas, fases, coleção) | esvaziado |
+| Época de progresso | sobe de 1 |
+| **Mantidos** | contas, apelidos, senhas, sessões, títulos, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
+
+Responde quantas linhas tocou em cada tabela (`players` = contas atualizadas, `playersWithProgress` = as que tinham algo a apagar). É seguro rodar duas vezes: a segunda não apaga mais nada (`playersWithProgress: 0`) e só sobe a época mais um. Cuidado: rodar de novo **depois** que os jogadores já recomeçaram apaga o progresso novo deles também.
+
+### O que o jogador vê depois do reset (época de progresso)
+
+O aparelho de um testador ainda guarda o save antigo. Para que ele não repovoe o ranking, existe uma **época de progresso**: um contador em `app_config` (`progress_epoch`, 0 até o primeiro reset), copiado para `players.progress_epoch` de cada conta. O aparelho guarda a época que viu (junto da revisão, em `adsclicker.cloud`) e a manda em todo `POST /api/sync` (`epoch`; ausente ou nunca aprendida = 0, a fase de testes).
+
+- Época diferente da conta: o servidor **não grava nada** e responde `{ status: 'reset', epoch }` (também com `force`). A gravação do sync inclui a época na condição, então um reset que acontece no meio de um sync também o derruba.
+- O aparelho então guarda o save antigo à parte (`localStorage`, chave `adsclicker.preResetSave`, nunca enviado), recomeça o jogo do zero, adota a época nova e mostra **uma vez** o aviso "O jogo foi zerado para o lançamento". Apelido, senha e títulos continuam (a sessão não muda). Um aparelho sem progresso real (até 60 s de jogo) recomeça em silêncio, sem aviso.
+- Um aparelho novo, que nunca sincronizou e sem progresso, apenas entra na época atual (vem em `GET /api/me`). Um convidado criado depois do reset já nasce na época atual.
+- Entrar com a conta num aparelho sem save traz a conta zerada (sem save na nuvem). Num aparelho com save antigo, o primeiro sync dispara o fluxo acima.
+- Páginas abertas com o código antigo (sem `epoch`) continuam jogando só no navegador: o servidor recusa o sync com `reset`, que o código antigo trata como falha. Ao recarregar, o código novo assume. O save antigo nunca chega ao ranking.
+- O save de antes só fica guardado no aparelho; não há tela para restaurá-lo (hoje só pelo console do navegador).
+
+### Passo a passo no dia do lançamento
+
+1. **Backup do banco de produção** (snapshot do provedor ou `pg_dump`). O reset não tem volta.
+2. **Aplicar as migrações em produção, antes do deploy.** A produção ainda não tem a migração do Hackathon (`drizzle/0001_whole_wasp.sql`), e há a nova, dos títulos e da época (`drizzle/0002_mushy_grandmaster.sql`, duas colunas em `players`, ambas aditivas). Com `DATABASE_URL` apontando para a produção (URL com pooler): `npm run db:migrate`. O comando aplica `0001` e `0002` em ordem e é seguro repetir. O código antigo continua funcionando com as colunas novas.
+3. **Deploy** do código desta versão. Confira `GET /api/me`: a resposta traz `"epoch": 0`.
+4. Entrar em `/admin`. Conferir que o **evento global** está em "Sem evento" (o reset não mexe nele).
+5. Card **Lançamento**, "Dar Turma Zero a todos os jogadores atuais": ler a contagem, confirmar. **Isto vem antes do reset**: depois dele ninguém tem sync aceito e o botão não encontraria mais ninguém.
+6. **Primeiro Platinado:** na lista de jogadores, buscar pelo apelido, Gerenciar, "Dar Primeiro Platinado". Só um jogador pode tê-lo.
+7. Conferir na aba Turma do jogo que os selos aparecem.
+8. Card **Lançamento**, "Zerar progresso para o lançamento": ler a contagem e o aviso (se ainda houver elegíveis sem Turma Zero, volte ao passo 5), digitar `ZERAR PROGRESSO`, "Zerar agora". Anotar o relatório.
+9. Conferir: ranking vazio (ou só com zeros), `GET /api/me` com `"epoch": 1`, e abrir o jogo num aparelho de testador (aviso de reset, jogo do zero, selo ainda ao lado do apelido).
+10. Abrir o jogo ao público. **Não rodar o reset de novo** depois disso.

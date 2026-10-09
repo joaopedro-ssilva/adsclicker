@@ -1,5 +1,6 @@
 import type { Board, Me } from '@/shared/api';
 import { BOARD_INFO } from './boards';
+import { TitleBadge } from './TitleBadge';
 
 interface OwnRankLineProps {
   me: Me | null;
@@ -31,7 +32,14 @@ export function OwnRankLine({ me, board, rank }: OwnRankLineProps) {
     <div className="community-own" data-qa="community-own" data-ranked="true">
       <span className="community-rank">{rank}º</span>
       <p>
-        <strong>{me.nickname}</strong>, você está em {rank}º lugar em {label}.
+        <strong>{me.nickname}</strong>
+        {me.titles?.length ? (
+          <>
+            {' '}
+            <TitleBadge titles={me.titles} />
+          </>
+        ) : null}
+        , você está em {rank}º lugar em {label}.
       </p>
     </div>
   );

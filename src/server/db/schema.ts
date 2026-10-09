@@ -83,6 +83,19 @@ export const players = pgTable(
     flagged: boolean('flagged').notNull().default(false),
     flagReason: text('flag_reason'),
     banned: boolean('banned').notNull().default(false),
+
+    // Titles and launch reset ------------------------------------------------------------------
+    /**
+     * Ids of the titles this player holds (catalogue in shared/titles.ts). A column and not a join
+     * table: the boards and the feed read it with the row they already read, and nothing queries
+     * "who holds X" often enough to need an index. The launch reset never touches it.
+     */
+    titles: text('titles').array().notNull().default(sql`'{}'::text[]`),
+    /**
+     * The progress epoch this account is at (see server/config/progressEpoch.ts). A sync from a
+     * device that holds another epoch is refused, which keeps a pre-reset save off the boards.
+     */
+    progressEpoch: integer('progress_epoch').notNull().default(0),
   },
   (t) => {
     // The boards only list ranked players, so each ordering is a partial index over exactly them.

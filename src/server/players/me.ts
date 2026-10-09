@@ -6,6 +6,7 @@ import { classroomBonusFor } from '../hackathon/classroom';
 import type { HackathonDeps } from '../hackathon/deps';
 import { sharedDeps } from '../hackathon/deps';
 import { effectiveMultiplier } from './multiplier';
+import { readProgressEpoch } from './progressEpoch';
 import { toCloudInfo, toMe } from './summary';
 
 /** GET /api/me: who this browser is. No session is not an error: the first sync creates one. */
@@ -17,7 +18,7 @@ export async function getMe(
 ): Promise<{ body: MeResponse; cookies: string[] }> {
   const authed = await currentPlayer(db, headers, now);
   const eventMultiplier = await getEventMultiplier(db, now);
-  if (!authed) return { body: { me: null, multiplier: eventMultiplier, cloud: null }, cookies: [] };
+  if (!authed) return { body: { me: null, multiplier: eventMultiplier, cloud: null, epoch: await readProgressEpoch(db) }, cookies: [] };
 
   const { player } = authed;
   const bonus = await classroomBonusFor(db, player.id, hackathon);
@@ -27,6 +28,7 @@ export async function getMe(
       multiplier: effectiveMultiplier(eventMultiplier, player.multiplier),
       ...(bonus ? { bonus } : {}),
       cloud: toCloudInfo(player),
+      epoch: player.progressEpoch,
     },
     cookies: authed.cookies,
   };

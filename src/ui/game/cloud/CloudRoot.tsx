@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useCloud } from '@/game/cloud';
 import { CloudToasts } from './CloudToasts';
 import { ConflictDialog } from './ConflictDialog';
+import { LaunchResetDialog } from './LaunchResetDialog';
 
 /** Mounted once the game is ready: starts the background sync and hosts what the cloud can put on screen. */
 export function CloudRoot() {
@@ -14,6 +15,7 @@ export function CloudRoot() {
   return (
     <>
       <ConflictDialog />
+      <LaunchResetDialog />
       <CloudToasts />
     </>
   );

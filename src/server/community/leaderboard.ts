@@ -7,6 +7,7 @@ import type { PlayerCore } from '../players/summary';
 import { isRanked } from '../players/summary';
 import type { Db } from '../db/client';
 import { hackathonProfiles, players, rankedCondition } from '../db/schema';
+import { titlesForWire } from '../players/titles';
 import { createTtlCache } from './cache';
 
 export const BOARD_SIZE = 100;
@@ -45,6 +46,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
       clicks: players.clicks,
       avatarProfessor: players.avatarProfessor,
       avatarSkin: players.avatarSkin,
+      titles: players.titles,
       lastSeenAt: players.lastSeenAt,
       bestItemBase: hackathonProfiles.bestItemBase,
       bestItemRarity: hackathonProfiles.bestItemRarity,
@@ -63,6 +65,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
     updatedAt: now,
     entries: rows.map((row, index) => {
       const professor = professorIdSchema.safeParse(row.avatarProfessor);
+      const titles = titlesForWire(row.titles);
       return {
         rank: index + 1,
         nickname: row.nickname ?? '',
@@ -72,6 +75,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
         diplomas: row.diplomasEarned,
         achievements: row.achievements,
         online: row.lastSeenAt.getTime() > onlineSince,
+        ...(titles ? { titles } : {}),
         ...(row.bestItemBase && row.bestItemRarity ? { item: { base: row.bestItemBase, rarity: row.bestItemRarity } } : {}),
       };
     }),

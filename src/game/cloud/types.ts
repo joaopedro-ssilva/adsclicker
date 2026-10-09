@@ -31,6 +31,11 @@ export interface CloudState {
   conflict: CloudConflict | null;
   /** Additive: true when the backend answered that it is not configured (or the route does not exist). The account UI hides its forms. */
   unavailable: boolean;
+  /**
+   * Set when the server reset the progress for the launch and this device held a save from before:
+   * the game started over and the old save was kept aside on the device. Shown once, then dismissed.
+   */
+  launchReset: { savedAside: boolean } | null;
 }
 
 export interface CloudActions {
@@ -49,6 +54,8 @@ export interface CloudActions {
   login(nickname: string, password: string): Promise<ActionResult>;
   /** Ends the session. The local save stays on the device and becomes a new guest on the next sync. */
   logout(): Promise<void>;
+  /** Closes the notice that the game was reset for the launch. */
+  dismissLaunchReset(): void;
 }
 
 export type CloudStore = CloudState & CloudActions;

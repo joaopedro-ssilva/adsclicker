@@ -7,7 +7,11 @@ import type { z } from 'zod';
 import {
   accountResponseSchema,
   adminPlayerResponseSchema,
+  adminLaunchResetPreviewSchema,
+  adminLaunchResetResultSchema,
   adminPlayersResponseSchema,
+  adminTurmaZeroPreviewSchema,
+  adminTurmaZeroResultSchema,
   apiErrorSchema,
   communityResponseSchema,
   leaderboardResponseSchema,
@@ -94,5 +98,10 @@ export const api = {
     setEvent: (body: AdminEventRequest) => call('POST', '/api/admin/event', okResponseSchema, { body }),
     patchPlayer: (id: string, body: AdminPlayerPatch) =>
       call('POST', `/api/admin/players/${encodeURIComponent(id)}`, adminPlayerResponseSchema, { body }),
+    turmaZeroPreview: () => call('GET', '/api/admin/titles/turma-zero', adminTurmaZeroPreviewSchema),
+    grantTurmaZero: () => call('POST', '/api/admin/titles/turma-zero', adminTurmaZeroResultSchema, { body: {} }),
+    launchResetPreview: () => call('GET', '/api/admin/launch-reset', adminLaunchResetPreviewSchema),
+    launchReset: (phrase: string) =>
+      call('POST', '/api/admin/launch-reset', adminLaunchResetResultSchema, { body: { phrase } }),
   },
 };

@@ -5,6 +5,7 @@
  */
 import { z } from 'zod';
 import { PROFESSOR_IDS } from '@/game/content/types';
+import { TITLE_IDS } from './titles';
 
 // ---------------------------------------------------------------------------
 // Limits shared by client and server
@@ -52,6 +53,8 @@ export const meSchema = z.object({
   ranked: z.boolean(),
   /** Why not ranked, ready to show, or null. */
   unrankedReason: z.string().nullable(),
+  /** Ids of the titles this player holds (shared/titles.ts). Absent on older servers. */
+  titles: z.array(z.string()).optional(),
 });
 export type Me = z.infer<typeof meSchema>;
 
@@ -118,6 +121,11 @@ export const syncRequestSchema = z.object({
   baseRev: z.number().int().min(0),
   /** After a conflict, the player chose to keep this device's progress: overwrite the cloud. */
   force: z.boolean().optional(),
+  /**
+   * The progress epoch this device last saw (GET /api/me). Absent or 0 = the test phase. A device
+   * whose epoch is not the account's gets `status: 'reset'` and nothing is written.
+   */
+  epoch: z.number().int().min(0).optional(),
 });
 export type SyncRequest = z.infer<typeof syncRequestSchema>;
 
@@ -139,6 +147,17 @@ export const syncResponseSchema = z.discriminatedUnion('status', [
     bonus: cloudBonusSchema.optional(),
     me: meSchema,
   }),
+  z.object({
+    /**
+     * The progress was reset (docs/BACKEND.md, "Títulos e reset de lançamento") and this device
+     * still holds a save from before. Nothing was written. The device must start over at `epoch`.
+     */
+    status: z.literal('reset'),
+    epoch: z.number().int(),
+    multiplier: z.number(),
+    bonus: cloudBonusSchema.optional(),
+    me: meSchema,
+  }),
 ]);
 export type SyncResponse = z.infer<typeof syncResponseSchema>;
 
@@ -153,6 +172,8 @@ export const meResponseSchema = z.object({
   bonus: cloudBonusSchema.optional(),
   /** Revision and summary of the cloud save, without the save itself. */
   cloud: cloudSaveSchema.omit({ save: true }).nullable(),
+  /** The progress epoch of this account (of the game, without a session). Absent on older servers. */
+  epoch: z.number().int().optional(),
 });
 export type MeResponse = z.infer<typeof meResponseSchema>;
 
@@ -219,6 +240,8 @@ export const leaderboardEntrySchema = z.object({
   online: z.boolean(),
   /** The best Hackathon item this player owns, to show off next to the nickname. */
   item: z.object({ base: z.string(), rarity: z.string() }).nullable().optional(),
+  /** Ids of the titles this player holds, highest priority first. Absent = none. */
+  titles: z.array(z.string()).optional(),
 });
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
@@ -249,6 +272,8 @@ export const feedItemSchema = z.object({
   /** hire: professor id; skin: skin id; graduation: the graduation number as text; item: Hackathon item base id (a legendary drop); promotion: Hackathon cargo id. */
   detail: z.string().nullable(),
   at: z.number(),
+  /** Ids of the titles this player holds, highest priority first. Absent = none. */
+  titles: z.array(z.string()).optional(),
 });
 export type FeedItem = z.infer<typeof feedItemSchema>;
 
@@ -293,6 +318,8 @@ export const adminPlayerSchema = z.object({
   banned: z.boolean(),
   /** True for the player of the browser making the request. */
   self: z.boolean(),
+  /** Ids of the titles this player holds. */
+  titles: z.array(z.string()).optional(),
 });
 export type AdminPlayer = z.infer<typeof adminPlayerSchema>;
 
@@ -321,8 +348,62 @@ export const adminPlayerPatchSchema = z.object({
   banned: z.boolean().optional(),
   /** Removes an offensive nickname (the player can pick another). */
   clearNickname: z.literal(true).optional(),
+  /** Gives the player a title (no-op when held). A single-holder title cannot go to a second player. */
+  grantTitle: z.enum(TITLE_IDS).optional(),
+  /** Takes a title away (no-op when not held). */
+  revokeTitle: z.enum(TITLE_IDS).optional(),
 });
 export type AdminPlayerPatch = z.infer<typeof adminPlayerPatchSchema>;
 
 export const adminPlayerResponseSchema = z.object({ player: adminPlayerSchema });
 export type AdminPlayerResponse = z.infer<typeof adminPlayerResponseSchema>;
+
+/** What the bulk grant of "Turma Zero" would do, to show before confirming. */
+export const adminTurmaZeroPreviewSchema = z.object({
+  /** Accounts with a nickname that synced at least once. */
+  eligible: z.number().int(),
+  /** Of those, how many already hold the title. */
+  alreadyHave: z.number().int(),
+  /** eligible - alreadyHave: the accounts a POST would change. */
+  toGrant: z.number().int(),
+});
+export type AdminTurmaZeroPreview = z.infer<typeof adminTurmaZeroPreviewSchema>;
+
+/** POST /api/admin/titles/turma-zero */
+export const adminTurmaZeroResultSchema = z.object({ granted: z.number().int(), alreadyHad: z.number().int() });
+export type AdminTurmaZeroResult = z.infer<typeof adminTurmaZeroResultSchema>;
+
+/** The phrase the admin types to run the launch reset. */
+export const LAUNCH_RESET_PHRASE = 'ZERAR PROGRESSO';
+
+/** GET /api/admin/launch-reset: what the reset would touch right now. */
+export const adminLaunchResetPreviewSchema = z.object({
+  epoch: z.number().int(),
+  /** Players that hold progress (a cloud save or any progress column off its default). */
+  players: z.number().int(),
+  feedEvents: z.number().int(),
+  hackathonRows: z.number().int(),
+  /** Accounts with a nickname that synced and still lack Turma Zero: give it BEFORE resetting. */
+  withoutTurmaZero: z.number().int(),
+});
+export type AdminLaunchResetPreview = z.infer<typeof adminLaunchResetPreviewSchema>;
+
+export const adminLaunchResetRequestSchema = z.object({ phrase: z.string().max(100) });
+export type AdminLaunchResetRequest = z.infer<typeof adminLaunchResetRequestSchema>;
+
+/** POST /api/admin/launch-reset: rows touched, per table, and the new epoch. */
+export const adminLaunchResetResultSchema = z.object({
+  /** The new progress epoch. */
+  epoch: z.number().int(),
+  /** Accounts updated (all of them: each moves to the new epoch). */
+  players: z.number().int(),
+  /** Of those, how many actually held progress to clear (0 on a second run). */
+  playersWithProgress: z.number().int(),
+  feedEvents: z.number().int(),
+  hackathonProfiles: z.number().int(),
+  hackathonItems: z.number().int(),
+  hackathonRuns: z.number().int(),
+  hackathonStages: z.number().int(),
+  hackathonCollection: z.number().int(),
+});
+export type AdminLaunchResetResult = z.infer<typeof adminLaunchResetResultSchema>;

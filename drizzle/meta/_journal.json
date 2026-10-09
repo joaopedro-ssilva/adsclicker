@@ -15,6 +15,13 @@
       "when": 1790962241825,
       "tag": "0001_whole_wasp",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791575669670,
+      "tag": "0002_mushy_grandmaster",
+      "breakpoints": true
     }
   ]
 }

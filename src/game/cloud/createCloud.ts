@@ -11,6 +11,8 @@ import type { ActionResult, CloudStore } from './types';
 
 /** Where the cloud revision this device last saw lives, next to the save. */
 export const CLOUD_KEY = 'adsclicker.cloud';
+/** Where the save from before a launch reset is kept on the device (never sent anywhere). */
+export const PRE_RESET_SAVE_KEY = 'adsclicker.preResetSave';
 
 /** Wait before a sync that follows a graduation or a hire, so a burst of events becomes one request. */
 export const EVENT_DELAY_MS = 800;
@@ -30,6 +32,8 @@ export interface CloudGame {
   /** Replaces the local progress. Returns false when the text is not a usable save. */
   adopt(serialized: string): boolean;
   summary(): SaveSummary;
+  /** Starts a brand-new game on this device (the store's hard reset). The local save is gone. */
+  resetProgress(): void;
   multiplier(): number;
   setMultiplier(value: number): void;
   /** Permanent classroom bonuses earned in the Hackathon (game state `cloudBonus`). */
@@ -85,6 +89,8 @@ interface Persisted {
   /** A reset is waiting to overwrite the cloud. */
   force: boolean;
   pending?: PendingSync[];
+  /** The progress epoch this device last saw; absent = never learned (the test phase, epoch 0). */
+  epoch?: number;
 }
 
 const pendingSchema = z.object({ baseRev: z.number().int().min(0), summary: saveSummarySchema });
@@ -101,12 +107,13 @@ function readPersisted(storage: StorageLike | null): Persisted {
       const { rev } = parsed;
       const force = 'force' in parsed && parsed.force === true;
       const pending = 'pending' in parsed ? readPending(parsed.pending) : [];
-      if (typeof rev === 'number' && Number.isInteger(rev) && rev >= 0) return { rev, force, pending };
+      const epoch = 'epoch' in parsed && typeof parsed.epoch === 'number' && Number.isInteger(parsed.epoch) && parsed.epoch >= 0 ? parsed.epoch : undefined;
+      if (typeof rev === 'number' && Number.isInteger(rev) && rev >= 0) return { rev, force, pending, epoch };
     }
   } catch {
     // unreadable: start from "never synced"
   }
-  return { rev: 0, force: false, pending: [] };
+  return { rev: 0, force: false, pending: [], epoch: undefined };
 }
 
 /**
@@ -142,6 +149,11 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
   let rev = 0;
   /** After a hard reset the next sync overwrites the cloud instead of asking. */
   let forceNext = false;
+  /**
+   * The progress epoch this device last saw, or null when it has never learned one (the test
+   * phase: sent as 0). A server whose epoch differs answers `reset` instead of taking the save.
+   */
+  let epoch: number | null = null;
   let pending: PendingSync[] = [];
   let bootstrapped = false;
   let inflight: Promise<void> | null = null;
@@ -161,7 +173,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
   return create<CloudStore>()((set, get) => {
     const persist = () => {
       try {
-        deps.storage()?.setItem(CLOUD_KEY, JSON.stringify({ rev, force: forceNext, pending: pending.length > 0 ? pending : undefined } satisfies Persisted));
+        deps.storage()?.setItem(CLOUD_KEY, JSON.stringify({ rev, force: forceNext, pending: pending.length > 0 ? pending : undefined, epoch: epoch ?? undefined } satisfies Persisted));
       } catch {
         // storage blocked: the revision then lives for this session only
       }
@@ -196,6 +208,29 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       applyMultiplier(get().multiplier);
       set({ conflict: null, status: 'synced', lastSyncedAt: cloud.savedAt });
       return true;
+    };
+
+    /**
+     * The server says the game was reset for the launch and this device holds a save from before.
+     * That save is kept aside (on the device only), the game starts over at the new epoch and the
+     * player is told once. Nothing of the old save ever reaches the server.
+     */
+    const startOver = (nextEpoch: number, me: Me) => {
+      const hadProgress = !isFreshDevice(game.summary());
+      if (hadProgress) {
+        try {
+          deps.storage()?.setItem(PRE_RESET_SAVE_KEY, game.serialize());
+        } catch {
+          // storage blocked or full: the reset still has to happen, the ranking comes first
+        }
+      }
+      epoch = nextEpoch;
+      game.resetProgress(); // announces 'reset': new generation, revision 0, a sync soon
+      pending = [];
+      rev = 0;
+      forceNext = false;
+      persist();
+      set({ me, status: 'idle', conflict: null, unavailable: false, launchReset: hadProgress ? { savedAside: true } : null });
     };
 
     // ----- scheduling -------------------------------------------------------
@@ -256,13 +291,24 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         set({ me: me.data.me, unavailable: false });
         applyMultiplier(me.data.multiplier);
         applyBonus(me.data.bonus);
+        // A device that never learned an epoch and has nothing to lose (never synced, no real
+        // progress) simply joins the server's: a new player after the launch. Anything else
+        // stays at epoch 0 and, if the game was reset meanwhile, is told so by the sync.
+        if (epoch === null && me.data.epoch !== undefined && rev === 0 && isFreshDevice(game.summary())) {
+          epoch = me.data.epoch;
+          persist();
+        }
       }
 
       const forced = forceNext;
       // Kept next to older unanswered ones: the previous page's request may be the one that landed.
       pending = [...pending, { baseRev: rev, summary: game.summary() }].slice(-MAX_PENDING);
       persist();
-      const result = await api.sync({ save: game.serialize(), baseRev: rev, force: forced || undefined }, { keepalive });
+      const sentEpoch = epoch ?? 0; // never learned = the test phase = 0
+      const result = await api.sync(
+        { save: game.serialize(), baseRev: rev, force: forced || undefined, epoch: sentEpoch },
+        { keepalive },
+      );
       if (!started) return;
       if (generation !== startedGeneration) {
         // The save was replaced while the request was out: its answer is about a save that is gone.
@@ -282,6 +328,10 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       const { data } = result;
       applyMultiplier(data.multiplier);
       applyBonus(data.bonus);
+      if (data.status === 'reset') {
+        startOver(data.epoch, data.me);
+        return;
+      }
       if (data.status === 'conflict' && isOwnWrite(pending, data.cloud)) {
         // Our own earlier request landed after the page closed: take its revision and send what is new.
         rev = data.cloud.rev;
@@ -391,6 +441,11 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       multiplier: 1,
       conflict: null,
       unavailable: false,
+      launchReset: null,
+
+      dismissLaunchReset() {
+        set({ launchReset: null });
+      },
 
       start() {
         if (started) return;
@@ -398,6 +453,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         const saved = readPersisted(deps.storage());
         rev = saved.rev;
         forceNext = saved.force;
+        epoch = saved.epoch ?? null;
         pending = saved.pending ?? [];
         visible = env.visible();
         // A multiplier left in the save is not trusted: the server's value arrives with the first answer.
@@ -443,8 +499,12 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         const conflict = get().conflict;
         if (!conflict) return;
         const result = await exclusive(() =>
-          api.sync({ save: game.serialize(), baseRev: conflict.cloud.rev, force: true }),
+          api.sync({ save: game.serialize(), baseRev: conflict.cloud.rev, force: true, epoch: epoch ?? 0 }),
         );
+        if (result.ok && result.data.status === 'reset') {
+          startOver(result.data.epoch, result.data.me);
+          return;
+        }
         if (!result.ok || result.data.status !== 'ok') return; // the dialog stays so the player can try again
         failures = 0;
         rev = result.data.rev;
