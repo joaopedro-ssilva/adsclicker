@@ -85,7 +85,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ### Sinergia e Formatura (Angelo)
 - Sinergia: cada disciplina ganha `synergy` (base 5%) por cada outro professor contratado. Pesquisas aumentam.
-- **Formatura** (prestígio): disponível com o Angelo contratado. `diplomas = floor((runCoins / base)^exponent × diplomaGain)`, com `base = 2e19` e `exponent = 0.5`: a primeira formatura de um jogador ativo (cerca de 2 h 45) rende uns 10 diplomas, e cada formatura seguinte exige 4× mais ADScoins da corrida para dobrar os diplomas dela. Só pode formar se ganhar pelo menos 1.
+- **Formatura** (prestígio): disponível com o Angelo contratado. `diplomas = floor((runCoins / base)^exponent × diplomaGain)`, com `base = 2e19` e `exponent = 0.5`: a primeira formatura de um jogador ativo (cerca de 2 h 45) rende uns 10 diplomas, e cada formatura seguinte exige 4× mais ADScoins da corrida para dobrar os diplomas dela. Só pode formar se ganhar pelo menos 1. **Limite por corrida**: uma formatura paga no máximo `10 × 1,3^formaturas já feitas` diplomas (10, 13, 16, 21, 27...); ADScoins além disso não rendem diploma, então esperar não compensa. A aba Formatura mostra "n/limite diplomas desta turma". O bônus de produção dos diplomas (+1% cada) para em +100%, e a aba mostra esse valor, não o produto bruto. Constantes em `balance.graduation.cap`; as turmas do simulador (ativo) vão de 2 h 26 na primeira a ~20 min na 12ª.
 - Zera: moedas, `runCoins`, níveis, pesquisas, contratações (menos Edécio e os mantidos por nós de prestígio), buffs, invasão, sprint, combo, recargas.
 - Mantém: diplomas, árvore, conquistas, skins, cenários, temas, contadores, configurações.
 - **Árvore de prestígio**: ~20 nós em 4 ramos — `core` (tronco: produção global, manter professores, ganho de diplomas), `click`, `idle`, `events`. Nós têm nível máximo e custo crescente (1 a 30 diplomas no primeiro nível, dobrando a cada nível; a árvore inteira custa ~1.900 diplomas, algo como 12 formaturas).
@@ -96,7 +96,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 | Professor | Por rank | No teto |
 | --- | --- | --- |
-| Edécio | cada clique soma +0,15% das ADScoins/s de todos | +6% |
+| Edécio | cada clique rende a mais +0,15% do que a turma inteira produz por segundo | +6% |
 | Gladimir | +0,15 h no teto offline e +0,5 ponto na taxa | +6 h e +20 pontos |
 | Bruna B2 | custos ×0,99 | −33% em tudo |
 | Wagner | recompensa de invasão +2,5% | ×2 |
@@ -111,6 +111,28 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 - Ao formar a turma, o jogador pode escolher um professor contratado para homenagear na turma seguinte (opcional, nenhum por padrão). A escolha vale por uma turma e só conta enquanto o professor está contratado. Fica marcado com uma estrela no elenco.
 - Efeitos: Edécio, o combo não cai; Gladimir, o offline paga 100%; B2, o desconto do Domínio vale em dobro; Wagner, invasões duas vezes mais seguido; Guto, recargas pela metade; B1, sprints pagam o dobro; Angelo, +25% de diplomas na formatura dessa turma; Pablo, o bônus de produção do Domínio vale em dobro.
 - O jogo guarda quais professores já foram homenageados (conquista Volta Olímpica).
+
+### Maestrias (depois da primeira Formatura)
+- Uma mecânica própria por professor. Cada formatura dá **uma vaga** (quem já tinha formaturas ganha as vagas delas); o jogador escolhe, na aba Formatura, qual professor recebe (com confirmação: não troca). O nível 1 vem com a vaga; os níveis 2 a 5 custam 50 / 150 / 350 / 750 diplomas (1.300 por Maestria, ~10.400 as oito, bem mais que a árvore de 1.890). Valem para sempre, mesmo com o professor ainda não contratado na turma.
+- Dentro da turma zeram só os contadores (progresso do Joinha, cargas do Rollforward, enxame em curso); níveis e a carga da Super invasão ficam.
+- Primeira onda (as outras cinco aparecem como "Em breve" com a descrição, sem escolha):
+  - **Edécio, Joinha de Ouro**: a cada 100 / 90 / 80 / 70 / 60 cliques manuais, o próximo clique é de ouro e vale 6 / 9 / 12 / 16 / 20 s da produção da turma (sem buffs temporários). Pode ser crítico a partir do nível 3. No nível 5, segurar o mouse na tela clica 10 vezes por segundo (cada repetição é um clique normal, passa pelo limite de cliques).
+  - **Gladimir, Rollforward**: 300 cliques manuais enchem uma carga; guarda 1 / 1 / 2 / 2 / 3. Gastar uma avança o jogo 15 / 25 / 35 / 50 / 70 s: as ADScoins do período (produção sem buffs) chegam de uma vez, e andam juntos as recargas das habilidades, a próxima oferta de sprint, a próxima invasão e a carga da Super invasão. Sprint em curso, invasão na tela e buffs ativos não mudam, e as moedas do salto não contam como progresso de sprint de produção. (A ideia do briefing, 5 a 60 min por salto, reduzia a 2ª corrida do jogador ativo à metade só no nível 1.)
+  - **Wagner, Super invasão**: carrega com tempo real, uma vez a cada 60 / 52 / 45 / 38 / 30 min (uma carga guardada). Ao disparar, por 45 s, 24 bugs (sprites do Hackathon) aparecem pelo palco, cada um com 2 a 5 de vida e 6,5 s para escapar, e o chefe "Deploy de sexta" (24 de vida) chega aos 33 s. Prêmio: 12 s de produção por bug e 120 s pelo chefe, ×1,5 se limpar tudo, ×1 / 1,25 / 1,5 / 1,8 / 2,2 por nível, ×bônus de recompensa de invasão do Wagner. Do nível 2 em diante o firewall derruba um bug sozinho a cada 3 / 2 / 1,3 / 0,8 s (o chefe, na metade do ritmo). A invasão que estiver na tela espera o enxame; nenhuma nova aparece durante ele.
+- O servidor limita cada recompensa pelo nível da Maestria que o save mostra (veja `plausibility.ts`), e confere vagas ≤ formaturas e diplomas gastos ≤ diplomas ganhos.
+
+### Limite de cliques
+- O motor aceita no máximo 15 cliques manuais por segundo (janela móvel de 1 s, `balance.clickLimit`). O que passar é descartado em silêncio: sem moedas, combo, contadores, progresso do Joinha nem carga do Rollforward. O servidor usa o mesmo número. Cliques automáticos da árvore não passam por esse limite.
+
+### Monitores (depois da primeira Formatura)
+- Quatro alunos que assumem uma tarefa chata, contratados com diplomas na aba Formatura. Cada um tem 4 níveis (o primeiro contrata, os outros deixam o monitor mais rápido ou melhor), uma chave liga/desliga (o estado é salvo) e fica com o jogador entre as Formaturas, como a árvore. Rodam no tick do engine, nunca por clique, e não contam como o jogador agindo (a sessão de "1 minuto sem clicar" continua correndo).
+- **Compras** 🛒: a cada 20 / 10 / 5 / 2,5 s compra 1 nível da aula que mais rende por ADScoin (ganho de produção do próximo nível ÷ custo). Só compra aulas de professores que o jogador já começou à mão (algum nível em qualquer aula dele) e nunca upgrades de clique nem contratações. Configuração: gasta no máximo 10 / 25 / 50 / 100% das ADScoins em mãos numa compra (padrão 50%), que é a reserva para o que o jogador está juntando.
+- **Pesquisa** 🔬: a cada 30 / 15 / 8 / 4 s compra a pesquisa aberta mais barata, com o mesmo limite de gasto (padrão 50%). Roda antes do Compras, para este não deixar a pesquisa sem moedas.
+- **Segurança** 🛡️: se a invasão ficar 5 / 4 / 3 / 2 s na tela, o monitor a defende e leva 35 / 50 / 65 / 80% do prêmio (moedas ou duração do buff; nunca encurta um buff que já está rodando mais longo). O jogador pode clicar antes e ganhar tudo.
+- **Sprints** 📋: 30 / 15 / 6 / 2 s depois de as ofertas aparecerem, aceita uma. Preferência: a primeira, a que mais paga (moedas em segundos de produção; buff vale 2× a duração) ou só as de clique (cliques, críticos, combo, produção; pula comprar e defender, e se não houver nenhuma deixa a escolha com o jogador). Cumprir a meta continua sendo do jogador.
+- **Preço em diplomas** (por nível): Compras 5 / 25 / 100 / 400, Segurança 8 / 35 / 140 / 500, Sprints 12 / 45 / 170 / 600, Pesquisa 10 / 40 / 150 / 550. O primeiro cabe na primeira ou segunda Formatura (limite de `10 × 1,3^formaturas` diplomas por corrida) e os quatro no máximo somam ~2.800, mais que a árvore inteira.
+- **Regra das conquistas de jogar na mão**: o que um monitor faz é invisível para contadores, estatísticas da turma e sequência de defesas, e ele nunca soma nem tira. Compras não entra em níveis comprados (Índice Criado, Compra Coletiva, sprints de comprar) nem escolhe professor novo (Turma Enxuta) nem upgrade de clique (Só no Clique só piora com ele ligado, e a chave existe para isso); Segurança não conta como invasão defendida nem perdida e não mexe na sequência (Cinco Seguidas, Firewall Humano, Zero Dia, Semestre Perfeito, sprints de defender); Sprints: sprint aceita por ele que vence não conta como perdida (Prazo é uma Sugestão, Semestre Perfeito), e a que o jogador cumpre conta como concluída; Pesquisa não soma em pesquisas compradas; nenhum monitor clica (Sem Mouse, Só no Clique).
+- Nada disso cria moedas: o servidor não muda a verificação de plausibilidade (há teste jogando com todos no nível máximo).
 
 ### Complexidade (Pablo)
 - Pesquisas caras que reduzem `costGrowth` em 0,01 cada (até 1,10) e dão multiplicadores grandes. É o conteúdo de fim de jogo.

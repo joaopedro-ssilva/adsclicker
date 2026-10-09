@@ -8,7 +8,7 @@
  *   npm run sim -- --profile casual --seed 3 --audit
  *
  * Flags: --profile active|casual|idle|all, --cps, --defend, --hours, --seed, --graduate-min,
- * --graduate-ratio, --graduate-until, --no-graduate, --away play,away (seconds), --audit (research
+ * --graduate-ratio, --graduate-until, --no-graduate, --no-maestrias, --away play,away (seconds), --audit (research
  * table), --sprints (sprint table), --sprint-audit h1,h2,... (can the active player, and one who does
  * nothing, finish each sprint at those hours of an active run?), --every (timeline step, minutes).
  */
@@ -81,6 +81,7 @@ function main(): void {
     if (graduateRatio !== undefined) options.graduateGainRatio = graduateRatio;
     if (graduateUntil !== undefined) options.graduateUntil = graduateUntil;
     if (flags.has('no-graduate')) options.graduate = false;
+    if (flags.has('no-maestrias')) options.maestrias = false;
     const away = flags.get('away');
     if (away) {
       const [play, gone] = away.split(',').map(Number);

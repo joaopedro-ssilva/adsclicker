@@ -8,6 +8,9 @@ import { Abilities } from './Abilities';
 import { Actor } from './Actor';
 import { BuffChips } from './BuffChips';
 import { InvasionLayer } from './InvasionLayer';
+import { MaestriaDock } from './maestria/MaestriaDock';
+import { SwarmLayer } from './maestria/SwarmLayer';
+import { SwarmSummary } from './maestria/SwarmSummary';
 import { Roster } from './Roster';
 import { SprintCard } from './SprintCard';
 import { StageHeader } from './StageHeader';
@@ -46,11 +49,14 @@ export function Stage() {
             <div className="stage-right">
               <Abilities />
             </div>
+            <MaestriaDock />
             <Actor scale={scale} />
             <InvasionLayer />
+            <SwarmLayer />
           </div>
           <Roster />
         </div>
+        <SwarmSummary />
       </Scenery>
     </section>
   );

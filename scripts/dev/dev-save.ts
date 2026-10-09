@@ -27,6 +27,16 @@ state.honoured = 'edecio';
 for (const id of PROFESSOR_IDS) state.honouredBefore[id] = true;
 for (const ability of content.abilities) state.abilitiesTried[ability.id] = true;
 
+// The three Maestrias that exist, unlocked (a slot each, from the graduations below) and at level 5.
+for (const id of PROFESSOR_IDS) {
+  if (content.maestrias.defs[id].built) state.maestria.levels[id] = 5;
+}
+state.maestria.swarm.since = now - 3 * 3600_000; // the Super invasão starts charged
+state.maestria.rollforward.charges = 3;
+
+// Every Monitor hired at its top level and switched on.
+for (const monitor of content.monitors) state.monitors.units[monitor.id] = { level: monitor.levels.length, on: true, nextAt: 0, done: 0, last: '' };
+
 for (const achievement of content.achievements) {
   state.achievements[achievement.id] = now;
   if (achievement.condition.kind === 'secret') state.secrets[achievement.condition.trigger] = true;

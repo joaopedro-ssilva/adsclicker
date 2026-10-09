@@ -28,7 +28,7 @@ export interface MasteryView {
   nextAt: number;
   /** 0..1 progress from the current rank to the next. */
   progress: number;
-  /** What the bonus is right now, ready to show: "Cada clique soma 1,5% das ADScoins/s da turma". */
+  /** What the bonus is right now, ready to show: "Cada clique rende a mais 1,5% do que a turma inteira produz por segundo". */
   line: string;
   honoured: boolean;
 }

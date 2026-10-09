@@ -1,0 +1,419 @@
+/* Maestrias on the stage: the golden click meter, the Rollforward and Super invasão buttons, and the swarm. */
+
+/* Buttons: they reuse the ability look, below the abilities column */
+
+/* Bottom left of the stage, under the sprint card and clear of the professor: one over the other, or side by side on a compact stage. */
+.maestria-dock {
+  position: absolute;
+  left: var(--space-4);
+  bottom: 14px;
+  z-index: 2;
+}
+
+.maestria-dock .abilities {
+  justify-items: stretch;
+}
+
+.maestria-dock .ability {
+  width: 176px;
+}
+
+.maestria-button {
+  position: relative;
+}
+
+.maestria-button[data-state='cooldown'] {
+  opacity: 0.92;
+}
+
+.maestria-pips {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: flex;
+  gap: 2px;
+}
+
+.maestria-pips i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: color-mix(in srgb, var(--border) 70%, var(--bg));
+  border: 1px solid var(--border);
+}
+
+.maestria-pips i[data-on='true'] {
+  background: var(--legendary);
+  border-color: var(--legendary);
+}
+
+/* Joinha de Ouro: the counter beside the professor */
+
+.golden-slot {
+  position: absolute;
+  left: calc(100% + 22px);
+  bottom: 10%;
+}
+
+.golden {
+  --gold: #f5c542;
+
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  min-width: 92px;
+  padding: 8px 10px 6px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.golden-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.golden-cells {
+  display: grid;
+  grid-template-columns: repeat(var(--cells), 1fr);
+  gap: 2px;
+  width: 100%;
+  padding: 3px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.golden-cells i {
+  display: block;
+  height: 9px;
+  background: color-mix(in srgb, var(--border) 70%, var(--bg));
+}
+
+.golden-cells i[data-on='true'] {
+  background: var(--gold);
+  box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.35);
+}
+
+.golden-label {
+  max-width: 110px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.golden-label b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.golden[data-ready='true'] {
+  border-color: var(--gold);
+  animation: golden-throb 560ms steps(2) infinite;
+}
+
+.golden[data-ready='true'] .golden-title,
+.golden[data-ready='true'] .golden-label {
+  color: var(--gold);
+}
+
+@keyframes golden-throb {
+  50% {
+    box-shadow:
+      var(--shadow),
+      0 0 0 3px color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+}
+
+/* The professor glows while the next click is golden */
+.clicker[data-golden='true'] .character {
+  filter: drop-shadow(0 0 6px #f5c542) drop-shadow(0 0 14px rgb(245 197 66 / 0.7));
+}
+
+/* The swarm */
+
+.swarm-layer {
+  --zoom: 2;
+
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.swarm-hud {
+  position: absolute;
+  top: var(--space-3);
+  left: calc(50% + 24px);
+  display: grid;
+  gap: 4px;
+  width: min(220px, 36cqw);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  transform: translateX(-50%);
+}
+
+.swarm-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.swarm-time {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.swarm-time[data-urgent='true'] {
+  color: var(--bad);
+}
+
+.swarm-timebar {
+  height: 6px;
+  background: color-mix(in srgb, var(--border) 70%, var(--bg));
+}
+
+.swarm-timebar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.swarm-count {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.swarm-count b {
+  color: var(--text);
+}
+
+.swarm-bossbar {
+  position: relative;
+  display: grid;
+  height: 16px;
+  background: color-mix(in srgb, var(--bad) 22%, var(--bg));
+  border: 2px solid var(--bad);
+}
+
+.swarm-bossbar i {
+  grid-area: 1 / 1;
+  background: var(--bad);
+}
+
+.swarm-bossbar span {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+  align-self: center;
+  padding: 0 6px;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 0.6);
+}
+
+.swarm-bug {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  animation: swarm-in 260ms steps(4) both;
+}
+
+.swarm-bug:focus-visible {
+  outline: 3px dashed var(--accent);
+  outline-offset: 4px;
+}
+
+.swarm-sprite {
+  display: grid;
+  place-items: center;
+  width: calc(var(--w) * var(--zoom) * 1px);
+  height: calc(var(--h) * var(--zoom) * 1px);
+  font-size: 32px;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+  /* The sprite is a fresh element after each hit (keyed on the health): it flashes, then goes back to wiggling. */
+  animation:
+    swarm-hit 180ms steps(3),
+    swarm-wiggle 700ms steps(2) 180ms infinite;
+}
+
+.swarm-bug:active .swarm-sprite {
+  filter: brightness(1.6);
+}
+
+.swarm-bug[data-boss='true'] {
+  z-index: 1;
+}
+
+.swarm-pips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  max-width: calc(var(--w, 40) * var(--zoom) * 1px);
+}
+
+.swarm-pips i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: color-mix(in srgb, var(--border) 70%, var(--bg));
+  border: 1px solid var(--bg);
+}
+
+.swarm-pips i[data-on='true'] {
+  background: var(--bad);
+}
+
+.swarm-bug[data-boss='true'] .swarm-pips i {
+  width: 5px;
+  height: 5px;
+}
+
+@keyframes swarm-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+}
+
+@keyframes swarm-hit {
+  0% {
+    filter: brightness(2.4);
+    transform: scale(0.88);
+  }
+}
+
+@keyframes swarm-wiggle {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* The summary after a swarm */
+
+.swarm-summary {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.swarm-summary dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.swarm-summary dl div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.swarm-summary dt {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.swarm-summary dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.swarm-summary small {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+@container stage (max-width: 639px) {
+  .golden-slot {
+    left: calc(100% + 8px);
+  }
+
+  .golden {
+    min-width: 72px;
+    padding: 6px 6px 4px;
+  }
+
+  .golden-title {
+    font-size: 11px;
+  }
+
+  .golden-label {
+    max-width: 76px;
+  }
+
+  /* Side by side (the stage is short): two 54 px buttons fit the 116 px column. */
+  .maestria-dock {
+    left: var(--space-1);
+    bottom: var(--space-1);
+  }
+
+  .maestria-dock .abilities {
+    grid-template-columns: repeat(2, 54px);
+    gap: 4px;
+    justify-items: start;
+  }
+
+  .maestria-dock .ability {
+    width: 54px;
+    padding: 2px;
+  }
+
+  .maestria-dock .ability .ui-meter {
+    --meter-size: 40px;
+  }
+
+  .maestria-pips {
+    top: 2px;
+    right: 2px;
+  }
+
+  .swarm-layer {
+    --zoom: 1;
+  }
+
+  .swarm-hud {
+    top: var(--space-2);
+    width: calc(100cqw - 116px - 64px - 48px);
+    min-width: 132px;
+    padding: var(--space-1) var(--space-2);
+  }
+}

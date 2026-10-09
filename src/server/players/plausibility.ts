@@ -13,6 +13,7 @@ import { content as gameContent } from '@/game/content';
 import type { GameContent } from '@/game/content/types';
 import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
+import { maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
  * Seconds added to every time window. Covers network latency, the browser throttling timers,
@@ -64,8 +65,8 @@ function lumpFactor(stats: { eventReward: number; sprintReward: number; eventInt
 }
 
 /**
- * Hand clicks per second a human can sustain (autoclick mice and two-finger tapping reach 15
- * to 20). Used for both the click counter and the coins clicks can produce.
+ * Hand clicks per second when the content sets no balance.clickLimit. The engine drops clicks past
+ * that limit, so the server holds a save to the same number (handClicks below).
  */
 export const MAX_CLICKS_PER_SECOND = 20;
 
@@ -94,6 +95,12 @@ export const BACKWARDS_TOLERANCE = 1e-6;
 /** A save whose coins pass this power of ten is refused outright (it could not be stored as `numeric` anyway). */
 export const MAX_COIN_EXPONENT = 5_000;
 
+/**
+ * Research bought between the two snapshots and before the graduation (+25% diplomas each) is in neither,
+ * and a window with a big lump (a Rollforward, a Super invasão) can graduate on all of it at once.
+ */
+export const DIPLOMA_GAIN_SLACK = 1.5;
+
 /** `ratio` is gain / ceiling of the coins check (1 = right at the limit), for calibration. */
 export type Verdict = { ok: true; ratio: number } | { ok: false; reason: string };
 
@@ -119,6 +126,7 @@ function rates(state: GameState, content: GameContent) {
     diplomaGain: stats.diplomaGain,
     lumpFactor: lumpFactor(stats),
     // What a click is worth at best, as a multiple of the base click: full combo and the average crit.
+    stats,
     clickFactor: (1 + stats.comboMax * stats.comboStep) * (1 + stats.critChance * (stats.critMult - 1)),
   };
 }
@@ -162,14 +170,20 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   const bestNumber = (pick: (r: ReturnType<typeof rates>) => number): number =>
     prevRates ? Math.max(pick(nextRates), pick(prevRates)) : pick(nextRates);
 
+  const handClicks = content.balance.clickLimit?.perSecond ?? MAX_CLICKS_PER_SECOND;
   const autoClicks = bestNumber((r) => r.autoClicks);
-  const clicksAllowed = (MAX_CLICKS_PER_SECOND + autoClicks) * window + AUTO_CLICK_BUFF_CLICKS * allowance;
-  if (clicksDone > MAX_CLICKS_PER_SECOND * window + CLICK_COUNT_GRACE * allowance) return fail('more clicks than possible');
+  const clicksAllowed = (handClicks + autoClicks) * window + AUTO_CLICK_BUFF_CLICKS * allowance;
+  if (clicksDone > handClicks * window + CLICK_COUNT_GRACE * allowance) return fail('more clicks than possible');
 
   const returns = Math.min(offlineReturns, 1 + window / OFFLINE_RETURN_EVERY_SECONDS);
   const offlineSeconds = returns * bestNumber((r) => r.offlineSeconds);
   const lumps = REWARD_LUMP_SECONDS * bestNumber((r) => r.lumpFactor) * allowance;
-  const productionSeconds = window * PRODUCTION_SLACK + offlineSeconds + lumps;
+  const maestriaWindow = { clicks: handClicks * window + CLICK_COUNT_GRACE * allowance, seconds: window };
+  const maestriaSeconds = Math.max(
+    maestriaLumpSeconds(next, content, nextRates.stats, maestriaWindow),
+    previous && prevRates ? maestriaLumpSeconds(previous, content, prevRates.stats, maestriaWindow) : 0,
+  );
+  const productionSeconds = window * PRODUCTION_SLACK + offlineSeconds + lumps + maestriaSeconds;
   const clickFactor = bestNumber((r) => r.clickFactor) * CLICK_BUFF_SLACK;
   const ceiling = best((r) => r.cps)
     .mul(productionSeconds)
@@ -177,12 +191,24 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   ratio = gain.div(Decimal.max(ceiling, 1e-9)).toNumber();
   if (gain.gt(ceiling)) return fail('more coins than the state can produce in the time elapsed');
 
+  // Maestrias: a slot per graduation, and the levels were paid with diplomas that were earned.
+  if (maestriaSlotsUsed(next) > next.counters.graduations) return fail('more Maestrias than graduations');
+  if (maestriaDiplomasSpent(next, content) > next.diplomasEarned) return fail('Maestria levels beyond the diplomas earned');
+
   // Diplomas only come from graduating, and one graduation pays at most what the run's coins are worth.
   if (diplomasDone > 0) {
     if (graduationsDone <= 0) return fail('diplomas without a graduation');
+    const cap = content.balance.graduation.cap;
+    if (cap) {
+      // Each graduation pays at most base x growth ^ (graduations done before it).
+      const before = next.counters.graduations - graduationsDone;
+      let allowed = 0;
+      for (let i = 0; i < Math.min(graduationsDone, 1000); i += 1) allowed += cap.base * cap.growth ** (before + i);
+      if (diplomasDone > allowed) return fail('more diplomas than the cap allows');
+    }
     const { base, exponent } = content.balance.graduation;
     const perRun = runPool.div(Decimal.max(parseDecimal(base), 1)).pow(exponent);
-    const bound = perRun.mul(bestNumber((r) => r.diplomaGain)).toNumber() * graduationsDone ** (1 - exponent) + 1;
+    const bound = perRun.mul(bestNumber((r) => r.diplomaGain) * DIPLOMA_GAIN_SLACK).toNumber() * graduationsDone ** (1 - exponent) + 1;
     if (Number.isFinite(bound) && diplomasDone > bound) return fail('more diplomas than the run was worth');
   }
 

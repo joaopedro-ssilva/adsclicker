@@ -1,9 +1,10 @@
-import { PROFESSOR_IDS } from '../content/types';
+import { MONITOR_IDS, PROFESSOR_IDS } from '../content/types';
 import type { CounterKey, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import { ZERO } from './decimal';
+import { createMaestriaState } from './maestria/slots';
 import { SAVE_VERSION } from './state';
-import type { GameState, RunStats, Settings } from './state';
+import type { GameState, MonitorsState, RunStats, Settings } from './state';
 
 export function createCounters(): Record<CounterKey, number> {
   return {
@@ -39,6 +40,12 @@ export function createRunStats(): RunStats {
     eventsDefended: 0,
     eventsMissed: 0,
   };
+}
+
+export function createMonitorsState(): MonitorsState {
+  const units = {} as MonitorsState['units'];
+  for (const id of MONITOR_IDS) units[id] = { level: 0, on: true, nextAt: 0, done: 0, last: '' };
+  return { units, settings: { comprasShare: 0.5, pesquisaShare: 0.5, sprintPick: 'first' } };
 }
 
 export function defaultSettings(): Settings {
@@ -110,6 +117,8 @@ export function createInitialState(content: GameContent, now: number): GameState
     honoured: null,
     honouredBefore: {},
     abilitiesTried: {},
+    maestria: createMaestriaState(),
+    monitors: createMonitorsState(),
     session: { seconds: 0, activeAt: now },
     calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 

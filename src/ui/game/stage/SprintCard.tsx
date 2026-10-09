@@ -36,6 +36,7 @@ function ActiveSprintView() {
       </div>
       <ProgressBar value={done} max={sprint.target} ariaLabel={`Progresso da sprint ${def.name}`} valueLabel={valueLabel} segmented segments={16} size="sm" />
       <p className="sprint-reward">Prêmio: {rewardLabel(def.reward)}</p>
+      {sprint.auto ? <p className="sprint-auto">📋 Aceita pelo monitor. Cumprir é com você.</p> : null}
     </div>
   );
 }

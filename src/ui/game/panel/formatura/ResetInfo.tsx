@@ -10,7 +10,7 @@ const RESETS = [
   'Buffs, invasões, sprints e recargas',
 ];
 
-const STAYS = ['Diplomas e a árvore', 'Conquistas', 'Skins, cenários e temas', 'Estatísticas e configurações'];
+const STAYS = ['Diplomas, a árvore e os monitores', 'Conquistas', 'Skins, cenários e temas', 'Estatísticas e configurações'];
 
 /** What a graduation wipes and what it keeps (professors kept by the tree are listed by name). */
 export function ResetInfo() {

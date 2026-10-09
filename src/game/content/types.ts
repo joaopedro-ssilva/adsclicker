@@ -314,6 +314,105 @@ export interface SprintDef {
 }
 
 // ---------------------------------------------------------------------------
+// Monitores: students who automate a chore, hired with diplomas
+// ---------------------------------------------------------------------------
+
+export const MONITOR_IDS = ['compras', 'seguranca', 'sprints', 'pesquisa'] as const;
+export type MonitorId = (typeof MONITOR_IDS)[number];
+
+export interface MonitorLevelDef {
+  /** Diplomas to reach this level (the first level hires the monitor). */
+  cost: number;
+  /**
+   * Compras and Pesquisa: milliseconds between two purchases. Seguranca and Sprints: how long the
+   * monitor lets the player act before stepping in.
+   */
+  delayMs: number;
+  /** Seguranca only: share (0..1) of the reward of an invasion the monitor defends. */
+  share?: number;
+  /** What the monitor does at this level, in pt-BR, for its card. */
+  line: string;
+}
+
+export interface MonitorDef {
+  id: MonitorId;
+  name: string;
+  emoji: string;
+  /** The chore it takes over, in one sentence. */
+  description: string;
+  /** Level 1 hires the monitor; each next one makes it faster or better. */
+  levels: MonitorLevelDef[];
+}
+
+// ---------------------------------------------------------------------------
+// Maestrias: one special mechanic per professor, unlocked with a graduation slot, levelled with diplomas
+// ---------------------------------------------------------------------------
+
+export const MAESTRIA_MAX_LEVEL = 5;
+
+export interface MaestriaDef {
+  professor: ProfessorId;
+  name: string;
+  /** One line for the card; also shown while the Maestria is not built yet. */
+  summary: string;
+  /** False = designed but not built: shown as "Em breve" and not selectable. */
+  built: boolean;
+  /** Diplomas for levels 2..5, in order (level 1 comes with the slot). */
+  levelCosts: number[];
+}
+
+/** Numbers of the built Maestrias. Arrays are indexed by level - 1. */
+export interface MaestriasConfig {
+  defs: Record<ProfessorId, MaestriaDef>;
+  /** Edécio, Joinha de Ouro. */
+  joinha: {
+    /** Manual clicks before the golden one. */
+    clicksNeeded: number[];
+    /** Seconds of the class's coins/second a golden click is worth. */
+    seconds: number[];
+    /** The golden click can crit from this level. */
+    critFromLevel: number;
+    /** Holding the pointer on the professor clicks by itself from this level. */
+    holdFromLevel: number;
+    holdPerSecond: number;
+  };
+  /** Gladimir, Rollforward. */
+  rollforward: {
+    /** Manual clicks that fill one charge. */
+    clicksToFill: number;
+    /** How far one charge jumps the game forward. */
+    jumpSeconds: number[];
+    /** Charges that can be stored. */
+    maxCharges: number[];
+  };
+  /** Wagner, Super invasão. */
+  swarm: {
+    /** Real minutes for the charge to fill. */
+    chargeMinutes: number[];
+    durationMs: number;
+    /** Regular bugs per swarm, before the boss. */
+    bugs: number;
+    firstSpawnMs: number;
+    spawnEveryMs: number;
+    /** How long a bug stays before it escapes. */
+    bugLifeMs: number;
+    bossAtMs: number;
+    /** Clicks to defeat each kind. `sprite` is an art manifest key. */
+    kinds: { id: string; name: string; sprite: string; hp: number; weight: number }[];
+    boss: { id: string; name: string; sprite: string; hp: number };
+    /** Seconds of the class's coins/second paid per bug and for the boss. */
+    bugSeconds: number;
+    bossSeconds: number;
+    /** Multiplier on the reward when every bug and the boss fall. */
+    clearBonus: number;
+    /** Reward multiplier by level. */
+    rewardMult: number[];
+    /** The firewall's pace by level: one bug dies every N ms. 0 = no firewall. */
+    firewallEveryMs: number[];
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Prestige ("Formatura")
 // ---------------------------------------------------------------------------
 
@@ -470,6 +569,11 @@ export interface BalanceConfig {
   sprints: { offers: number; cooldownMs: number };
   /** Minimum reward, in coins, for a Reward of kind 'coins' = floor * clickValue. */
   rewardClickFloor: number;
+  /**
+   * Most manual clicks the engine accepts in any `windowMs` (a rolling window). Clicks over it are dropped without a
+   * trace, so an auto-clicker gains nothing. Omitted = no limit. The server's plausibility check uses the same number.
+   */
+  clickLimit?: { perSecond: number; windowMs: number };
   /** Domínio: one rank per `step` levels summed over a professor's disciplines, up to `cap` ranks. */
   mastery: { step: number; cap: number };
   graduation: {
@@ -481,6 +585,11 @@ export interface BalanceConfig {
     bonusPerDiploma: number;
     /** Ceiling of the diploma bonus (additive, 3 = +300%). Omitted = no ceiling. */
     maxBonus?: number;
+    /**
+     * Most diplomas one graduation can pay: base x growth ^ graduations already done (10, 20, 40...
+     * with 10 and 2). Coins past it count for nothing, so sitting on a run stops paying. Omitted = no cap.
+     */
+    cap?: { base: number; growth: number };
   };
 }
 
@@ -498,5 +607,7 @@ export interface GameContent {
   sceneries: SceneryDef[];
   themes: ThemeDef[];
   mastery: Record<ProfessorId, MasteryDef>;
+  monitors: MonitorDef[];
+  maestrias: MaestriasConfig;
   balance: BalanceConfig;
 }

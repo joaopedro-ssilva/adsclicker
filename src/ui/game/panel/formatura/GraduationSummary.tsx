@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { content, useGame, useGraduationPreview } from '@/game/store';
 import { formatPercent } from '@/game/engine/format';
+import { diplomaBonus } from '@/game/engine/views';
 import { Button, Icon, ProgressBar } from '@/ui/kit';
 import { fmt, fmtInt } from '../lib/numbers';
 import { GraduateDialog } from './GraduateDialog';
@@ -14,7 +15,11 @@ export function GraduationSummary() {
   const runCoins = useGame((store) => fmt(store.state.runCoins));
   const [confirming, setConfirming] = useState(false);
 
-  const bonus = earned * content.balance.graduation.bonusPerDiploma;
+  // The engine's number, not earned x bonusPerDiploma: the bonus stops at balance.graduation.maxBonus.
+  const bonus = useGame((store) => diplomaBonus(store.state, content));
+  const { maxBonus } = content.balance.graduation;
+  const bonusMaxed = maxBonus !== undefined && bonus >= maxBonus;
+  const growth = content.balance.graduation.cap?.growth ?? 1;
 
   return (
     <div className="graduation-summary">
@@ -33,7 +38,10 @@ export function GraduationSummary() {
           </div>
           <div>
             <dt>Bônus de produção</dt>
-            <dd>+{formatPercent(bonus)}</dd>
+            <dd title={bonusMaxed ? 'O bônus dos diplomas chegou ao teto.' : undefined}>
+              +{formatPercent(bonus)}
+              {bonusMaxed ? <small> máx.</small> : null}
+            </dd>
           </div>
           <div>
             <dt>Formaturas</dt>
@@ -48,14 +56,28 @@ export function GraduationSummary() {
           <strong>+{fmtInt(preview.diplomas)}</strong>
           <span>{preview.diplomas === 1 ? 'diploma' : 'diplomas'}</span>
         </p>
-        <ProgressBar
-          value={preview.progress}
-          max={1}
-          label={`Rumo ao diploma ${preview.diplomas + 1}`}
-          valueLabel={`${runCoins} / ${fmt(preview.nextAt)}`}
-          segmented
-          segments={24}
-        />
+        {preview.cap !== null ? (
+          <p className="graduation-cap" data-full={preview.atCap} data-qa="diploma-cap">
+            <strong>
+              {fmtInt(preview.diplomas)}/{fmtInt(preview.cap)}
+            </strong>{' '}
+            diplomas desta turma
+          </p>
+        ) : null}
+        {preview.atCap && preview.cap !== null ? (
+          <p className="graduation-cap-note" data-qa="diploma-cap-note">
+            Limite da turma atingido: as ADScoins a mais não rendem diploma. Forme a turma para subir o limite da próxima para {fmtInt(preview.cap * growth)}.
+          </p>
+        ) : (
+          <ProgressBar
+            value={preview.progress}
+            max={1}
+            label={`Rumo ao diploma ${preview.diplomas + 1}`}
+            valueLabel={`${runCoins} / ${fmt(preview.nextAt)}`}
+            segmented
+            segments={24}
+          />
+        )}
         {preview.unlocked ? (
           <Button
             size="lg"

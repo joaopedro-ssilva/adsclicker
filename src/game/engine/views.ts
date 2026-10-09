@@ -28,7 +28,10 @@ import {
 import { milestoneMultAt, nextMilestone, previousMilestone } from './formulas';
 export { masteryLevels, masteryLine, masteryRank, masteryView, masteryViews } from './mastery';
 export type { MasteryView } from './mastery';
-import { diplomasFor, prestigeNodeAvailable, prestigeNodeCost, runCoinsFor } from './prestige';
+export { monitorsView } from './monitors';
+import { diplomaCap, diplomasFor, diplomasForRun, prestigeNodeAvailable, prestigeNodeCost, runCoinsFor } from './prestige';
+export { diplomaBonus } from './stats';
+export * from './maestria/views';
 import { effectiveBuyAmount, quoteLevels } from './purchases';
 import { hireLock, isAbilityUnlocked, levelledLock, researchLock } from './requirements';
 import type { GameState } from './state';
@@ -238,7 +241,9 @@ export function prestigeNodeViews(state: GameState, content: GameContent): Prest
 export function graduationPreview(state: GameState, content: GameContent): GraduationPreview {
   const { stats } = getStateCache(state, content);
   const unlocked = hasFeature(state, content, 'graduation');
-  const diplomas = diplomasFor(state.runCoins, content, stats);
+  const diplomas = diplomasForRun(state, content, stats);
+  const cap = diplomaCap(state, content);
+  const atCap = cap !== null && diplomasFor(state.runCoins, content, stats) >= cap;
   const current = runCoinsFor(diplomas, content, stats);
   const nextAt = runCoinsFor(diplomas + 1, content, stats);
   const span = nextAt.sub(current);
@@ -246,8 +251,10 @@ export function graduationPreview(state: GameState, content: GameContent): Gradu
     unlocked,
     diplomas,
     nextAt,
-    progress: span.gt(0) ? ratio(state.runCoins.sub(current), span) : 0,
+    progress: atCap ? 1 : span.gt(0) ? ratio(state.runCoins.sub(current), span) : 0,
     canGraduate: unlocked && diplomas >= 1,
+    cap,
+    atCap,
   };
 }
 

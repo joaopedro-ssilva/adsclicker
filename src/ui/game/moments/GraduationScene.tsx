@@ -17,6 +17,7 @@ const BURSTS = 7;
 /** Full-screen graduation: diplomas counted up, confetti from all sides, what they give for good. */
 export function GraduationScene({ diplomas, onClose }: GraduationSceneProps) {
   const bonus = Math.round(content.balance.graduation.bonusPerDiploma * 100);
+  const { maxBonus } = content.balance.graduation;
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
@@ -45,7 +46,7 @@ export function GraduationScene({ diplomas, onClose }: GraduationSceneProps) {
         </p>
         <h3 className="scene-title">{diplomas === 1 ? 'Diploma conquistado' : 'Diplomas conquistados'}</h3>
         <p className="gradscene-note">
-          Cada diploma dá <b>+{bonus}% de produção</b> para sempre e abre a árvore de Formatura. A turma recomeça mais
+          Cada diploma dá <b>+{bonus}% de produção</b> para sempre{maxBonus === undefined ? '' : `, até +${Math.round(maxBonus * 100)}%`}, e abre a árvore de Formatura. A turma recomeça mais
           forte.
         </p>
         <div className="scene-actions">

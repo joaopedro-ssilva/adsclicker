@@ -16,6 +16,8 @@ export const soundNames = [
   'sprintFailed',
   'graduate',
   'uiTap',
+  'golden',
+  'rollforward',
 ] as const;
 
 export type SoundName = (typeof soundNames)[number];
@@ -54,6 +56,8 @@ export const sounds: Record<SoundName, SoundDef> = {
   sprintFailed: { notes: [64, 62, 59, 55], step: 0.12, wave: 'triangle', length: 0.2 },
   graduate: { notes: [60, 64, 67, 72, 67, 72, 76, 79, 84], step: 0.17, wave: 'square', layer: 'triangle', length: 0.27 },
   uiTap: { notes: [81], step: 0.02, wave: 'triangle', length: 0.035, volume: 0.1 },
+  golden: { notes: [79, 84, 88, 91, 96], step: 0.05, wave: 'square', layer: 'triangle', length: 0.12, noise: 0.03 },
+  rollforward: { notes: [55, 60, 67, 72, 79, 84, 91], step: 0.035, wave: 'sawtooth', layer: 'square', volume: 0.09 },
 };
 
 /** The background loop: a lead line (0 = rest) and a bass note every fourth step. */

@@ -6,5 +6,7 @@
 @import './album/album.css';
 @import './formatura/formatura.css';
 @import './formatura/honour.css';
+@import './formatura/maestrias/maestrias.css';
+@import './formatura/monitors/monitors.css';
 @import './config/config.css';
 @import './comunidade/comunidade.css';

@@ -85,9 +85,9 @@ describe('Domínio', () => {
     const view = masteryView(g.state, content, 'edecio');
     expect(view).toMatchObject({ rank: 2, cap: 40, maxed: false, levels: 60, nextAt: 75 });
     expect(view.progress).toBeCloseTo(0.4, 5);
-    expect(view.line).toBe('Cada clique soma 0,3% das ADScoins/s da turma');
+    expect(view.line).toBe('Cada clique rende a mais 0,3% do que a turma inteira produz por segundo');
     setLevels(g.state, 'gladimir', 1000);
-    expect(masteryView(g.state, content, 'gladimir').line).toBe('Offline: +6 h de teto e +20% de taxa');
+    expect(masteryView(g.state, content, 'gladimir').line).toBe('Offline: conta até 6 h a mais de ausência e paga 20% a mais da produção');
   });
 
   it('pays each professor mechanic at the cap, to the whole game', () => {
@@ -200,6 +200,7 @@ describe('honoured professor', () => {
     const g = game();
     for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
     g.state.honoured = 'angelo';
+    g.state.counters.graduations = 3; // the cap of the first graduations (10, 13, 16) would hold the 12.5 back
     g.state.runCoins = new Decimal('2e21'); // sqrt(100) = 10 -> 12.5
     g.state.lifetimeCoins = g.state.runCoins;
     graduate(g.state, content, T0, g.emit);

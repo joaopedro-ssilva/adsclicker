@@ -13,6 +13,8 @@ const GHOST_MS = 900;
 interface Ghost {
   key: number;
   kind: 'defended' | 'missed';
+  /** Defended by the Monitor de Segurança: a smaller, quieter exit. */
+  auto?: boolean;
   emoji: string;
   x: number;
   y: number;
@@ -95,7 +97,14 @@ export function InvasionLayer() {
       const from = last.current;
       const emoji = invasionById.get(event.def)?.emoji;
       if (!from || !emoji) return;
-      setGhost({ key: event.uid, kind: event.type === 'invasionDefended' ? 'defended' : 'missed', emoji, x: from.x, y: from.y });
+      setGhost({
+        key: event.uid,
+        kind: event.type === 'invasionDefended' ? 'defended' : 'missed',
+        auto: event.type === 'invasionDefended' && event.byMonitor === true,
+        emoji,
+        x: from.x,
+        y: from.y,
+      });
     },
     ['invasionDefended', 'invasionMissed'],
   );
@@ -105,7 +114,7 @@ export function InvasionLayer() {
     <div className="invasion-layer">
       {invasion ? <ActiveThreat key={invasion.uid} invasion={invasion} /> : null}
       {ghost ? (
-        <span className="invasion-ghost" data-kind={ghost.kind} key={ghost.key} style={position(ghost.x, ghost.y)} aria-hidden="true">
+        <span className="invasion-ghost" data-kind={ghost.kind} data-auto={ghost.auto === true} key={ghost.key} style={position(ghost.x, ghost.y)} aria-hidden="true">
           {ghost.emoji}
         </span>
       ) : null}

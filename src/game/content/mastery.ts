@@ -24,7 +24,7 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
   edecio: {
     professor: 'edecio',
     perRank: [{ stat: 'clickFromIdle', op: 'add', value: 0.0015 }],
-    line: 'Cada clique soma {v} das ADScoins/s da turma',
+    line: 'Cada clique rende a mais {v} do que a turma inteira produz por segundo',
     units: ['percent'],
     honour: {
       name: 'Combo que não cai',
@@ -38,7 +38,7 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
       { stat: 'offlineHours', op: 'add', value: 0.15 },
       { stat: 'offlineRate', op: 'add', value: 0.005 },
     ],
-    line: 'Offline: +{v} de teto e +{w} de taxa',
+    line: 'Offline: conta até {v} a mais de ausência e paga {w} a mais da produção',
     units: ['hours', 'percent'],
     honour: {
       name: 'Backup completo',
@@ -74,7 +74,7 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
       { stat: 'abilityDuration', op: 'add', value: 0.01 },
       { stat: 'abilityCooldown', op: 'mult', value: 0.99 },
     ],
-    line: 'Buffs duram {v} mais e recarregam {w} mais rápido',
+    line: 'Buffs duram {v} a mais e as habilidades recarregam {w} mais rápido',
     units: ['percent', 'percent'],
     honour: {
       name: 'Recarga pela metade',

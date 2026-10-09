@@ -3,9 +3,29 @@ import type { GameContent, ProfessorId } from '../content/types';
 import { grantAchievementRewards } from './achievements';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
-import { createInitialState, createRunStats } from './init';
-import { MAX_CARGO_BONUS, MAX_DEV_MULTIPLIER, MAX_MENTOR_BONUS, MIN_DEV_MULTIPLIER, SAVE_VERSION } from './state';
-import type { ActiveBuff, ActiveInvasion, ActiveSprint, BuyAmount, CloudBonus, GameState, LastRun, RunStats, Settings } from './state';
+import { createInitialState, createMonitorsState, createRunStats } from './init';
+import { readMaestria } from './maestria/save';
+import {
+  MAX_CARGO_BONUS,
+  MAX_DEV_MULTIPLIER,
+  MAX_MENTOR_BONUS,
+  MIN_DEV_MULTIPLIER,
+  MONITOR_SHARES,
+  SAVE_VERSION,
+  SPRINT_PICKS,
+} from './state';
+import type {
+  ActiveBuff,
+  ActiveInvasion,
+  ActiveSprint,
+  BuyAmount,
+  CloudBonus,
+  GameState,
+  LastRun,
+  MonitorsState,
+  RunStats,
+  Settings,
+} from './state';
 
 export type RawSave = Record<string, unknown>;
 export type Migration = (raw: RawSave) => RawSave;
@@ -132,10 +152,44 @@ function readSprint(value: unknown, content: GameContent): GameState['sprint'] {
       };
       const refCps = readString(active.refCps);
       if (refCps) sprint.refCps = refCps;
+      if (active.auto === true) sprint.auto = true;
       fresh.active = sprint;
     }
   }
   return fresh;
+}
+
+/** Monitores: levels capped at the content's, settings limited to the values the UI offers, ids checked. */
+function readMonitors(value: unknown, content: GameContent, now: number): MonitorsState {
+  const monitors = createMonitorsState();
+  if (!isRecord(value)) return monitors;
+  const index = getIndex(content);
+  const units = isRecord(value.units) ? value.units : {};
+
+  for (const def of content.monitors) {
+    const raw = units[def.id];
+    if (!isRecord(raw)) continue;
+    const last = readString(raw.last) ?? '';
+    const known = def.id === 'compras' ? index.disciplines : def.id === 'pesquisa' ? index.research : def.id === 'seguranca' ? index.invasions : index.sprints;
+    monitors.units[def.id] = {
+      level: Math.floor(readNumber(raw.level, 0, 0, def.levels.length)),
+      on: raw.on !== false,
+      nextAt: readNumber(raw.nextAt, 0, 0, now),
+      done: Math.floor(readNumber(raw.done, 0, 0)),
+      last: known.has(last) ? last : '',
+    };
+  }
+
+  if (isRecord(value.settings)) {
+    const settings = value.settings;
+    const share = (raw: unknown, fallback: number) => MONITOR_SHARES.find((option) => option === raw) ?? fallback;
+    monitors.settings = {
+      comprasShare: share(settings.comprasShare, monitors.settings.comprasShare),
+      pesquisaShare: share(settings.pesquisaShare, monitors.settings.pesquisaShare),
+      sprintPick: SPRINT_PICKS.find((option) => option === settings.sprintPick) ?? monitors.settings.sprintPick,
+    };
+  }
+  return monitors;
 }
 
 function readRun(value: unknown): RunStats {
@@ -289,6 +343,8 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.honoured = isProfessorId(raw.honoured) ? raw.honoured : null;
   state.honouredBefore = readBooleans(raw.honouredBefore, isProfessorId);
   state.abilitiesTried = readBooleans(raw.abilitiesTried, (id) => index.abilities.has(id));
+  state.maestria = readMaestria(raw.maestria, content);
+  state.monitors = readMonitors(raw.monitors, content, now);
   if (isRecord(raw.session)) {
     state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };
   }

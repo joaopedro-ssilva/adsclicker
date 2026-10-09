@@ -1,5 +1,6 @@
 import type Decimal from 'break_infinity.js';
-import type { CounterKey, Effect, ProfessorId } from '../content/types';
+import type { CounterKey, Effect, MonitorId, ProfessorId } from '../content/types';
+import type { MaestriaState } from './maestria/types';
 
 /** Bump when the saved shape changes and add a migration in save.ts. */
 export const SAVE_VERSION = 1;
@@ -60,6 +61,39 @@ export interface ActiveSprint {
    * Progress then counts seconds of that production earned, so it never overflows a number.
    */
   refCps?: string;
+  /** Accepted by the Monitor de Sprints: if it runs out the sprint is not counted as failed. */
+  auto?: boolean;
+}
+
+/** One hired (or not yet hired) Monitor. Survives graduation. */
+export interface MonitorUnit {
+  /** 0 = not hired. */
+  level: number;
+  /** The player's switch. */
+  on: boolean;
+  /** Compras and Pesquisa: when it acts next. Sprints: when it accepts the offers on screen (0 = no offers seen). */
+  nextAt: number;
+  /** Times it acted, ever. */
+  done: number;
+  /** Id of the last thing it bought or accepted, for the card. '' = none. */
+  last: string;
+}
+
+export type SprintPick = 'first' | 'best' | 'clicks';
+export const SPRINT_PICKS: readonly SprintPick[] = ['first', 'best', 'clicks'];
+/** Shares of the coins one automatic purchase may spend (Compras and Pesquisa). */
+export const MONITOR_SHARES: readonly number[] = [0.1, 0.25, 0.5, 1];
+
+export interface MonitorsState {
+  units: Record<MonitorId, MonitorUnit>;
+  settings: {
+    /** Compras buys only what costs at most this share of the ADScoins in hand. */
+    comprasShare: number;
+    /** Pesquisa buys only a research that costs at most this share of the ADScoins in hand. */
+    pesquisaShare: number;
+    /** Which offer the Monitor de Sprints takes. */
+    sprintPick: SprintPick;
+  };
 }
 
 /** Numbers about the current run only. Zeroed at every graduation. */
@@ -188,6 +222,12 @@ export interface GameState {
   honouredBefore: Record<string, boolean>;
   /** Abilities used at least once, ever. */
   abilitiesTried: Record<string, boolean>;
+
+  /** Maestrias: the slots spent, their levels and the runtime of each (see engine/maestria). */
+  maestria: MaestriaState;
+
+  /** Monitores (automation hired with diplomas). Survives graduation. */
+  monitors: MonitorsState;
 
   /** The current sitting: seconds played and when the player last acted. Restarted at every boot. */
   session: { seconds: number; activeAt: number };

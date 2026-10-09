@@ -4,6 +4,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
+import { resetMaestriasForGraduation } from './maestria';
 import { recordGraduationDay } from './session';
 import type { GameState } from './state';
 import { computeStats, hasFeature } from './stats';
@@ -19,6 +20,21 @@ export function diplomasFor(runCoins: Decimal, content: GameContent, stats: Stat
   return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, value));
 }
 
+/** Most diplomas the next graduation can pay: base x growth ^ graduations done. Null when the content sets no cap. */
+export function diplomaCap(state: GameState, content: GameContent): number | null {
+  const cap = content.balance.graduation.cap;
+  if (!cap) return null;
+  const value = cap.base * cap.growth ** state.counters.graduations;
+  return Number.isFinite(value) ? Math.floor(value) : Number.MAX_SAFE_INTEGER;
+}
+
+/** Diplomas the current run pays if the player graduates now: diplomasFor, held at the cap. */
+export function diplomasForRun(state: GameState, content: GameContent, stats: Stats): number {
+  const worth = diplomasFor(state.runCoins, content, stats);
+  const cap = diplomaCap(state, content);
+  return cap === null ? worth : Math.min(worth, cap);
+}
+
 /** Run coins needed to graduate with `diplomas` in total (the inverse of diplomasFor). */
 export function runCoinsFor(diplomas: number, content: GameContent, stats: Stats): Decimal {
   const { base, exponent } = content.balance.graduation;
@@ -28,7 +44,7 @@ export function runCoinsFor(diplomas: number, content: GameContent, stats: Stats
 }
 
 export function canGraduate(state: GameState, content: GameContent, stats: Stats): boolean {
-  return hasFeature(state, content, 'graduation') && diplomasFor(state.runCoins, content, stats) >= 1;
+  return hasFeature(state, content, 'graduation') && diplomasForRun(state, content, stats) >= 1;
 }
 
 /** Professors that survive a graduation because of prestige nodes the player owns. */
@@ -59,7 +75,7 @@ export function graduate(
 ): boolean {
   const stats = computeStats(state, content);
   if (!canGraduate(state, content, stats)) return false;
-  const diplomas = diplomasFor(state.runCoins, content, stats);
+  const diplomas = diplomasForRun(state, content, stats);
   const index = getIndex(content);
   const kept = keptProfessors(state, content);
 
@@ -97,6 +113,7 @@ export function graduate(
   state.sprint = { offers: [], active: null, nextOffersAt: 0 };
   state.combo = { steps: 0, lastClickAt: 0 };
   state.autoClickCarry = 0;
+  resetMaestriasForGraduation(state);
   if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
 
   emit({ type: 'graduate', diplomas });

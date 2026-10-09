@@ -234,6 +234,22 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       },
       buyPrestigeNode: (id) => run((state, emit) => engine.buyPrestigeNode(state, content, id, now(), emit), true),
 
+      buyMonitor: (id) => run((state, emit) => engine.buyMonitor(state, content, id, now(), emit), true),
+      setMonitorOn(id, on) {
+        run((state) => engine.setMonitorOn(state, id, on), true);
+      },
+      setMonitorSettings(patch) {
+        run((state) => engine.setMonitorSettings(state, patch), true);
+      },
+
+      unlockMaestria: (professor) => run((state, emit) => engine.unlockMaestria(state, content, professor, now(), emit), true),
+      buyMaestriaLevel: (professor) => run((state, emit) => engine.buyMaestriaLevel(state, content, professor, now(), emit), true),
+      fireRollforward: () => run((state, emit) => engine.fireRollforward(state, content, now(), emit), true),
+      startSwarm: () => run((state, emit) => engine.startSwarm(state, content, now(), emit), true),
+      hitBug(uid) {
+        run((state, emit) => engine.hitBug(state, content, uid, now(), emit));
+      },
+
       buyCafe() {
         return run((state, emit) => engine.buyCafe(state, content, now(), emit), true);
       },

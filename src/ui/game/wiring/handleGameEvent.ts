@@ -7,13 +7,16 @@ import { toast } from '@/ui/kit';
 import { useMoments } from '../moments/momentsStore';
 import { forgetLayers } from '../stage/LayerReveal';
 import { achievementGrants, invasionById, rewardText, sprintById } from './describe';
+import { handleMaestriaEvent, onGoldenClick } from './maestriaEvents';
 import { anchorElement, anchorPoint } from './stageRefs';
 
 const GOLD = '#f7ca75';
 const COIN_GAP_MS = 90;
 const AUTO_NUMBER_GAP_MS = 450;
 const BUY_SOUND_GAP_MS = 70;
+const MONITOR_NUMBER_GAP_MS = 3000;
 
+let lastMonitor = 0;
 let lastCoins = 0;
 let lastAuto = 0;
 let lastBuy = 0;
@@ -41,6 +44,11 @@ function onClick(event: Extract<GameEvent, { type: 'click' }>): void {
     return;
   }
 
+  if (event.golden) {
+    onGoldenClick(event);
+    return;
+  }
+
   const point = event.x !== undefined && event.y !== undefined ? { x: event.x, y: event.y } : anchorPoint('actor', 0.28);
   if (settings.floatingNumbers) {
     fx.floatingNumber({ ...point, text: `+${formatNumber(event.value)}`, crit: event.crit, thumbsUp: event.crit });
@@ -60,6 +68,14 @@ function onClick(event: Extract<GameEvent, { type: 'click' }>): void {
 function onInvasionEnd(event: Extract<GameEvent, { type: 'invasionDefended' | 'invasionMissed' }>): void {
   const def = invasionById.get(event.def);
   const point = anchorPoint('invasion');
+  if (event.type === 'invasionDefended' && event.byMonitor) {
+    // The Monitor de Segurança stepped in: a quiet mark, no fanfare and no toast.
+    const balance = anchorElement('balance');
+    if (balance && event.reward.kind === 'coins') fx.coins({ ...point, target: balance, count: 6, color: GOLD });
+    fx.floatingNumber({ ...point, text: `🛡️ ${rewardText(event.reward)}`, color: '#78d9a5' });
+    audio.play('uiTap');
+    return;
+  }
   if (event.type === 'invasionDefended') {
     audio.play('invasionDefended');
     const balance = anchorElement('balance');
@@ -82,6 +98,31 @@ function onInvasionEnd(event: Extract<GameEvent, { type: 'invasionDefended' | 'i
       duration: 3500,
     });
   }
+}
+
+const monitorNames: Record<'compras' | 'pesquisa' | 'sprints', Map<string, string>> = {
+  compras: new Map(content.disciplines.map((def) => [def.id, def.name])),
+  pesquisa: new Map(content.research.map((def) => [def.id, def.name])),
+  sprints: new Map(content.sprints.map((def) => [def.id, def.name])),
+};
+
+/** A Monitor did its chore: a small line over the balance (purchases) or a toast (a sprint). Defences are handled with the invasion. */
+function onMonitorAct(event: Extract<GameEvent, { type: 'monitorAct' }>): void {
+  if (event.monitor === 'seguranca') return;
+  const name = monitorNames[event.monitor].get(event.id) ?? '';
+  if (event.monitor === 'sprints') {
+    toast({ title: `📋 Monitor aceitou: ${name}`, description: 'Cumprir a meta é com você.', duration: 3500 });
+    return;
+  }
+  const now = performance.now();
+  if (now - lastMonitor < MONITOR_NUMBER_GAP_MS || !useGame.getState().state.settings.floatingNumbers) return;
+  lastMonitor = now;
+  const point = anchorPoint('balance', 1.45); // under the balance, so the number it shows stays readable
+  fx.floatingNumber({
+    ...point,
+    text: event.monitor === 'compras' ? `🛒 ${name}` : `🔬 ${name}`,
+    color: '#9ec7ff',
+  });
 }
 
 /** One place that turns what happened in the game into sound, effects, toasts and ceremonies. */
@@ -143,6 +184,17 @@ export function handleGameEvent(event: GameEvent): void {
       }
       break;
     }
+    case 'maestria':
+    case 'rollforward':
+    case 'swarmStart':
+    case 'swarmHit':
+    case 'swarmEscape':
+    case 'swarmEnd':
+      handleMaestriaEvent(event);
+      break;
+    case 'monitorAct':
+      onMonitorAct(event);
+      break;
     case 'sprintOffers':
       toast({ title: '📋 Novas sprints', description: 'Escolha uma meta no card do palco.', duration: 4000 });
       break;

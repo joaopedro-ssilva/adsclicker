@@ -2,7 +2,9 @@
 import { memo, useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { content, useGame, useGameState } from '@/game/store';
 import { Character } from '@/ui/art/Character';
+import { joinhaView } from '@/game/engine/views';
 import { characterSprite } from '../shared/characterProps';
+import { useHoldToClick } from './maestria/useHoldToClick';
 import { registerAnchor } from '../wiring/stageRefs';
 
 interface ClickerButtonProps {
@@ -19,6 +21,8 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
   const professorId = useGameState((state) => state.activeProfessor);
   const skinId = useGameState((state) => state.equippedSkin[state.activeProfessor]);
   const click = useGame((store) => store.click);
+  // Joinha de Ouro: the next click is golden.
+  const golden = useGame((store) => joinhaView(store.state, content)?.ready ?? false);
   const [bump, setBump] = useState(0);
   const button = useRef<HTMLButtonElement>(null);
 
@@ -35,6 +39,8 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
     [click],
   );
 
+  const startHold = useHoldToClick(perform);
+
   const aimAtHead = useCallback(() => {
     const rect = button.current?.getBoundingClientRect();
     return rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height * 0.28 } : { x: 0, y: 0 };
@@ -43,6 +49,8 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
   const onPointerDown = (event: PointerEvent<HTMLButtonElement>) => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     perform(event.clientX, event.clientY);
+    // Joinha de Ouro level 5: keep the pointer down and the clicks keep coming.
+    startHold(event.clientX, event.clientY);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -60,6 +68,7 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
       type="button"
       className="clicker"
       data-qa="clicker"
+      data-golden={golden}
       aria-label={`Clicar em ${professor.name} para ganhar ADScoins`}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}

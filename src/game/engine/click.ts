@@ -1,8 +1,12 @@
 import type { GameContent } from '../content/types';
 import type { Emit } from '../store/types';
 import { decayCombo } from './combo';
+import { Decimal } from './decimal';
+import { acceptClick } from './clickLimit';
 import { clickValueWith, gain } from './economy';
 import { afterAction } from './lifecycle';
+import { goldenCanCrit, goldenReady, goldenValue, recordJoinhaClick } from './maestria/joinha';
+import { recordRollforwardClick } from './maestria/rollforward';
 import { recordSprintEvent } from './sprints';
 import type { GameState } from './state';
 import { computeStats, hasFeature } from './stats';
@@ -24,6 +28,7 @@ export function click(
   emit: Emit,
   position: ClickPosition = {},
 ): void {
+  if (!acceptClick(state, content, now)) return;
   const stats = computeStats(state, content);
   const config = content.balance.combo;
   let crit = false;
@@ -37,9 +42,16 @@ export function click(
   }
   state.combo.lastClickAt = now;
 
+  // Joinha de Ouro: after enough manual clicks the next one is golden. It crits only from the level that allows it.
+  const golden = goldenReady(state, content);
+  if (golden && !goldenCanCrit(state, content)) crit = false;
+
   const steps = state.combo.steps;
-  const value = clickValueWith(state, content, stats, { comboSteps: steps, crit });
+  let value = clickValueWith(state, content, stats, { comboSteps: steps, crit });
+  if (golden) value = Decimal.max(value, goldenValue(state, content, stats, crit));
   gain(state, value);
+  recordJoinhaClick(state, content, golden);
+  recordRollforwardClick(state, content);
   state.run.clicks += 1;
   state.run.clickCoins = state.run.clickCoins.add(value);
 
@@ -52,6 +64,6 @@ export function click(
   if (crit) recordSprintEvent(state, content, { kind: 'crits', amount: 1 });
   recordSprintEvent(state, content, { kind: 'reachCombo', amount: Math.floor(steps) });
 
-  emit({ type: 'click', value, crit, comboSteps: steps, auto: false, x: position.x, y: position.y });
+  emit({ type: 'click', value, crit, comboSteps: steps, auto: false, x: position.x, y: position.y, golden });
   afterAction(state, content, now, emit, { throttle: true });
 }

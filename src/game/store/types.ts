@@ -1,6 +1,6 @@
 import type Decimal from 'break_infinity.js';
-import type { ProfessorId, Rarity } from '../content/types';
-import type { BuyAmount, CloudBonus, GameState, Settings } from '../engine/state';
+import type { MonitorId, ProfessorId, Rarity } from '../content/types';
+import type { BuyAmount, CloudBonus, GameState, MonitorsState, Settings } from '../engine/state';
 
 // ---------------------------------------------------------------------------
 // Event bus: things that happened, for animation, sound and toasts.
@@ -12,15 +12,15 @@ export type RewardResult =
   | { kind: 'buff'; buffId: string; name: string; emoji: string; durationMs: number };
 
 export type GameEvent =
-  | { type: 'click'; value: Decimal; crit: boolean; comboSteps: number; auto: boolean; x?: number; y?: number }
-  | { type: 'purchase'; kind: 'discipline' | 'clickUpgrade' | 'research' | 'prestigeNode'; id: string; levels: number }
+  | { type: 'click'; value: Decimal; crit: boolean; comboSteps: number; auto: boolean; x?: number; y?: number; golden?: boolean }
+  | { type: 'purchase'; kind: 'discipline' | 'clickUpgrade' | 'research' | 'prestigeNode' | 'monitor'; id: string; levels: number }
   | { type: 'milestone'; id: string; level: number }
   | { type: 'hire'; professor: ProfessorId }
   | { type: 'achievement'; id: string }
   | { type: 'unlock'; kind: 'skin' | 'scenery' | 'theme'; id: string; rarity?: Rarity }
   | { type: 'invasionSpawn'; uid: number; def: string }
   | { type: 'invasionHit'; uid: number; clicksLeft: number }
-  | { type: 'invasionDefended'; uid: number; def: string; reward: RewardResult; streak: number }
+  | { type: 'invasionDefended'; uid: number; def: string; reward: RewardResult; streak: number; byMonitor?: boolean }
   | { type: 'invasionMissed'; uid: number; def: string }
   | { type: 'abilityUsed'; id: string }
   | { type: 'buffStart'; id: string }
@@ -29,6 +29,15 @@ export type GameEvent =
   | { type: 'sprintStart'; def: string }
   | { type: 'sprintDone'; def: string; reward: RewardResult }
   | { type: 'sprintFailed'; def: string }
+  /** A Monitor did its chore. `id` is the discipline, research, invasion or sprint it dealt with. */
+  | { type: 'monitorAct'; monitor: MonitorId; id: string }
+  /** A Maestria was unlocked (level 1) or raised. */
+  | { type: 'maestria'; professor: ProfessorId; level: number }
+  | { type: 'rollforward'; ms: number; coins: Decimal }
+  | { type: 'swarmStart'; uid: number }
+  | { type: 'swarmHit'; uid: number; bug: number; x: number; y: number; hp: number; boss: boolean; killed: boolean; auto: boolean }
+  | { type: 'swarmEscape'; uid: number; bug: number; x: number; y: number }
+  | { type: 'swarmEnd'; uid: number; defeated: number; total: number; bossDefeated: boolean; cleared: boolean; seconds: number; coins: Decimal }
   | { type: 'graduate'; diplomas: number }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
@@ -130,6 +139,36 @@ export interface PrestigeNodeView {
   maxed: boolean;
 }
 
+export interface MonitorView {
+  id: MonitorId;
+  name: string;
+  emoji: string;
+  description: string;
+  /** 0 = not hired. */
+  level: number;
+  maxLevel: number;
+  on: boolean;
+  /** Diplomas for the next level (the hire, at level 0), or null when maxed. */
+  cost: number | null;
+  affordable: boolean;
+  /** What it does at the current level; the level-1 line while not hired. */
+  line: string;
+  /** What the next level changes, or null when maxed. */
+  nextLine: string | null;
+  /** Times it acted, ever, and the last thing it dealt with (an id of the matching content list, or ''). */
+  done: number;
+  last: string;
+  /** Why it has nothing to do right now ("Contrate o Wagner"), or null when its layer exists. */
+  idle: string | null;
+}
+
+export interface MonitorsView {
+  /** Graduated at least once: the monitors can be hired. */
+  unlocked: boolean;
+  monitors: MonitorView[];
+  settings: MonitorsState['settings'];
+}
+
 export interface GraduationPreview {
   /** Feature unlocked (Angelo hired). */
   unlocked: boolean;
@@ -140,6 +179,10 @@ export interface GraduationPreview {
   /** 0..1 progress towards the next diploma. */
   progress: number;
   canGraduate: boolean;
+  /** Most diplomas this graduation can pay (see balance.graduation.cap); null = no cap. */
+  cap: number | null;
+  /** The run is worth `cap` diplomas or more: further coins count for nothing. */
+  atCap: boolean;
 }
 
 export interface AchievementView {
@@ -189,6 +232,24 @@ export interface GameActions {
   /** `honour`: the hired professor honoured for the next run (optional). */
   graduate(honour?: ProfessorId | null): boolean;
   buyPrestigeNode(id: string): boolean;
+
+  /** Hires a Monitor, or raises it one level, with diplomas. */
+  buyMonitor(id: MonitorId): boolean;
+  /** The player's switch of a hired Monitor. */
+  setMonitorOn(id: MonitorId, on: boolean): void;
+  /** Compras/Pesquisa spending limit and the Sprints preference. Values outside the offered ones are ignored. */
+  setMonitorSettings(patch: Partial<MonitorsState['settings']>): void;
+
+  /** Puts a free graduation slot on a Maestria (level 1). */
+  unlockMaestria(professor: ProfessorId): boolean;
+  /** Buys the next level of an unlocked Maestria with diplomas. */
+  buyMaestriaLevel(professor: ProfessorId): boolean;
+  /** Spends a Rollforward charge. */
+  fireRollforward(): boolean;
+  /** Starts the Super invasão when it is charged. */
+  startSwarm(): boolean;
+  /** One click on a bug (or the boss) of the swarm. */
+  hitBug(uid: number): void;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;

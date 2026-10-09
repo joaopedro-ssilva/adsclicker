@@ -2,6 +2,8 @@
  * A small, valid GameContent for tests. Cheap numbers and one professor per feature, so every
  * engine rule can be exercised without depending on the real content.
  */
+import { maestrias } from '../../content/maestrias';
+import { monitors } from '../../content/monitors';
 import { PROFESSOR_IDS } from '../../content/types';
 import type {
   AbilityDef,
@@ -328,6 +330,8 @@ export function createFixtureContent(): GameContent {
     sceneries: [scenery('sala', true), scenery('laboratorio')],
     themes: [theme('escuro', true), theme('claro')],
     mastery: neutralMastery(),
+    monitors: monitors.map((def) => ({ ...def, levels: [...def.levels] })),
+    maestrias: structuredClone(maestrias),
     balance: { ...fixtureBalance, graduation: { ...fixtureBalance.graduation } },
   };
 }

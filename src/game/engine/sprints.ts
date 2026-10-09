@@ -100,8 +100,11 @@ export function settleSprint(state: GameState, content: GameContent, now: number
     state.sprint.active = null;
     state.sprint.offers = [];
     state.sprint.nextOffersAt = now + cooldown;
-    state.counters.sprintsFailed += 1;
-    state.run.sprintsFailed += 1;
+    // A sprint the monitor took on its own can only help: running out is not held against the player.
+    if (!active.auto) {
+      state.counters.sprintsFailed += 1;
+      state.run.sprintsFailed += 1;
+    }
     emit({ type: 'sprintFailed', def: def.id });
   }
 }

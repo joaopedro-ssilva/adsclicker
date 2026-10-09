@@ -3,11 +3,12 @@
  * through `emit`. Time comes in as `now` (epoch ms) and randomness as `rng`; nothing here reads
  * a clock. Every action ends with afterAction(): settle the sprint and scan achievements.
  */
-import type { GameContent, ProfessorId } from '../content/types';
+import type { GameContent, MonitorId, ProfessorId } from '../content/types';
 import type { Emit } from '../store/types';
 import { activateAbility as activateAbilityRaw } from './buffs';
 import { getIndex } from './contentIndex';
 import { afterAction } from './lifecycle';
+import { buyMonitor as buyMonitorRaw } from './monitors';
 import { buyPrestigeNode as buyPrestigeNodeRaw, graduate as graduateRaw } from './prestige';
 import { buyLevelled } from './purchases';
 import { hitInvasion as hitInvasionRaw } from './invasions';
@@ -74,6 +75,16 @@ export function buyPrestigeNode(state: GameState, content: GameContent, id: stri
   if (bought) afterAction(state, content, now, emit);
   return bought;
 }
+
+export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
+  const bought = buyMonitorRaw(state, content, id, emit);
+  if (bought) afterAction(state, content, now, emit);
+  return bought;
+}
+
+export { setMonitorOn, setMonitorSettings } from './monitors';
+
+export { buyMaestriaLevel, fireRollforward, hitBug, startSwarm, unlockMaestria } from './maestria/actions';
 
 export { buyCafe, cafeCost } from './cafe';
 

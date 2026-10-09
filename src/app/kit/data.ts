@@ -75,6 +75,8 @@ export const soundLabels: Record<SoundName, string> = {
   sprintFailed: 'Sprint falhou',
   graduate: 'Formatura',
   uiTap: 'Toque',
+  golden: 'Clique de ouro',
+  rollforward: 'Rollforward',
 };
 
 export const iconLabels: Record<IconName, string> = {

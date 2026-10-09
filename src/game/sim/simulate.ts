@@ -28,9 +28,12 @@ import {
   takeSprint,
   trackLevels,
 } from './strategy';
+import { clickSwarm, holdsPointer, spendMaestrias, fireChargedMaestrias } from './maestrias';
 import type { Env, InvasionDecisions, PurchaseRecord, StrategyOptions } from './strategy';
 
 export interface SimOptions extends Partial<StrategyOptions> {
+  /** Play the Maestrias: slots on Edécio, Gladimir and Wagner, charges used as soon as they are ready. Default true. */
+  maestrias?: boolean;
   /** Simulated play time limit, in seconds. Default 6 hours. */
   maxSeconds?: number;
   /** Engine step, in ms. Default 500. */
@@ -159,6 +162,7 @@ const DEFAULTS = {
   seed: 1,
   stopWhenDone: true,
   sampleSeconds: 300,
+  maestrias: true,
 } as const;
 
 /** Arbitrary but non-zero epoch for the simulated clock. */
@@ -343,8 +347,12 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
     env.now = now;
     advance(state, content, now, rng, emit);
 
-    clickCarry += (opts.clicksPerSecond * opts.stepMs) / 1000;
-    for (; clickCarry >= 1; clickCarry -= 1) click(state, content, now, rng, emit);
+    // Joinha de Ouro level 5: a player who is clicking holds the pointer instead. While a swarm is on, clicks go to the bugs.
+    const perSecond = opts.maestrias && holdsPointer(env, opts.clicksPerSecond) ? Math.max(opts.clicksPerSecond, content.maestrias.joinha.holdPerSecond) : opts.clicksPerSecond;
+    clickCarry += (perSecond * opts.stepMs) / 1000;
+    for (; clickCarry >= 1; clickCarry -= 1) {
+      if (!(opts.maestrias && clickSwarm(env))) click(state, content, now, rng, emit);
+    }
 
     handleInvasion(env, strategy, decisions);
 
@@ -352,6 +360,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       nextDecision = now + opts.decisionMs;
       trackLevels(env, opts.decisionMs / 1000);
       activateReadyAbilities(env);
+      if (opts.maestrias) fireChargedMaestrias(env);
       takeSprint(env, strategy);
       serveSprint(env);
       hireIfAffordable(env);
@@ -363,6 +372,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       const runCoins = state.runCoins;
       const outcome = graduateIfWorth(env, strategy);
       if (outcome) {
+        if (opts.maestrias) spendMaestrias(env);
         run.endedAt = (now - START) / 1000;
         run.diplomas = outcome.diplomas;
         run.diplomasTotal = state.diplomasEarned;

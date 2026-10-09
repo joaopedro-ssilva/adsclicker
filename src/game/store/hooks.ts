@@ -14,6 +14,7 @@ import {
   disciplineViews,
   graduationPreview,
   hasFeature,
+  monitorsView,
   prestigeNodeViews,
   professorViews,
   researchViews,
@@ -28,6 +29,7 @@ import type {
   GameEventType,
   GraduationPreview,
   LevelledView,
+  MonitorsView,
   PrestigeNodeView,
   ProfessorView,
   ResearchView,
@@ -70,7 +72,8 @@ export const useResearchViews = (): ResearchView[] => useGameView(researchViews)
 export const useProfessorViews = (): ProfessorView[] => useGameView(professorViews);
 export const useAbilityViews = (): AbilityView[] => useGameView(abilityViews);
 export const usePrestigeNodeViews = (): PrestigeNodeView[] => useGameView(prestigeNodeViews);
-export const useGraduationPreview = (): GraduationPreview => useGameView(graduationPreview);
+export const useMonitorsView = (): MonitorsView => useGameView(monitorsView);
+export const useGraduationPreview =(): GraduationPreview => useGameView(graduationPreview);
 export const useAchievementViews = (): AchievementView[] => useGameView(achievementViews);
 
 /** True when a hired professor brings the feature (the layer is unlocked). */

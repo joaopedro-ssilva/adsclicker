@@ -5,6 +5,8 @@ import { expireBuffs } from './buffs';
 import { decayCombo } from './combo';
 import { clickValueWith, coinsPerSecondWith, gain } from './economy';
 import { updateInvasions } from './invasions';
+import { updateMaestrias } from './maestria';
+import { runMonitors } from './monitors';
 import { countSession, touchCalendar } from './session';
 import { offerSprints, settleSprint } from './sprints';
 import type { GameState } from './state';
@@ -69,6 +71,8 @@ export function advance(state: GameState, content: GameContent, now: number, rng
 
   updateInvasions(state, content, now, rng, emit);
   offerSprints(state, content, now, rng, emit);
+  updateMaestrias(state, content, now, rng, emit);
+  runMonitors(state, content, now, rng, emit);
   state.lastTickAt = now;
   touchCalendar(state, now);
   invalidateStats(state);

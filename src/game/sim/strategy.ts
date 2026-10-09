@@ -590,7 +590,11 @@ export function graduateIfWorth(env: Env, opts: StrategyOptions): GraduationOutc
   if (!opts.graduate || state.counters.graduations >= opts.graduateUntil) return null;
   if (!hasFeature(state, content, 'graduation')) return null;
   const preview = graduationPreview(state, content);
-  const wanted = Math.max(opts.graduateMinDiplomas, Math.ceil(opts.graduateGainRatio * state.diplomasEarned), 1);
+  // At the run's cap the coins stop counting, so a sensible player does not wait for more.
+  const wanted = Math.min(
+    Math.max(opts.graduateMinDiplomas, Math.ceil(opts.graduateGainRatio * state.diplomasEarned), 1),
+    preview.cap ?? Infinity,
+  );
   if (!preview.canGraduate || preview.diplomas < wanted) return null;
   if (!engine.graduate(state, content, env.now, env.emit)) return null;
   const bought: string[] = [];
