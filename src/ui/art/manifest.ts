@@ -145,7 +145,7 @@ export const ASSETS: Record<string, SpriteMeta> = {
   "skins/b2-darkmode": { w: 33, h: 48, anchor: { x: 17, y: 2 } },
   "skins/b2-default": { w: 35, h: 47, anchor: { x: 17, y: 1 } },
   "skins/b2-obra": { w: 28, h: 47, anchor: { x: 14, y: 2 } },
-  "skins/b2-paleta": { w: 36, h: 54, anchor: { x: 17, y: 8 } },
+  "skins/b2-paleta": { w: 36, h: 54, anchor: { x: 17, y: 12 } },
   "skins/b2-pixel": { w: 28, h: 47, anchor: { x: 13, y: 2 } },
   "skins/b2-postit": { w: 41, h: 48, anchor: { x: 21, y: 3 } },
   "skins/b2-wireframe": { w: 39, h: 48, anchor: { x: 19, y: 2 } },

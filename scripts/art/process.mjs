@@ -31,6 +31,8 @@ function liftSkin(img, { g, b }) {
   }
 }
 
+/** Bodies with bare shoulders or a low neckline: the head sits this many rows lower, or it floats over a strip of skin. */
+const BODY_NECK_DROP = { 'b2-paleta': 4 };
 /** Heads whose hood or collar should hang over the neck: rows the head is lowered onto the body. */
 const HEAD_DROP = { 'gladimir-mestre': 4, 'pablo-galactico': 3 };
 /** Rows from the neck anchor to the feet that every professor body ends up with. */
@@ -732,6 +734,7 @@ async function processSheet(sheet, anchors) {
         anchor = skinAnchor(sprite);
         console.log(`    ${key}: neck to feet ${below} -> ${sprite.h - (anchor.top ?? anchor.y)}px`);
       }
+      anchor.y += BODY_NECK_DROP[key] ?? 0;
     } else if (sheet.kind === 'head') {
       const professor = key.split('-')[0];
       if (!sheet.folder && HEAD_SKIN_LIFT[professor]) liftSkin(sprite, HEAD_SKIN_LIFT[professor]);
