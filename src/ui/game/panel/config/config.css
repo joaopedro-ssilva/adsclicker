@@ -223,6 +223,50 @@
   font-size: 16px;
 }
 
+.about-link {
+  color: var(--accent-text);
+  font-weight: 800;
+}
+
+/* The request for a star: a whole clickable row, so it is easy to hit on a phone. */
+.about-star {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  color: var(--text);
+  text-decoration: none;
+  background: var(--surface);
+  border: 2px solid var(--accent);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.about-star:hover {
+  filter: brightness(1.15);
+}
+
+.about-star:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow-color);
+}
+
+.about-star svg {
+  flex-shrink: 0;
+  color: var(--warn);
+}
+
+.about-star span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.about-star small {
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
 @container panel (max-width: 440px) {
   .setting-row .setting-text:has(+ input[type='range']) {
     flex: 0 0 34%;
