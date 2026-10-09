@@ -34,6 +34,10 @@ import type { Env, InvasionDecisions, PurchaseRecord, StrategyOptions } from './
 export interface SimOptions extends Partial<StrategyOptions> {
   /** Play the Maestrias: slots on Edécio, Gladimir and Wagner, charges used as soon as they are ready. Default true. */
   maestrias?: boolean;
+  /** Hire Monitores with the diplomas left after the tree and the Maestrias (cheapest level first). Default true. */
+  monitors?: boolean;
+  /** The Monitor de Segurança: 'auto' buys it like the others, 'off' never does, 'max' starts the game with it at its top level. */
+  guard?: 'auto' | 'off' | 'max';
   /** Which professors get the Maestria slots, in order. Default: all eight (see DEFAULT_PICKS). */
   maestriaPicks?: ProfessorId[];
   /** Simulated play time limit, in seconds. Default 6 hours. */
@@ -51,6 +55,8 @@ export interface SimOptions extends Partial<StrategyOptions> {
   away?: { playSeconds: number; awaySeconds: number };
   /** Stops the simulation as soon as this returns true (checked every engine step). */
   until?: (state: GameState) => boolean;
+  /** Called after every engine step with the state and the simulated seconds (for measurements that need the whole timeline). */
+  onStep?: (state: GameState, seconds: number) => void;
   /** Continues from this state (kept and mutated) instead of a new game. Its clock must come from a simulation. */
   from?: GameState;
   /** Runs once on the fresh state, to start a scenario from somewhere else (tests and experiments). */
@@ -145,7 +151,7 @@ export interface SimResult {
   awaySeconds: number;
   /** Simulated seconds played. */
   seconds: number;
-  options: Required<Omit<SimOptions, keyof StrategyOptions | 'away' | 'setup' | 'until' | 'from'>> & StrategyOptions & Pick<SimOptions, 'away'>;
+  options: Required<Omit<SimOptions, keyof StrategyOptions | 'away' | 'setup' | 'until' | 'from' | 'onStep'>> & StrategyOptions & Pick<SimOptions, 'away'>;
   finalState: GameState;
 }
 
@@ -158,6 +164,7 @@ const DEFAULTS = {
   graduateUntil: Infinity,
   saveWindowSeconds: 300,
   patienceSeconds: 60,
+  honour: 'auto',
   maxSeconds: 6 * 3600,
   stepMs: 500,
   decisionMs: 1000,
@@ -165,6 +172,8 @@ const DEFAULTS = {
   stopWhenDone: true,
   sampleSeconds: 300,
   maestrias: true,
+  monitors: true,
+  guard: 'auto',
   maestriaPicks: DEFAULT_PICKS,
 } as const;
 
@@ -211,11 +220,15 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
     graduateUntil: opts.graduateUntil,
     saveWindowSeconds: opts.saveWindowSeconds,
     patienceSeconds: opts.patienceSeconds,
+    honour: opts.honour,
   };
 
   const rng = createRng(opts.seed);
   const state = opts.from ?? createInitialState(content, START);
-  if (!opts.from) opts.setup?.(state);
+  if (!opts.from) {
+    if (opts.guard === 'max') state.monitors.units.seguranca = { ...state.monitors.units.seguranca, level: content.monitors.find((m) => m.id === 'seguranca')?.levels.length ?? 0, on: true };
+    opts.setup?.(state);
+  }
 
   const tally = emptyTally();
   const sprints: Record<string, SprintStats> = {};
@@ -375,7 +388,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       const runCoins = state.runCoins;
       const outcome = graduateIfWorth(env, strategy);
       if (outcome) {
-        if (opts.maestrias) spendMaestrias(env, opts.maestriaPicks);
+        if (opts.maestrias) spendMaestrias(env, opts.maestriaPicks, opts.monitors, opts.guard === 'off' ? ['seguranca'] : []);
         run.endedAt = (now - START) / 1000;
         run.diplomas = outcome.diplomas;
         run.diplomasTotal = state.diplomasEarned;
@@ -407,6 +420,7 @@ export function simulate(content: GameContent, options: SimOptions = {}): SimRes
       nextSample = now + opts.sampleSeconds * 1000;
     }
     if (opts.stopWhenDone && reached.size === MILESTONES.length) break;
+    opts.onStep?.(state, (now - START) / 1000);
     if (opts.until?.(state)) break;
   }
   sample();

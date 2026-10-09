@@ -1,4 +1,5 @@
-import type { ProfessorId } from '../content/types';
+import { MONITOR_IDS } from '../content/types';
+import type { MonitorId, ProfessorId } from '../content/types';
 import * as engine from '../engine/actions';
 import { freeSlots, maestriaLevel, maestriaNextCost } from '../engine/maestria';
 import { bolsaView, festaView, joinhaView, swarmView } from '../engine/views';
@@ -7,20 +8,31 @@ import type { Env } from './strategy';
 /** The order a player is likely to pick them: the three of the first wave, then the second wave. */
 export const DEFAULT_PICKS: ProfessorId[] = ['edecio', 'gladimir', 'wagner', 'b2', 'guto', 'b1', 'angelo', 'pablo'];
 
-/** After a graduation: puts each new slot on the next built Maestria, then spends leftover diplomas on the cheapest level. */
-export function spendMaestrias(env: Env, picks: ProfessorId[] = DEFAULT_PICKS): void {
+/** After a graduation: puts each new slot on the next built Maestria, then spends leftover diplomas on the cheapest Maestria or Monitor level. */
+export function spendMaestrias(env: Env, picks: ProfessorId[] = DEFAULT_PICKS, monitors = true, skip: MonitorId[] = []): void {
   const { state, content } = env;
   for (const id of picks) {
     if (freeSlots(state) <= 0) break;
     if (maestriaLevel(state, id) === 0) engine.unlockMaestria(state, content, id, env.now, env.emit);
   }
   for (let guard = 0; guard < 40; guard += 1) {
-    let best: { id: ProfessorId; cost: number } | null = null;
+    let best: { id: ProfessorId | MonitorId; cost: number; monitor: boolean } | null = null;
     for (const id of picks) {
       const cost = maestriaNextCost(state, content, id);
-      if (cost !== null && state.diplomas >= cost && (!best || cost < best.cost)) best = { id, cost };
+      if (cost !== null && state.diplomas >= cost && (!best || cost < best.cost)) best = { id, cost, monitor: false };
     }
-    if (!best || !engine.buyMaestriaLevel(state, content, best.id, env.now, env.emit)) return;
+    if (monitors && state.counters.graduations > 0) {
+      for (const id of MONITOR_IDS) {
+        if (skip.includes(id)) continue;
+        const cost = content.monitors.find((def) => def.id === id)?.levels[state.monitors.units[id].level]?.cost;
+        if (cost !== undefined && state.diplomas >= cost && (!best || cost < best.cost)) best = { id, cost, monitor: true };
+      }
+    }
+    if (!best) return;
+    const bought = best.monitor
+      ? engine.buyMonitor(state, content, best.id as MonitorId, env.now, env.emit)
+      : engine.buyMaestriaLevel(state, content, best.id as ProfessorId, env.now, env.emit);
+    if (!bought) return;
   }
 }
 

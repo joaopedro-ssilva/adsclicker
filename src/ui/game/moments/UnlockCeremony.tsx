@@ -14,7 +14,7 @@ interface UnlockCeremonyProps {
   onClose: () => void;
 }
 
-const RARITY_COLOR = { common: '#a7acba', rare: '#79b7ff', epic: '#c69bff', legendary: '#f7ca75' } as const;
+const RARITY_COLOR = { common: '#a7acba', rare: '#79b7ff', epic: '#c69bff', legendary: '#f7ca75', mythic: '#ff6fb1' } as const;
 
 /**
  * Epic and legendary unlocks take the screen. Epic is a centred card with sparkles; legendary is the whole screen
@@ -23,7 +23,7 @@ const RARITY_COLOR = { common: '#a7acba', rare: '#79b7ff', epic: '#c69bff', lege
 export function UnlockCeremony({ moment, onClose }: UnlockCeremonyProps) {
   const subject = unlockSubject(moment);
   const narrow = useMediaQuery('(max-width: 640px)');
-  const legendary = moment.rarity === 'legendary';
+  const legendary = moment.rarity === 'legendary' || moment.rarity === 'mythic';
   const color = RARITY_COLOR[moment.rarity];
 
   useEffect(() => {

@@ -217,7 +217,8 @@
   padding: var(--space-4);
 }
 
-.unlock-big[data-rarity='legendary'] .unlock-stage {
+.unlock-big[data-rarity='legendary'] .unlock-stage,
+.unlock-big[data-rarity='mythic'] .unlock-stage {
   animation-duration: 1000ms;
   filter: drop-shadow(0 0 28px color-mix(in srgb, var(--scene) 70%, transparent));
 }

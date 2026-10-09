@@ -560,7 +560,7 @@ export interface AchievementDef {
   };
 }
 
-export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
+export type Rarity = 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
 
 /**
  * A skin is a body sprite; the head is a separate layer that belongs to the professor.
@@ -603,6 +603,8 @@ export interface SceneryDef {
   asset: string;
   /** Moving particles drawn over the image. */
   ambient: Ambient;
+  /** The art has no floor: the professor hovers on stage instead of standing (no contact shadow). */
+  floats?: boolean;
   /** Fallback gradient (top, bottom) and floor colour when the image is missing. */
   palette: {
     sky: string;

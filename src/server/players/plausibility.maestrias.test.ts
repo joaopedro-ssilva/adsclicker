@@ -3,6 +3,7 @@ import { content } from '@/game/content';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { coinsPerSecond } from '@/game/engine';
 import { bolsaMaxSeconds, horasMaxDiplomas } from '@/game/engine/maestria';
+import { maxAngeloCapFactor } from '@/game/engine/prestige';
 import type { GameState } from '@/game/engine/state';
 import { simulate } from '@/game/sim/simulate';
 import type { SimOptions } from '@/game/sim/simulate';
@@ -104,10 +105,33 @@ describe('judgeSave: Maestrias', () => {
     const cap = content.balance.graduation.cap;
     if (!cap) throw new Error('no cap');
     next.counters.graduations = previous.counters.graduations + 1;
-    const allowed = cap.base * cap.growth ** previous.counters.graduations + horasMaxDiplomas(content, 5);
+    const allowed = cap.base * cap.growth ** previous.counters.graduations * maxAngeloCapFactor(content, false) + horasMaxDiplomas(content, 5);
     next.diplomasEarned = previous.diplomasEarned + Math.ceil(allowed) + 10;
     next.lifetimeCoins = previous.lifetimeCoins.mul(1e60);
     expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
+  });
+
+  it("Angelo's honour stretches the cap the server allows, but only once he has been honoured", () => {
+    const { previous, next, elapsedMs } = last();
+    const cap = content.balance.graduation.cap;
+    if (!cap) throw new Error('no cap');
+    const base = cap.base * cap.growth ** previous.counters.graduations;
+    const horas = horasMaxDiplomas(content, 5);
+    const stretched = Math.floor(base * maxAngeloCapFactor(content, true)) + horas;
+    const plain = Math.ceil(base * maxAngeloCapFactor(content, false)) + horas;
+    expect(stretched).toBeGreaterThan(plain + 2);
+    const attempt = (honoured: boolean, diplomas: number) => {
+      const copy = roundTrip(next);
+      copy.counters.graduations = previous.counters.graduations + 1;
+      copy.diplomasEarned = previous.diplomasEarned + diplomas;
+      copy.honouredBefore = { ...copy.honouredBefore, angelo: honoured };
+      const verdict = judgeSave({ previous: { ...previous, honouredBefore: { ...previous.honouredBefore, angelo: honoured } }, next: copy, elapsedMs });
+      return verdict.ok ? '' : verdict.reason;
+    };
+    const between = plain + 2; // above the plain ceiling, below the honoured one
+    expect(attempt(false, between)).toContain('cap allows');
+    expect(attempt(true, between)).not.toContain('cap allows');
+    expect(attempt(true, stretched + 5)).toContain('cap allows');
   });
 
   it('more clicks than the engine accepts (the click limit)', () => {

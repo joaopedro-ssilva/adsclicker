@@ -68,10 +68,10 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     units: ['percent'],
     honour: {
       name: 'Alerta máximo',
-      description: 'As invasões aparecem duas vezes mais seguido e pagam 50% a mais durante a turma.',
+      description: 'As invasões aparecem duas vezes mais seguido e pagam 25% a mais durante a turma.',
       flat: [
         { stat: 'eventInterval', op: 'mult', value: 0.5 },
-        { stat: 'eventReward', op: 'mult', value: 1.5 },
+        { stat: 'eventReward', op: 'mult', value: 1.25 },
       ],
     },
   },
@@ -84,9 +84,9 @@ export const mastery: Record<ProfessorId, MasteryDef> = {
     line: 'Buffs duram {v} a mais e as habilidades recarregam {w} mais rápido',
     units: ['percent', 'percent'],
     honour: {
-      name: 'Recarga pela metade',
-      description: 'As habilidades recarregam na metade do tempo durante a turma.',
-      flat: [{ stat: 'abilityCooldown', op: 'mult', value: 0.5 }],
+      name: 'Recarga reduzida',
+      description: 'As habilidades recarregam em 60% do tempo durante a turma.',
+      flat: [{ stat: 'abilityCooldown', op: 'mult', value: 0.6 }],
     },
   },
   b1: {

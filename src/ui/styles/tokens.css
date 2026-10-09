@@ -19,6 +19,7 @@
   --rare: #79b7ff;
   --epic: #c69bff;
   --legendary: #f7ca75;
+  --mythic: #ff6fb1;
 
   /* Status */
   --good: #78d9a5;
@@ -71,6 +72,7 @@ body {
   --rare: #1f62c4;
   --epic: #7b3fc4;
   --legendary: #96600a;
+  --mythic: #b0185c;
   --good: #16794a;
   --warn: #8a5a00;
   --bad: #c0282d;

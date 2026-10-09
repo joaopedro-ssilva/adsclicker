@@ -6,7 +6,7 @@ const skins = new Map(content.skins.map((entry) => [entry.id, entry]));
 const sceneries = new Map(content.sceneries.map((entry) => [entry.id, entry]));
 const themes = new Map(content.themes.map((entry) => [entry.id, entry]));
 
-export const RARITY_LABEL = { common: 'Comum', rare: 'Raro', epic: 'Épico', legendary: 'Lendário' } as const;
+export const RARITY_LABEL = { common: 'Comum', rare: 'Raro', epic: 'Épico', legendary: 'Lendário', mythic: 'Mítico' } as const;
 
 export type UnlockSubject =
   | { item: 'skin'; def: SkinDef }

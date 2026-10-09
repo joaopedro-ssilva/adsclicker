@@ -1,4 +1,4 @@
-import type { BuffDef, Effect, GameContent, Reward, SprintDef } from '../content/types';
+import type { BuffDef, Effect, GameContent, ProfessorId, Reward, SprintDef } from '../content/types';
 import { Decimal, ZERO, parseDecimal } from '../engine/decimal';
 import * as engine from '../engine/actions';
 import { getIndex } from '../engine/contentIndex';
@@ -35,6 +35,22 @@ export interface StrategyOptions {
   saveWindowSeconds: number;
   /** A purchase is worth waiting for when its price is within this many seconds of income. */
   patienceSeconds: number;
+  /** Professor honoured at each graduation: a fixed one (when hired), 'auto' for the best hired one by HONOUR_PRIORITY, 'rotate' for the best one not honoured yet (the Volta Olímpica achievement), 'none' for nobody. */
+  honour?: ProfessorId | 'auto' | 'rotate' | 'none';
+}
+
+/**
+ * The order 'auto' picks the honoured professor in, first hired one wins. Measured with `npm run sim -- --honour <id>`
+ * (see GAME_DESIGN, pacing): the strongest honours first.
+ */
+export const HONOUR_PRIORITY: ProfessorId[] = ['pablo', 'b2', 'guto', 'edecio', 'b1', 'wagner', 'angelo', 'gladimir'];
+
+function pickHonour(state: GameState, choice: NonNullable<StrategyOptions['honour']>): ProfessorId | null {
+  if (choice === 'none') return null;
+  if (choice !== 'auto' && choice !== 'rotate') return state.hired[choice] ? choice : null;
+  const hired = HONOUR_PRIORITY.filter((id) => state.hired[id]);
+  if (choice === 'rotate') return hired.find((id) => !state.honouredBefore[id]) ?? hired[0] ?? null;
+  return hired[0] ?? null;
 }
 
 /** What a purchase or a tree node was, for the audit tables. */
@@ -596,7 +612,7 @@ export function graduateIfWorth(env: Env, opts: StrategyOptions): GraduationOutc
     preview.cap ?? Infinity,
   );
   if (!preview.canGraduate || preview.diplomas < wanted) return null;
-  if (!engine.graduate(state, content, env.now, env.emit)) return null;
+  if (!engine.graduate(state, content, env.now, env.emit, pickHonour(state, opts.honour ?? 'auto'))) return null;
   const bought: string[] = [];
   const options = spendDiplomas(env, opts, (id) => bought.push(id));
   return { diplomas: preview.diplomas, options, bought };

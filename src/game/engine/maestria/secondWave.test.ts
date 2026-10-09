@@ -161,13 +161,13 @@ describe('Releases (B1)', () => {
     expect(releaseVersions(g.state, content)).toBe(0);
     g.state.run.sprintsCompleted = 12;
     expect(releaseVersions(g.state, content)).toBe(2);
-    expect(releaseMultiplier(g.state, content)).toBeCloseTo(1.06);
+    expect(releaseMultiplier(g.state, content)).toBeCloseTo(1 + 2 * (content.maestrias.releases.bonus[0] ?? 0));
     g.state.run.sprintsCompleted = 10_000;
     expect(releaseVersions(g.state, content)).toBe(content.maestrias.releases.maxVersions);
     g.state.maestria.levels = { b1: 5 };
     expect(releaseVersions(g.state, content)).toBe(content.maestrias.releases.maxVersions);
-    expect(releaseMultiplier(g.state, content)).toBeCloseTo(1 + 10 * 0.05);
-    expect(computeStats(g.state, content).globalPower).toBeGreaterThan(1.49);
+    expect(releaseMultiplier(g.state, content)).toBeCloseTo(1 + 10 * (content.maestrias.releases.bonus[4] ?? 0));
+    expect(computeStats(g.state, content).globalPower).toBeGreaterThan(1.34);
   });
 
   it('starts again with the next run', () => {

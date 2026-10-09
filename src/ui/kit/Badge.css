@@ -66,3 +66,7 @@
 [data-rarity='legendary'] {
   --rarity: var(--legendary);
 }
+
+[data-rarity='mythic'] {
+  --rarity: var(--mythic);
+}

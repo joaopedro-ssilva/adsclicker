@@ -84,6 +84,47 @@
     inset 0 0 0 2px color-mix(in srgb, var(--rarity) 40%, transparent);
 }
 
+/* Mythic: a double pixel frame with pixel studs on the top corners and a slow pulse (still, but framed, with reduced motion). */
+.skin-card[data-rarity='mythic'] {
+  position: relative;
+  border-color: var(--rarity);
+  box-shadow:
+    3px 3px 0 var(--shadow-color),
+    inset 0 0 0 2px var(--surface-raised),
+    inset 0 0 0 4px var(--rarity);
+  animation: mythic-frame 3.2s steps(4) infinite;
+}
+
+.skin-card[data-rarity='mythic'] .skin-card-stage {
+  background: radial-gradient(ellipse at 50% 70%, color-mix(in srgb, var(--rarity) 38%, var(--bg)), var(--bg) 80%);
+  border-color: var(--rarity);
+}
+
+.skin-card[data-rarity='mythic']::before,
+.skin-card[data-rarity='mythic']::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  background: var(--rarity);
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
+.skin-card[data-rarity='mythic']::before {
+  left: -4px;
+}
+
+.skin-card[data-rarity='mythic']::after {
+  right: -4px;
+}
+
+@keyframes mythic-frame {
+  50% {
+    border-color: color-mix(in srgb, var(--rarity) 55%, #fff);
+  }
+}
+
 .skin-card[data-equipped='true'] {
   border-color: var(--accent);
   background: var(--accent-soft);

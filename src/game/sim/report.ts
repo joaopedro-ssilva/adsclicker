@@ -53,7 +53,7 @@ export function runTable(result: SimResult): string[] {
     `${pad('Corrida', 9)}${pad('Duração', 12)}${pad('Total', 12)}${pad('Angelo em', 12)}${pad('Pablo em', 12)}${pad('Diplomas', 10)}${pad('Acumulado', 11)}${pad('ADScoins', 10)}${pad('Prod/Clq/Auto/Inv/Spr', 24)}Opções`,
     '-'.repeat(124),
   ];
-  const shown: RunRecord[] = result.runs.slice(0, 14);
+  const shown: RunRecord[] = result.runs.slice(0, 25);
   for (const run of shown) {
     const length = run.endedAt === null ? null : run.endedAt - run.startedAt;
     lines.push(

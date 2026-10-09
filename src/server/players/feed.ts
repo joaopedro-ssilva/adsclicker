@@ -41,7 +41,7 @@ export function diffFeed(previous: GameState | null, next: GameState, content: G
   for (const id in next.skins) {
     if (!next.skins[id] || previous.skins[id]) continue;
     const rarity = skins.get(id)?.rarity;
-    if (rarity === 'epic' || rarity === 'legendary') drafts.push({ kind: 'skin', detail: id });
+    if (rarity === 'epic' || rarity === 'legendary' || rarity === 'mythic') drafts.push({ kind: 'skin', detail: id });
   }
 
   return drafts.slice(0, MAX_EVENTS_PER_SYNC);

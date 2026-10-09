@@ -27,7 +27,7 @@ export interface HackathonMoment {
 }
 
 /** Ceremonies that take the screen and wait for the player. */
-export type BlockingMoment = HireMoment | GraduateMoment | HackathonMoment | (UnlockMoment & { rarity: 'epic' | 'legendary' });
+export type BlockingMoment = HireMoment | GraduateMoment | HackathonMoment | (UnlockMoment & { rarity: 'epic' | 'legendary' | 'mythic' });
 
 type NewBlocking = Omit<HireMoment, 'id'> | Omit<GraduateMoment, 'id'> | Omit<HackathonMoment, 'id'>;
 
@@ -53,7 +53,7 @@ export const useMoments = create<MomentsStore>((set) => ({
   pushUnlock: (moment) =>
     set((state) => {
       const entry: UnlockMoment = { ...moment, id: ++sequence, kind: 'unlock' };
-      if (entry.rarity === 'epic' || entry.rarity === 'legendary') {
+      if (entry.rarity === 'epic' || entry.rarity === 'legendary' || entry.rarity === 'mythic') {
         return { queue: [...state.queue, entry as BlockingMoment] };
       }
       return { cards: [...state.cards, entry].slice(-MAX_CARDS) };

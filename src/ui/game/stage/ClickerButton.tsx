@@ -10,6 +10,8 @@ import { registerAnchor } from '../wiring/stageRefs';
 interface ClickerButtonProps {
   /** Integer zoom of the sprite. */
   scale: number;
+  /** The scenery has no floor: the professor hovers and casts no shadow. */
+  floating?: boolean;
 }
 
 /**
@@ -17,7 +19,7 @@ interface ClickerButtonProps {
  * the release), Space and Enter count too, and a click by assistive technology aims at the head.
  * Everything beyond the squash (numbers, coins, sound) comes from the click event in the wiring.
  */
-export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButtonProps) {
+export const ClickerButton = memo(function ClickerButton({ scale, floating = false }: ClickerButtonProps) {
   const professorId = useGameState((state) => state.activeProfessor);
   const skinId = useGameState((state) => state.equippedSkin[state.activeProfessor]);
   const click = useGame((store) => store.click);
@@ -69,6 +71,7 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
       className="clicker"
       data-qa="clicker"
       data-golden={golden}
+      data-floating={floating}
       aria-label={`Clicar em ${professor.name} para ganhar ADScoins`}
       onPointerDown={onPointerDown}
       onKeyDown={onKeyDown}
@@ -84,7 +87,7 @@ export const ClickerButton = memo(function ClickerButton({ scale }: ClickerButto
       onContextMenu={(event) => event.preventDefault()}
       onDragStart={(event) => event.preventDefault()}
     >
-      <Character {...characterSprite(professorId, skinId)} scale={scale} bump={bump} label={professor.name} />
+      <Character {...characterSprite(professorId, skinId)} scale={scale} bump={bump} shadow={!floating} label={professor.name} />
     </button>
   );
 });

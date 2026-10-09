@@ -110,7 +110,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Cabo de Rede Solto',
     emoji: '🔌',
     description: 'Metade dos problemas de rede é um plugue mal encaixado. Gera ADScoins por segundo.',
-    baseCost: '5.8e9',
+    baseCost: '7.25e9',
     baseProduction: '2.1e7',
   },
   {
@@ -120,7 +120,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Firewall de Papelão',
     emoji: '🧱',
     description: 'Protege até chegar a primeira chuva de pacotes. Gera ADScoins por segundo.',
-    baseCost: '5.2e10',
+    baseCost: '6.5e10',
     baseProduction: '1.7e8',
   },
   {
@@ -130,7 +130,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Pentest Amistoso',
     emoji: '🕵️',
     description: 'Invadir o próprio sistema, com autorização e sorriso. Gera ADScoins por segundo.',
-    baseCost: '4.7e11',
+    baseCost: '5.88e11',
     baseProduction: '1.3e9',
   },
 
@@ -142,7 +142,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Deploy na Sexta',
     emoji: '🚀',
     description: 'O que pode dar errado? (o fim de semana inteiro). Gera ADScoins por segundo.',
-    baseCost: '4.2e12',
+    baseCost: '6.3e12',
     baseProduction: '1e10',
   },
   {
@@ -152,7 +152,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Contêiner Sem Medo',
     emoji: '📦',
     description: 'Na minha máquina funcionava. Agora funciona na de todo mundo. Gera ADScoins por segundo.',
-    baseCost: '3.8e13',
+    baseCost: '5.7e13',
     baseProduction: '7.9e10',
   },
   {
@@ -162,7 +162,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Nuvem Multirregião',
     emoji: '🌍',
     description: 'Seu servidor em três continentes e a conta em todos eles. Gera ADScoins por segundo.',
-    baseCost: '3.4e14',
+    baseCost: '5.1e14',
     baseProduction: '6.2e11',
   },
 
@@ -174,7 +174,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Padding ou Margin?',
     emoji: '📏',
     description: 'A dúvida eterna do espaçamento. Gera ADScoins por segundo.',
-    baseCost: '3.1e15',
+    baseCost: '4.96e15',
     baseProduction: '4.8e12',
   },
   {
@@ -184,7 +184,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Pixel Fora do Lugar',
     emoji: '🔍',
     description: 'Só ela vê, e depois de ver ninguém consegue mais ignorar. Gera ADScoins por segundo.',
-    baseCost: '2.8e16',
+    baseCost: '4.48e16',
     baseProduction: '3.8e13',
   },
   {
@@ -194,7 +194,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Backlog Infinito',
     emoji: '📋',
     description: 'Cada card entregue gera dois novos. Gera ADScoins por segundo.',
-    baseCost: '2.5e17',
+    baseCost: '4e17',
     baseProduction: '2.9e14',
   },
 
@@ -206,7 +206,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Ata de Reunião',
     emoji: '📜',
     description: 'Tudo o que foi decidido, e o que ficou para a próxima. Gera ADScoins por segundo.',
-    baseCost: '2.3e18',
+    baseCost: '4.14e18',
     baseProduction: '2.3e15',
   },
   {
@@ -216,7 +216,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Herança Múltipla',
     emoji: '🧬',
     description: 'Uma classe filha com tantos pais que ninguém sabe de quem é o método. Gera ADScoins por segundo.',
-    baseCost: '2e19',
+    baseCost: '3.6e19',
     baseProduction: '1.8e16',
   },
   {
@@ -226,7 +226,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Polimorfismo',
     emoji: '🎭',
     description: 'Mesmo método, vários comportamentos, uma só coordenação. Gera ADScoins por segundo.',
-    baseCost: '1.8e20',
+    baseCost: '3.24e20',
     baseProduction: '1.4e17',
   },
 
@@ -238,7 +238,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Lista Encadeada',
     emoji: '🔗',
     description: 'Cada elo sabe quem vem depois, e isso basta. Gera ADScoins por segundo.',
-    baseCost: '1.6e21',
+    baseCost: '3.04e21',
     baseProduction: '1.1e18',
   },
   {
@@ -248,7 +248,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Pilha e Fila',
     emoji: '🥞',
     description: 'Quem chega por último sai primeiro, mas só na pilha. Gera ADScoins por segundo.',
-    baseCost: '1.5e22',
+    baseCost: '2.85e22',
     baseProduction: '8.5e18',
   },
   {
@@ -258,7 +258,7 @@ export const disciplines: DisciplineDef[] = [
     name: 'Grafo e Caminho Mínimo',
     emoji: '🕸️',
     description: 'O menor caminho entre dois pontos. O Dijkstra agradece. Gera ADScoins por segundo.',
-    baseCost: '1.3e23',
+    baseCost: '2.47e23',
     baseProduction: '6.6e19',
   },
 ];

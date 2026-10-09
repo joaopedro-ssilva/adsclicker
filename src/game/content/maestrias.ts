@@ -5,10 +5,11 @@ import type { BolsaAssetDef, BuffDef, MaestriaDef, MaestriasConfig, ProfessorId 
  * Maestrias: one special mechanic per professor. Every graduation gives one slot, the player picks
  * the professor who gets it (level 1), and four more levels are bought with diplomas.
  *
- * Costs are the same for all eight, 1,300 diplomas for levels 2 to 5: the eight maxed come
- * to 10,400 on top of the tree's 1,890, so diplomas keep a purpose once the tree is done.
+ * Costs are the same for all eight, 1,950 diplomas for levels 2 to 5: the eight maxed come
+ * to 15,600 on top of the tree's 1,890, so diplomas keep a purpose well past the twentieth Formatura
+ * (the speed-up of every purchase is what shortens the runs, so the sink has to last).
  */
-const LEVEL_COSTS = [50, 150, 350, 750];
+const LEVEL_COSTS = [75, 225, 525, 1125];
 
 const def = (professor: ProfessorId, name: string, summary: string, built: boolean): MaestriaDef => ({
   professor,
@@ -74,9 +75,9 @@ const defs: Record<ProfessorId, MaestriaDef> = {
 // ---------------------------------------------------------------------------
 
 const FESTA_SECONDS = [40, 45, 50, 55, 60];
-const FESTA_POWER = [1.25, 1.35, 1.5, 1.65, 1.8];
-const FESTA_COOLDOWN = [0.5, 0.4, 0.33, 0.25, 0.2];
-const FESTA_INVASIONS = [0.5, 0.4, 0.33, 0.25, 0.2];
+const FESTA_POWER = [1.1, 1.15, 1.2, 1.25, 1.3];
+const FESTA_COOLDOWN = [0.6, 0.5, 0.45, 0.4, 0.35];
+const FESTA_INVASIONS = [0.6, 0.5, 0.45, 0.4, 0.35];
 
 const festaBuffs: BuffDef[] = FESTA_SECONDS.map((seconds, index) => ({
   id: `${FESTA_BUFF_PREFIX}${index + 1}`,
@@ -163,14 +164,14 @@ export const maestrias: MaestriasConfig = {
   defs,
   joinha: {
     clicksNeeded: [100, 90, 80, 70, 60],
-    seconds: [6, 9, 12, 16, 20],
+    seconds: [1, 1, 2, 2, 3],
     critFromLevel: 3,
     holdFromLevel: 5,
     holdPerSecond: 10,
   },
   rollforward: {
     clicksToFill: 300,
-    jumpSeconds: [15, 25, 35, 50, 70],
+    jumpSeconds: [2, 4, 5, 7, 10],
     maxCharges: [1, 1, 2, 2, 3],
   },
   swarm: {
@@ -190,8 +191,8 @@ export const maestrias: MaestriasConfig = {
       { id: 'bug-de-merge', name: 'Bug de merge', sprite: 'hackathon/enemies/bug-de-merge', hp: 5, weight: 1 },
     ],
     boss: { id: 'deploy-de-sexta', name: 'Deploy de sexta', sprite: 'hackathon/enemies/deploy-de-sexta', hp: 24 },
-    bugSeconds: 12,
-    bossSeconds: 120,
+    bugSeconds: 4,
+    bossSeconds: 30,
     clearBonus: 1.5,
     rewardMult: [1, 1.25, 1.5, 1.8, 2.2],
     firewallEveryMs: [0, 3_000, 2_000, 1_300, 800],
@@ -202,7 +203,7 @@ export const maestrias: MaestriasConfig = {
     maxRolls: 10,
   },
   festa: {
-    rechargeMinutes: [40, 36, 32, 28, 25],
+    rechargeMinutes: [60, 55, 50, 45, 40],
     seconds: FESTA_SECONDS,
     power: FESTA_POWER,
     cooldown: FESTA_COOLDOWN,
@@ -211,7 +212,7 @@ export const maestrias: MaestriasConfig = {
   },
   releases: {
     sprintsPerVersion: [5, 5, 4, 4, 3],
-    bonus: [0.03, 0.035, 0.04, 0.045, 0.05],
+    bonus: [0.015, 0.02, 0.025, 0.03, 0.035],
     maxVersions: 10,
   },
   horas: {

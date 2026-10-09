@@ -1,10 +1,11 @@
 import { PROFESSOR_IDS } from '../content/types';
-import type { GameContent, PrestigeNodeDef, ProfessorId } from '../content/types';
+import type { Effect, GameContent, PrestigeNodeDef, ProfessorId } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
+import { masteryRank } from './mastery';
 import { recordGraduationDay } from './session';
 import type { GameState } from './state';
 import { computeStats, hasFeature } from './stats';
@@ -20,12 +21,46 @@ export function diplomasFor(runCoins: Decimal, content: GameContent, stats: Stat
   return Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, value));
 }
 
-/** Most diplomas the next graduation can pay: base x growth ^ graduations done. Null when the content sets no cap. */
+/** The diploma gain Angelo's Domínio (at `rank`) and his honour (when `honoured`) give, as a multiplier. */
+function angeloGain(content: GameContent, rank: number, honoured: boolean): number {
+  const def = content.mastery.angelo;
+  let add = 0;
+  let mult = 1;
+  const apply = (effects: readonly Effect[], levels: number) => {
+    for (const effect of effects) {
+      if (effect.stat !== 'diplomaGain') continue;
+      if (effect.op === 'add') add += effect.value * levels;
+      else mult *= effect.value ** levels;
+    }
+  };
+  apply(def.perRank, rank);
+  if (honoured) {
+    apply(def.honour.flat ?? [], 1);
+    apply(def.honour.perRank ?? [], rank);
+  }
+  return (1 + add) * mult;
+}
+
+/**
+ * How much Angelo stretches this run's diploma cap: the same proportion his Domínio and his honour add to the
+ * diplomas (the tree and the research are not his, and still stop at the cap). 1 while he is not hired.
+ */
+export function angeloCapFactor(state: GameState, content: GameContent): number {
+  if (!state.hired.angelo) return 1;
+  return angeloGain(content, masteryRank(state, content, 'angelo'), state.honoured === 'angelo');
+}
+
+/** The most Angelo can ever stretch the cap (Domínio maxed, plus the honour when he has been honoured): the server's ceiling. */
+export function maxAngeloCapFactor(content: GameContent, honoured: boolean): number {
+  return angeloGain(content, content.balance.mastery.cap, honoured);
+}
+
+/** Most diplomas the next graduation can pay: base x growth ^ graduations done, stretched by Angelo. Null when the content sets no cap. */
 export function diplomaCap(state: GameState, content: GameContent): number | null {
   const cap = content.balance.graduation.cap;
   if (!cap) return null;
-  const value = cap.base * cap.growth ** state.counters.graduations;
-  return Number.isFinite(value) ? Math.floor(value) : Number.MAX_SAFE_INTEGER;
+  const value = cap.base * cap.growth ** state.counters.graduations * angeloCapFactor(state, content);
+  return Number.isFinite(value) ? Math.floor(value + 1e-9) : Number.MAX_SAFE_INTEGER;
 }
 
 /** Diplomas the current run pays if the player graduates now: diplomasFor, held at the cap. */

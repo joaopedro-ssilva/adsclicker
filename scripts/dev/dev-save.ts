@@ -56,7 +56,7 @@ Object.assign(state.counters, {
   bestEventStreak: 120,
   biggestPurchase: 500,
   bestDayStreak: 7,
-  abilitiesUsed: 120,
+  abilitiesUsed: 1_200,
   sprintsCompleted: 150,
   levelsBought: 6_000,
   researchBought: content.research.length,

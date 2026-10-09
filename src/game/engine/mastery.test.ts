@@ -122,7 +122,7 @@ describe('honoured professor', () => {
   function readyToGraduate() {
     const g = game();
     for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
-    g.state.runCoins = new Decimal('8e19'); // sqrt(4) = 2 diplomas
+    g.state.runCoins = new Decimal('3.2e21'); // sqrt(4) = 2 diplomas
     g.state.lifetimeCoins = g.state.runCoins;
     return g;
   }
@@ -134,7 +134,7 @@ describe('honoured professor', () => {
     expect(g.state.honouredBefore).toEqual({ wagner: true });
     expect(g.state.hired.wagner).toBe(false); // the run restarted
     for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
-    g.state.runCoins = new Decimal('8e19');
+    g.state.runCoins = new Decimal('3.2e21');
     expect(graduate(g.state, content, T0, g.emit)).toBe(true);
     expect(g.state.honoured).toBeNull(); // the pick is optional and does not carry over
     expect(g.state.honouredBefore).toEqual({ wagner: true });
@@ -157,12 +157,12 @@ describe('honoured professor', () => {
       expect(pick(computeStats(g.state, content)) / pick(plain), id).toBeCloseTo(expected, 6);
     };
     check('wagner', (s) => s.eventInterval, 0.5);
-    check('guto', (s) => s.abilityCooldown, 0.5);
+    check('guto', (s) => s.abilityCooldown, 0.6);
     check('b1', (s) => s.sprintReward, 2);
     check('angelo', (s) => s.diplomaGain, 1.25);
     g.state.honoured = 'gladimir';
     expect(computeStats(g.state, content).offlineRate).toBe(1);
-    check('wagner', (s) => s.eventReward, 1.5);
+    check('wagner', (s) => s.eventReward, 1.25);
     check('gladimir', (s) => s.offlineHours - plain.offlineHours + 1, 5);
     check('edecio', (s) => s.comboMax, 2);
   });
@@ -197,7 +197,7 @@ describe('honoured professor', () => {
     for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
     g.state.honoured = 'angelo';
     g.state.counters.graduations = 3; // the cap of the first graduations (10, 13, 16) would hold the 12.5 back
-    g.state.runCoins = new Decimal('2e21'); // sqrt(100) = 10 -> 12.5
+    g.state.runCoins = new Decimal('8e22'); // sqrt(100) = 10 -> 12.5
     g.state.lifetimeCoins = g.state.runCoins;
     graduate(g.state, content, T0, g.emit);
     expect(g.state.diplomas).toBe(12);
@@ -267,7 +267,7 @@ describe('run, session and calendar', () => {
     expect(g.state.counters.biggestPurchase).toBe(1);
 
     for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
-    g.state.runCoins = new Decimal('2e19');
+    g.state.runCoins = new Decimal('8e20');
     graduate(g.state, content, T0 + 300, g.emit);
     expect(g.state.run.clicks).toBe(0);
     expect(g.state.run.levelsBought).toBe(0);
@@ -357,7 +357,7 @@ describe('new achievement conditions (real content)', () => {
     expect(unlocked(g)).not.toContain('mastery-gladimir');
     setLevels(g.state, 'gladimir', 1000);
     expect(unlocked(g)).toContain('mastery-gladimir');
-    expect(g.state.skins['gladimir-guardiao']).toBe(true);
+    expect(g.state.skins['gladimir-arquivista']).toBe(true);
 
     for (const id of PROFESSOR_IDS) setLevels(g.state, id, 249);
     expect(unlocked(g)).not.toContain('mastery-all-10');
@@ -440,7 +440,7 @@ describe('new achievement conditions (real content)', () => {
       const g = game();
       for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
       prepare(g);
-      g.state.runCoins = new Decimal('2e19');
+      g.state.runCoins = new Decimal('8e20');
       g.state.lifetimeCoins = g.state.runCoins;
       graduate(g.state, content, now, g.emit);
       return g;
@@ -474,9 +474,9 @@ describe('new achievement conditions (real content)', () => {
     });
 
     it('Só no Clique: 70% of the coins from clicks', () => {
-      const clicky = graduated((g) => (g.state.run.clickCoins = new Decimal('1.4e19')));
+      const clicky = graduated((g) => (g.state.run.clickCoins = new Decimal('5.6e20')));
       expect(clicky.state.achievements['grad-click-share']).toBeDefined();
-      const idle = graduated((g) => (g.state.run.clickCoins = new Decimal('1.3e19')));
+      const idle = graduated((g) => (g.state.run.clickCoins = new Decimal('5.2e20')));
       expect(idle.state.achievements['grad-click-share']).toBeUndefined();
     });
 
@@ -501,7 +501,7 @@ describe('new achievement conditions (real content)', () => {
       const g = game();
       for (let i = 0; i < 6; i += 1) {
         for (const id of PROFESSOR_IDS) g.state.hired[id] = true;
-        g.state.runCoins = new Decimal('2e19');
+        g.state.runCoins = new Decimal('8e20');
         g.state.lifetimeCoins = g.state.runCoins;
         expect(g.state.achievements['grad-day-6']).toBeUndefined();
         graduate(g.state, content, T0 + i * 60_000, g.emit);
@@ -512,7 +512,7 @@ describe('new achievement conditions (real content)', () => {
       const h = game();
       for (let i = 0; i < 6; i += 1) {
         for (const id of PROFESSOR_IDS) h.state.hired[id] = true;
-        h.state.runCoins = new Decimal('2e19');
+        h.state.runCoins = new Decimal('8e20');
         h.state.lifetimeCoins = h.state.runCoins;
         graduate(h.state, content, T0 + i * DAY, h.emit);
       }

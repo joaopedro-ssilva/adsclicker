@@ -28,14 +28,17 @@ const EXPECTED_SKIN_IDS = [
   'edecio-formando',
   'edecio-samurai',
   'edecio-lenda',
+  'edecio-primordial',
   'gladimir-default',
   'gladimir-dba',
   'gladimir-pescador',
   'gladimir-maker',
   'gladimir-bibliotecario',
   'gladimir-piloto',
-  'gladimir-mestre',
+  'gladimir-drone',
   'gladimir-guardiao',
+  'gladimir-mestre',
+  'gladimir-arquivista',
   'b2-default',
   'b2-postit',
   'b2-obra',
@@ -43,13 +46,16 @@ const EXPECTED_SKIN_IDS = [
   'b2-darkmode',
   'b2-pixel',
   'b2-paleta',
+  'b2-prisma',
   'wagner-default',
   'wagner-hacker',
   'wagner-agente',
   'wagner-detetive',
+  'wagner-ferias',
   'wagner-firewall',
-  'wagner-cripto',
   'wagner-cavaleiro',
+  'wagner-cripto',
+  'wagner-sentinela',
   'guto-default',
   'guto-churrasqueiro',
   'guto-pagodeiro',
@@ -57,6 +63,7 @@ const EXPECTED_SKIN_IDS = [
   'guto-paladino',
   'guto-capitao',
   'guto-astronauta',
+  'guto-tempestade',
   'b1-default',
   'b1-po',
   'b1-flexbox',
@@ -64,21 +71,24 @@ const EXPECTED_SKIN_IDS = [
   'b1-lancamento',
   'b1-arquiteta',
   'b1-rainha',
+  'b1-imperatriz',
   'angelo-default',
   'angelo-terno',
   'angelo-maestro',
   'angelo-padel',
   'angelo-paraninfo',
   'angelo-capitao',
-  'angelo-rei',
   'angelo-reitor',
+  'angelo-rei',
+  'angelo-chanceler',
   'pablo-default',
   'pablo-cientista',
   'pablo-enxadrista',
-  'pablo-garagem',
   'pablo-mago',
+  'pablo-garagem',
   'pablo-galactico',
   'pablo-oraculo',
+  'pablo-singularidade',
 ];
 
 const EXPECTED_SKIN_RARITY: Record<string, string> = {
@@ -96,6 +106,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'edecio-formando': 'epic',
   'edecio-samurai': 'legendary',
   'edecio-lenda': 'legendary',
+  'edecio-primordial': 'mythic',
   'gladimir-default': 'common',
   'gladimir-dba': 'common',
   'gladimir-pescador': 'common',
@@ -103,7 +114,9 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'gladimir-bibliotecario': 'rare',
   'gladimir-piloto': 'epic',
   'gladimir-mestre': 'legendary',
-  'gladimir-guardiao': 'legendary',
+  'gladimir-drone': 'epic',
+  'gladimir-guardiao': 'epic',
+  'gladimir-arquivista': 'mythic',
   'b2-default': 'common',
   'b2-postit': 'common',
   'b2-obra': 'common',
@@ -111,13 +124,16 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'b2-darkmode': 'epic',
   'b2-pixel': 'epic',
   'b2-paleta': 'legendary',
+  'b2-prisma': 'mythic',
   'wagner-default': 'common',
   'wagner-hacker': 'common',
   'wagner-agente': 'rare',
   'wagner-detetive': 'rare',
   'wagner-firewall': 'epic',
   'wagner-cripto': 'legendary',
-  'wagner-cavaleiro': 'legendary',
+  'wagner-ferias': 'rare',
+  'wagner-cavaleiro': 'epic',
+  'wagner-sentinela': 'mythic',
   'guto-default': 'common',
   'guto-churrasqueiro': 'common',
   'guto-pagodeiro': 'rare',
@@ -125,6 +141,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'guto-paladino': 'epic',
   'guto-capitao': 'epic',
   'guto-astronauta': 'legendary',
+  'guto-tempestade': 'mythic',
   'b1-default': 'common',
   'b1-po': 'common',
   'b1-flexbox': 'rare',
@@ -132,6 +149,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'b1-lancamento': 'epic',
   'b1-arquiteta': 'epic',
   'b1-rainha': 'legendary',
+  'b1-imperatriz': 'mythic',
   'angelo-default': 'common',
   'angelo-terno': 'common',
   'angelo-maestro': 'rare',
@@ -139,14 +157,16 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'angelo-paraninfo': 'epic',
   'angelo-capitao': 'epic',
   'angelo-rei': 'legendary',
-  'angelo-reitor': 'legendary',
+  'angelo-reitor': 'epic',
+  'angelo-chanceler': 'mythic',
   'pablo-default': 'common',
   'pablo-cientista': 'common',
   'pablo-enxadrista': 'rare',
-  'pablo-garagem': 'rare',
+  'pablo-garagem': 'legendary',
   'pablo-mago': 'epic',
   'pablo-galactico': 'legendary',
   'pablo-oraculo': 'legendary',
+  'pablo-singularidade': 'mythic',
 };
 
 const SKINS_WITH_HEADGEAR = [
@@ -156,16 +176,25 @@ const SKINS_WITH_HEADGEAR = [
   'edecio-gladiador',
   'edecio-formando',
   'edecio-samurai',
+  'edecio-primordial',
   'gladimir-pescador',
   'gladimir-maker',
   'gladimir-piloto',
   'gladimir-mestre',
   'gladimir-guardiao',
+  'gladimir-arquivista',
+  'b2-prisma',
   'b2-obra',
   'wagner-agente',
   'wagner-detetive',
   'wagner-cripto',
   'wagner-cavaleiro',
+  'wagner-ferias',
+  'wagner-sentinela',
+  'guto-tempestade',
+  'b1-imperatriz',
+  'angelo-chanceler',
+  'pablo-singularidade',
   'guto-pagodeiro',
   'guto-capitao',
   'guto-astronauta',
@@ -204,6 +233,13 @@ const EXPECTED_SCENERY_IDS = [
   'estudio',
   'espaco',
   'trofeus',
+  'jardim',
+  'grafica',
+  'por-do-sol',
+  'neve',
+  'castelo',
+  'masmorra',
+  'galaxia',
 ];
 
 const EXPECTED_AMBIENT: Record<string, string> = {
@@ -231,6 +267,13 @@ const EXPECTED_AMBIENT: Record<string, string> = {
   estudio: 'none',
   espaco: 'stars',
   trofeus: 'confetti',
+  jardim: 'leaves',
+  grafica: 'dust',
+  'por-do-sol': 'leaves',
+  neve: 'dust',
+  castelo: 'leaves',
+  masmorra: 'dust',
+  galaxia: 'stars',
 };
 
 const ORIGINAL_UPGRADE_NAMES = [
@@ -625,12 +668,12 @@ describe('content: professors, disciplines and numbers', () => {
     expect(balance.events).toEqual({ minIntervalMs: 75_000, maxIntervalMs: 150_000 });
     expect(balance.sprints).toEqual({ offers: 3, cooldownMs: 150_000 });
     expect(balance.rewardClickFloor).toBe(50);
-    expect(balance.graduation).toEqual({ base: '2e19', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.3 } });
+    expect(balance.graduation).toEqual({ base: '8e20', exponent: 0.5, bonusPerDiploma: 0.01, maxBonus: 1, cap: { base: 10, growth: 1.15 } });
   });
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 65 skins of the design, with their rarities', () => {
+  it('has exactly the 75 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -657,7 +700,7 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has exactly the 24 sceneries of the design with one default', () => {
+  it('has exactly the 31 sceneries of the design with one default, and only the Galáxia floats', () => {
     expect(sceneryIds).toEqual(EXPECTED_SCENERY_IDS);
     expect(content.sceneries.filter((scenery) => scenery.default === true).map((scenery) => scenery.id)).toEqual([
       'sala-de-aula',
@@ -665,6 +708,7 @@ describe('content: skins, sceneries and themes', () => {
     for (const scenery of content.sceneries) {
       expect(scenery.asset).toBe(`sceneries/${scenery.id}`);
       expect(scenery.ambient, `${scenery.id} ambient`).toBe(EXPECTED_AMBIENT[scenery.id]);
+      expect(scenery.floats === true, `${scenery.id} floats`).toBe(scenery.id === 'galaxia');
       for (const colour of Object.values(scenery.palette)) expect(colour).toMatch(/^#[0-9a-f]{6}$/i);
       expect(scenery.artPrompt).toContain('16:9');
       expect(scenery.artPrompt).toContain('lower third');
@@ -672,8 +716,8 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has the 5 HUD themes with one default and legible contrast', () => {
-    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel']);
+  it('has the 8 HUD themes with one default and legible contrast', () => {
+    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro']);
     expect(content.themes.filter((theme) => theme.default === true).map((theme) => theme.id)).toEqual(['escuro']);
     const luminance = (hex: string): number => {
       const channels = [1, 3, 5].map((start) => {
@@ -701,9 +745,9 @@ describe('content: skins, sceneries and themes', () => {
 });
 
 describe('content: achievements', () => {
-  it('has about 115 achievements spread over the families of the design', () => {
-    expect(content.achievements.length).toBeGreaterThanOrEqual(110);
-    expect(content.achievements.length).toBeLessThanOrEqual(120);
+  it('has about 130 achievements spread over the families of the design', () => {
+    expect(content.achievements.length).toBeGreaterThanOrEqual(125);
+    expect(content.achievements.length).toBeLessThanOrEqual(135);
     const count = (family: string) => content.achievements.filter((a) => a.family === family).length;
     expect(count('click')).toBeGreaterThanOrEqual(10);
     expect(count('production')).toBeGreaterThanOrEqual(12);
@@ -712,12 +756,12 @@ describe('content: achievements', () => {
     expect(count('sprints')).toBeGreaterThanOrEqual(5);
     expect(count('graduation')).toBeGreaterThanOrEqual(6);
     expect(count('collection')).toBeGreaterThanOrEqual(5);
-    expect(count('secret')).toBe(6);
+    expect(count('secret')).toBe(12);
   });
 
   it('covers every secret trigger of the design and hides only the secret family', () => {
     const triggers = content.achievements.flatMap((a) => (a.condition.kind === 'secret' ? [a.condition.trigger] : []));
-    for (const trigger of ['logo-clicks', 'night-owl', 'swap-spree', 'idle-watcher']) {
+    for (const trigger of ['logo-clicks', 'night-owl', 'swap-spree', 'idle-watcher', 'friday-deploy', 'error-404', 'wallpaper', 'fitting-room', 'lettuce-hands', 'hands-off']) {
       expect(triggers).toContain(trigger);
     }
     for (const achievement of content.achievements) {
@@ -746,6 +790,8 @@ describe('content: achievements', () => {
       content.achievements.filter((a) => a.reward?.skin && EXPECTED_SKIN_RARITY[a.reward.skin] === rarity);
     // Legendary skins come from the level 100 ladder or from a long-haul challenge; never from hiring or early counters.
     for (const achievement of byRarity('legendary')) expect(achievement.id).not.toMatch(/^hire-|^click-(100|500|1k|5k)$/);
+    for (const achievement of byRarity('mythic')) expect(achievement.id).not.toMatch(/^hire-|^lvl|^research-/);
+    expect(byRarity('mythic')).toHaveLength(8);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });
@@ -799,7 +845,7 @@ describe('content: heritage and tone', () => {
 });
 
 describe('content: Domínio, milestones and the new skins', () => {
-  const RARITY_ORDER = ['common', 'rare', 'epic', 'legendary'];
+  const RARITY_ORDER = ['common', 'rare', 'epic', 'legendary', 'mythic'];
 
   it('keeps each professor skin list ordered by rarity', () => {
     for (const id of PROFESSOR_IDS) {

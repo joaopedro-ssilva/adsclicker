@@ -31,6 +31,9 @@ export function AlbumTab() {
   const owned = useGame((store) => store.state.skins);
   const ownedSkins = content.skins.filter((skin) => owned[skin.id]).length;
 
+  const mythics = content.skins.filter((skin) => skin.rarity === 'mythic');
+  const ownedMythics = mythics.filter((skin) => owned[skin.id]).length;
+
   const items = SECTIONS.filter((item) => item.value !== 'temas' || hudThemes);
 
   return (
@@ -55,7 +58,7 @@ export function AlbumTab() {
 
       {section === 'skins' ? (
         <p className="panel-hint album-count">
-          {ownedSkins}/{content.skins.length} skins na coleção. Desbloqueie as outras com conquistas.
+          {ownedSkins}/{content.skins.length} skins na coleção. Desbloqueie as outras com conquistas. Míticas: {ownedMythics}/{mythics.length}.
         </p>
       ) : null}
 

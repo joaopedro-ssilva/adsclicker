@@ -7,7 +7,7 @@ import { createInitialState } from '../init';
 import { createRng } from '../rng';
 import { deserializeState, serializeState } from '../save';
 import { advance } from '../tick';
-import { diplomaCap } from '../prestige';
+import { angeloCapFactor, diplomaCap, maxAngeloCapFactor } from '../prestige';
 import { buyMaestriaLevel, fireRollforward, freeSlots, hitSwarmBug, startSwarm, unlockMaestria, updateSwarm } from './index';
 
 const T0 = 1_700_000_000_000;
@@ -36,7 +36,7 @@ describe('slots and levels', () => {
     expect(freeSlots(g.state)).toBe(1);
 
     expect(buyMaestriaLevel(g.state, content, 'edecio', g.emit)).toBe(false);
-    g.state.diplomas = 50;
+    g.state.diplomas = content.maestrias.defs.edecio.levelCosts[0] ?? 0;
     expect(buyMaestriaLevel(g.state, content, 'edecio', g.emit)).toBe(true);
     expect(g.state.maestria.levels.edecio).toBe(2);
     expect(g.state.diplomas).toBe(0);
@@ -210,8 +210,48 @@ describe('diploma cap', () => {
     expect(g.state.diplomas).toBe(10);
     g.state.hired.angelo = true;
     g.state.runCoins = new Decimal('2e30');
-    expect(diplomaCap(g.state, content)).toBe(13);
+    expect(diplomaCap(g.state, content)).toBe(11);
     graduate(g.state, content, T0, g.emit);
-    expect(g.state.diplomas).toBe(23);
+    expect(g.state.diplomas).toBe(21);
+  });
+
+  it("stretches by the same proportion as Angelo's Domínio and his honour add to the diplomas", () => {
+    const g = game();
+    g.state.hired.angelo = true;
+    expect(angeloCapFactor(g.state, content)).toBe(1);
+    // 20 ranks of Domínio: +0.5% each in diplomas, so the cap is 10% bigger
+    const angelo = content.disciplines.find((d) => d.professor === 'angelo');
+    g.state.levels[angelo?.id ?? ''] = 25 * 20;
+    const perRank = content.mastery.angelo.perRank[0]?.value ?? 0;
+    expect(angeloCapFactor(g.state, content)).toBeCloseTo(1 + perRank * 20, 9);
+    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * (1 + perRank * 20) + 1e-9));
+    // honoured: x1.25 on top
+    g.state.honoured = 'angelo';
+    const honour = content.mastery.angelo.honour.flat?.[0]?.value ?? 1;
+    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * (1 + perRank * 20) * honour + 1e-9));
+    // the cap grows with the graduations as before
+    g.state.counters.graduations = 1;
+    expect(diplomaCap(g.state, content)).toBe(Math.floor(10 * 1.15 * (1 + perRank * 20) * honour + 1e-9));
+  });
+
+  it('lets Angelo pay the stretched cap at graduation, and nobody else stretches it', () => {
+    const g = game();
+    g.state.hired.angelo = true;
+    g.state.honoured = 'angelo';
+    g.state.runCoins = new Decimal('2e30');
+    const cap = diplomaCap(g.state, content) ?? 0;
+    expect(cap).toBeGreaterThan(10); // the honour alone gives x1.25
+    expect(graduate(g.state, content, T0, g.emit)).toBe(true);
+    expect(g.state.diplomas).toBe(cap);
+    const other = game();
+    other.state.hired.angelo = true;
+    other.state.honoured = 'pablo';
+    expect(diplomaCap(other.state, content)).toBe(10);
+  });
+
+  it('has a server ceiling of Domínio maxed, with the honour only once Angelo has been honoured', () => {
+    const perRank = content.mastery.angelo.perRank[0]?.value ?? 0;
+    expect(maxAngeloCapFactor(content, false)).toBeCloseTo(1 + perRank * content.balance.mastery.cap, 9);
+    expect(maxAngeloCapFactor(content, true)).toBeGreaterThan(maxAngeloCapFactor(content, false));
   });
 });

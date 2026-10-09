@@ -28,10 +28,11 @@ const ach = (
 });
 
 /**
- * 116 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
+ * 129 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
  * Every non-default cosmetic is granted by exactly one achievement, and harder ones give rarer skins:
  * common = hire / early clicks, rare = discipline level 25, epic = all research, legendary = level 100
- * or a long-haul challenge (a million clicks, a Domínio at the cap, 25 graduations...).
+ * or a long-haul challenge; mythic (one per professor) is reserved for the hardest feat of each family
+ * (a million clicks, a Domínio at the cap, 25 graduations, 50 defended invasions in a row...).
  */
 export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ click (12)
@@ -42,7 +43,7 @@ export const achievements: AchievementDef[] = [
   ach('click-10k', 'click', 'Rodando em Loop', '💻', 'Dê 10.000 cliques. O for não termina.', counter('clicks', 10000), {
     skin: 'edecio-programador',
   }),
-  ach('click-50k', 'click', 'Meio Caminho Andado', '🏃', 'Dê 50.000 cliques.', counter('clicks', 50000)),
+  ach('click-50k', 'click', 'Meio Caminho Andado', '🏃', 'Dê 50.000 cliques.', counter('clicks', 50000), { theme: 'vermelho' }),
   ach('click-100k', 'click', 'Cem Mil Joinhas', '💪', 'Dê 100.000 cliques. Braço de aço.', counter('clicks', 100000), {
     skin: 'edecio-chad',
   }),
@@ -56,8 +57,11 @@ export const achievements: AchievementDef[] = [
   ach('session-1h', 'click', 'Mateada', '🧉', 'Jogue 1 hora seguida, de uma só vez. A cuia esfria, o joinha não.', { kind: 'session', gte: 3600 }, {
     skin: 'edecio-gauchao',
   }),
-  ach('click-1m', 'click', 'Um Milhão de Joinhas', '🤝', 'Dê 1.000.000 de cliques. Os dedos pedem arrego, o joinha não.', counter('clicks', 1000000), {
+  ach('click-500k', 'click', 'Meio Milhão de Joinhas', '🌟', 'Dê 500.000 cliques. A mão já tem memória muscular própria.', counter('clicks', 500000), {
     skin: 'edecio-lenda',
+  }),
+  ach('click-1m', 'click', 'Um Milhão de Joinhas', '🤝', 'Dê 1.000.000 de cliques. Os dedos pedem arrego, o joinha não.', counter('clicks', 1000000), {
+    skin: 'edecio-primordial',
   }),
 
   // ------------------------------------------------------------------ production (15)
@@ -102,6 +106,9 @@ export const achievements: AchievementDef[] = [
   }),
   ach('abilities-active', 'production', 'Tudo no Ar', '🌩️', 'Deixe todas as habilidades ativas ao mesmo tempo. Deploy em produção, numa sexta.', { kind: 'abilitiesActive' }, {
     skin: 'guto-capitao',
+  }),
+  ach('abilities-1000', 'production', 'Dia de Tempestade', '⛈️', 'Use 1.000 habilidades no total. Cada clique no botão é um raio.', counter('abilitiesUsed', 1000), {
+    skin: 'guto-tempestade',
   }),
   ach('research-all', 'production', 'P = NP', '♾️', 'Compre todas as pesquisas do jogo em uma mesma turma. Provado por exaustão.', { kind: 'everyResearch' }, {
     skin: 'pablo-oraculo',
@@ -218,13 +225,18 @@ export const achievements: AchievementDef[] = [
     kind: 'mastery',
     professor: 'gladimir',
     rank: 40,
+  }, { skin: 'gladimir-arquivista' }),
+  ach('mastery-gladimir-25', 'professor', 'Backup Semanal', '💽', 'Leve o Domínio do Gladimir ao rank 25. Metade do caminho até o backup eterno.', {
+    kind: 'mastery',
+    professor: 'gladimir',
+    rank: 25,
   }, { skin: 'gladimir-guardiao' }),
   ach('legado-edecio', 'professor', 'Legado', '📜', 'Some 500 níveis nas aulas do Edécio. Quem começou tudo não sai de moda.', {
     kind: 'professorLevels',
     professor: 'edecio',
     gte: 500,
   }, { scenery: 'servidor-antigo' }),
-  ach('mastery-all-10', 'professor', 'Corpo Docente', '🧑‍🏫', 'Deixe os 8 professores com Domínio 10 ou mais ao mesmo tempo.', { kind: 'mastery', rank: 10 }),
+  ach('mastery-all-10', 'professor', 'Corpo Docente', '🧑‍🏫', 'Deixe os 8 professores com Domínio 10 ou mais ao mesmo tempo.', { kind: 'mastery', rank: 10 }, { scenery: 'castelo' }),
 
   // ------------------------------------------------------------------ events (7)
   ach('defend-10', 'events', 'Guarda do Campus', '⛓️', 'Defenda 10 invasões.', counter('eventsDefended', 10), { scenery: 'prisao' }),
@@ -237,14 +249,18 @@ export const achievements: AchievementDef[] = [
   ach('streak-5', 'events', 'Cinco Seguidas', '🔒', 'Defenda 5 invasões seguidas, sem deixar nenhuma escapar.', counter('bestEventStreak', 5)),
   ach('streak-10', 'events', 'Torcida Organizada', '🏟️', 'Defenda 10 invasões seguidas.', counter('bestEventStreak', 10), {
     scenery: 'arena',
-  }),
-  ach('streak-25', 'events', 'Firewall Humano', '🧱', 'Defenda 25 invasões seguidas.', counter('bestEventStreak', 25), {
     skin: 'wagner-detetive',
   }),
-  ach('streak-100', 'events', 'Zero Dia', '🏰', 'Defenda 100 invasões seguidas. Nenhuma vulnerabilidade foi explorada.', counter('bestEventStreak', 100), {
+  ach('streak-25', 'events', 'Firewall Humano', '🧱', 'Defenda 25 invasões seguidas.', counter('bestEventStreak', 25), {
     skin: 'wagner-cavaleiro',
   }),
-  ach('missed-10', 'events', 'Senha 123456 Aprovada', '🔑', 'Deixe 10 invasões escaparem. A segurança agradece a sinceridade.', counter('eventsMissed', 10)),
+  ach('streak-50', 'events', 'Sentinela', '🛰️', 'Defenda 50 invasões seguidas. Nem um pacote passou.', counter('bestEventStreak', 50), {
+    skin: 'wagner-sentinela',
+  }),
+  ach('streak-100', 'events', 'Zero Dia', '🏰', 'Defenda 100 invasões seguidas. Nenhuma vulnerabilidade foi explorada.', counter('bestEventStreak', 100)),
+  ach('missed-10', 'events', 'Senha 123456 Aprovada', '🔑', 'Deixe 10 invasões escaparem. A segurança agradece a sinceridade.', counter('eventsMissed', 10), {
+    skin: 'wagner-ferias',
+  }),
 
   // ------------------------------------------------------------------ sprints (6)
   ach('sprint-1', 'sprints', 'Primeiro Sprint', '🏁', 'Conclua 1 sprint.', counter('sprintsCompleted', 1)),
@@ -260,7 +276,7 @@ export const achievements: AchievementDef[] = [
   }),
   ach('grad-5', 'graduation', 'Cinco Turmas', '📜', 'Faça 5 Formaturas.', counter('graduations', 5), { scenery: 'quadra-de-padel' }),
   ach('grad-10', 'graduation', 'Decano', '🏅', 'Faça 10 Formaturas.', counter('graduations', 10), { skin: 'edecio-formando' }),
-  ach('grad-25', 'graduation', 'Patrono do Curso', '🏆', 'Faça 25 Formaturas.', counter('graduations', 25), { skin: 'angelo-reitor' }),
+  ach('grad-25', 'graduation', 'Patrono do Curso', '🏆', 'Faça 25 Formaturas.', counter('graduations', 25), { skin: 'angelo-chanceler' }),
   ach('grad-day-6', 'graduation', 'Set Fechado', '📅', 'Faça 6 Formaturas no mesmo dia. Ganhou o set, fecha o jogo.', { kind: 'graduationsToday', gte: 6 }, {
     skin: 'angelo-capitao',
   }),
@@ -269,43 +285,60 @@ export const achievements: AchievementDef[] = [
     metric: 'seconds',
     lte: 600,
   }, { skin: 'pablo-garagem' }),
+  ach('grad-blitz', 'graduation', 'O(0)', '🚀', 'Forme uma turma em menos de 3 minutos de jogo. Já chegou formado.', {
+    kind: 'lastRun',
+    metric: 'seconds',
+    lte: 180,
+  }, { skin: 'pablo-singularidade' }),
   ach('grad-no-mouse', 'graduation', 'Sem Mouse', '🐭', 'Forme uma turma sem clicar no professor nenhuma vez. Os cliques automáticos valem.', {
     kind: 'lastRun',
     metric: 'clicks',
     lte: 0,
-  }),
+  }, { skin: 'gladimir-drone' }),
   ach('grad-click-share', 'graduation', 'Só no Clique', '👆', 'Forme uma turma em que 70% das ADScoins vieram de cliques.', { kind: 'lastRunClickShare', gte: 0.7 }),
   ach('grad-lean', 'graduation', 'Turma Enxuta', '🎒', 'Forme uma turma com aulas compradas de no máximo 3 professores. Os outros só assinam a ata.', {
     kind: 'lastRun',
     metric: 'investedProfessors',
     lte: 3,
-  }),
+  }, { scenery: 'masmorra' }),
   ach('grad-perfect', 'graduation', 'Semestre Perfeito', '✅', 'Forme uma turma sem perder sprint nem deixar invasão escapar, com pelo menos um de cada concluído.', {
     kind: 'lastRunClean',
-  }),
-  ach('honour-all', 'graduation', 'Volta Olímpica', '🏟️', 'Homenageie cada um dos 8 professores em uma Formatura.', { kind: 'honoured', gte: 8 }),
-  ach('diplomas-100', 'graduation', 'Parede de Diplomas', '🖼️', 'Ganhe 100 diplomas no total.', { kind: 'diplomasEarned', gte: 100 }),
-  ach('diplomas-10000', 'graduation', 'Gráfica Sobrecarregada', '🖨️', 'Ganhe 10.000 diplomas no total.', { kind: 'diplomasEarned', gte: 10000 }),
-  ach('tree-5', 'graduation', 'Raízes Fundas', '🌱', 'Tenha 5 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 5 }),
+  }, { skin: 'b1-imperatriz' }),
+  ach('honour-all', 'graduation', 'Volta Olímpica', '🏟️', 'Homenageie cada um dos 8 professores em uma Formatura.', { kind: 'honoured', gte: 8 }, { scenery: 'neve' }),
+  ach('diplomas-100', 'graduation', 'Parede de Diplomas', '🖼️', 'Ganhe 100 diplomas no total.', { kind: 'diplomasEarned', gte: 100 }, { skin: 'angelo-reitor' }),
+  ach('diplomas-10000', 'graduation', 'Gráfica Sobrecarregada', '🖨️', 'Ganhe 10.000 diplomas no total.', { kind: 'diplomasEarned', gte: 10000 }, { scenery: 'grafica' }),
+  ach('tree-5', 'graduation', 'Raízes Fundas', '🌱', 'Tenha 5 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 5 }, { theme: 'floresta' }),
   ach('maestrias-all', 'graduation', 'Oito Mestres', '🎓', 'Libere a Maestria dos 8 professores. Cada um com a sua especialidade e nenhum com tempo livre.', { kind: 'maestrias', unlocked: 8 }),
-  ach('maestrias-max', 'graduation', 'Mestre dos Mestres', '🧙', 'Leve uma Maestria ao nível 5. O resto da turma que espere o próximo diploma.', { kind: 'maestrias', unlocked: 1, level: 5 }),
-  ach('tree-15', 'graduation', 'Árvore Frondosa', '🌳', 'Tenha 15 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 15 }),
+  ach('maestrias-max', 'graduation', 'Mestre dos Mestres', '🧙', 'Leve uma Maestria ao nível 5. O resto da turma que espere o próximo diploma.', { kind: 'maestrias', unlocked: 1, level: 5 }, { theme: 'ouro' }),
+  ach('tree-15', 'graduation', 'Árvore Frondosa', '🌳', 'Tenha 15 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 15 }, { scenery: 'jardim' }),
 
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 65 skins.', { kind: 'skinsOwned', gte: 65 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 75 skins.', { kind: 'skinsOwned', gte: 75 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),
-  ach('days-7', 'collection', 'Sequência de Sete', '🗓️', 'Jogue 7 dias seguidos. Frequência de 100%.', counter('bestDayStreak', 7)),
+  ach('days-7', 'collection', 'Sequência de Sete', '🗓️', 'Jogue 7 dias seguidos. Frequência de 100%.', counter('bestDayStreak', 7), { scenery: 'por-do-sol' }),
   ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha todas as skins raras.', { kind: 'rarityOwned', rarity: 'rare' }),
+  ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha todas as skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic' }, {
+    skin: 'b2-prisma',
+  }),
+  ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha todas as skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary' }, {
+    scenery: 'galaxia',
+  }),
 
   // ------------------------------------------------------------------ secret (6)
   ach('secret-logo', 'secret', 'Curioso Demais', '🔎', 'Clique 10 vezes no logo do jogo.', { kind: 'secret', trigger: 'logo-clicks' }, { theme: 'terminal' }, true),
   ach('secret-night-owl', 'secret', 'Coruja da Madrugada', '🦉', 'Jogue entre 3h e 5h da manhã.', { kind: 'secret', trigger: 'night-owl' }, { scenery: 'madrugada' }, true),
   ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, undefined, true),
-  ach('secret-idle', 'secret', 'Observador Paciente', '👀', 'Fique 1 minuto sem clicar com o jogo aberto.', { kind: 'secret', trigger: 'idle-watcher' }, undefined, true),
+  ach('secret-idle', 'secret', 'Observador Paciente', '👀', 'Fique 1 minuto sem clicar com o jogo aberto.', { kind: 'secret', trigger: 'idle-watcher' }, { theme: 'roxo' }, true),
   ach('secret-offline', 'secret', 'Bom Retorno', '🌙', 'Recolha o ganho offline 5 vezes.', counter('offlineCollections', 5), { skin: 'gladimir-pescador' }, true),
   ach('secret-dedicacao', 'secret', 'Vida Acadêmica', '⌛', 'Jogue por 10 horas no total.', counter('playSeconds', 36000), { scenery: 'biblioteca' }, true),
+  ach('secret-friday', 'secret', 'Deploy de Sexta', '🚀', 'Jogue numa sexta-feira às 17:59. Sexta ninguém faz deploy, mas todo mundo faz.', { kind: 'secret', trigger: 'friday-deploy' }, undefined, true),
+  ach('secret-404', 'secret', 'Erro 404', '🧭', 'Tenha exatamente 404 ADScoins. Saldo não encontrado.', { kind: 'secret', trigger: 'error-404' }, undefined, true),
+  ach('secret-wallpaper', 'secret', 'Papel de Parede', '🖼️', 'Fique 5 minutos com o painel lateral escondido, só admirando o cenário.', { kind: 'secret', trigger: 'wallpaper' }, undefined, true),
+  ach('secret-fitting', 'secret', 'Provador', '🪞', 'Troque de skin 10 vezes em 1 minuto. Nada serviu de primeira.', { kind: 'secret', trigger: 'fitting-room' }, undefined, true),
+  ach('secret-lettuce', 'secret', 'Mão de Alface', '🥬', 'Venda com prejuízo na Bolsa do Pablo. A planilha chorou.', { kind: 'secret', trigger: 'lettuce-hands' }, undefined, true),
+  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não derrote nenhum bug na mão. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, undefined, true),
 ];

@@ -6,6 +6,7 @@ type SceneSeed = {
   description: string;
   default?: boolean;
   ambient: Ambient;
+  floats?: boolean;
   palette: [string, string, string];
   scene: string;
 };
@@ -20,11 +21,12 @@ const make = (seed: SceneSeed): SceneryDef => ({
   ...(seed.default ? { default: true } : {}),
   asset: `sceneries/${seed.id}`,
   ambient: seed.ambient,
+  ...(seed.floats ? { floats: true } : {}),
   palette: { sky: seed.palette[0], horizon: seed.palette[1], floor: seed.palette[2] },
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 24 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 31 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const sceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
@@ -218,5 +220,62 @@ export const sceneries: SceneryDef[] = [
     ambient: 'confetti',
     palette: ['#2c1c10', '#6b4a22', '#4a2e18'],
     scene: 'trophy room with glass display cases full of golden cups, medals and framed certificates, polished wooden floor, warm golden light',
+  }),
+  make({
+    id: 'jardim',
+    name: 'Jardim do Campus',
+    description: 'Gramado, flores e cerejeiras em frente ao prédio. Árvore frondosa, sombra garantida.',
+    ambient: 'leaves',
+    palette: ['#9fd4f0', '#7fae5c', '#d8c7a0'],
+    scene: 'university campus garden with a big leafy tree, flower beds, a blooming cherry tree and a brick building, sunny day',
+  }),
+  make({
+    id: 'grafica',
+    name: 'Gráfica',
+    description: 'Prensas rodando e pilhas de papel. Cada diploma passou por aqui.',
+    ambient: 'dust',
+    palette: ['#3a3631', '#5a4e40', '#6b4a2f'],
+    scene: 'old print shop with large printing presses, stacks of paper rolls and boxes, arched windows, warm dusty light',
+  }),
+  make({
+    id: 'por-do-sol',
+    name: 'Pôr do Sol no Campus',
+    description: 'O campus ao entardecer, com céu laranja e a torre do relógio. Sete dias seguidos de boa vista.',
+    ambient: 'leaves',
+    palette: ['#f6a05a', '#e8704f', '#8a6a5a'],
+    scene: 'university campus at sunset with a clock tower, old brick buildings, trees, lamp posts and an orange pink sky',
+  }),
+  make({
+    id: 'neve',
+    name: 'Neve no Campus',
+    description: 'Prédios cobertos de neve, uma fonte congelada e flocos no ar. Volta olímpica no frio.',
+    ambient: 'dust',
+    palette: ['#9fc4ee', '#c9dcf0', '#9aa3b5'],
+    scene: 'snowy university campus with a frozen fountain, snow covered pine trees, old buildings and falling snowflakes, blue winter sky',
+  }),
+  make({
+    id: 'castelo',
+    name: 'Castelo',
+    description: 'Um castelo ao fundo, montanhas e um caminho de terra. O Corpo Docente reina.',
+    ambient: 'leaves',
+    palette: ['#8ac4f0', '#6aa05a', '#c9a96a'],
+    scene: 'fantasy landscape with a castle on a hill, green meadows, a river, mountains and a dirt path, bright day',
+  }),
+  make({
+    id: 'masmorra',
+    name: 'Masmorra',
+    description: 'Pedra, tochas e um baú no canto. Turma enxuta, tesouro idem.',
+    ambient: 'dust',
+    palette: ['#1c1f24', '#3a3d44', '#4a4a50'],
+    scene: 'stone dungeon with arched doorways, wall torches, hanging chains and a wooden treasure chest, dim warm light',
+  }),
+  make({
+    id: 'galaxia',
+    name: 'Galáxia',
+    description: 'Nebulosas, planetas e anéis. Sem chão: aqui o professor flutua.',
+    ambient: 'stars',
+    floats: true,
+    palette: ['#0a0620', '#2a1a5a', '#1a1040'],
+    scene: 'deep space with purple nebulae, a ringed planet, distant moons and a spiral galaxy (no ground at all, open space)',
   }),
 ];

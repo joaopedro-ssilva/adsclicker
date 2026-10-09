@@ -69,7 +69,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ### Conforto e temas (Bruna B2)
 - Libera compra em lote. Pesquisas dão `costMult` (descontos) e aumentam duração de buffs e janelas de evento.
-- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 5 temas: padrão escuro, claro, alto contraste, terminal verde, pastel. Liberados por conquistas.
+- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 9 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques) e Ouro (Mestre dos Mestres). Liberados por conquistas.
 
 ### Invasões (Wagner)
 - A cada 75 a 150 s (× `eventInterval`) surge uma ameaça numa posição aleatória do palco. Ela some depois de `windowMs` (× `eventWindow`). O jogador precisa clicar `clicksRequired` vezes nela.
@@ -146,7 +146,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ## 5. Conquistas
 
-~116. Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
+~129. Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
 
 | Família | Quantas | Exemplos |
 | --- | --- | --- |
@@ -157,11 +157,13 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 | `sprints` | ~6 | concluir 5 / 25 / 100 sprints |
 | `graduation` | ~15 | 1 / 5 / 10 / 25 formaturas; diplomas ganhos; nós da árvore; formaturas "de desafio" (sem clicar, em 10 min, turma enxuta, 70% das ADScoins por cliques, sem sprint falho nem invasão perdida, 6 no mesmo dia); homenagear os 8 |
 | `collection` | ~8 | ter N skins; N conquistas; 7 dias seguidos; todas as skins raras |
-| `secret` | ~8 | descritas como "???" até acontecer |
+| `secret` | 12 | descritas como "???" até acontecer |
 
-Gatilhos secretos que a UI dispara com `triggerSecret(id)`: `logo-clicks` (clicar 10× no logo), `konami` (código Konami), `night-owl` (jogar entre 3h e 5h), `swap-spree` (trocar de professor 20× em 1 minuto), `idle-watcher` (1 minuto sem clicar com o jogo aberto), `joinha` (digitar "muito legal"). Os outros secretos usam condições normais.
+Gatilhos secretos que a UI dispara com `triggerSecret(id)`: `logo-clicks` (clicar 10× no logo), `konami` (código Konami), `night-owl` (jogar entre 3h e 5h), `swap-spree` (trocar de professor 20× em 1 minuto), `idle-watcher` (1 minuto sem clicar com o jogo aberto), `joinha` (digitar "muito legal"), `friday-deploy` (jogar numa sexta às 17:59), `error-404` (saldo exato de 404 ADScoins inteiras), `wallpaper` (5 minutos com o painel lateral escondido), `fitting-room` (10 trocas de skin em 1 minuto), `lettuce-hands` (vender com prejuízo na Bolsa) e `hands-off` (disparar a Super invasão sem derrotar nenhum bug na mão). Os outros secretos usam condições normais.
 
 Conquistas novas que olham a turma inteira (Sem Mouse, O(1), Turma Enxuta, Só no Clique, Semestre Perfeito) são julgadas no instante da Formatura, sobre os números da turma que acabou (`state.run`, guardado em `lastRun`). "Turma Enxuta" conta professores com níveis comprados (o Angelo exige os 6 anteriores contratados, então "contratar poucos" seria impossível). "Só no Clique" pede 70% das ADScoins da turma vindas de cliques, manuais ou automáticos. "Sem Mouse" só é possível com cliques automáticos, que não contam como cliques. "Mateada" conta tempo de sessão apenas enquanto o jogador age (deixar a aba aberta não vale). "Set Fechado" e "Sequência de Sete" usam o dia do relógio local do jogador.
+
+Raridades de skin: comum, rara, épica, lendária e **mítica**, a mais alta. Há uma mítica por professor, sempre a recompensa da maior façanha de cada linha (Um Milhão de Joinhas, Domínio no máximo do Gladimir, todas as épicas, 50 invasões seguidas, 1.000 habilidades, Semestre Perfeito, 25 Formaturas, Formatura em menos de 3 minutos). No palco, uma skin mítica ganha brilho rosa e faíscas de pixel (desligados com "reduzir movimento"); no Álbum, moldura dupla própria.
 
 Toda skin não padrão, todo cenário não padrão e todo tema não padrão é recompensa de exatamente uma conquista.
 
@@ -171,7 +173,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (65)
+### Skins (75)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -189,6 +191,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | edecio | `edecio-gauchao` | Gauchão | rare | bombacha, lenço e cuia de chimarrão | chapéu |
 | edecio | `edecio-formando` | Formando de 1900 | epic | terno antigo e bengala | cartola |
 | edecio | `edecio-lenda` | Lenda do Joinha | legendary | traje dourado e mão gigante de joinha |  |
+| edecio | `edecio-primordial` | O Joinha Primordial | mythic | túnica celestial branca e dourada, manopla de ouro | auréola |
 | gladimir | `gladimir-default` | Xadrez de Sempre | common (padrão) | camisa xadrez, calça cáqui, crachá | |
 | gladimir | `gladimir-dba` | DBA de Plantão | common | colete, cabo de rede no ombro, caneca "SELECT *" | |
 | gladimir | `gladimir-maker` | Maker IoT | rare | jaleco com sensores e LEDs, protoboard na mão | óculos de proteção |
@@ -196,7 +199,9 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
 | gladimir | `gladimir-pescador` | Pescador de Dados | common | colete de pesca, vara e balde | chapéu de pescador |
 | gladimir | `gladimir-bibliotecario` | Bibliotecário | rare | cardigã e pilha de livros |  |
-| gladimir | `gladimir-guardiao` | Guardião do Backup | legendary | armadura e escudo em forma de disquete | elmo |
+| gladimir | `gladimir-guardiao` | Guardião do Backup | epic | armadura e escudo em forma de disquete | elmo |
+| gladimir | `gladimir-drone` | Piloto Automático | epic | camisa cinza, controle e drone |  |
+| gladimir | `gladimir-arquivista` | Arquivista Eterno | mythic | manto azul com runas de dados e tomo luminoso | capuz de luz |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |
@@ -204,13 +209,16 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | b2 | `b2-paleta` | Paleta Viva | legendary | vestido em degradê arco-íris, pincel gigante | |
 | b2 | `b2-obra` | Designer de Capacete | common | macacão e planta na mão | capacete de obra |
 | b2 | `b2-pixel` | Pixel Perfeita | epic | roupa de quadrados e régua gigante |  |
+| b2 | `b2-prisma` | Musa do Prisma | mythic | vestido de cristal que quebra a luz | tiara de prisma |
 | wagner | `wagner-default` | Preto Básico | common (padrão) | camiseta preta, calça cargo, crachá | |
 | wagner | `wagner-hacker` | Capuz Verde | common | moletom com capuz e código verde, notebook | |
 | wagner | `wagner-agente` | Agente Secreto | rare | terno preto, gravata fina, fone espiral | óculos escuros |
 | wagner | `wagner-firewall` | Firewall | epic | armadura de tijolos com chamas laranja | |
 | wagner | `wagner-cripto` | Cavaleiro da Criptografia | legendary | armadura prateada com cadeado no peito, escudo com chave | elmo |
 | wagner | `wagner-detetive` | Detetive | rare | sobretudo e lupa | chapéu |
-| wagner | `wagner-cavaleiro` | Cavaleiro do Cadeado | legendary | armadura negra, espada em forma de chave | elmo aberto |
+| wagner | `wagner-ferias` | Wagner de Férias | rare | camisa florida, boia de patinho, coco gelado | chapéu de palha e óculos escuros |
+| wagner | `wagner-cavaleiro` | Cavaleiro do Cadeado | epic | armadura negra, espada em forma de chave | elmo aberto |
+| wagner | `wagner-sentinela` | Sentinela Zero | mythic | armadura negra de contornos vermelhos, lança de energia | elmo fechado |
 | guto | `guto-default` | Camisa Florida | common (padrão) | camisa havaiana, bermuda, chinelo | |
 | guto | `guto-churrasqueiro` | Mestre do Churrasco | common | avental, espeto na mão, pano no ombro | |
 | guto | `guto-pagodeiro` | Pagodeiro | rare | camisa aberta, pandeiro na mão | chapéu panamá |
@@ -218,6 +226,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | guto | `guto-astronauta` | Astronauta da Nuvem | legendary | traje espacial branco com nuvens azuis | capacete de astronauta |
 | guto | `guto-paladino` | Paladino da Nuvem | epic | armadura de placas, capa azul, espada e escudo com nuvem |  |
 | guto | `guto-capitao` | Capitão do Deploy | epic | uniforme de capitão de navio | quepe |
+| guto | `guto-tempestade` | Senhor da Tempestade | mythic | armadura azul-noite com raios dourados, lança elétrica | elmo de relâmpago |
 | b1 | `b1-default` | Listras e Jeans | common (padrão) | camiseta listrada, jaqueta jeans | |
 | b1 | `b1-po` | Product Owner | common | blazer, quadro kanban debaixo do braço | |
 | b1 | `b1-flexbox` | Flexbox | rare | roupa com blocos coloridos alinhados | |
@@ -225,22 +234,25 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | b1 | `b1-rainha` | Rainha do CSS | legendary | vestido roxo com capa, cetro com chaves `{ }` | coroa |
 | b1 | `b1-scrum` | Scrum Master | rare | colete cheio de botões e apito |  |
 | b1 | `b1-arquiteta` | Arquiteta de Grid | epic | capa e compasso gigante |  |
+| b1 | `b1-imperatriz` | Imperatriz do Roadmap | mythic | manto imperial roxo com estrelas | coroa gigante |
 | angelo | `angelo-default` | Social e Gravata | common (padrão) | camisa social, gravata, calça social | |
 | angelo | `angelo-terno` | Terno de Reunião | common | terno completo, pasta de documentos | |
 | angelo | `angelo-maestro` | Maestro | rare | fraque, batuta na mão | |
 | angelo | `angelo-paraninfo` | Paraninfo | epic | beca preta de formatura com faixa âmbar, canudo na mão | capelo |
 | angelo | `angelo-rei` | Herança Real | legendary | manto real vermelho com arminho, cetro | coroa |
 | angelo | `angelo-capitao` | Capitão da Quadra | epic | uniforme de capitão e troféu de padel |  |
-| angelo | `angelo-reitor` | Reitor | legendary | toga com faixa dourada | capelo |
+| angelo | `angelo-reitor` | Reitor | epic | toga com faixa dourada | capelo |
+| angelo | `angelo-chanceler` | Chanceler Supremo | mythic | toga branca e dourada, selo da universidade | coroa de louros |
 | pablo | `pablo-default` | Suéter e Camisa | common (padrão) | suéter azul sobre camisa branca | |
 | pablo | `pablo-cientista` | Cientista | common | jaleco branco, prancheta com fórmulas | |
 | pablo | `pablo-enxadrista` | Enxadrista | rare | colete xadrez, peça de rei na mão | |
 | pablo | `pablo-mago` | Mago dos Algoritmos | epic | manto azul com estrelas, cajado com árvore binária | chapéu de mago |
 | pablo | `pablo-galactico` | Arquimago do Código | legendary | manto escuro com runas de prata, capuz e cajado de cristal | sim |
-| pablo | `pablo-garagem` | Hacker de Garagem | rare | moletom, placa de circuito, fone de ouvido | chapéu |
+| pablo | `pablo-garagem` | Hacker de Garagem | legendary | jaqueta ciberpunk com neon rosa e ciano, visor holográfico, fone de ouvido | visor |
 | pablo | `pablo-oraculo` | Oráculo | legendary | túnica clara e esfera de dados flutuando |  |
+| pablo | `pablo-singularidade` | A Singularidade | mythic | manto de céu estrelado com galáxias | capuz |
 
-### Cenários (24)
+### Cenários (31)
 
 | id | Nome | Ambiente | Cena |
 | --- | --- | --- | --- |
@@ -268,19 +280,34 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | `estudio` | Estúdio de Podcast | none | microfones, espuma acústica e letreiro no ar |
 | `espaco` | Estação Orbital | stars | janelão para a Terra e consoles acesos |
 | `trofeus` | Sala dos Troféus | confetti | vitrines de taças, medalhas e certificados |
+| `jardim` | Jardim do Campus | leaves | gramado, flores e cerejeira em frente ao prédio (Árvore Frondosa) |
+| `grafica` | Gráfica | dust | prensas e pilhas de papel (Gráfica Sobrecarregada) |
+| `por-do-sol` | Pôr do Sol no Campus | leaves | campus ao entardecer com torre de relógio (Sequência de Sete) |
+| `neve` | Neve no Campus | dust | prédios cobertos de neve e fonte congelada (Volta Olímpica) |
+| `castelo` | Castelo | leaves | castelo numa colina, campo e montanhas (Corpo Docente) |
+| `masmorra` | Masmorra | dust | pedra, tochas e baú (Turma Enxuta) |
+| `galaxia` | Galáxia | stars | nebulosas e planetas, **sem chão**: o professor flutua (floats), sem sombra de contato (todas as lendárias) |
 
 ## 7. Ritmo (metas do balanceamento)
 
-| Marco | Tempo de jogo ativo |
-| --- | --- |
-| Primeiro upgrade | 10 s |
-| Gladimir | 5 min |
-| Primeira skin por conquista (1.000 cliques) | 4 min |
-| 4 professores | 45 min |
-| Angelo e primeira formatura | 2 a 3 h |
-| Pablo | depois da primeira formatura |
+Primeira formatura: **4 a 5 horas para o jogador casual** (1 clique/s), cerca de 3 h para o ativo e 5,5 h para o ocioso. O começo não muda: Gladimir e a terceira professora saem nos mesmos minutos de antes. O que se esticou foi o meio e o fim da primeira turma (custos dos professores 4 a 8 em 1,25x, 1,5x, 1,6x, 1,8x e 1,9x, e a base do diploma, de 2e19 para 8e20).
 
-O simulador (`npm run sim`) joga com estratégia gulosa (compra o que tem melhor retorno) mais uma taxa fixa de cliques, e imprime quando cada marco acontece.
+| Marco | Ativo | Casual | Ocioso |
+| --- | --- | --- | --- |
+| Gladimir | 5 min | 14 min 30 s | 33 min |
+| Bruna B2 | 21 min | 31 min | 52 min |
+| Wagner (4 professores) | 48 min | 1 h 01 | 1 h 26 |
+| Guto | 1 h 18 | 1 h 38 | 2 h 10 |
+| Bruna B1 | 1 h 48 | 2 h 25 | 3 h 04 |
+| Angelo | 2 h 17 | 3 h 24 | 4 h 09 |
+| Primeira formatura | 2 h 59 | 4 h 34 | 5 h 36 |
+| Pablo | 5 h 02 | 7 h 07 | 9 h 25 |
+
+Turmas seguintes (minutos por turma, simulador padrão, semente 1, com Maestrias, Monitores e homenagem automática): a 2ª dura 135 (ativo) e 172 (casual); a 12ª, 41 e 52; a 20ª, 23 e 35; da 25ª em diante o ativo fica entre 12 e 20 min e o casual em torno de 20 a 25 min até umas 80 formaturas. A curva só cai e achata, e nenhum perfil trava em 60 horas. O limite de diplomas por turma é 10 x 1,15^formaturas; o Domínio e a homenagem do Angelo esticam o limite na mesma proporção em que aumentam os diplomas. Com fator 1,3 as turmas do meio ficavam curtas demais (a 12ª do ativo em 20 min e as de 20 em diante abaixo de 10). Passando de umas 80 formaturas (mais de 100 h) o limite cresce mais depressa do que a produção e as turmas passam de uma hora.
+
+As Maestrias e os Monitores devem encurtar as turmas tardias em 15% ou menos: Joinha, Rollforward, Super invasão, Festa de lançamento e Releases foram reduzidos para isso, e os níveis das Maestrias custam 75, 225, 525 e 1.125 diplomas.
+
+O simulador (`npm run sim`) joga com estratégia gulosa (compra o que tem melhor retorno) mais uma taxa fixa de cliques, usa as Maestrias e os Monitores e homenageia um professor a cada formatura (`--honour`). `npx tsx src/game/sim/longrun.ts` faz uma simulação longa e imprime o momento de cada conquista que dá visual, os marcos dos candidatos a skin mítica e a formatura "relâmpago".
 
 ## 8. Interface
 

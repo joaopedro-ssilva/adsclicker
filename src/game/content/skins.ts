@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 65 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 75 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -149,6 +149,15 @@ export const skins: SkinDef[] = [
       palette: ['#f5c542', '#b8860b', '#fff4c2'],
       artPrompt: 'shiny golden suit, one arm raised holding a giant golden thumbs up hand',
     },
+    {
+      id: 'edecio-primordial',
+      name: 'O Joinha Primordial',
+      rarity: 'mythic',
+      description: 'Túnica celestial branca e dourada, auréola e uma manopla de ouro. O primeiro joinha da história.',
+      headgear: true,
+      palette: ['#f6efd8', '#e8b923', '#fff8d6'],
+      artPrompt: 'flowing white and gold celestial robes with a golden sash and sun emblems, one hand in a big golden gauntlet giving a thumbs up',
+    },
   ]),
   ...make('gladimir', [
     {
@@ -204,6 +213,23 @@ export const skins: SkinDef[] = [
       artPrompt: 'orange space pilot flight suit with a white vest, utility belt, tall dark boots, no helmet',
     },
     {
+      id: 'gladimir-drone',
+      name: 'Piloto Automático',
+      rarity: 'epic',
+      description: 'Camisa cinza, controle de drone nas mãos e olhos no céu. O mouse ficou na gaveta.',
+      palette: ['#6b7280', '#3b82f6', '#e5e7eb'],
+      artPrompt: 'grey short sleeve shirt, jeans, holding a drone remote controller with a small quadcopter drone hovering by one shoulder, sneakers',
+    },
+    {
+      id: 'gladimir-guardiao',
+      name: 'Guardião do Backup',
+      rarity: 'epic',
+      description: 'Armadura e escudo em forma de disquete. Nenhum dado passa sem backup.',
+      headgear: true,
+      palette: ['#6c7a89', '#2b4c8c', '#e6e9ef'],
+      artPrompt: 'full steel armor in blue and silver, large shield shaped like a floppy disk, plumed helmet',
+    },
+    {
       id: 'gladimir-mestre',
       name: 'Mestre da Galáxia',
       rarity: 'legendary',
@@ -213,13 +239,13 @@ export const skins: SkinDef[] = [
       artPrompt: 'beige space knight robe tunic with a brown belt, glowing blue energy sword held in one hand, brown boots',
     },
     {
-      id: 'gladimir-guardiao',
-      name: 'Guardião do Backup',
-      rarity: 'legendary',
-      description: 'Armadura e escudo em forma de disquete. Nenhum dado passa sem backup.',
+      id: 'gladimir-arquivista',
+      name: 'Arquivista Eterno',
+      rarity: 'mythic',
+      description: 'Manto azul com capuz de luz e runas de dados. Guarda cada byte desde o começo dos tempos.',
       headgear: true,
-      palette: ['#6c7a89', '#2b4c8c', '#e6e9ef'],
-      artPrompt: 'full steel armor in blue and silver, large shield shaped like a floppy disk, plumed helmet',
+      palette: ['#1d4ed8', '#22d3ee', '#e0f2fe'],
+      artPrompt: 'long deep blue hooded robe with glowing cyan data runes, holding a glowing tome of data',
     },
   ]),
   ...make('b2', [
@@ -281,6 +307,15 @@ export const skins: SkinDef[] = [
       palette: ['#ec4899', '#facc15', '#38bdf8'],
       artPrompt: 'knee-length dress with a rainbow gradient from red to violet, holding a giant paintbrush, colorful shoes',
     },
+    {
+      id: 'b2-prisma',
+      name: 'Musa do Prisma',
+      rarity: 'mythic',
+      description: 'Vestido de cristal que quebra a luz em todas as cores e uma tiara de prisma. Nenhum tom ficou sem nome.',
+      headgear: true,
+      palette: ['#f5f3ff', '#ec4899', '#38bdf8'],
+      artPrompt: 'white crystal gown refracting rainbow light, prism tiara, long flowing sleeves',
+    },
   ]),
   ...make('wagner', [
     {
@@ -319,12 +354,30 @@ export const skins: SkinDef[] = [
       artPrompt: 'long trench coat with a scarf, holding a large magnifying glass, fedora hat',
     },
     {
+      id: 'wagner-ferias',
+      name: 'Wagner de Férias',
+      rarity: 'rare',
+      description: 'Camisa florida, óculos escuros, chapéu de palha e boia de patinho. A senha das férias é 123456.',
+      headgear: true,
+      palette: ['#f59e0b', '#22b8cf', '#fef3c7'],
+      artPrompt: 'colorful Hawaiian shirt, board shorts, sunglasses, straw hat, rubber duck pool float around the waist, holding a coconut drink, flip-flops',
+    },
+    {
       id: 'wagner-firewall',
       name: 'Firewall',
       rarity: 'epic',
       description: 'Armadura de tijolos com chamas laranja. Aqui ninguém passa sem pedir.',
       palette: ['#b04a2f', '#f08a1c', '#3a2a24'],
       artPrompt: 'armor built from red bricks like a brick wall, orange flames licking up the edges, brick gauntlets and boots',
+    },
+    {
+      id: 'wagner-cavaleiro',
+      name: 'Cavaleiro do Cadeado',
+      rarity: 'epic',
+      description: 'Armadura negra e espada em forma de chave. Defende o reino com autenticação em dois fatores.',
+      headgear: true,
+      palette: ['#23232b', '#22c55e', '#9aa0aa'],
+      artPrompt: 'black plate armor with green accents, sword shaped like a giant key, open-face helmet',
     },
     {
       id: 'wagner-cripto',
@@ -336,13 +389,13 @@ export const skins: SkinDef[] = [
       artPrompt: 'shining silver knight armor with a big padlock emblem on the chest plate, shield decorated with a golden key, steel boots',
     },
     {
-      id: 'wagner-cavaleiro',
-      name: 'Cavaleiro do Cadeado',
-      rarity: 'legendary',
-      description: 'Armadura negra e espada em forma de chave. Defende o reino com autenticação em dois fatores.',
+      id: 'wagner-sentinela',
+      name: 'Sentinela Zero',
+      rarity: 'mythic',
+      description: 'Armadura negra de contornos vermelhos, elmo com viseira e uma lança de energia. Nenhum pacote passa.',
       headgear: true,
-      palette: ['#23232b', '#22c55e', '#9aa0aa'],
-      artPrompt: 'black plate armor with green accents, sword shaped like a giant key, open-face helmet',
+      palette: ['#15151b', '#ef4444', '#9aa0aa'],
+      artPrompt: 'sleek black armor with glowing red trim, closed helmet with a red crest, round red shield',
     },
   ]),
   ...make('guto', [
@@ -406,6 +459,15 @@ export const skins: SkinDef[] = [
       palette: ['#f2f4f8', '#38bdf8', '#06b6d4'],
       artPrompt: 'white space suit decorated with blue cloud patches and a cloud logo on the chest, gloves, chunky space boots',
     },
+    {
+      id: 'guto-tempestade',
+      name: 'Senhor da Tempestade',
+      rarity: 'mythic',
+      description: 'Armadura azul-noite com raios dourados, elmo de relâmpago e lança elétrica. Faz chover deploy.',
+      headgear: true,
+      palette: ['#1e2a4a', '#facc15', '#38bdf8'],
+      artPrompt: 'dark navy storm armor with golden lightning bolts, flowing stormcloud cape, holding a golden lightning spear',
+    },
   ]),
   ...make('b1', [
     {
@@ -466,6 +528,15 @@ export const skins: SkinDef[] = [
       palette: ['#7c3aed', '#facc15', '#f2f2f2'],
       artPrompt: 'long purple royal dress with a flowing cape, golden scepter topped with curly braces { }, jeweled belt',
     },
+    {
+      id: 'b1-imperatriz',
+      name: 'Imperatriz do Roadmap',
+      rarity: 'mythic',
+      description: 'Manto imperial roxo bordado de estrelas e coroa gigante. Todo o backlog se curva ao seu roadmap.',
+      headgear: true,
+      palette: ['#5b21b6', '#facc15', '#c4b5fd'],
+      artPrompt: 'long imperial purple robe embroidered with golden stars, huge golden crown with purple jewels',
+    },
   ]),
   ...make('angelo', [
     {
@@ -520,6 +591,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'padel team captain uniform with a captain armband, holding a gold padel trophy',
     },
     {
+      id: 'angelo-reitor',
+      name: 'Reitor',
+      rarity: 'epic',
+      description: 'Toga com faixa dourada e capelo. Despacho assinado, assunto encerrado.',
+      headgear: true,
+      palette: ['#1a1a22', '#f5c542', '#e5e7eb'],
+      artPrompt: 'academic gown with a wide golden sash, ceremonial rector regalia, mortarboard',
+    },
+    {
       id: 'angelo-rei',
       name: 'Herança Real',
       rarity: 'legendary',
@@ -529,13 +609,13 @@ export const skins: SkinDef[] = [
       artPrompt: 'royal red velvet robe with white ermine fur trim, golden scepter in hand, ornate golden clasp, dark boots',
     },
     {
-      id: 'angelo-reitor',
-      name: 'Reitor',
-      rarity: 'legendary',
-      description: 'Toga com faixa dourada e capelo. Despacho assinado, assunto encerrado.',
+      id: 'angelo-chanceler',
+      name: 'Chanceler Supremo',
+      rarity: 'mythic',
+      description: 'Toga branca e dourada, coroa de louros e o selo da universidade. Acima do reitor, só o próprio estatuto.',
       headgear: true,
-      palette: ['#1a1a22', '#f5c542', '#e5e7eb'],
-      artPrompt: 'academic gown with a wide golden sash, ceremonial rector regalia, mortarboard',
+      palette: ['#f5f0e1', '#d4a017', '#fff8e1'],
+      artPrompt: 'white and gold ceremonial chancellor robe, golden laurel wreath, holding a university seal scroll',
     },
   ]),
   ...make('pablo', [
@@ -565,15 +645,6 @@ export const skins: SkinDef[] = [
       artPrompt: 'black and white checkered vest over a white shirt, holding a chess king piece, dark trousers, dress shoes',
     },
     {
-      id: 'pablo-garagem',
-      name: 'Hacker de Garagem',
-      rarity: 'rare',
-      description: 'Moletom, placa de circuito e fone de ouvido. A startup nasceu antes do primeiro commit.',
-      headgear: true,
-      palette: ['#3a3f5a', '#6366f1', '#4ade80'],
-      artPrompt: 'oversized hoodie, holding a circuit board, big over-ear headphones',
-    },
-    {
       id: 'pablo-mago',
       name: 'Mago dos Algoritmos',
       rarity: 'epic',
@@ -581,6 +652,15 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#2f2a8f', '#facc15', '#6366f1'],
       artPrompt: 'long blue wizard robe covered in yellow stars, wooden staff topped with a small binary tree of glowing nodes, pointed shoes',
+    },
+    {
+      id: 'pablo-garagem',
+      name: 'Hacker de Garagem',
+      rarity: 'legendary',
+      description: 'Jaqueta ciberpunk com neon rosa e ciano, visor holográfico e fone de ouvido. A startup nasceu antes do primeiro commit e já fez o deploy.',
+      headgear: true,
+      palette: ['#14141c', '#ec4899', '#22d3ee'],
+      artPrompt: 'black cyberpunk jacket with neon pink and cyan trim, holographic visor, over-ear headphones, holding a glowing tablet',
     },
     {
       id: 'pablo-galactico',
@@ -598,6 +678,15 @@ export const skins: SkinDef[] = [
       description: 'Túnica clara e uma esfera de dados flutuando. Já sabe o resultado, só confere a complexidade.',
       palette: ['#e8e6f5', '#6366f1', '#a5b4fc'],
       artPrompt: 'light flowing robe, floating glowing orb of data',
+    },
+    {
+      id: 'pablo-singularidade',
+      name: 'A Singularidade',
+      rarity: 'mythic',
+      description: 'Manto de céu estrelado com capuz e galáxias nas dobras. O resultado chegou antes da pergunta.',
+      headgear: true,
+      palette: ['#0f0a2a', '#8b5cf6', '#e0e7ff'],
+      artPrompt: 'long hooded robe made of a starry night sky with swirling galaxies, glowing violet runes',
     },
   ]),
 ];

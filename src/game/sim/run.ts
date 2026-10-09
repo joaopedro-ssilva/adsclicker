@@ -8,14 +8,16 @@
  *   npm run sim -- --profile casual --seed 3 --audit
  *
  * Flags: --profile active|casual|idle|all, --cps, --defend, --hours, --seed, --graduate-min,
- * --graduate-ratio, --graduate-until, --no-graduate, --no-maestrias, --picks edecio,gladimir (the only Maestrias that get slots), --away play,away (seconds), --audit (research
+ * --graduate-ratio, --graduate-until, --no-graduate, --no-maestrias, --no-monitors, --guard auto|off|max (the Monitor de Segurança), --honour edecio|...|auto|rotate|none (who is honoured at each graduation, default auto),
+ * --set path=json[;path=json] (override content numbers for an experiment, e.g. --set 'balance.graduation.base="4e19";professors.wagner.hireCost="2e12"'), --picks edecio,gladimir (the only Maestrias that get slots), --away play,away (seconds), --audit (research
  * table), --sprints (sprint table), --sprint-audit h1,h2,... (can the active player, and one who does
  * nothing, finish each sprint at those hours of an active run?), --every (timeline step, minutes).
  */
-import { content } from '@/game/content';
+import { content as baseContent } from '@/game/content';
 import type { ProfessorId } from '@/game/content/types';
 import { formatDuration } from '../engine/format';
 import { auditSprints } from './audit';
+import { applyOverrides } from './overrides';
 import { PROFILES, PROFILE_IDS } from './profiles';
 import type { ProfileId } from './profiles';
 import {
@@ -46,6 +48,7 @@ function readFlags(argv: string[]): Map<string, string> {
 
 function main(): void {
   const flags = readFlags(process.argv.slice(2));
+  const content = applyOverrides(baseContent, flags.get('set'));
   const number = (name: string): number | undefined => {
     const raw = flags.get(name);
     const parsed = raw === undefined ? Number.NaN : Number(raw);
@@ -83,6 +86,11 @@ function main(): void {
     if (graduateUntil !== undefined) options.graduateUntil = graduateUntil;
     if (flags.has('no-graduate')) options.graduate = false;
     if (flags.has('no-maestrias')) options.maestrias = false;
+    const honour = flags.get('honour');
+    if (honour) options.honour = honour as SimOptions['honour'];
+    if (flags.has('no-monitors')) options.monitors = false;
+    const guard = flags.get('guard');
+    if (guard) options.guard = guard as SimOptions['guard'];
     const picks = flags.get('picks');
     if (picks) options.maestriaPicks = picks.split(',') as ProfessorId[];
     const away = flags.get('away');

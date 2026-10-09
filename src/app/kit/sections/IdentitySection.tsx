@@ -28,6 +28,7 @@ const TOKEN_GROUPS: { title: string; tokens: { name: string; label: string }[] }
       { name: 'rare', label: 'Rara' },
       { name: 'epic', label: 'Épica' },
       { name: 'legendary', label: 'Lendária' },
+      { name: 'mythic', label: 'Mítica' },
     ],
   },
   {
@@ -87,6 +88,7 @@ export function IdentitySection() {
             <RarityBadge rarity="rare" />
             <RarityBadge rarity="epic" />
             <RarityBadge rarity="legendary" />
+            <RarityBadge rarity="mythic" />
           </div>
         </Panel>
       </div>
