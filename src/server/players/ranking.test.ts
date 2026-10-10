@@ -10,15 +10,15 @@ describe('ranking of flagged players', () => {
     process.env.RANK_FLAGGED_PLAYERS = original;
   });
 
-  it('keeps flagged players off the boards under the strict rule', () => {
-    process.env.RANK_FLAGGED_PLAYERS = 'false';
+  it('keeps flagged players off the boards by default', () => {
+    delete process.env.RANK_FLAGGED_PLAYERS;
     expect(flaggedAreRanked()).toBe(false);
     expect(isRanked(flaggedPlayer)).toBe(false);
     expect(toMe(flaggedPlayer).unrankedReason).not.toBeNull();
   });
 
-  it('ranks flagged players in the test phase, but never banned or test accounts', () => {
-    delete process.env.RANK_FLAGGED_PLAYERS;
+  it('ranks flagged players only with the test-phase switch on, and never banned or test accounts', () => {
+    process.env.RANK_FLAGGED_PLAYERS = 'true';
     expect(flaggedAreRanked()).toBe(true);
     expect(isRanked(flaggedPlayer)).toBe(true);
     expect(toMe(flaggedPlayer)).toMatchObject({ ranked: true, unrankedReason: null });
