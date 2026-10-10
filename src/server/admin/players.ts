@@ -8,6 +8,7 @@ import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
+import { logEvent } from '../logs/log';
 import { nicknameKey } from '../players/nickname';
 import { assertTitleFree, grantTitleSql, revokeTitleSql, titleIdsOf } from '../players/titles';
 import type { PlayerCore } from '../players/summary';
@@ -114,6 +115,23 @@ export function patchToColumns(patch: AdminPlayerPatch): PgUpdateSetSource<typeo
   return set;
 }
 
+/** One log entry per kind of change in an admin patch. */
+function logAdminPatch(db: Db, id: string, patch: AdminPlayerPatch, nickname: string | null): void {
+  const changes: [string, string, unknown][] = [];
+  if (patch.banned !== undefined) changes.push([patch.banned ? 'admin_ban' : 'admin_unban', patch.banned ? 'Jogador banido' : 'Banimento removido', null]);
+  if (patch.flagged !== undefined) {
+    changes.push([patch.flagged ? 'admin_flag' : 'admin_unflag', patch.flagged ? 'Marca de suspeito colocada' : 'Marca de suspeito removida', null]);
+  }
+  if (patch.multiplier !== undefined) changes.push(['admin_multiplier', `Multiplicador do jogador: ×${patch.multiplier}`, { multiplier: patch.multiplier }]);
+  if (patch.testAccount !== undefined) changes.push(['admin_test_account', patch.testAccount ? 'Marcado como conta de teste' : 'Conta de teste desmarcada', null]);
+  if (patch.clearNickname) changes.push(['admin_clear_nickname', 'Apelido removido', null]);
+  if (patch.grantTitle !== undefined) changes.push(['admin_title_grant', `Título concedido: ${patch.grantTitle}`, { title: patch.grantTitle }]);
+  if (patch.revokeTitle !== undefined) changes.push(['admin_title_revoke', `Título removido: ${patch.revokeTitle}`, { title: patch.revokeTitle }]);
+  for (const [kind, message, detail] of changes) {
+    logEvent(db, { level: 'info', kind, message, playerId: id, nickname, route: '/api/admin/players/[id]', detail });
+  }
+}
+
 /** POST /api/admin/players/[id]. */
 export async function patchPlayer(
   db: Db,
@@ -134,5 +152,6 @@ export async function patchPlayer(
       : await db.update(players).set(set).where(eq(players.id, id)).returning(listColumns);
   const row = rows[0];
   if (!row) throw new ApiFailure('not_found');
+  logAdminPatch(db, id, patch, row.nickname);
   return { player: toAdminPlayer(row, selfId, now) };
 }

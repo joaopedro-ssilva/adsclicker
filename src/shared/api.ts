@@ -407,3 +407,71 @@ export const adminLaunchResetResultSchema = z.object({
   hackathonCollection: z.number().int(),
 });
 export type AdminLaunchResetResult = z.infer<typeof adminLaunchResetResultSchema>;
+
+// ---------------------------------------------------------------------------
+// Admin: server log and class activity (GET /api/admin/logs, /api/admin/activity)
+// ---------------------------------------------------------------------------
+
+export const LOG_LEVELS = ['info', 'warn', 'error'] as const;
+export type LogLevel = (typeof LOG_LEVELS)[number];
+export const LOG_RANGES = ['1h', '24h', '7d', 'all'] as const;
+export type LogRange = (typeof LOG_RANGES)[number];
+
+/** How long the server log and the activity feed keep rows (whichever limit comes first). */
+export const LOG_RETENTION_DAYS = 30;
+export const LOG_RETENTION_MAX_ROWS = 100_000;
+
+export const adminLogEntrySchema = z.object({
+  id: z.number(),
+  at: z.number(),
+  level: z.enum(LOG_LEVELS),
+  kind: z.string(),
+  message: z.string(),
+  playerId: z.string().nullable(),
+  nickname: z.string().nullable(),
+  route: z.string().nullable(),
+  detail: z.unknown(),
+});
+export type AdminLogEntry = z.infer<typeof adminLogEntrySchema>;
+
+export const adminTrafficHourSchema = z.object({
+  hour: z.number(),
+  accepted: z.number().int(),
+  rejected: z.number().int(),
+  players: z.number().int(),
+});
+export type AdminTrafficHour = z.infer<typeof adminTrafficHourSchema>;
+
+export const adminLogsResponseSchema = z.object({
+  entries: z.array(adminLogEntrySchema),
+  /** Pass as `before` to load the next (older) page; null at the end. */
+  nextBefore: z.number().nullable(),
+  /** Kinds present in the log, for the filter. */
+  kinds: z.array(z.string()),
+  /** The last 24 hours, oldest first. */
+  traffic: z.array(adminTrafficHourSchema),
+  retentionDays: z.number(),
+  maxRows: z.number(),
+  serverTime: z.number(),
+});
+export type AdminLogsResponse = z.infer<typeof adminLogsResponseSchema>;
+
+export const adminActivityEntrySchema = z.object({
+  id: z.string(),
+  at: z.number(),
+  playerId: z.string(),
+  nickname: z.string().nullable(),
+  kind: z.string(),
+  detail: z.string().nullable(),
+});
+export type AdminActivityEntry = z.infer<typeof adminActivityEntrySchema>;
+
+export const adminActivityResponseSchema = z.object({
+  entries: z.array(adminActivityEntrySchema),
+  /** Pass as `before` to load the next (older) page; null at the end. */
+  nextBefore: z.string().nullable(),
+  retentionDays: z.number(),
+  maxRows: z.number(),
+  serverTime: z.number(),
+});
+export type AdminActivityResponse = z.infer<typeof adminActivityResponseSchema>;

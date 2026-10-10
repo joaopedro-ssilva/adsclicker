@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { logEventAuto } from '@/server/logs/log';
 import { adminConfigured, checkLogin, endSession, startSession } from './auth';
 
 export interface LoginState {
@@ -17,10 +18,12 @@ export async function login(_previous: LoginState, form: FormData): Promise<Logi
   const user = String(form.get('user') ?? '');
   const password = String(form.get('password') ?? '');
   if (!checkLogin(user, password)) {
+    logEventAuto({ level: 'warn', kind: 'admin_login_failed', message: 'Login do admin falhou.', route: '/admin' }, { throttleMs: 5_000 });
     await new Promise((resolve) => setTimeout(resolve, FAILED_LOGIN_DELAY_MS));
     return { error: 'Usuário ou senha incorretos.' };
   }
   await startSession();
+  logEventAuto({ level: 'info', kind: 'admin_login', message: 'Login do admin.', route: '/admin' });
   redirect('/admin');
 }
 

@@ -6,6 +6,8 @@
 import type { z } from 'zod';
 import {
   accountResponseSchema,
+  adminActivityResponseSchema,
+  adminLogsResponseSchema,
   adminPlayerResponseSchema,
   adminLaunchResetPreviewSchema,
   adminLaunchResetResultSchema,
@@ -100,6 +102,10 @@ export const api = {
       call('POST', `/api/admin/players/${encodeURIComponent(id)}`, adminPlayerResponseSchema, { body }),
     turmaZeroPreview: () => call('GET', '/api/admin/titles/turma-zero', adminTurmaZeroPreviewSchema),
     grantTurmaZero: () => call('POST', '/api/admin/titles/turma-zero', adminTurmaZeroResultSchema, { body: {} }),
+    logs: (query: Record<string, string>, signal?: AbortSignal) =>
+      call('GET', `/api/admin/logs?${new URLSearchParams(query).toString()}`, adminLogsResponseSchema, { signal }),
+    activity: (query: Record<string, string>, signal?: AbortSignal) =>
+      call('GET', `/api/admin/activity?${new URLSearchParams(query).toString()}`, adminActivityResponseSchema, { signal }),
     launchResetPreview: () => call('GET', '/api/admin/launch-reset', adminLaunchResetPreviewSchema),
     launchReset: (phrase: string) =>
       call('POST', '/api/admin/launch-reset', adminLaunchResetResultSchema, { body: { phrase } }),

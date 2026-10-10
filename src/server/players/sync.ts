@@ -15,6 +15,7 @@ import type { Db } from '../db/client';
 import { feedEvents, players } from '../db/schema';
 import type { PlayerRow } from '../db/schema';
 import { ApiFailure } from '../http/errors';
+import { logEvent, trackSync } from '../logs/log';
 import { RATE_RULES, consume } from '../http/rateLimit';
 import { diffFeed } from './feed';
 import { effectiveMultiplier } from './multiplier';
@@ -46,13 +47,41 @@ const FLAG_REASON_MAX = 200;
  * only when the feed has something to add), and the event multiplier from memory.
  */
 export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> {
+  const trace: { playerId: string | null } = { playerId: null };
+  try {
+    const result = await syncPlayerInner(db, input, trace);
+    // Hourly counters only (no row per sync): "ok" is an accepted sync; conflict and reset wrote nothing.
+    trackSync(db, { accepted: result.body.status === 'ok', playerId: trace.playerId });
+    return result;
+  } catch (error) {
+    if (error instanceof ApiFailure && (error.code === 'invalid' || error.code === 'rate_limited')) {
+      trackSync(db, { accepted: false, playerId: trace.playerId });
+    }
+    throw error;
+  }
+}
+
+async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: string | null }): Promise<SyncResult> {
   const now = input.now ?? Date.now();
   const { request } = input;
   const cookies: string[] = [];
 
   // Judge the body before touching the database, so garbage never creates a guest.
   const parsed = deserializeState(request.save, content, now);
-  if (!parsed || coinsOutOfRange(parsed)) throw new ApiFailure('invalid', 'O save enviado é inválido.');
+  if (!parsed || coinsOutOfRange(parsed)) {
+    logEvent(
+      db,
+      {
+        level: 'warn',
+        kind: 'sync_invalid_save',
+        message: 'Save rejeitado como inválido.',
+        route: '/api/sync',
+        detail: { reason: parsed ? 'coins_out_of_range' : 'unreadable', saveChars: request.save.length },
+      },
+      { throttleMs: 30_000 },
+    );
+    throw new ApiFailure('invalid', 'O save enviado é inválido.');
+  }
 
   let player: PlayerRow;
   const hit = input.token ? await findSessionWithSave(db, input.token, now) : null;
@@ -65,6 +94,7 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
     cookies.push(sessionCookie(guest.token));
   }
 
+  trace.playerId = player.id;
   await consume(db, RATE_RULES.sync, player.id, now);
 
   const eventMultiplier = await getEventMultiplier(db, now);
@@ -94,6 +124,17 @@ export async function syncPlayer(db: Db, input: SyncInput): Promise<SyncResult> 
   const previous = stored && !(request.force && isRollback(stored, parsed)) ? stored : null;
   const verdict = judgeSave({ previous, next: parsed, elapsedMs: now - player.lastSeenAt.getTime() });
 
+  if (!verdict.ok) {
+    logEvent(db, {
+      level: 'warn',
+      kind: 'sync_suspect',
+      message: `Jogador marcado como suspeito: ${verdict.reason.slice(0, 150)}`,
+      playerId: player.id,
+      nickname: player.nickname,
+      route: '/api/sync',
+      detail: { reason: verdict.reason.slice(0, FLAG_REASON_MAX), alreadyFlagged: player.flagged, force: Boolean(request.force) },
+    });
+  }
   const flagged = player.flagged || !verdict.ok;
   const flagReason = verdict.ok ? player.flagReason : verdict.reason.slice(0, FLAG_REASON_MAX);
   const ranked = isRanked({ ...player, flagged });

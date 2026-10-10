@@ -191,3 +191,39 @@ O aparelho de um testador ainda guarda o save antigo. Para que ele não repovoe 
 8. Card **Lançamento**, "Zerar progresso para o lançamento": ler a contagem e o aviso (se ainda houver elegíveis sem Turma Zero, volte ao passo 5), digitar `ZERAR PROGRESSO`, "Zerar agora". Anotar o relatório.
 9. Conferir: ranking vazio (ou só com zeros), `GET /api/me` com `"epoch": 1`, e abrir o jogo num aparelho de testador (aviso de reset, jogo do zero, selo ainda ao lado do apelido).
 10. Abrir o jogo ao público. **Não rodar o reset de novo** depois disso.
+
+## Logs
+
+O `/admin` tem o card **Logs** com duas visões: **Servidor** e **Atividades**. Ambas ficam atrás da sessão de admin (`GET /api/admin/logs` e `GET /api/admin/activity`), mostram a última hora por padrão (atalhos 1 h, 24 h, 7 dias, tudo), do mais novo para o mais antigo, com "Carregar mais", filtro e busca, e horários no fuso do navegador.
+
+### Servidor (`server_logs`)
+
+Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `player_id`, `nickname`, `route`, `detail` jsonb) sem chave estrangeira: o registro sobrevive à conta. Migração `drizzle/0003_thick_calypso.sql` (aditiva; o `vercel-build` aplica sozinho). Escrita por `logEvent` (`src/server/logs/log.ts`):
+
+| O que | `kind` (nível) | De onde |
+| --- | --- | --- |
+| Erro inesperado (500), com rota, mensagem curta e 3 linhas da pilha | `server_error` (error) | `route()` em `server/http/route.ts` |
+| Limite de taxa recusado (qual limite, qual rota; no máximo 1 por minuto por limite e rota) | `rate_limited` (warn) | `route()` |
+| Banco inacessível | `db_unreachable` (error) | `route()` guarda na memória; a próxima escrita que der certo grava uma linha com desde/até e quantas requisições falharam. O `console.error` de antes continua |
+| Save recusado como inválido | `sync_invalid_save` (warn) | `syncPlayer` |
+| Sync que marca suspeito, com o motivo da plausibilidade | `sync_suspect` (warn) | `syncPlayer` |
+| Convidado criado | `guest_created` (info) | `createGuest` |
+| Apelido escolhido / senha definida ou trocada | `nickname_claimed`, `password_set` (info) | `players/account.ts` |
+| Login ok / falho (apelido tentado e motivo, nunca a senha) | `login_ok` (info), `login_failed` (warn) | `auth/login.ts` |
+| Login do admin ok / falho (sem usuário nem senha) | `admin_login`, `admin_login_failed` | `app/admin/actions.ts` |
+| Banir, marcar, tirar a marca, multiplicador, conta de teste, apelido removido, título dado/tirado | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_title_grant`, `admin_title_revoke` | `patchPlayer` |
+| Multiplicador do evento, Turma Zero em massa, reset de lançamento (com as contagens) | `admin_event_multiplier`, `admin_turma_zero`, `admin_launch_reset` | rota do evento, `grantTurmaZeroToAll`, `resetForLaunch` |
+
+A marca de suspeito só é limpa pelo admin (`admin_unflag`) ou pelo reset de lançamento; o sync nunca a limpa.
+
+**Fora do caminho da requisição.** A escrita é agendada com `after()` do Next (depois da resposta); fora de uma requisição ela dispara sem ser esperada. Todo erro dela é engolido: logar nunca derruba nem atrasa nada. Os testes desligam `logEvent` (`NODE_ENV=test`); `writeLog` é testado direto.
+
+**O que nunca entra.** `detail` passa por `redact`: chaves com `pass`, `senha`, `token`, `cookie`, `secret`, `hash`, `ip`, `save` etc. viram `[removido]`; textos são cortados em 300 caracteres, no máximo 20 itens por lista, 3 níveis e 4 000 caracteres no total. Nenhum IP, senha, cookie ou save inteiro é gravado.
+
+**Tráfego.** Sync aceito não vira linha. `traffic_hourly` guarda uma linha por hora (aceitos, recusados) e `traffic_hourly_players` uma por jogador por hora (para contar jogadores distintos); o card mostra as últimas 24 h no topo. "Recusado" = save inválido ou limite de taxa; conflito e reset de época não contam como nenhum dos dois.
+
+**Retenção.** 30 dias ou 100 000 linhas, o que vier primeiro (constantes em `src/shared/api.ts`). A poda roda ao abrir o card (primeira página) e, no máximo a cada 10 minutos por instância, depois de uma escrita. Vale também para as tabelas de tráfego (30 dias). A tela diz isso.
+
+### Atividades (`feed_events`)
+
+Todas as linhas da tabela do mural (o jogo mostra só as 30 mais recentes), com apelido, o texto igual ao do mural público (`feedAction`) e a hora; filtro por tipo e busca por apelido. O mural público e o cache de 10 s não mudaram. A retenção do mural era de 14 dias e sem limite de linhas; agora é a mesma dos logs (30 dias, 100 000 linhas), podada na carga da comunidade (no máximo de hora em hora por instância) e ao abrir a visão. O reset de lançamento apaga este histórico, e a tela avisa.

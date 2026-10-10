@@ -1,5 +1,5 @@
 import { desc, eq, lt, sql } from 'drizzle-orm';
-import { FEED_KINDS, ONLINE_WINDOW_MS } from '@/shared/api';
+import { FEED_KINDS, LOG_RETENTION_DAYS, LOG_RETENTION_MAX_ROWS, ONLINE_WINDOW_MS } from '@/shared/api';
 import type { CommunityResponse, FeedItem } from '@/shared/api';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
@@ -9,7 +9,8 @@ import { titlesForWire } from '../players/titles';
 import { createTtlCache } from './cache';
 
 export const FEED_SIZE = 30;
-const FEED_KEEP_MS = 14 * 24 * 60 * 60 * 1000;
+/** The game shows 30 events, but the admin "Atividades" view reads the whole table: keep it as long as the server log. */
+const FEED_KEEP_MS = LOG_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const PRUNE_EVERY_MS = 60 * 60 * 1000;
 
 /** Players that count in the totals: everyone who is not banned or a test account (nickname or not); flagged ones only in the test phase. */
@@ -96,14 +97,23 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
 
 let lastPrune = 0;
 
-/** Old events are never shown; sweep them about hourly per instance, without making a request wait. */
+/** Old events: sweep them about hourly per instance, without making a request wait. */
 function pruneFeedLater(db: Db, now: number): void {
   if (now - lastPrune < PRUNE_EVERY_MS) return;
   lastPrune = now;
-  void db
-    .delete(feedEvents)
-    .where(lt(feedEvents.createdAt, new Date(now - FEED_KEEP_MS)))
-    .catch(() => undefined);
+  void pruneFeed(db, now);
+}
+
+/** Deletes events older than the retention and, beyond the row cap, the oldest ones. Never throws. */
+export async function pruneFeed(db: Db, now: number = Date.now()): Promise<void> {
+  try {
+    await db.delete(feedEvents).where(lt(feedEvents.createdAt, new Date(now - FEED_KEEP_MS)));
+    await db.execute(
+      sql`delete from feed_events where id in (select id from feed_events order by created_at desc, id desc offset ${LOG_RETENTION_MAX_ROWS})`,
+    );
+  } catch {
+    // Pruning is housekeeping; a failure must not reach a request.
+  }
 }
 
 const caches = new Map<Db, ReturnType<typeof createTtlCache<CommunityResponse>>>();

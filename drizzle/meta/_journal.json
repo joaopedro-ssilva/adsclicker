@@ -22,6 +22,13 @@
       "when": 1791575669670,
       "tag": "0002_mushy_grandmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791590608145,
+      "tag": "0003_thick_calypso",
+      "breakpoints": true
     }
   ]
 }

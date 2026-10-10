@@ -54,7 +54,9 @@ export async function consume(db: Db, rule: RateRule, subject: string, now: numb
     })
     .returning({ count: rateLimits.count });
   if (row && row.count > rule.limit) {
-    throw new ApiFailure('rate_limited', undefined, retryAfterSeconds(now, rule.windowMs));
+    const failure = new ApiFailure('rate_limited', undefined, retryAfterSeconds(now, rule.windowMs));
+    failure.scope = rule.scope;
+    throw failure;
   }
   sweepLater(db, now);
 }

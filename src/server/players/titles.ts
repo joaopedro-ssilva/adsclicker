@@ -6,6 +6,7 @@ import type { TitleId } from '@/shared/titles';
 import type { Db } from '../db/client';
 import { players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
+import { logEvent } from '../logs/log';
 
 export const TURMA_ZERO: TitleId = 'turma-zero';
 
@@ -71,7 +72,15 @@ export async function grantTurmaZeroToAll(db: Db): Promise<AdminTurmaZeroResult>
     .where(and(testPhaseAccount(), sql`not ${holds(TURMA_ZERO)}`))
     .returning({ id: players.id });
   const after = await turmaZeroPreview(db);
-  return { granted: granted.length, alreadyHad: Math.max(0, after.alreadyHave - granted.length) };
+  const result = { granted: granted.length, alreadyHad: Math.max(0, after.alreadyHave - granted.length) };
+  logEvent(db, {
+    level: 'info',
+    kind: 'admin_turma_zero',
+    message: `Turma Zero em massa: ${result.granted} concedidos.`,
+    route: '/api/admin/titles/turma-zero',
+    detail: result,
+  });
+  return result;
 }
 
 /** Accounts eligible for Turma Zero that do not hold it (shown as a warning before the launch reset, which resets `rev`). */

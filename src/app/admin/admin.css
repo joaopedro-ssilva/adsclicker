@@ -427,3 +427,145 @@
   color: var(--bad);
   font-weight: 800;
 }
+
+/* Logs and activity */
+
+.admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-filters select,
+.admin-filters input {
+  min-height: 36px;
+  max-width: 100%;
+  padding: 4px 10px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.admin-filters input {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.admin-traffic {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.admin-traffic-hours {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-2);
+  overflow-x: auto;
+  list-style: none;
+  font-size: 12px;
+}
+
+.admin-traffic-hours li {
+  flex: 0 0 auto;
+  display: grid;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.admin-traffic-time {
+  color: var(--text-muted);
+  font-weight: 800;
+}
+
+.admin-traffic-bad {
+  color: var(--warn);
+}
+
+.admin-log-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-log-row {
+  min-width: 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.admin-log-row[data-level='error'] {
+  border-left: 3px solid var(--bad);
+}
+
+.admin-log-row[data-level='warn'] {
+  border-left: 3px solid var(--warn);
+}
+
+.admin-log-row summary,
+.admin-activity-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px var(--space-2);
+  padding: 8px 6px;
+}
+
+.admin-log-row summary {
+  cursor: pointer;
+}
+
+.admin-log-time {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.admin-log-kind {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.admin-log-message {
+  flex: 1 1 220px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-log-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--space-4);
+  margin: 0;
+  padding: 0 6px var(--space-2);
+  font-size: 12px;
+}
+
+.admin-log-meta dt {
+  display: inline;
+  color: var(--text-muted);
+}
+
+.admin-log-meta dd {
+  display: inline;
+  margin: 0 0 0 4px;
+  overflow-wrap: anywhere;
+}
+
+.admin-log-detail {
+  max-height: 240px;
+  margin: 0 6px var(--space-2);
+  padding: var(--space-2);
+  overflow: auto;
+  background: var(--bg);
+  border: 2px solid var(--border);
+  font-size: 12px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

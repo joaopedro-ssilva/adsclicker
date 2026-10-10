@@ -30,6 +30,8 @@ export class ApiFailure extends Error {
   readonly code: ApiErrorCode;
   readonly status: number;
   readonly retryAfterSeconds: number | undefined;
+  /** For `rate_limited`: which limit was hit (the rule's scope), for the server log. */
+  scope: string | undefined;
 
   constructor(code: ApiErrorCode, message: string = DEFAULT_MESSAGE[code], retryAfterSeconds?: number) {
     super(message);

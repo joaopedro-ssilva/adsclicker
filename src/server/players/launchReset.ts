@@ -6,6 +6,7 @@ import { clearLeaderboardCache } from '../community/leaderboard';
 import type { Db } from '../db/client';
 import { feedEvents, players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
+import { logEvent } from '../logs/log';
 import { bumpProgressEpoch, readProgressEpoch } from './progressEpoch';
 import { countWithoutTurmaZero } from './titles';
 
@@ -132,6 +133,13 @@ export async function resetForLaunch(db: Db, phrase: string, now: number = Date.
   // This instance's 10 s caches would keep showing the old boards for a few seconds.
   clearLeaderboardCache();
   clearCommunityCache();
+  logEvent(db, {
+    level: 'warn',
+    kind: 'admin_launch_reset',
+    message: `Reset de lançamento: época ${result.epoch}, ${result.accounts} contas.`,
+    route: '/api/admin/launch-reset',
+    detail: result,
+  });
   return {
     epoch: result.epoch,
     players: result.accounts,

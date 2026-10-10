@@ -8,6 +8,7 @@ import { logout } from './actions';
 import { BrowserCard } from './BrowserCard';
 import { EventCard } from './EventCard';
 import { LaunchCard } from './LaunchCard';
+import { LogsCard } from './LogsCard';
 import { PlayersCard } from './PlayersCard';
 import { TotalsBar } from './TotalsBar';
 import { useAdminPlayers } from './useAdminPlayers';
@@ -64,6 +65,8 @@ export function AdminPanel() {
         />
 
         <PlayersCard list={list} onChanged={onPlayerChanged} />
+
+        <LogsCard />
       </main>
     </ThemeProvider>
   );

@@ -307,3 +307,47 @@ export const hackathonCollection = pgTable(
   },
   (t) => [primaryKey({ columns: [t.playerId, t.base] })],
 );
+
+// ---------------------------------------------------------------------------
+// Server event log (docs/BACKEND.md, "Logs"). No foreign key to players: an entry outlives the account.
+// ---------------------------------------------------------------------------
+
+/** One row per notable server event (errors, rejected saves, account and admin actions). Never one per accepted sync. */
+export const serverLogs = pgTable(
+  'server_logs',
+  {
+    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    at: timestamptz('at').notNull().defaultNow(),
+    /** info | warn | error */
+    level: text('level').notNull(),
+    /** Short machine code, e.g. server_error, login_failed, admin_ban. */
+    kind: text('kind').notNull(),
+    message: text('message').notNull(),
+    playerId: uuid('player_id'),
+    nickname: text('nickname'),
+    route: text('route'),
+    detail: jsonb('detail'),
+  },
+  (t) => [
+    index('server_logs_at_idx').on(t.at.desc()),
+    index('server_logs_level_at_idx').on(t.level, t.at.desc()),
+    index('server_logs_kind_at_idx').on(t.kind, t.at.desc()),
+  ],
+);
+
+/** Traffic counters, one row per hour (UTC), so the admin can see activity without a row per sync. */
+export const trafficHourly = pgTable('traffic_hourly', {
+  hour: timestamptz('hour').primaryKey(),
+  syncsAccepted: integer('syncs_accepted').notNull().default(0),
+  syncsRejected: integer('syncs_rejected').notNull().default(0),
+});
+
+/** Who synced in which hour: gives the distinct-player count. One row per player per hour. */
+export const trafficHourlyPlayers = pgTable(
+  'traffic_hourly_players',
+  {
+    hour: timestamptz('hour').notNull(),
+    playerId: uuid('player_id').notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.hour, t.playerId] })],
+);

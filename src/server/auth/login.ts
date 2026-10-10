@@ -9,6 +9,7 @@ import { players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { hashIp } from '../http/ip';
 import { RATE_RULES, consume } from '../http/rateLimit';
+import { logEvent } from '../logs/log';
 import { nicknameKey } from '../players/nickname';
 import { effectiveMultiplier } from '../players/multiplier';
 import { toCloudSave, toMe } from '../players/summary';
@@ -31,17 +32,36 @@ export async function login(
   await consume(db, RATE_RULES.loginNickname, key, now);
 
   const [player] = await db.select().from(players).where(eq(players.nicknameKey, key)).limit(1);
+  const failed = (reason: string) =>
+    logEvent(
+      db,
+      {
+        level: 'warn',
+        kind: 'login_failed',
+        message: `Login falhou para "${request.nickname.slice(0, 32)}"`,
+        nickname: request.nickname.slice(0, 32),
+        playerId: player?.id ?? null,
+        route: '/api/auth/login',
+        detail: { reason },
+      },
+      { throttleMs: 5_000, throttleKey: key },
+    );
   if (!player || player.passwordHash === null) {
     await burnVerification(request.password);
+    failed(player ? 'no_password' : 'unknown_nickname');
     throw new ApiFailure('wrong_credentials');
   }
-  if (!(await verifyPassword(request.password, player.passwordHash))) throw new ApiFailure('wrong_credentials');
+  if (!(await verifyPassword(request.password, player.passwordHash))) {
+    failed('wrong_password');
+    throw new ApiFailure('wrong_credentials');
+  }
 
   const token = await createSession(db, player.id, now);
   if (context.currentToken) await deleteSession(db, hashToken(context.currentToken));
 
   const multiplier = effectiveMultiplier(await getEventMultiplier(db, now), player.multiplier);
   const bonus = await classroomBonusFor(db, player.id, context.hackathon ?? sharedDeps());
+  logEvent(db, { level: 'info', kind: 'login_ok', message: 'Login feito.', playerId: player.id, nickname: player.nickname, route: '/api/auth/login' });
   return {
     body: { me: toMe(player), multiplier, ...(bonus ? { bonus } : {}), cloud: toCloudSave(player) },
     cookies: [sessionCookie(token)],

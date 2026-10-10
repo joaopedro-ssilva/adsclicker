@@ -2,6 +2,7 @@ import type { Db } from '../db/client';
 import { players } from '../db/schema';
 import type { PlayerRow } from '../db/schema';
 import { hashIp } from '../http/ip';
+import { logEvent } from '../logs/log';
 import { RATE_RULES, consume } from '../http/rateLimit';
 import { readProgressEpoch } from '../players/progressEpoch';
 import { createSession, sweepExpiredSessionsLater } from './session';
@@ -22,5 +23,6 @@ export async function createGuest(db: Db, ip: string, now: number = Date.now()):
     return { player, token };
   });
   sweepExpiredSessionsLater(db, now);
+  logEvent(db, { level: 'info', kind: 'guest_created', message: 'Convidado criado.', playerId: created.player.id, route: '/api/sync' });
   return created;
 }

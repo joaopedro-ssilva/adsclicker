@@ -8,6 +8,7 @@ import { isUniqueViolation } from '../db/client';
 import { feedEvents, players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { RATE_RULES, consume } from '../http/rateLimit';
+import { logEvent } from '../logs/log';
 import { NICKNAME_REFUSED_MESSAGE, checkNickname, nicknameKey } from './nickname';
 import { toMe } from './summary';
 
@@ -47,6 +48,15 @@ export async function setNickname(db: Db, authed: Authed, request: NicknameReque
     throw error;
   }
   if (settingPassword) await deleteOtherSessions(db, player.id, authed.tokenHash);
+  logEvent(db, {
+    level: 'info',
+    kind: 'nickname_claimed',
+    message: `Apelido escolhido: ${request.nickname}`,
+    playerId: player.id,
+    nickname: request.nickname,
+    route: '/api/account/nickname',
+    detail: { first: player.nickname === null, passwordSet: settingPassword },
+  });
   return { me: toMe({ ...player, nickname: request.nickname, passwordHash }) };
 }
 
@@ -65,5 +75,13 @@ export async function setPassword(db: Db, authed: Authed, request: PasswordReque
   const passwordHash = await hashPassword(request.password);
   await db.update(players).set({ passwordHash }).where(eq(players.id, player.id));
   await deleteOtherSessions(db, player.id, authed.tokenHash);
+  logEvent(db, {
+    level: 'info',
+    kind: 'password_set',
+    message: player.passwordHash === null ? 'Senha definida.' : 'Senha trocada.',
+    playerId: player.id,
+    nickname: player.nickname,
+    route: '/api/account/password',
+  });
   return { me: toMe({ ...player, passwordHash }) };
 }
