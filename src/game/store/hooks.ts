@@ -11,6 +11,7 @@ import {
   clickValue,
   coinsPerSecond,
   comboInfo,
+  liveClickValue,
   disciplineViews,
   graduationPreview,
   hasFeature,
@@ -63,6 +64,8 @@ export function useGameView<T>(build: (state: GameState, content: GameContent) =
 export const useCoins = (): Decimal => useGameState((state) => state.coins);
 export const useCoinsPerSecond = (): Decimal => useGameView(coinsPerSecond);
 export const useClickValue = (): Decimal => useGameView(clickValue);
+/** The click value with the running combo: changes as the combo rises and decays. */
+export const useLiveClickValue = (): Decimal => useGameView(liveClickValue);
 export const useStats = (): Stats => useGameView(statsOf);
 export const useCombo = (): ComboInfo => useGameView(comboInfo);
 

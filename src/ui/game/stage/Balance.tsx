@@ -2,7 +2,7 @@
 import { memo, useEffect, useRef } from 'react';
 import type Decimal from 'break_infinity.js';
 import { useCloud } from '@/game/cloud';
-import { useClickValue, useCoins, useCoinsPerSecond, useCombo, useJoinhaView } from '@/game/store';
+import { useCoins, useCoinsPerSecond, useJoinhaView, useLiveClickValue } from '@/game/store';
 import { formatNumber } from '@/game/engine/format';
 import { Icon, NumberTicker } from '@/ui/kit';
 import { registerAnchor } from '../wiring/stageRefs';
@@ -13,15 +13,13 @@ function magnitude(value: Decimal): number {
 }
 
 function Rates() {
-  // What the next click is worth right now: the base value with the running combo and the golden mode on top.
-  const combo = useCombo();
+  // What the next click is worth right now, computed the way the click itself is: combo first, golden mode on top.
   const golden = useJoinhaView();
-  const boost = (combo.unlocked ? combo.multiplier : 1) * (golden?.active ? golden.multiplier : 1);
-  const perClick = useClickValue().mul(boost);
+  const perClick = useLiveClickValue().mul(golden?.active ? golden.multiplier : 1);
   const perSecond = useCoinsPerSecond();
   return (
     <p className="balance-rates">
-      <span data-boosted={boost > 1}>
+      <span>
         <b>{formatNumber(perClick)}</b> por clique
       </span>
       <span>

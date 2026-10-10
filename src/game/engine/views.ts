@@ -56,6 +56,12 @@ export function clickValue(state: GameState, content: GameContent): Decimal {
   return cache.clickValue;
 }
 
+/** What a hand click is worth with the combo as it stands now (no crit, no golden mode): the idle share is added after the combo, as in the click itself. */
+export function liveClickValue(state: GameState, content: GameContent): Decimal {
+  const { stats } = getStateCache(state, content);
+  return clickValueWith(state, content, stats, { comboSteps: hasFeature(state, content, 'combo') ? state.combo.steps : 0 });
+}
+
 export interface ComboInfo {
   /** Whole combo steps. */
   steps: number;
