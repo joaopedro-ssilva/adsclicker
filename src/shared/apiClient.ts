@@ -8,6 +8,7 @@ import {
   accountResponseSchema,
   adminActivityResponseSchema,
   adminLogsResponseSchema,
+  adminPasswordResetResponseSchema,
   adminPlayerResponseSchema,
   adminLaunchResetPreviewSchema,
   adminLaunchResetResultSchema,
@@ -100,6 +101,8 @@ export const api = {
     setEvent: (body: AdminEventRequest) => call('POST', '/api/admin/event', okResponseSchema, { body }),
     patchPlayer: (id: string, body: AdminPlayerPatch) =>
       call('POST', `/api/admin/players/${encodeURIComponent(id)}`, adminPlayerResponseSchema, { body }),
+    resetPassword: (id: string) =>
+      call('POST', `/api/admin/players/${encodeURIComponent(id)}/password-reset`, adminPasswordResetResponseSchema, { body: {} }),
     turmaZeroPreview: () => call('GET', '/api/admin/titles/turma-zero', adminTurmaZeroPreviewSchema),
     grantTurmaZero: () => call('POST', '/api/admin/titles/turma-zero', adminTurmaZeroResultSchema, { body: {} }),
     logs: (query: Record<string, string>, signal?: AbortSignal) =>

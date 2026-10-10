@@ -358,6 +358,13 @@ export type AdminPlayerPatch = z.infer<typeof adminPlayerPatchSchema>;
 export const adminPlayerResponseSchema = z.object({ player: adminPlayerSchema });
 export type AdminPlayerResponse = z.infer<typeof adminPlayerResponseSchema>;
 
+/** POST /api/admin/players/[id]/password-reset (no body). The temporary password comes back once and is never stored in clear. */
+export const adminPasswordResetResponseSchema = z.object({
+  player: adminPlayerSchema,
+  temporaryPassword: z.string(),
+});
+export type AdminPasswordResetResponse = z.infer<typeof adminPasswordResetResponseSchema>;
+
 /** What the bulk grant of "Turma Zero" would do, to show before confirming. */
 export const adminTurmaZeroPreviewSchema = z.object({
   /** Accounts with a nickname that synced at least once. */

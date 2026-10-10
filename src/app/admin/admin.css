@@ -308,6 +308,34 @@
   font-weight: 800;
 }
 
+.admin-temp-password {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface));
+  border: 2px solid var(--warn);
+  font-weight: 800;
+}
+
+.admin-temp-password-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.admin-temp-password code {
+  padding: var(--space-2) var(--space-3);
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  user-select: all;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  overflow-wrap: anywhere;
+}
+
 .admin-actions-panel > .admin-result {
   grid-column: 1 / -1;
 }

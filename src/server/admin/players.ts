@@ -3,12 +3,14 @@ import type { SQL } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { ONLINE_WINDOW_MS } from '@/shared/api';
-import type { AdminPlayer, AdminPlayerPatch, AdminPlayerResponse, AdminPlayersResponse } from '@/shared/api';
+import type { AdminPasswordResetResponse, AdminPlayer, AdminPlayerPatch, AdminPlayerResponse, AdminPlayersResponse } from '@/shared/api';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
-import { players } from '../db/schema';
+import { hashPassword } from '../auth/password';
+import { players, sessions } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { logEvent } from '../logs/log';
+import { generateTempPassword } from './tempPassword';
 import { nicknameKey } from '../players/nickname';
 import { assertTitleFree, grantTitleSql, revokeTitleSql, titleIdsOf } from '../players/titles';
 import type { PlayerCore } from '../players/summary';
@@ -154,4 +156,32 @@ export async function patchPlayer(
   if (!row) throw new ApiFailure('not_found');
   logAdminPatch(db, id, patch, row.nickname);
   return { player: toAdminPlayer(row, selfId, now) };
+}
+
+/**
+ * POST /api/admin/players/[id]/password-reset: gives a player who lost the password a new, temporary
+ * one. It is stored hashed like any other, every session of the player is revoked, and the clear
+ * text is returned this once. It is never logged. A guest (no nickname) has nothing to log in with.
+ */
+export async function resetPlayerPassword(db: Db, id: string, selfId: string | null, now: number = Date.now()): Promise<AdminPasswordResetResponse> {
+  if (!z.uuid().safeParse(id).success) throw new ApiFailure('not_found');
+  const temporaryPassword = generateTempPassword();
+  const passwordHash = await hashPassword(temporaryPassword);
+  const row = await db.transaction(async (tx) => {
+    const found = (await tx.select(listColumns).from(players).where(eq(players.id, id)).limit(1))[0];
+    if (!found) throw new ApiFailure('not_found');
+    if (found.nickname === null) throw new ApiFailure('invalid', 'Só dá para redefinir a senha de quem tem apelido.');
+    const updated = await tx.update(players).set({ passwordHash }).where(eq(players.id, id)).returning(listColumns);
+    await tx.delete(sessions).where(eq(sessions.playerId, id));
+    return updated[0] ?? found;
+  });
+  logEvent(db, {
+    level: 'info',
+    kind: 'admin_password_reset',
+    message: `Senha redefinida pelo admin: ${row.nickname}`,
+    playerId: id,
+    nickname: row.nickname,
+    route: '/api/admin/players/[id]/password-reset',
+  });
+  return { player: toAdminPlayer(row, selfId, now), temporaryPassword };
 }

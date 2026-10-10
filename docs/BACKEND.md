@@ -104,6 +104,7 @@ Protegido pelo login que já existe (`ADMIN_USER` / `ADMIN_PASSWORD`, cookie `ad
 - Lista de jogadores com busca e paginação: apelido, online, último acesso, progresso, marcas.
 - Evento global: multiplicador para todos.
 - Por jogador: multiplicador, conta de teste, marcar/desmarcar, banir, remover apelido ofensivo.
+- **Redefinir senha** (`POST /api/admin/players/[id]/password-reset`, sem corpo, atrás da sessão de admin e da checagem de mesma origem): para quem perdeu a senha (o jogo não tem e-mail e a senha só existe como hash scrypt). O servidor gera uma senha temporária de 12 caracteres (`randomInt`, alfabeto sem 0/O/1/l/I), grava o hash como qualquer senha, apaga **todas** as sessões do jogador e devolve `{ player, temporaryPassword }` uma única vez. A senha nunca é guardada em claro nem entra no log (`admin_password_reset` leva só o id e o apelido). Só vale para conta com apelido (visitante: `invalid`); funciona com ou sem senha anterior. O admin mostra a senha numa caixa com botão de copiar, e ela se perde ao sair ou recarregar. O jogador entra com apelido + senha temporária e a troca em `POST /api/account/password` (senha atual + nova, que já existia; as outras sessões caem).
 - Títulos por jogador e em massa, e o reset de lançamento: ver "Títulos e reset de lançamento" abaixo.
 - "Este navegador": o jogador da sessão atual aparece destacado, para aplicar ×10 ou ×50 em si mesmo numa demonstração.
 
@@ -212,6 +213,7 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Login ok / falho (apelido tentado e motivo, nunca a senha) | `login_ok` (info), `login_failed` (warn) | `auth/login.ts` |
 | Login do admin ok / falho (sem usuário nem senha) | `admin_login`, `admin_login_failed` | `app/admin/actions.ts` |
 | Banir, marcar, tirar a marca, multiplicador, conta de teste, apelido removido, título dado/tirado | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_title_grant`, `admin_title_revoke` | `patchPlayer` |
+| Senha redefinida pelo admin (sem a senha) | `admin_password_reset` | `resetPlayerPassword` |
 | Multiplicador do evento, Turma Zero em massa, reset de lançamento (com as contagens) | `admin_event_multiplier`, `admin_turma_zero`, `admin_launch_reset` | rota do evento, `grantTurmaZeroToAll`, `resetForLaunch` |
 
 A marca de suspeito só é limpa pelo admin (`admin_unflag`) ou pelo reset de lançamento; o sync nunca a limpa.

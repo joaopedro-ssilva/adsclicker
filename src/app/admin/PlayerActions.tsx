@@ -14,24 +14,51 @@ interface PlayerActionsProps {
   onChanged: (player: AdminPlayer) => void;
 }
 
-type Pending = 'ban' | 'clearNickname';
+type Pending = 'ban' | 'clearNickname' | 'resetPassword';
 
 const PRESETS = [1, 10, 50, 100] as const;
 
-const CONFIRM_TEXT: Record<Pending, { question: string; yes: string }> = {
-  ban: { question: 'Banir este jogador? Ele sai do ranking e do feed.', yes: 'Sim, banir' },
-  clearNickname: { question: 'Remover o apelido? O jogador sai do ranking até escolher outro.', yes: 'Sim, remover' },
+const CONFIRM_TEXT: Record<Pending, (name: string) => { question: string; yes: string }> = {
+  ban: () => ({ question: 'Banir este jogador? Ele sai do ranking e do feed.', yes: 'Sim, banir' }),
+  clearNickname: () => ({ question: 'Remover o apelido? O jogador sai do ranking até escolher outro.', yes: 'Sim, remover' }),
+  resetPassword: (name) => ({
+    question: `Redefinir a senha de ${name}? A senha atual deixa de valer e todos os aparelhos dele são desconectados.`,
+    yes: 'Sim, redefinir',
+  }),
 };
 
 /** Everything an admin can do to one player, with a confirmation for the destructive ones. */
 export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
   const { busy, message, run } = useApiAction();
   const [pending, setPending] = useState<Pending | null>(null);
+  // Held only in this component's memory: leaving or refreshing loses it, by design.
+  const [temporary, setTemporary] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const patch = async (body: AdminPlayerPatch, okText: string) => {
     setPending(null);
     const done = await run(() => api.admin.patchPlayer(player.id, body), okText);
     if (done) onChanged(done.player);
+  };
+
+  const resetPassword = async () => {
+    setPending(null);
+    setTemporary(null);
+    setCopied(false);
+    const done = await run(() => api.admin.resetPassword(player.id), 'Senha redefinida.');
+    if (done) {
+      setTemporary(done.temporaryPassword);
+      onChanged(done.player);
+    }
+  };
+
+  const copyTemporary = async () => {
+    try {
+      await navigator.clipboard.writeText(temporary ?? '');
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
@@ -127,9 +154,50 @@ export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
         <p className="admin-hint">Títulos aparecem como selo ao lado do apelido nos rankings e no mural. Valem para sempre, inclusive depois do reset de lançamento.</p>
       </div>
 
+      <div className="admin-actions-group">
+        <h4>Senha</h4>
+        <div className="admin-action-buttons">
+          <Button
+            size="sm"
+            variant="secondary"
+            disabled={busy || !player.nickname}
+            data-qa="admin-reset-password"
+            onClick={() => setPending('resetPassword')}
+          >
+            Redefinir senha
+          </Button>
+        </div>
+        <p className="admin-hint">
+          {player.nickname
+            ? 'Gera uma senha temporária, desconecta todos os aparelhos do jogador e mostra a senha uma única vez.'
+            : 'Só contas com apelido têm senha para redefinir.'}
+        </p>
+      </div>
+
+      {temporary ? (
+        <div className="admin-temp-password" role="status" data-qa="admin-temp-password">
+          <p>
+            Senha temporária de <strong>{player.nickname}</strong>
+          </p>
+          <div className="admin-temp-password-row">
+            <code data-qa="admin-temp-password-value">{temporary}</code>
+            <Button size="sm" variant="primary" onClick={copyTemporary} data-qa="admin-temp-password-copy">
+              {copied ? 'Copiada' : 'Copiar'}
+            </Button>
+          </div>
+          <p className="admin-hint">
+            Passe esta senha ao jogador. Ela não será mostrada de novo: se você sair ou recarregar a página, ela se perde. Peça para ele trocá-la
+            logo depois de entrar (na conta, em &quot;Trocar senha&quot;).
+          </p>
+          <Button size="sm" variant="ghost" onClick={() => setTemporary(null)}>
+            Fechar
+          </Button>
+        </div>
+      ) : null}
+
       {pending ? (
         <div className="admin-confirm" role="alertdialog" aria-label="Confirmar ação">
-          <p>{CONFIRM_TEXT[pending].question}</p>
+          <p>{CONFIRM_TEXT[pending](player.nickname ?? 'este jogador').question}</p>
           <div className="admin-action-buttons">
             <Button
               size="sm"
@@ -139,10 +207,12 @@ export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
               onClick={() =>
                 pending === 'ban'
                   ? patch({ banned: true }, 'Jogador banido.')
-                  : patch({ clearNickname: true }, 'Apelido removido.')
+                  : pending === 'resetPassword'
+                    ? resetPassword()
+                    : patch({ clearNickname: true }, 'Apelido removido.')
               }
             >
-              {CONFIRM_TEXT[pending].yes}
+              {CONFIRM_TEXT[pending](player.nickname ?? 'este jogador').yes}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => setPending(null)}>
               Cancelar

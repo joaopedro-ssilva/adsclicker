@@ -8,7 +8,7 @@ import { content } from '@/game/content';
 import { deserializeState, serializeState } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import type { SyncRequest } from '@/shared/api';
-import { listPlayers, patchPlayer } from './admin/players';
+import { listPlayers, patchPlayer, resetPlayerPassword } from './admin/players';
 import { currentPlayer, requireSession } from './auth/context';
 import { login, logout } from './auth/login';
 import { SESSION_COOKIE, findSession, hashToken, readSessionToken, SESSION_TTL_MS } from './auth/session';
@@ -623,6 +623,38 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       // A search that does not match this browser's player does not drag it in.
       const miss = await listPlayers(db, { search: 'Édécio', page: 1, selfId: self }, T0);
       expect(miss.players.some((player) => player.self)).toBe(false);
+    });
+
+    it('resets a password: temporary one works, old one and all sessions are gone, a guest is refused', async () => {
+      const player = await newPlayer({ nickname: 'Esquecido', password: 'senha-velha' });
+      const second = await login(db, { nickname: 'Esquecido', password: 'senha-velha' }, { ip: '10.0.3.1', currentToken: null, now: player.now });
+      const secondToken = tokenOf(second.cookies);
+
+      const result = await resetPlayerPassword(db, player.id, null, player.now);
+      expect(result.player).toMatchObject({ id: player.id, nickname: 'Esquecido', hasPassword: true });
+      expect(result.temporaryPassword).toHaveLength(12);
+      const [stored] = await db.select({ hash: players.passwordHash }).from(players).where(eq(players.id, player.id));
+      expect(stored!.hash).toMatch(/^scrypt\$/);
+      expect(stored!.hash).not.toContain(result.temporaryPassword);
+
+      expect(await findSession(db, player.token, player.now)).toBeNull();
+      expect(await findSession(db, secondToken, player.now)).toBeNull();
+      await expectFailure(login(db, { nickname: 'Esquecido', password: 'senha-velha' }, { ip: '10.0.3.2', currentToken: null, now: player.now }), 'wrong_credentials');
+      const back = await login(db, { nickname: 'Esquecido', password: result.temporaryPassword }, { ip: '10.0.3.2', currentToken: null, now: player.now });
+      expect(back.body.me.nickname).toBe('Esquecido');
+
+      // The player then changes it through the normal flow, with the temporary one as the current password.
+      const authed = await requireSession(db, new Headers({ cookie: `${SESSION_COOKIE}=${tokenOf(back.cookies)}` }), player.now);
+      await setPassword(db, authed, { password: 'senha-nova-1', currentPassword: result.temporaryPassword }, player.now);
+
+      // Works for an account that never had a password; refuses guests and unknown ids.
+      const legacy = await newPlayer({ nickname: 'Antigo', legacy: true, seed: 2 });
+      const fresh = await resetPlayerPassword(db, legacy.id, null, legacy.now);
+      expect(fresh.player.hasPassword).toBe(true);
+      const guest = await newPlayer({ seed: 3 });
+      await expectFailure(resetPlayerPassword(db, guest.id, null, guest.now), 'invalid');
+      await expectFailure(resetPlayerPassword(db, '00000000-0000-4000-8000-000000000000', null, T0), 'not_found');
+      await expectFailure(resetPlayerPassword(db, 'nao-e-uuid', null, T0), 'not_found');
     });
 
     it('finds a guest by the start of the id', async () => {
