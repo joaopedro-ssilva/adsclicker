@@ -13,8 +13,9 @@ interface SkinCardProps {
   onEquip: (id: string) => void;
 }
 
-/** A skin: owned ones can be equipped, locked ones are a dark silhouette that says how to get them. */
+/** A skin: owned ones can be equipped, locked ones are a dark silhouette. Both say how the skin is got. */
 export const SkinCard = memo(function SkinCard({ skin, owned, equipped, onEquip }: SkinCardProps) {
+  const hint = unlockHint('skin', skin.id, owned);
   return (
     <article className="skin-card" data-rarity={skin.rarity} data-owned={owned} data-equipped={equipped}>
       <div className="skin-card-stage">
@@ -31,6 +32,7 @@ export const SkinCard = memo(function SkinCard({ skin, owned, equipped, onEquip 
       </div>
       <h3 className="skin-card-name">{owned ? skin.name : '???'}</h3>
       <RarityBadge rarity={skin.rarity} />
+      {hint ? <p className="skin-card-hint">{hint}</p> : null}
       {owned ? (
         <Button
           size="sm"
@@ -52,9 +54,7 @@ export const SkinCard = memo(function SkinCard({ skin, owned, equipped, onEquip 
             'Equipar'
           )}
         </Button>
-      ) : (
-        <p className="skin-card-hint">{unlockHint('skin', skin.id)}</p>
-      )}
+      ) : null}
     </article>
   );
 });

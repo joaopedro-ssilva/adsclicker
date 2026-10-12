@@ -14,6 +14,7 @@ interface ThemeCardProps {
 
 /** A HUD theme with a miniature of its own colours. */
 export const ThemeCard = memo(function ThemeCard({ theme, owned, equipped, onEquip }: ThemeCardProps) {
+  const hint = unlockHint('theme', theme.id, owned);
   const { bg, surface, surfaceRaised, border, text, textMuted } = theme.colors;
   return (
     <article className="theme-card" data-owned={owned} data-equipped={equipped}>
@@ -38,7 +39,8 @@ export const ThemeCard = memo(function ThemeCard({ theme, owned, equipped, onEqu
       </div>
       <div className="theme-card-text">
         <h3>{owned ? theme.name : '???'}</h3>
-        {owned ? <p>{theme.description}</p> : <p className="skin-card-hint">{unlockHint('theme', theme.id)}</p>}
+        {owned ? <p>{theme.description}</p> : null}
+        {hint ? <p className="skin-card-hint">{hint}</p> : null}
       </div>
       {owned ? (
         <Button

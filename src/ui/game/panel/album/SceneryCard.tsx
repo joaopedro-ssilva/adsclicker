@@ -14,6 +14,7 @@ interface SceneryCardProps {
 
 /** A scenery with a live thumbnail (no particles, to keep fourteen of them cheap). */
 export const SceneryCard = memo(function SceneryCard({ scenery, owned, equipped, onEquip }: SceneryCardProps) {
+  const hint = unlockHint('scenery', scenery.id, owned);
   return (
     <article className="album-scenery-card" data-owned={owned} data-equipped={equipped}>
       <div className="album-scenery-card-thumb" data-locked={!owned}>
@@ -24,6 +25,7 @@ export const SceneryCard = memo(function SceneryCard({ scenery, owned, equipped,
       {owned ? (
         <>
           <p className="album-scenery-card-desc">{scenery.description}</p>
+          {hint ? <p className="skin-card-hint">{hint}</p> : null}
           <Button
             size="sm"
             variant={equipped ? 'secondary' : 'primary'}
@@ -45,9 +47,9 @@ export const SceneryCard = memo(function SceneryCard({ scenery, owned, equipped,
             )}
           </Button>
         </>
-      ) : (
-        <p className="skin-card-hint">{unlockHint('scenery', scenery.id)}</p>
-      )}
+      ) : hint ? (
+        <p className="skin-card-hint">{hint}</p>
+      ) : null}
     </article>
   );
 });
