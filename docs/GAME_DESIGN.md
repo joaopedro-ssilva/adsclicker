@@ -129,7 +129,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 - O servidor limita cada recompensa pelo nível da Maestria que o save mostra (veja `plausibility.ts` e `maestriaBounds.ts`), e confere vagas ≤ formaturas e diplomas gastos ≤ diplomas ganhos. Festa: uma por recarga (e uma já cheia), com o reforço, as habilidades e as invasões que ela traz. Bolsa: um balde cheio mais o que enche na janela. Horas: o teto de diplomas da formatura ganha mais uma faixa por Maestria de Angelo. Releases e Design System aparecem na própria produção do save, que já é o piso do teto.
 
 ### Limite de cliques
-- O motor aceita no máximo 15 cliques manuais por segundo (janela móvel de 1 s, `balance.clickLimit`). O que passar é descartado em silêncio: sem moedas, combo, contadores, progresso do Joinha nem carga do Rollforward. O servidor usa o mesmo número. Cliques automáticos da árvore não passam por esse limite.
+- O motor aceita no máximo 100 cliques manuais por segundo (janela móvel de 1 s, `balance.clickLimit`). O que passar é descartado em silêncio: sem moedas, combo, contadores, progresso do Joinha nem carga do Rollforward. O servidor usa o mesmo número. Cliques automáticos da árvore não passam por esse limite.
 
 ### Monitores (depois da primeira Formatura)
 - Quatro alunos que assumem uma tarefa chata, contratados com diplomas na aba Formatura. Cada um tem 4 níveis (o primeiro contrata, os outros deixam o monitor mais rápido ou melhor), uma chave liga/desliga (o estado é salvo) e fica com o jogador entre as Formaturas, como a árvore. Rodam no tick do engine, nunca por clique, e não contam como o jogador agindo (a sessão de "1 minuto sem clicar" continua correndo).

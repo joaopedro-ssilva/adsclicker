@@ -167,6 +167,8 @@
 .skin-card .ui-button {
   width: 100%;
   min-height: 36px;
+  /* Owned cards show the unlock hint too, of varying length: keep the buttons of a row on one line. */
+  margin-top: auto;
 }
 
 .skin-card-hint {

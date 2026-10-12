@@ -21,11 +21,14 @@ export function grantingAchievement(kind: Granted, id: string): AchievementDef |
   return grantedBy[kind].get(id);
 }
 
-/** How to get a locked cosmetic, ready to show. Secret achievements never give their condition away. */
-export function unlockHint(kind: Granted, id: string): string {
+/**
+ * How a cosmetic is got, ready to show, locked or owned. A secret achievement keeps its condition hidden until the
+ * cosmetic is owned. Null for an owned cosmetic no achievement grants (the defaults).
+ */
+export function unlockHint(kind: Granted, id: string, owned = false): string | null {
   const achievement = grantingAchievement(kind, id);
-  if (!achievement) return 'Recompensa de uma conquista';
-  if (achievement.secret) return 'Conquista secreta: ???';
+  if (!achievement) return owned ? null : 'Recompensa de uma conquista';
+  if (achievement.secret && !owned) return 'Conquista secreta: ???';
   return `${achievement.name}: ${achievement.description}`;
 }
 
