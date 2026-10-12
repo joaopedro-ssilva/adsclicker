@@ -326,6 +326,8 @@ export const adminPlayerSchema = z.object({
   flagged: z.boolean(),
   flagReason: z.string().nullable(),
   banned: z.boolean(),
+  /** Cleared for good: the anticheat never flags this player. */
+  trusted: z.boolean(),
   /** True for the player of the browser making the request. */
   self: z.boolean(),
   /** Ids of every tag this player holds (public and admin-only), in catalogue order. */
@@ -356,6 +358,8 @@ export const adminPlayerPatchSchema = z.object({
   testAccount: z.boolean().optional(),
   flagged: z.boolean().optional(),
   banned: z.boolean().optional(),
+  /** Cleared for good: the anticheat never flags them again. Turning it on also clears a current flag (unless `flagged` says otherwise). */
+  trusted: z.boolean().optional(),
   /** Removes an offensive nickname (the player can pick another). */
   clearNickname: z.literal(true).optional(),
   /** Gives the player a tag (no-op when held). A single-holder tag cannot go to a second player. */

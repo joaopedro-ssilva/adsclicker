@@ -39,6 +39,7 @@ export function toAdminPlayer(row: PlayerCore, selfId: string | null, now: numbe
     flagged: row.flagged,
     flagReason: row.flagReason,
     banned: row.banned,
+    trusted: row.trusted,
     self: row.id === selfId,
     tags: tagIdsOf(catalog, row.titles),
   };
@@ -111,6 +112,14 @@ export function patchToColumns(patch: AdminPlayerPatch): PgUpdateSetSource<typeo
     set.flagReason = patch.flagged ? ADMIN_FLAG_REASON : null;
   }
   if (patch.banned !== undefined) set.banned = patch.banned;
+  if (patch.trusted !== undefined) {
+    set.trusted = patch.trusted;
+    // Trusting a player clears the flag they carry now, unless the same patch sets it.
+    if (patch.trusted && patch.flagged === undefined) {
+      set.flagged = false;
+      set.flagReason = null;
+    }
+  }
   if (patch.clearNickname) {
     set.nickname = null;
     set.nicknameKey = null;
@@ -126,6 +135,9 @@ function logAdminPatch(db: Db, id: string, patch: AdminPlayerPatch, nickname: st
   if (patch.banned !== undefined) changes.push([patch.banned ? 'admin_ban' : 'admin_unban', patch.banned ? 'Jogador banido' : 'Banimento removido', null]);
   if (patch.flagged !== undefined) {
     changes.push([patch.flagged ? 'admin_flag' : 'admin_unflag', patch.flagged ? 'Marca de suspeito colocada' : 'Marca de suspeito removida', null]);
+  }
+  if (patch.trusted !== undefined) {
+    changes.push([patch.trusted ? 'admin_trust' : 'admin_untrust', patch.trusted ? 'Marcado como confiável (o anticheat não marca mais)' : 'Marca de confiável removida', null]);
   }
   if (patch.multiplier !== undefined) changes.push(['admin_multiplier', `Multiplicador do jogador: ×${patch.multiplier}`, { multiplier: patch.multiplier }]);
   if (patch.testAccount !== undefined) changes.push(['admin_test_account', patch.testAccount ? 'Marcado como conta de teste' : 'Conta de teste desmarcada', null]);

@@ -1,0 +1,1 @@
+ALTER TABLE "players" ADD COLUMN "trusted" boolean DEFAULT false NOT NULL;

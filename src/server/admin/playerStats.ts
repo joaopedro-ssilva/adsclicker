@@ -62,6 +62,7 @@ function accountSection(row: Omit<PlayerRow, 'save'>): Section {
       { label: 'Conta de teste', value: yesNo(row.testAccount) },
       { label: 'Suspeito', value: row.flagged ? `Sim: ${row.flagReason ?? 'sem motivo'}` : 'Não' },
       { label: 'Banido', value: yesNo(row.banned) },
+      { label: 'Confiável (anticheat ignorado)', value: yesNo(row.trusted) },
       { label: 'Época de progresso', value: int(row.progressEpoch) },
     ],
   };

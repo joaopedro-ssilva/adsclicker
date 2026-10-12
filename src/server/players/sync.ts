@@ -125,19 +125,23 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   const previous = stored && !(request.force && isRollback(stored, parsed)) ? stored : null;
   const verdict = judgeSave({ previous, next: parsed, elapsedMs: now - player.lastSeenAt.getTime() });
 
+  // A trusted player (cleared for good by the admin) is still judged and logged, but never flagged.
+  const suspect = !verdict.ok && !player.trusted;
   if (!verdict.ok) {
     logEvent(db, {
-      level: 'warn',
-      kind: 'sync_suspect',
-      message: `Jogador marcado como suspeito: ${verdict.reason.slice(0, 150)}`,
+      level: suspect ? 'warn' : 'info',
+      kind: suspect ? 'sync_suspect' : 'sync_suspect_trusted',
+      message: suspect
+        ? `Jogador marcado como suspeito: ${verdict.reason.slice(0, 150)}`
+        : `Anticheat ignorado (jogador confiável): ${verdict.reason.slice(0, 150)}`,
       playerId: player.id,
       nickname: player.nickname,
       route: '/api/sync',
       detail: { reason: verdict.reason.slice(0, FLAG_REASON_MAX), alreadyFlagged: player.flagged, force: Boolean(request.force) },
     });
   }
-  const flagged = player.flagged || !verdict.ok;
-  const flagReason = verdict.ok ? player.flagReason : verdict.reason.slice(0, FLAG_REASON_MAX);
+  const flagged = player.flagged || suspect;
+  const flagReason = suspect && !verdict.ok ? verdict.reason.slice(0, FLAG_REASON_MAX) : player.flagReason;
   const ranked = isRanked({ ...player, flagged });
   const drafts = ranked ? diffFeed(previous, parsed) : [];
 

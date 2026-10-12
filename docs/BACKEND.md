@@ -104,6 +104,7 @@ Protegido pelo login que já existe (`ADMIN_USER` / `ADMIN_PASSWORD`, cookie `ad
 - Lista de jogadores com busca e paginação: apelido, online, último acesso, progresso, marcas.
 - Evento global: multiplicador para todos.
 - Por jogador: multiplicador, conta de teste, marcar/desmarcar, banir, remover apelido ofensivo.
+- **Jogador confiável** (`POST /api/admin/players/[id]` com `trusted`): botão "Limpar de vez (confiável)". Limpa a marca de suspeito atual e grava `players.trusted = true`: daí em diante o teste de plausibilidade continua rodando a cada sync, mas um save reprovado **não marca** o jogador; o caso vai para o log como `sync_suspect_trusted` (info, com o motivo) em vez de `sync_suspect`. O jogador fica no ranking. A marca manual de suspeito continua funcionando e, por ser manual, não é limpa pelo sync. "Tirar confiável" volta ao normal. O reset de lançamento mantém a marca.
 - **Redefinir senha** (`POST /api/admin/players/[id]/password-reset`, sem corpo, atrás da sessão de admin e da checagem de mesma origem): para quem perdeu a senha (o jogo não tem e-mail e a senha só existe como hash scrypt). O servidor gera uma senha temporária de 12 caracteres (`randomInt`, alfabeto sem 0/O/1/l/I), grava o hash como qualquer senha, apaga **todas** as sessões do jogador e devolve `{ player, temporaryPassword }` uma única vez. A senha nunca é guardada em claro nem entra no log (`admin_password_reset` leva só o id e o apelido). Só vale para conta com apelido (visitante: `invalid`); funciona com ou sem senha anterior. O admin mostra a senha numa caixa com botão de copiar, e ela se perde ao sair ou recarregar. O jogador entra com apelido + senha temporária e a troca em `POST /api/account/password` (senha atual + nova, que já existia; as outras sessões caem).
 - **Estatísticas do jogador** (`GET /api/admin/players/[id]/stats`): ao abrir "Gerenciar", o admin mostra tudo sobre o jogador. A conta vem da linha (`players`); o progresso é lido do próprio save na nuvem (o mesmo parse do sync): ADScoins, por segundo e por clique, turmas formadas, diplomas, professores e homenageados, pesquisas, árvore, conquistas, skins, cenários, temas, Maestrias, monitores, todos os contadores e a turma atual. Quem tem perfil no Hackathon ganha uma seção com cargo, nível, vitórias e itens. Sem save na nuvem, só a conta.
 - Tags (criar, editar, apagar, dar e tirar), Turma Zero em massa e o reset de lançamento: ver "Tags e reset de lançamento" abaixo.
@@ -168,7 +169,7 @@ Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `
 | Mural (`feed_events`) | esvaziado |
 | Hackathon (perfis, itens, partidas, fases, coleção) | esvaziado |
 | Época de progresso | sobe de 1 |
-| **Mantidos** | contas, apelidos, senhas, sessões, tags, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
+| **Mantidos** | contas, apelidos, senhas, sessões, tags, marca de confiável, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
 
 Responde quantas linhas tocou em cada tabela (`players` = contas atualizadas, `playersWithProgress` = as que tinham algo a apagar). É seguro rodar duas vezes: a segunda não apaga mais nada (`playersWithProgress: 0`) e só sobe a época mais um. Cuidado: rodar de novo **depois** que os jogadores já recomeçaram apaga o progresso novo deles também.
 
@@ -211,11 +212,12 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Banco inacessível | `db_unreachable` (error) | `route()` guarda na memória; a próxima escrita que der certo grava uma linha com desde/até e quantas requisições falharam. O `console.error` de antes continua |
 | Save recusado como inválido | `sync_invalid_save` (warn) | `syncPlayer` |
 | Sync que marca suspeito, com o motivo da plausibilidade | `sync_suspect` (warn) | `syncPlayer` |
+| Sync reprovado de um jogador confiável (não marca) | `sync_suspect_trusted` (info) | `syncPlayer` |
 | Convidado criado | `guest_created` (info) | `createGuest` |
 | Apelido escolhido / senha definida ou trocada | `nickname_claimed`, `password_set` (info) | `players/account.ts` |
 | Login ok / falho (apelido tentado e motivo, nunca a senha) | `login_ok` (info), `login_failed` (warn) | `auth/login.ts` |
 | Login do admin ok / falho (sem usuário nem senha) | `admin_login`, `admin_login_failed` | `app/admin/actions.ts` |
-| Banir, marcar, tirar a marca, multiplicador, conta de teste, apelido removido, tag dada/tirada | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_tag_grant`, `admin_tag_revoke` | `patchPlayer` |
+| Banir, marcar, tirar a marca, confiável, multiplicador, conta de teste, apelido removido, tag dada/tirada | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_trust`, `admin_untrust`, `admin_tag_grant`, `admin_tag_revoke` | `patchPlayer` |
 | Tag criada, editada, apagada | `admin_tag_create`, `admin_tag_update`, `admin_tag_delete` | `createTag`, `updateTag`, `deleteTag` |
 | Senha redefinida pelo admin (sem a senha) | `admin_password_reset` | `resetPlayerPassword` |
 | Multiplicador do evento, Turma Zero em massa, reset de lançamento (com as contagens) | `admin_event_multiplier`, `admin_turma_zero`, `admin_launch_reset` | rota do evento, `grantTurmaZeroToAll`, `resetForLaunch` |

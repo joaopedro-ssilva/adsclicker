@@ -228,6 +228,37 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       expect(board.entries.map((entry) => entry.nickname)).not.toContain('Trapaceiro');
     });
 
+    it('never flags a trusted player: a hand-edited save stays on the boards until the mark is taken away', async () => {
+      const states = savesOf(4);
+      const player = await newPlayer({ nickname: 'Confiavel', windows: 3 });
+      await patchPlayer(db, player.id, { flagged: true }, null, player.now);
+      const trusted = await patchPlayer(db, player.id, { trusted: true }, null, player.now);
+      // Trusting clears the flag the player carried.
+      expect(trusted.player).toMatchObject({ trusted: true, flagged: false, flagReason: null });
+
+      const cheat = states[2]!;
+      cheat.lifetimeCoins = cheat.lifetimeCoins.mul(1e12);
+      cheat.runCoins = cheat.runCoins.mul(1e12);
+      cheat.coins = cheat.coins.mul(1e12);
+      const result = await syncPlayer(db, { request: body(cheat, player.rev), token: player.token, ip: '10.0.0.1', now: player.now + 45_000 });
+      expect(result.body).toMatchObject({ status: 'ok', me: { ranked: true } });
+      const [row] = await db.select().from(players).where(eq(players.id, player.id));
+      expect(row).toMatchObject({ flagged: false, flagReason: null, trusted: true, lifetimeCoinsText: cheat.lifetimeCoins.toString() });
+      clearLeaderboardCache();
+      expect((await getLeaderboard(db, 'coins', player.now + 60_000)).entries.map((entry) => entry.nickname)).toContain('Confiavel');
+
+      // Without the mark, the next impossible save flags them as usual.
+      await patchPlayer(db, player.id, { trusted: false }, null, player.now);
+      const next = states[3]!;
+      next.lifetimeCoins = cheat.lifetimeCoins.mul(1e12);
+      next.runCoins = cheat.runCoins.mul(1e12);
+      next.coins = cheat.coins.mul(1e12);
+      const flagged = await syncPlayer(db, { request: body(next, player.rev + 1), token: player.token, ip: '10.0.0.1', now: player.now + 90_000 });
+      expect(flagged.body).toMatchObject({ status: 'ok', me: { ranked: false } });
+      const [after] = await db.select({ flagged: players.flagged, trusted: players.trusted }).from(players).where(eq(players.id, player.id));
+      expect(after).toEqual({ flagged: true, trusted: false });
+    });
+
     it('rate-limits a player to 6 syncs a minute', async () => {
       const [state] = savesOf(1);
       const created = await syncPlayer(db, { request: body(state!, 0), token: null, ip: '10.0.0.1', now: T0 });

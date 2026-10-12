@@ -110,6 +110,20 @@ export function PlayerActions({ player, tags, onChanged, onTagsChanged }: Player
           >
             {player.flagged ? 'Limpar suspeita' : 'Marcar como suspeito'}
           </Button>
+          <Button
+            size="sm"
+            variant={player.trusted ? 'secondary' : 'primary'}
+            disabled={busy}
+            data-qa="admin-toggle-trusted"
+            onClick={() =>
+              patch(
+                { trusted: !player.trusted },
+                player.trusted ? 'Marca de confiável removida: o anticheat volta a valer.' : 'Confiável: o anticheat não marca mais este jogador.',
+              )
+            }
+          >
+            {player.trusted ? 'Tirar confiável' : 'Limpar de vez (confiável)'}
+          </Button>
           {player.banned ? (
             <Button size="sm" variant="secondary" disabled={busy} data-qa="admin-unban" onClick={() => patch({ banned: false }, 'Jogador desbanido.')}>
               Desbanir
@@ -129,6 +143,10 @@ export function PlayerActions({ player, tags, onChanged, onTagsChanged }: Player
             Remover apelido
           </Button>
         </div>
+        <p className="admin-hint">
+          <strong>Confiável</strong> limpa a suspeita atual e faz o anticheat nunca mais marcar este jogador: ele fica no ranking mesmo se o save
+          parecer impossível (o caso continua no log como &quot;Anticheat ignorado&quot;). A marca manual de suspeito continua funcionando.
+        </p>
       </div>
 
       <div className="admin-actions-group">

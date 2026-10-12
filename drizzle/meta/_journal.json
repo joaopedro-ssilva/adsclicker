@@ -36,6 +36,13 @@
       "when": 1791840505400,
       "tag": "0004_player_tags",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791841463947,
+      "tag": "0005_player_trusted",
+      "breakpoints": true
     }
   ]
 }

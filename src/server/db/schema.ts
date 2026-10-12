@@ -83,6 +83,11 @@ export const players = pgTable(
     flagged: boolean('flagged').notNull().default(false),
     flagReason: text('flag_reason'),
     banned: boolean('banned').notNull().default(false),
+    /**
+     * Cleared for good by the admin: the plausibility check still runs and logs, but never flags
+     * this player (docs/BACKEND.md, "Jogador confiável"). The admin can still flag them by hand.
+     */
+    trusted: boolean('trusted').notNull().default(false),
 
     // Titles and launch reset ------------------------------------------------------------------
     /**
