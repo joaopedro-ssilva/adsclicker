@@ -1,7 +1,7 @@
 import { formatNumber } from '@/game/engine/format';
 import type { LeaderboardEntry } from '@/shared/api';
 import { PlayerAvatar } from './PlayerAvatar';
-import { TitleBadge } from './TitleBadge';
+import { TagBadge } from './TagBadge';
 
 interface LeaderboardRowProps {
   entry: LeaderboardEntry;
@@ -18,7 +18,7 @@ export function LeaderboardRow({ entry, own }: LeaderboardRowProps) {
       <span className="community-name">
         <span className="community-nick" title={entry.nickname}>
           {entry.nickname}
-          <TitleBadge titles={entry.titles} />
+          <TagBadge tags={entry.tags} />
           {own ? <span className="community-you">você</span> : null}
         </span>
         <span className="community-sub">

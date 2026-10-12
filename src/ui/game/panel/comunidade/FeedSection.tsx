@@ -1,7 +1,7 @@
 import type { FeedItem } from '@/shared/api';
 import { Section } from '../lib/Section';
 import { feedAction } from './feedText';
-import { TitleBadge } from './TitleBadge';
+import { TagBadge } from './TagBadge';
 import { relativeTime } from './relativeTime';
 
 interface FeedSectionProps {
@@ -20,7 +20,7 @@ export function FeedSection({ feed, now }: FeedSectionProps) {
           {items.map((item) => (
             <li key={item.id} className="community-feed-item" data-kind={item.kind}>
               <span className="community-feed-text">
-                <strong>{item.nickname}</strong> <TitleBadge titles={item.titles} /> {feedAction(item)}
+                <strong>{item.nickname}</strong> <TagBadge tags={item.tags} /> {feedAction(item)}
               </span>
               <time className="community-feed-time" dateTime={new Date(item.at).toISOString()}>
                 {relativeTime(item.at, now)}

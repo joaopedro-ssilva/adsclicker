@@ -13,6 +13,7 @@ import { logEvent } from '../logs/log';
 import { nicknameKey } from '../players/nickname';
 import { effectiveMultiplier } from '../players/multiplier';
 import { toCloudSave, toMe } from '../players/summary';
+import { getTagCatalog } from '../players/tags';
 import { burnVerification, verifyPassword } from './password';
 import { createSession, deleteSession, hashToken, sessionCookie, clearedSessionCookie } from './session';
 
@@ -63,7 +64,7 @@ export async function login(
   const bonus = await classroomBonusFor(db, player.id, context.hackathon ?? sharedDeps());
   logEvent(db, { level: 'info', kind: 'login_ok', message: 'Login feito.', playerId: player.id, nickname: player.nickname, route: '/api/auth/login' });
   return {
-    body: { me: toMe(player), multiplier, ...(bonus ? { bonus } : {}), cloud: toCloudSave(player) },
+    body: { me: toMe(player, await getTagCatalog(db)), multiplier, ...(bonus ? { bonus } : {}), cloud: toCloudSave(player) },
     cookies: [sessionCookie(token)],
   };
 }

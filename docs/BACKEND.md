@@ -105,7 +105,8 @@ Protegido pelo login que já existe (`ADMIN_USER` / `ADMIN_PASSWORD`, cookie `ad
 - Evento global: multiplicador para todos.
 - Por jogador: multiplicador, conta de teste, marcar/desmarcar, banir, remover apelido ofensivo.
 - **Redefinir senha** (`POST /api/admin/players/[id]/password-reset`, sem corpo, atrás da sessão de admin e da checagem de mesma origem): para quem perdeu a senha (o jogo não tem e-mail e a senha só existe como hash scrypt). O servidor gera uma senha temporária de 12 caracteres (`randomInt`, alfabeto sem 0/O/1/l/I), grava o hash como qualquer senha, apaga **todas** as sessões do jogador e devolve `{ player, temporaryPassword }` uma única vez. A senha nunca é guardada em claro nem entra no log (`admin_password_reset` leva só o id e o apelido). Só vale para conta com apelido (visitante: `invalid`); funciona com ou sem senha anterior. O admin mostra a senha numa caixa com botão de copiar, e ela se perde ao sair ou recarregar. O jogador entra com apelido + senha temporária e a troca em `POST /api/account/password` (senha atual + nova, que já existia; as outras sessões caem).
-- Títulos por jogador e em massa, e o reset de lançamento: ver "Títulos e reset de lançamento" abaixo.
+- **Estatísticas do jogador** (`GET /api/admin/players/[id]/stats`): ao abrir "Gerenciar", o admin mostra tudo sobre o jogador. A conta vem da linha (`players`); o progresso é lido do próprio save na nuvem (o mesmo parse do sync): ADScoins, por segundo e por clique, turmas formadas, diplomas, professores e homenageados, pesquisas, árvore, conquistas, skins, cenários, temas, Maestrias, monitores, todos os contadores e a turma atual. Quem tem perfil no Hackathon ganha uma seção com cargo, nível, vitórias e itens. Sem save na nuvem, só a conta.
+- Tags (criar, editar, apagar, dar e tirar), Turma Zero em massa e o reset de lançamento: ver "Tags e reset de lançamento" abaixo.
 - "Este navegador": o jogador da sessão atual aparece destacado, para aplicar ×10 ou ×50 em si mesmo numa demonstração.
 
 ## Camadas de segurança
@@ -142,16 +143,18 @@ npm run dev
 
 Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `npm run db:migrate` apontando para ele e fazer o deploy.
 
-## Títulos e reset de lançamento
+## Tags e reset de lançamento
 
-### Títulos
+### Tags
 
-- Um jogador pode ter zero ou mais títulos de um catálogo fixo em código, [`src/shared/titles.ts`](../src/shared/titles.ts): `id`, nome, descrição, cor e, se for o caso, `single` (só um jogador pode tê-lo). O catálogo está em ordem de prioridade. Hoje: `primeiro-platinado` ("Primeiro Platinado", `single`) e `turma-zero` ("Turma Zero", para quem jogou a fase de testes).
-- **Armazenamento:** coluna `players.titles text[]` (padrão vazio), não uma tabela à parte. O ranking e o mural já leem a linha do jogador, então os títulos vêm junto, sem join e sem consulta nova (o ranking continua com seu cache de 10 s). Ninguém consulta "quem tem o título X" com frequência a ponto de precisar de índice. Ids que saírem do catálogo são ignorados na leitura.
-- **Contrato (só campos opcionais):** `titles?: string[]` em `me`, em cada linha do ranking e em cada item do mural (ids, do de maior prioridade para o de menor; ausente = nenhum). Clientes antigos ignoram o campo.
-- **Interface:** selo pequeno ao lado do apelido (o de maior prioridade; os demais, com a descrição, no atributo `title`), no ranking, na linha "você está em Nº lugar" e no mural.
-- **Admin, por jogador** (`POST /api/admin/players/[id]` com `grantTitle` ou `revokeTitle`): conceder e remover são idempotentes. Conceder um título `single` a um segundo jogador é recusado com o nome de quem o tem.
-- **Admin, em massa** (`GET/POST /api/admin/titles/turma-zero`): "Dar Turma Zero a todos os jogadores atuais" dá o título a toda conta **com apelido e com ao menos um sync aceito** (`rev > 0`). O GET mostra a contagem (elegíveis, que já têm, que receberão) antes de confirmar. Repetir não faz nada (a segunda execução concede 0). Mantém os outros títulos de cada jogador.
+- O admin cria as tags no card **Tags** de `/admin`: nome (até 24 caracteres), descrição (até 120, aparece ao passar o mouse), cor (`#rrggbb`, com cores prontas e seletor livre), **quem vê** (`public`: ranking, mural e a linha do próprio jogador; `admin`: só em `/admin`, com borda tracejada) e, se quiser, **exclusiva** (`single`: só um jogador pode tê-la). Até 50 tags.
+- **Catálogo:** tabela `player_tags` (`id`, `label`, `description`, `color`, `visibility`, `single`, `position`). O `id` de uma tag nova é o nome sem acentos (`Campeão do Semestre` → `campeao-do-semestre`, com `-2`, `-3`... se repetir). A ordem (`position`, a mais nova por último) é a prioridade: a primeira tag pública é o selo mostrado quando só cabe um. A migração `0004_player_tags.sql` cria a tabela com as duas tags que vinham em código, com os mesmos ids: `primeiro-platinado` (exclusiva) e `turma-zero`. Elas agora são tags comuns: dá para editar a cor, o nome, a visibilidade, ou apagá-las.
+- **Quem tem:** coluna `players.titles text[]` (o nome ficou da época dos títulos), com os ids. O ranking e o mural já leem a linha do jogador, então as tags vêm junto, sem join. O catálogo é lido com um cache de 10 s por instância (como o ranking), limpo a cada mudança do admin. Ids que não existem mais no catálogo são ignorados na leitura.
+- **Contrato:** `tags?: { id, label, description, color }[]` em `me`, em cada linha do ranking e em cada item do mural, **só as públicas**, da maior prioridade para a menor (ausente = nenhuma). As de admin nunca saem do servidor fora de `/api/admin/**`. No admin, `AdminPlayer.tags` traz os ids de todas.
+- **Interface:** selo ao lado do apelido com a cor da tag (o texto escurece ou fica branco conforme a cor), no ranking, na linha "você está em Nº lugar" e no mural; as demais, com a descrição, no `title`. No admin a linha do jogador mostra todas.
+- **Admin, catálogo:** `GET /api/admin/tags` (lista, com quantos jogadores têm cada uma), `POST /api/admin/tags` (cria), `POST /api/admin/tags/[id]` (edita qualquer campo; tornar exclusiva uma tag que dois jogadores têm é recusado), `DELETE /api/admin/tags/[id]` (apaga e tira de todos os jogadores na mesma transação; responde `removedFrom`).
+- **Admin, por jogador** (`POST /api/admin/players/[id]` com `grantTag` ou `revokeTag`): dar e tirar são idempotentes. Dar uma tag que não existe é recusado; dar uma tag exclusiva a um segundo jogador é recusado com o nome de quem a tem.
+- **Admin, em massa** (`GET/POST /api/admin/titles/turma-zero`): "Dar Turma Zero a todos os jogadores atuais" dá a tag `turma-zero` a toda conta **com apelido e com ao menos um sync aceito** (`rev > 0`). O GET mostra a contagem (elegíveis, que já têm, que receberão) antes de confirmar. Repetir não faz nada (a segunda execução concede 0). Mantém as outras tags de cada jogador. Se a tag `turma-zero` for apagada, a ferramenta avisa e não faz nada (e o aviso do reset de lançamento some).
 
 ### Reset de lançamento
 
@@ -165,7 +168,7 @@ Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `
 | Mural (`feed_events`) | esvaziado |
 | Hackathon (perfis, itens, partidas, fases, coleção) | esvaziado |
 | Época de progresso | sobe de 1 |
-| **Mantidos** | contas, apelidos, senhas, sessões, títulos, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
+| **Mantidos** | contas, apelidos, senhas, sessões, tags, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
 
 Responde quantas linhas tocou em cada tabela (`players` = contas atualizadas, `playersWithProgress` = as que tinham algo a apagar). É seguro rodar duas vezes: a segunda não apaga mais nada (`playersWithProgress: 0`) e só sobe a época mais um. Cuidado: rodar de novo **depois** que os jogadores já recomeçaram apaga o progresso novo deles também.
 
@@ -174,7 +177,7 @@ Responde quantas linhas tocou em cada tabela (`players` = contas atualizadas, `p
 O aparelho de um testador ainda guarda o save antigo. Para que ele não repovoe o ranking, existe uma **época de progresso**: um contador em `app_config` (`progress_epoch`, 0 até o primeiro reset), copiado para `players.progress_epoch` de cada conta. O aparelho guarda a época que viu (junto da revisão, em `adsclicker.cloud`) e a manda em todo `POST /api/sync` (`epoch`; ausente ou nunca aprendida = 0, a fase de testes).
 
 - Época diferente da conta: o servidor **não grava nada** e responde `{ status: 'reset', epoch }` (também com `force`). A gravação do sync inclui a época na condição, então um reset que acontece no meio de um sync também o derruba.
-- O aparelho então guarda o save antigo à parte (`localStorage`, chave `adsclicker.preResetSave`, nunca enviado), recomeça o jogo do zero, adota a época nova e mostra **uma vez** o aviso "O jogo foi zerado para o lançamento". Apelido, senha e títulos continuam (a sessão não muda). Um aparelho sem progresso real (até 60 s de jogo) recomeça em silêncio, sem aviso.
+- O aparelho então guarda o save antigo à parte (`localStorage`, chave `adsclicker.preResetSave`, nunca enviado), recomeça o jogo do zero, adota a época nova e mostra **uma vez** o aviso "O jogo foi zerado para o lançamento". Apelido, senha e tags continuam (a sessão não muda). Um aparelho sem progresso real (até 60 s de jogo) recomeça em silêncio, sem aviso.
 - Um aparelho novo, que nunca sincronizou e sem progresso, apenas entra na época atual (vem em `GET /api/me`). Um convidado criado depois do reset já nasce na época atual.
 - Entrar com a conta num aparelho sem save traz a conta zerada (sem save na nuvem). Num aparelho com save antigo, o primeiro sync dispara o fluxo acima.
 - Páginas abertas com o código antigo (sem `epoch`) continuam jogando só no navegador: o servidor recusa o sync com `reset`, que o código antigo trata como falha. Ao recarregar, o código novo assume. O save antigo nunca chega ao ranking.
@@ -212,7 +215,8 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Apelido escolhido / senha definida ou trocada | `nickname_claimed`, `password_set` (info) | `players/account.ts` |
 | Login ok / falho (apelido tentado e motivo, nunca a senha) | `login_ok` (info), `login_failed` (warn) | `auth/login.ts` |
 | Login do admin ok / falho (sem usuário nem senha) | `admin_login`, `admin_login_failed` | `app/admin/actions.ts` |
-| Banir, marcar, tirar a marca, multiplicador, conta de teste, apelido removido, título dado/tirado | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_title_grant`, `admin_title_revoke` | `patchPlayer` |
+| Banir, marcar, tirar a marca, multiplicador, conta de teste, apelido removido, tag dada/tirada | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_tag_grant`, `admin_tag_revoke` | `patchPlayer` |
+| Tag criada, editada, apagada | `admin_tag_create`, `admin_tag_update`, `admin_tag_delete` | `createTag`, `updateTag`, `deleteTag` |
 | Senha redefinida pelo admin (sem a senha) | `admin_password_reset` | `resetPlayerPassword` |
 | Multiplicador do evento, Turma Zero em massa, reset de lançamento (com as contagens) | `admin_event_multiplier`, `admin_turma_zero`, `admin_launch_reset` | rota do evento, `grantTurmaZeroToAll`, `resetForLaunch` |
 

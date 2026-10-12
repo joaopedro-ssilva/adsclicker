@@ -3,9 +3,12 @@ import { formatDuration, formatNumber } from '@/game/engine/format';
 import type { AdminPlayer } from '@/shared/api';
 import { Button } from '@/ui/kit';
 import { relativeTime } from '@/ui/game/panel/comunidade/relativeTime';
-import { TitleBadge } from '@/ui/game/panel/comunidade/TitleBadge';
+import { useState } from 'react';
+import { TagBadge } from '@/ui/game/panel/comunidade/TagBadge';
 import { PlayerActions } from './PlayerActions';
 import { PlayerMarks } from './PlayerMarks';
+import { PlayerStats } from './PlayerStats';
+import type { AdminTagsState } from './useAdminTags';
 
 interface PlayerRowProps {
   player: AdminPlayer;
@@ -14,9 +17,16 @@ interface PlayerRowProps {
   open: boolean;
   onToggle: () => void;
   onChanged: (player: AdminPlayer) => void;
+  catalog: AdminTagsState;
 }
 
-export function PlayerRow({ player, now, open, onToggle, onChanged }: PlayerRowProps) {
+export function PlayerRow({ player, now, open, onToggle, onChanged, catalog }: PlayerRowProps) {
+  // Bumped after each action, so the statistics below follow what changed.
+  const [statsKey, setStatsKey] = useState(0);
+  const changed = (fresh: AdminPlayer) => {
+    onChanged(fresh);
+    setStatsKey((value) => value + 1);
+  };
   return (
     <>
       <tr
@@ -29,7 +39,7 @@ export function PlayerRow({ player, now, open, onToggle, onChanged }: PlayerRowP
           <span className="admin-cell-player">
             <span className="admin-dot" data-on={player.online} role="img" aria-label={player.online ? 'online' : 'offline'} />
             {player.nickname ? <strong>{player.nickname}</strong> : <em className="muted">convidado</em>}
-            <TitleBadge titles={player.titles} />
+            <TagBadge tags={catalog.badgesOf(player.tags)} all />
           </span>
         </td>
         <td data-label="Último acesso">{player.online ? 'online agora' : relativeTime(player.lastSeenAt, now)}</td>
@@ -61,7 +71,8 @@ export function PlayerRow({ player, now, open, onToggle, onChanged }: PlayerRowP
       {open ? (
         <tr className="admin-row-actions">
           <td colSpan={8}>
-            <PlayerActions player={player} onChanged={onChanged} />
+            <PlayerActions player={player} tags={catalog.tags} onChanged={changed} onTagsChanged={catalog.reload} />
+            <PlayerStats playerId={player.id} refreshKey={statsKey} />
           </td>
         </tr>
       ) : null}

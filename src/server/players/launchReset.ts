@@ -8,7 +8,7 @@ import { feedEvents, players } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { logEvent } from '../logs/log';
 import { bumpProgressEpoch, readProgressEpoch } from './progressEpoch';
-import { countWithoutTurmaZero } from './titles';
+import { countWithoutTurmaZero } from './tags';
 
 /** The Hackathon tables the launch reset empties (docs/HACKATHON.md: parked, only tested). */
 const HACKATHON_TABLES = {

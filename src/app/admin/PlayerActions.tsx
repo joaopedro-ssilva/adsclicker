@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { formatNumber } from '@/game/engine/format';
 import { api } from '@/shared/apiClient';
-import type { AdminPlayer, AdminPlayerPatch } from '@/shared/api';
-import { TITLES } from '@/shared/titles';
+import type { AdminPlayer, AdminPlayerPatch, AdminTag } from '@/shared/api';
+import { tagTextColor } from '@/shared/tags';
+import { cssVariables } from '@/ui/theme';
 import { Button } from '@/ui/kit';
 import { ActionResultText } from './ActionResultText';
 import { MultiplierPicker } from './MultiplierPicker';
@@ -11,7 +12,11 @@ import { useApiAction } from './useApiAction';
 
 interface PlayerActionsProps {
   player: AdminPlayer;
+  /** The tag catalogue; null while it loads. */
+  tags: AdminTag[] | null;
   onChanged: (player: AdminPlayer) => void;
+  /** A tag was given or taken: the holder counts of the catalogue move. */
+  onTagsChanged: () => void;
 }
 
 type Pending = 'ban' | 'clearNickname' | 'resetPassword';
@@ -28,7 +33,7 @@ const CONFIRM_TEXT: Record<Pending, (name: string) => { question: string; yes: s
 };
 
 /** Everything an admin can do to one player, with a confirmation for the destructive ones. */
-export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
+export function PlayerActions({ player, tags, onChanged, onTagsChanged }: PlayerActionsProps) {
   const { busy, message, run } = useApiAction();
   const [pending, setPending] = useState<Pending | null>(null);
   // Held only in this component's memory: leaving or refreshing loses it, by design.
@@ -39,6 +44,7 @@ export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
     setPending(null);
     const done = await run(() => api.admin.patchPlayer(player.id, body), okText);
     if (done) onChanged(done.player);
+    if (done && (body.grantTag !== undefined || body.revokeTag !== undefined)) onTagsChanged();
   };
 
   const resetPassword = async () => {
@@ -126,32 +132,40 @@ export function PlayerActions({ player, onChanged }: PlayerActionsProps) {
       </div>
 
       <div className="admin-actions-group">
-        <h4>Títulos</h4>
-        <div className="admin-action-buttons">
-          {TITLES.map((title) => {
-            const held = player.titles?.includes(title.id) ?? false;
-            return (
-              <Button
-                key={title.id}
-                size="sm"
-                variant={held ? 'secondary' : 'primary'}
-                disabled={busy}
-                title={title.description}
-                data-qa={`admin-title-${title.id}`}
-                data-held={held || undefined}
-                onClick={() =>
-                  patch(
-                    held ? { revokeTitle: title.id } : { grantTitle: title.id },
-                    held ? `Título "${title.label}" removido.` : `Título "${title.label}" concedido.`,
-                  )
-                }
-              >
-                {held ? `Tirar "${title.label}"` : `Dar "${title.label}"`}
-              </Button>
-            );
-          })}
-        </div>
-        <p className="admin-hint">Títulos aparecem como selo ao lado do apelido nos rankings e no mural. Valem para sempre, inclusive depois do reset de lançamento.</p>
+        <h4>Tags</h4>
+        {tags === null ? (
+          <p className="muted">Carregando tags...</p>
+        ) : tags.length === 0 ? (
+          <p className="admin-hint">Nenhuma tag criada. Crie uma no card &quot;Tags&quot;.</p>
+        ) : (
+          <div className="admin-action-buttons">
+            {tags.map((tag) => {
+              const held = player.tags.includes(tag.id);
+              return (
+                <Button
+                  key={tag.id}
+                  size="sm"
+                  variant={held ? 'secondary' : 'primary'}
+                  disabled={busy}
+                  title={tag.description || undefined}
+                  data-qa={`admin-tag-${tag.id}`}
+                  data-held={held || undefined}
+                  onClick={() =>
+                    patch(held ? { revokeTag: tag.id } : { grantTag: tag.id }, held ? `Tag "${tag.label}" tirada.` : `Tag "${tag.label}" dada.`)
+                  }
+                >
+                  <span
+                    className="admin-tag-dot"
+                    style={cssVariables({ '--tag-bg': tag.color, '--tag-fg': tagTextColor(tag.color) })}
+                    aria-hidden="true"
+                  />
+                  {held ? `Tirar "${tag.label}"` : `Dar "${tag.label}"`}
+                </Button>
+              );
+            })}
+          </div>
+        )}
+        <p className="admin-hint">Tags com borda tracejada só aparecem aqui no admin. Valem para sempre, inclusive depois do reset de lançamento.</p>
       </div>
 
       <div className="admin-actions-group">

@@ -11,6 +11,7 @@ import { RATE_RULES, consume } from '../http/rateLimit';
 import { logEvent } from '../logs/log';
 import { NICKNAME_REFUSED_MESSAGE, checkNickname, nicknameKey } from './nickname';
 import { toMe } from './summary';
+import { getTagCatalog } from './tags';
 
 /**
  * POST /api/account/nickname: picking one puts the player on the boards and announces them in the
@@ -57,7 +58,7 @@ export async function setNickname(db: Db, authed: Authed, request: NicknameReque
     route: '/api/account/nickname',
     detail: { first: player.nickname === null, passwordSet: settingPassword },
   });
-  return { me: toMe({ ...player, nickname: request.nickname, passwordHash }) };
+  return { me: toMe({ ...player, nickname: request.nickname, passwordHash }, await getTagCatalog(db)) };
 }
 
 /** POST /api/account/password: sets it the first time; changing it needs the current one and signs out other devices. */
@@ -83,5 +84,5 @@ export async function setPassword(db: Db, authed: Authed, request: PasswordReque
     nickname: player.nickname,
     route: '/api/account/password',
   });
-  return { me: toMe({ ...player, passwordHash }) };
+  return { me: toMe({ ...player, passwordHash }, await getTagCatalog(db)) };
 }

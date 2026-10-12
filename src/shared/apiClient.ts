@@ -13,6 +13,10 @@ import {
   adminLaunchResetPreviewSchema,
   adminLaunchResetResultSchema,
   adminPlayersResponseSchema,
+  adminPlayerStatsSchema,
+  adminTagDeleteResponseSchema,
+  adminTagResponseSchema,
+  adminTagsResponseSchema,
   adminTurmaZeroPreviewSchema,
   adminTurmaZeroResultSchema,
   apiErrorSchema,
@@ -27,6 +31,8 @@ import {
 import type {
   AdminEventRequest,
   AdminPlayerPatch,
+  AdminTagCreate,
+  AdminTagPatch,
   ApiError,
   Board,
   LoginRequest,
@@ -48,7 +54,7 @@ interface CallOptions {
 }
 
 export async function call<S extends z.ZodType>(
-  method: 'GET' | 'POST',
+  method: 'GET' | 'POST' | 'DELETE',
   path: string,
   schema: S,
   options: CallOptions = {},
@@ -103,6 +109,12 @@ export const api = {
       call('POST', `/api/admin/players/${encodeURIComponent(id)}`, adminPlayerResponseSchema, { body }),
     resetPassword: (id: string) =>
       call('POST', `/api/admin/players/${encodeURIComponent(id)}/password-reset`, adminPasswordResetResponseSchema, { body: {} }),
+    playerStats: (id: string) => call('GET', `/api/admin/players/${encodeURIComponent(id)}/stats`, adminPlayerStatsSchema),
+    tags: () => call('GET', '/api/admin/tags', adminTagsResponseSchema),
+    createTag: (body: AdminTagCreate) => call('POST', '/api/admin/tags', adminTagResponseSchema, { body }),
+    updateTag: (id: string, body: AdminTagPatch) =>
+      call('POST', `/api/admin/tags/${encodeURIComponent(id)}`, adminTagResponseSchema, { body }),
+    deleteTag: (id: string) => call('DELETE', `/api/admin/tags/${encodeURIComponent(id)}`, adminTagDeleteResponseSchema),
     turmaZeroPreview: () => call('GET', '/api/admin/titles/turma-zero', adminTurmaZeroPreviewSchema),
     grantTurmaZero: () => call('POST', '/api/admin/titles/turma-zero', adminTurmaZeroResultSchema, { body: {} }),
     logs: (query: Record<string, string>, signal?: AbortSignal) =>

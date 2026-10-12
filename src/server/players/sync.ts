@@ -13,7 +13,7 @@ import { sharedDeps } from '../hackathon/deps';
 import { readProfileRow } from '../hackathon/store';
 import type { Db } from '../db/client';
 import { feedEvents, players } from '../db/schema';
-import type { PlayerRow } from '../db/schema';
+import type { PlayerRow, PlayerTagRow } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { logEvent, trackSync } from '../logs/log';
 import { RATE_RULES, consume } from '../http/rateLimit';
@@ -22,6 +22,7 @@ import { effectiveMultiplier } from './multiplier';
 import { isRollback, judgeSave } from './plausibility';
 import { coinsOutOfRange, projectState } from './projection';
 import { isRanked, toCloudSave, toMe } from './summary';
+import { getTagCatalog } from './tags';
 
 export interface SyncInput {
   request: SyncRequest;
@@ -97,7 +98,7 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   trace.playerId = player.id;
   await consume(db, RATE_RULES.sync, player.id, now);
 
-  const eventMultiplier = await getEventMultiplier(db, now);
+  const [eventMultiplier, catalog] = await Promise.all([getEventMultiplier(db, now), getTagCatalog(db, now)]);
   const multiplier = effectiveMultiplier(eventMultiplier, player.multiplier);
 
   // The Hackathon student (if any) decides the classroom bonus: one primary-key read.
@@ -107,10 +108,10 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
 
   // A device that holds another progress epoch than the account (a save from before the launch reset)
   // writes nothing: the ranking stays clean. It is told to start over (docs/BACKEND.md).
-  if ((request.epoch ?? 0) !== player.progressEpoch) return { body: resetBody(player, multiplier, bonus), cookies };
+  if ((request.epoch ?? 0) !== player.progressEpoch) return { body: resetBody(player, multiplier, bonus, catalog), cookies };
 
   if (player.rev > request.baseRev && !request.force) {
-    return { body: conflictBody(player, multiplier, bonus), cookies };
+    return { body: conflictBody(player, multiplier, bonus, catalog), cookies };
   }
 
   // The client's own multiplier and bonus are never trusted: the server's replace them before anything is computed.
@@ -159,20 +160,20 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
     // Another device synced between our read and our write: treat it as the conflict it is.
     const [fresh] = await db.select().from(players).where(eq(players.id, player.id)).limit(1);
     if (!fresh) throw new ApiFailure('unauthorized');
-    if (fresh.progressEpoch !== player.progressEpoch) return { body: resetBody(fresh, multiplier, bonus), cookies };
-    return { body: conflictBody(fresh, multiplier, bonus), cookies };
+    if (fresh.progressEpoch !== player.progressEpoch) return { body: resetBody(fresh, multiplier, bonus, catalog), cookies };
+    return { body: conflictBody(fresh, multiplier, bonus, catalog), cookies };
   }
 
   await creditClassroom(db, student, parsed.counters, hackathon, now);
 
-  const me = toMe({ ...player, flagged });
+  const me = toMe({ ...player, flagged }, catalog);
   return { body: { status: 'ok', rev: newRev, serverTime: now, multiplier, ...(bonus ? { bonus } : {}), me }, cookies };
 }
 
-function conflictBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined): SyncResponse {
+function conflictBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined, catalog: readonly PlayerTagRow[]): SyncResponse {
   const cloud = toCloudSave(player);
   if (!cloud) throw new ApiFailure('internal');
-  return { status: 'conflict', cloud, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player) };
+  return { status: 'conflict', cloud, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player, catalog) };
 }
 
 async function writeSync(
@@ -197,6 +198,6 @@ async function writeSync(
   });
 }
 
-function resetBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined): SyncResponse {
-  return { status: 'reset', epoch: player.progressEpoch, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player) };
+function resetBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined, catalog: readonly PlayerTagRow[]): SyncResponse {
+  return { status: 'reset', epoch: player.progressEpoch, multiplier, ...(bonus ? { bonus } : {}), me: toMe(player, catalog) };
 }

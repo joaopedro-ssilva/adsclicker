@@ -3,7 +3,7 @@ import { getDb } from '@/server/db/client';
 import { assertSameOrigin } from '@/server/http/origin';
 import { jsonResponse } from '@/server/http/respond';
 import { route } from '@/server/http/route';
-import { grantTurmaZeroToAll, turmaZeroPreview } from '@/server/players/titles';
+import { grantTurmaZeroToAll, turmaZeroPreview } from '@/server/players/tags';
 
 export const dynamic = 'force-dynamic';
 

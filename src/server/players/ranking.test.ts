@@ -14,14 +14,14 @@ describe('ranking of flagged players', () => {
     delete process.env.RANK_FLAGGED_PLAYERS;
     expect(flaggedAreRanked()).toBe(false);
     expect(isRanked(flaggedPlayer)).toBe(false);
-    expect(toMe(flaggedPlayer).unrankedReason).not.toBeNull();
+    expect(toMe(flaggedPlayer, []).unrankedReason).not.toBeNull();
   });
 
   it('ranks flagged players only with the test-phase switch on, and never banned or test accounts', () => {
     process.env.RANK_FLAGGED_PLAYERS = 'true';
     expect(flaggedAreRanked()).toBe(true);
     expect(isRanked(flaggedPlayer)).toBe(true);
-    expect(toMe(flaggedPlayer)).toMatchObject({ ranked: true, unrankedReason: null });
+    expect(toMe(flaggedPlayer, [])).toMatchObject({ ranked: true, unrankedReason: null });
     expect(isRanked({ ...flaggedPlayer, banned: true })).toBe(false);
     expect(isRanked({ ...flaggedPlayer, testAccount: true })).toBe(false);
   });

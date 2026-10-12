@@ -597,3 +597,212 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+
+/* Tags */
+
+.admin-tag-list {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-tag-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.admin-tag-item > .admin-confirm,
+.admin-tag-item > .admin-tag-form {
+  flex-basis: 100%;
+}
+
+.admin-tag-summary {
+  display: flex;
+  flex: 1 1 260px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.admin-tag-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 12px;
+}
+
+.admin-card .admin-tag-description {
+  flex-basis: 100%;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.admin-tag-form {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.admin-tag-fields {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.admin-tag-fields > label,
+.admin-tag-field-label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-tag-fields input:not([type]),
+.admin-tag-hex {
+  min-height: 36px;
+  width: 100%;
+  min-width: 0;
+  padding: 4px 10px;
+  color: var(--text);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.admin-tag-colors {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.admin-tag-swatch {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+
+.admin-tag-swatch[aria-pressed='true'] {
+  outline: 3px solid var(--text);
+  outline-offset: 1px;
+}
+
+.admin-tag-colors input[type='color'] {
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  background: none;
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+
+.admin-tag-colors .admin-tag-hex {
+  width: 100px;
+}
+
+.admin-tag-hex[aria-invalid='true'] {
+  border-color: var(--bad);
+}
+
+.admin-tag-choice {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.admin-tag-choice label,
+.admin-tag-check {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+}
+
+.admin-tag-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.admin-tag-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: middle;
+  background: var(--tag-bg);
+  border: 1px solid var(--tag-fg);
+}
+
+@media (max-width: 520px) {
+  .admin-tag-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* One player's statistics, under the actions */
+
+.admin-stats {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.admin-stats h4 {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-stats-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--space-3);
+}
+
+.admin-stats-section {
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.admin-stats-section h5 {
+  margin: 0 0 var(--space-2);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-stats-section dl {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.admin-stats-section dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.admin-stats-section dt {
+  color: var(--text-muted);
+}
+
+.admin-stats-section dd {
+  margin: 0;
+  font-weight: 800;
+  text-align: right;
+  overflow-wrap: anywhere;
+}

@@ -10,14 +10,17 @@ import { EventCard } from './EventCard';
 import { LaunchCard } from './LaunchCard';
 import { LogsCard } from './LogsCard';
 import { PlayersCard } from './PlayersCard';
+import { TagsCard } from './TagsCard';
 import { TotalsBar } from './TotalsBar';
 import { useAdminPlayers } from './useAdminPlayers';
+import { useAdminTags } from './useAdminTags';
 import { useSelfPlayer } from './useSelfPlayer';
 
 /** Admin tools, all backed by the server: the global event, this browser's player and the player list. */
 export function AdminPanel() {
   const list = useAdminPlayers();
   const self = useSelfPlayer();
+  const catalog = useAdminTags();
   const [totalsKey, setTotalsKey] = useState(0);
 
   const onPlayerChanged = (player: AdminPlayer) => {
@@ -64,7 +67,9 @@ export function AdminPanel() {
           }}
         />
 
-        <PlayersCard list={list} onChanged={onPlayerChanged} />
+        <TagsCard catalog={catalog} onDeleted={list.reload} />
+
+        <PlayersCard list={list} onChanged={onPlayerChanged} catalog={catalog} />
 
         <LogsCard />
       </main>

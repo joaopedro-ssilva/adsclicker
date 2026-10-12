@@ -7,7 +7,7 @@ import type { PlayerCore } from '../players/summary';
 import { isRanked } from '../players/summary';
 import type { Db } from '../db/client';
 import { hackathonProfiles, players, rankedCondition } from '../db/schema';
-import { titlesForWire } from '../players/titles';
+import { getTagCatalog, publicTagsOf } from '../players/tags';
 import { createTtlCache } from './cache';
 
 export const BOARD_SIZE = 100;
@@ -37,27 +37,30 @@ const boardValue = (board: Board, row: ValueColumns): string => {
 
 async function loadBoard(db: Db, board: Board, now: number): Promise<LeaderboardResponse> {
   const column = ORDER_COLUMN[board];
-  const rows = await db
-    .select({
-      nickname: players.nickname,
-      lifetimeCoinsText: players.lifetimeCoinsText,
-      diplomasEarned: players.diplomasEarned,
-      achievements: players.achievements,
-      clicks: players.clicks,
-      avatarProfessor: players.avatarProfessor,
-      avatarSkin: players.avatarSkin,
-      titles: players.titles,
-      lastSeenAt: players.lastSeenAt,
-      bestItemBase: hackathonProfiles.bestItemBase,
-      bestItemRarity: hackathonProfiles.bestItemRarity,
-    })
-    .from(players)
-    // The best item lives on the profile (kept current when items change): a primary-key join over at most 100 rows.
-    .leftJoin(hackathonProfiles, eq(hackathonProfiles.playerId, players.id))
-    .where(rankedCondition())
-    // "desc nulls last" and the id tie-break spelled out, exactly as the index is declared.
-    .orderBy(sql`${column} desc nulls last`, players.id)
-    .limit(BOARD_SIZE);
+  const [catalog, rows] = await Promise.all([
+    getTagCatalog(db, now),
+    db
+      .select({
+        nickname: players.nickname,
+        lifetimeCoinsText: players.lifetimeCoinsText,
+        diplomasEarned: players.diplomasEarned,
+        achievements: players.achievements,
+        clicks: players.clicks,
+        avatarProfessor: players.avatarProfessor,
+        avatarSkin: players.avatarSkin,
+        titles: players.titles,
+        lastSeenAt: players.lastSeenAt,
+        bestItemBase: hackathonProfiles.bestItemBase,
+        bestItemRarity: hackathonProfiles.bestItemRarity,
+      })
+      .from(players)
+      // The best item lives on the profile (kept current when items change): a primary-key join over at most 100 rows.
+      .leftJoin(hackathonProfiles, eq(hackathonProfiles.playerId, players.id))
+      .where(rankedCondition())
+      // "desc nulls last" and the id tie-break spelled out, exactly as the index is declared.
+      .orderBy(sql`${column} desc nulls last`, players.id)
+      .limit(BOARD_SIZE),
+  ]);
 
   const onlineSince = now - ONLINE_WINDOW_MS;
   return {
@@ -65,7 +68,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
     updatedAt: now,
     entries: rows.map((row, index) => {
       const professor = professorIdSchema.safeParse(row.avatarProfessor);
-      const titles = titlesForWire(row.titles);
+      const tags = publicTagsOf(catalog, row.titles);
       return {
         rank: index + 1,
         nickname: row.nickname ?? '',
@@ -75,7 +78,7 @@ async function loadBoard(db: Db, board: Board, now: number): Promise<Leaderboard
         diplomas: row.diplomasEarned,
         achievements: row.achievements,
         online: row.lastSeenAt.getTime() > onlineSince,
-        ...(titles ? { titles } : {}),
+        ...(tags ? { tags } : {}),
         ...(row.bestItemBase && row.bestItemRarity ? { item: { base: row.bestItemBase, rarity: row.bestItemRarity } } : {}),
       };
     }),

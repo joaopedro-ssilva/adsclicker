@@ -5,7 +5,7 @@
  */
 import { z } from 'zod';
 import { PROFESSOR_IDS } from '@/game/content/types';
-import { TITLE_IDS } from './titles';
+import { TAG_COLOR_PATTERN, TAG_DESCRIPTION_MAX, TAG_LABEL_MAX, TAG_VISIBILITIES } from './tags';
 
 // ---------------------------------------------------------------------------
 // Limits shared by client and server
@@ -42,6 +42,16 @@ export const passwordSchema = z
 
 export const professorIdSchema = z.enum(PROFESSOR_IDS);
 
+/** A public tag as the game shows it, next to a nickname (shared/tags.ts). */
+export const publicTagSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  description: z.string(),
+  /** `#rrggbb` */
+  color: z.string(),
+});
+export type PublicTag = z.infer<typeof publicTagSchema>;
+
 /** Who the browser is, as far as the server knows. */
 export const meSchema = z.object({
   id: z.string(),
@@ -53,8 +63,8 @@ export const meSchema = z.object({
   ranked: z.boolean(),
   /** Why not ranked, ready to show, or null. */
   unrankedReason: z.string().nullable(),
-  /** Ids of the titles this player holds (shared/titles.ts). Absent on older servers. */
-  titles: z.array(z.string()).optional(),
+  /** The public tags this player holds, highest priority first. Absent = none. */
+  tags: z.array(publicTagSchema).optional(),
 });
 export type Me = z.infer<typeof meSchema>;
 
@@ -240,8 +250,8 @@ export const leaderboardEntrySchema = z.object({
   online: z.boolean(),
   /** The best Hackathon item this player owns, to show off next to the nickname. */
   item: z.object({ base: z.string(), rarity: z.string() }).nullable().optional(),
-  /** Ids of the titles this player holds, highest priority first. Absent = none. */
-  titles: z.array(z.string()).optional(),
+  /** The public tags this player holds, highest priority first. Absent = none. */
+  tags: z.array(publicTagSchema).optional(),
 });
 export type LeaderboardEntry = z.infer<typeof leaderboardEntrySchema>;
 
@@ -272,8 +282,8 @@ export const feedItemSchema = z.object({
   /** hire: professor id; skin: skin id; graduation: the graduation number as text; item: Hackathon item base id (a legendary drop); promotion: Hackathon cargo id. */
   detail: z.string().nullable(),
   at: z.number(),
-  /** Ids of the titles this player holds, highest priority first. Absent = none. */
-  titles: z.array(z.string()).optional(),
+  /** The public tags this player holds, highest priority first. Absent = none. */
+  tags: z.array(publicTagSchema).optional(),
 });
 export type FeedItem = z.infer<typeof feedItemSchema>;
 
@@ -318,8 +328,8 @@ export const adminPlayerSchema = z.object({
   banned: z.boolean(),
   /** True for the player of the browser making the request. */
   self: z.boolean(),
-  /** Ids of the titles this player holds. */
-  titles: z.array(z.string()).optional(),
+  /** Ids of every tag this player holds (public and admin-only), in catalogue order. */
+  tags: z.array(z.string()),
 });
 export type AdminPlayer = z.infer<typeof adminPlayerSchema>;
 
@@ -348,10 +358,10 @@ export const adminPlayerPatchSchema = z.object({
   banned: z.boolean().optional(),
   /** Removes an offensive nickname (the player can pick another). */
   clearNickname: z.literal(true).optional(),
-  /** Gives the player a title (no-op when held). A single-holder title cannot go to a second player. */
-  grantTitle: z.enum(TITLE_IDS).optional(),
-  /** Takes a title away (no-op when not held). */
-  revokeTitle: z.enum(TITLE_IDS).optional(),
+  /** Gives the player a tag (no-op when held). A single-holder tag cannot go to a second player. */
+  grantTag: z.string().min(1).max(64).optional(),
+  /** Takes a tag away (no-op when not held). */
+  revokeTag: z.string().min(1).max(64).optional(),
 });
 export type AdminPlayerPatch = z.infer<typeof adminPlayerPatchSchema>;
 
@@ -364,6 +374,87 @@ export const adminPasswordResetResponseSchema = z.object({
   temporaryPassword: z.string(),
 });
 export type AdminPasswordResetResponse = z.infer<typeof adminPasswordResetResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// Admin: player tags (GET/POST /api/admin/tags, POST/DELETE /api/admin/tags/[id])
+// ---------------------------------------------------------------------------
+
+export const tagVisibilitySchema = z.enum(TAG_VISIBILITIES);
+
+export const adminTagSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  description: z.string(),
+  color: z.string(),
+  visibility: tagVisibilitySchema,
+  /** At most one player may hold it. */
+  single: z.boolean(),
+  /** How many players hold it now. */
+  holders: z.number().int(),
+});
+export type AdminTag = z.infer<typeof adminTagSchema>;
+
+export const adminTagsResponseSchema = z.object({ tags: z.array(adminTagSchema) });
+export type AdminTagsResponse = z.infer<typeof adminTagsResponseSchema>;
+
+const tagLabelSchema = z
+  .string()
+  .trim()
+  .min(1, 'Dê um nome à tag.')
+  .max(TAG_LABEL_MAX, `O nome pode ter no máximo ${TAG_LABEL_MAX} caracteres.`);
+const tagDescriptionSchema = z.string().trim().max(TAG_DESCRIPTION_MAX, `A descrição pode ter no máximo ${TAG_DESCRIPTION_MAX} caracteres.`);
+const tagColorSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .regex(TAG_COLOR_PATTERN, 'Cor inválida: use o formato #rrggbb.');
+
+/** POST /api/admin/tags */
+export const adminTagCreateSchema = z.object({
+  label: tagLabelSchema,
+  description: tagDescriptionSchema.default(''),
+  color: tagColorSchema,
+  visibility: tagVisibilitySchema,
+  single: z.boolean().default(false),
+});
+export type AdminTagCreate = z.input<typeof adminTagCreateSchema>;
+
+/** POST /api/admin/tags/[id] — any subset of the fields. */
+export const adminTagPatchSchema = z.object({
+  label: tagLabelSchema.optional(),
+  description: tagDescriptionSchema.optional(),
+  color: tagColorSchema.optional(),
+  visibility: tagVisibilitySchema.optional(),
+  single: z.boolean().optional(),
+});
+export type AdminTagPatch = z.infer<typeof adminTagPatchSchema>;
+
+export const adminTagResponseSchema = z.object({ tag: adminTagSchema });
+export type AdminTagResponse = z.infer<typeof adminTagResponseSchema>;
+
+/** DELETE /api/admin/tags/[id]: the tag is gone and taken from everyone who held it. */
+export const adminTagDeleteResponseSchema = z.object({ removedFrom: z.number().int() });
+export type AdminTagDeleteResponse = z.infer<typeof adminTagDeleteResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// Admin: everything about one player (GET /api/admin/players/[id]/stats)
+// ---------------------------------------------------------------------------
+
+export const adminStatRowSchema = z.object({
+  label: z.string(),
+  /** Ready to show. */
+  value: z.string(),
+  /** Epoch ms when the value is a moment: the page formats it in the admin's time zone (`value` is the fallback). */
+  at: z.number().optional(),
+});
+export type AdminStatRow = z.infer<typeof adminStatRowSchema>;
+
+export const adminPlayerStatsSchema = z.object({
+  /** False when the player never synced: only the account section is there. */
+  hasSave: z.boolean(),
+  sections: z.array(z.object({ title: z.string(), rows: z.array(adminStatRowSchema) })),
+});
+export type AdminPlayerStats = z.infer<typeof adminPlayerStatsSchema>;
 
 /** What the bulk grant of "Turma Zero" would do, to show before confirming. */
 export const adminTurmaZeroPreviewSchema = z.object({
