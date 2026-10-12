@@ -24,8 +24,9 @@ export const balance: BalanceConfig = {
   events: { minIntervalMs: 75_000, maxIntervalMs: 150_000 },
   sprints: { offers: 3, cooldownMs: 150_000 },
   rewardClickFloor: 50,
-  // A fast human drums about 10-14 clicks a second; a script goes well past 15. Hold-to-click (Joinha de Ouro) is 10.
-  clickLimit: { perSecond: 15, windowMs: 1000 },
+  // A fast human drums about 10-14 clicks a second; the limit sits well above that so fast clicking (or an autoclicker)
+  // is not dropped, while still bounding what the server allows. Hold-to-click (Joinha de Ouro) is 10.
+  clickLimit: { perSecond: 100, windowMs: 1000 },
   // The cap makes sitting on a run pointless: at most 10 diplomas on the first graduation, 12 on the second, 14, 16...
   // (x1.18 each, stretched by Angelo's Domínio and honour). From the 40th graduation on it grows only 2% each: by then
   // everything diplomas buy is owned, production stops growing, and a cap that kept climbing made late runs take hours.

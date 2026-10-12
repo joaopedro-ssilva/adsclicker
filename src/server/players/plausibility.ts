@@ -174,13 +174,17 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
 
   const handClicks = content.balance.clickLimit?.perSecond ?? MAX_CLICKS_PER_SECOND;
   const autoClicks = bestNumber((r) => r.autoClicks);
-  const clicksAllowed = (handClicks + autoClicks) * window + AUTO_CLICK_BUFF_CLICKS * allowance;
   if (clicksDone > handClicks * window + CLICK_COUNT_GRACE * allowance) return fail('more clicks than possible');
+  // Every hand click the engine accepts is counted, so the coins check pays for the clicks the save shows (plus the
+  // grace), not the click limit over the whole window: the limit sits far above human speed and would leave room for
+  // coins nobody clicked.
+  const handClicksDone = Math.max(0, clicksDone) + CLICK_COUNT_GRACE * allowance;
+  const clicksAllowed = handClicksDone + autoClicks * window + AUTO_CLICK_BUFF_CLICKS * allowance;
 
   const returns = Math.min(offlineReturns, 1 + window / OFFLINE_RETURN_EVERY_SECONDS);
   const offlineSeconds = returns * bestNumber((r) => r.offlineSeconds);
   const lumps = REWARD_LUMP_SECONDS * bestNumber((r) => r.lumpFactor) * allowance;
-  const maestriaWindow = { clicks: handClicks * window + CLICK_COUNT_GRACE * allowance, seconds: window };
+  const maestriaWindow = { clicks: handClicksDone, seconds: window };
   const maestriaSeconds = Math.max(
     maestriaLumpSeconds(next, content, nextRates.stats, maestriaWindow),
     previous && prevRates ? maestriaLumpSeconds(previous, content, prevRates.stats, maestriaWindow) : 0,
