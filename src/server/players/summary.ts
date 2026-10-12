@@ -1,7 +1,7 @@
 import type { CloudSave, Me, SaveSummary } from '@/shared/api';
-import type { PlayerRow } from '../db/schema';
+import type { PlayerRow, PlayerTagRow } from '../db/schema';
 import { flaggedAreRanked } from './ranking';
-import { titlesForWire } from './titles';
+import { publicTagsOf } from './tags';
 
 /** The columns every "who is this" answer needs; the save text is not among them. */
 export type PlayerCore = Omit<PlayerRow, 'save'>;
@@ -18,18 +18,20 @@ function unrankedReason(player: Pick<PlayerCore, 'nickname' | 'flagged' | 'banne
   return 'Seu progresso está em verificação e fica fora do ranking por enquanto.';
 }
 
+/** `catalog` is the tag catalogue (getTagCatalog): the player's public tags go with the answer. */
 export function toMe(
   player: Pick<PlayerCore, 'id' | 'nickname' | 'passwordHash' | 'flagged' | 'banned' | 'testAccount'> &
     Partial<Pick<PlayerCore, 'titles'>>,
+  catalog: readonly PlayerTagRow[],
 ): Me {
-  const titles = titlesForWire(player.titles);
+  const tags = publicTagsOf(catalog, player.titles);
   return {
     id: player.id,
     nickname: player.nickname,
     hasPassword: player.passwordHash !== null,
     ranked: isRanked(player),
     unrankedReason: unrankedReason(player),
-    ...(titles ? { titles } : {}),
+    ...(tags ? { tags } : {}),
   };
 }
 

@@ -83,10 +83,15 @@ export const players = pgTable(
     flagged: boolean('flagged').notNull().default(false),
     flagReason: text('flag_reason'),
     banned: boolean('banned').notNull().default(false),
+    /**
+     * Cleared for good by the admin: the plausibility check still runs and logs, but never flags
+     * this player (docs/BACKEND.md, "Jogador confiável"). The admin can still flag them by hand.
+     */
+    trusted: boolean('trusted').notNull().default(false),
 
     // Titles and launch reset ------------------------------------------------------------------
     /**
-     * Ids of the titles this player holds (catalogue in shared/titles.ts). A column and not a join
+     * Ids of the tags this player holds (catalogue in `player_tags`). A column and not a join
      * table: the boards and the feed read it with the row they already read, and nothing queries
      * "who holds X" often enough to need an index. The launch reset never touches it.
      */
@@ -121,6 +126,31 @@ export const rankedCondition = () =>
   flaggedAreRanked()
     ? sql`${players.nickname} is not null and not ${players.banned} and not ${players.testAccount}`
     : rankedWhere(players);
+
+/**
+ * Tags the admin creates and gives to players (docs/BACKEND.md, "Tags"). Players hold the ids in
+ * `players.titles`; deleting a tag takes it from them in the same transaction.
+ */
+export const playerTags = pgTable(
+  'player_tags',
+  {
+    id: text('id').primaryKey(),
+    label: text('label').notNull(),
+    description: text('description').notNull().default(''),
+    /** `#rrggbb` */
+    color: text('color').notNull(),
+    /** public: badge on the boards, the feed and the player's own line. admin: only on /admin. */
+    visibility: text('visibility').notNull().default('public'),
+    /** At most one player may hold it. */
+    single: boolean('single').notNull().default(false),
+    /** Priority, lowest first: the badge shown when only one fits. */
+    position: integer('position').notNull().default(0),
+    createdAt: timestamptz('created_at').notNull().defaultNow(),
+  },
+  (t) => [check('player_tags_visibility', sql`${t.visibility} in ('public', 'admin')`)],
+);
+
+export type PlayerTagRow = typeof playerTags.$inferSelect;
 
 /** Only the SHA-256 of the cookie token is stored, so a database leak cannot be replayed. */
 export const sessions = pgTable(

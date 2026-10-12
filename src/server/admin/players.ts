@@ -8,17 +8,19 @@ import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { hashPassword } from '../auth/password';
 import { players, sessions } from '../db/schema';
+import type { PlayerTagRow } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { logEvent } from '../logs/log';
 import { generateTempPassword } from './tempPassword';
 import { nicknameKey } from '../players/nickname';
-import { assertTitleFree, grantTitleSql, revokeTitleSql, titleIdsOf } from '../players/titles';
+import { assertTagFree, grantTagSql, loadTags, requireTag, revokeTagSql, tagIdsOf } from '../players/tags';
 import type { PlayerCore } from '../players/summary';
 
 export const ADMIN_PAGE_SIZE = 25;
 export const ADMIN_FLAG_REASON = 'Marcado pelo admin';
 
-export function toAdminPlayer(row: PlayerCore, selfId: string | null, now: number): AdminPlayer {
+/** `catalog` is the tag catalogue: the ids of deleted tags are left out. */
+export function toAdminPlayer(row: PlayerCore, selfId: string | null, now: number, catalog: readonly PlayerTagRow[]): AdminPlayer {
   return {
     id: row.id,
     nickname: row.nickname,
@@ -37,8 +39,9 @@ export function toAdminPlayer(row: PlayerCore, selfId: string | null, now: numbe
     flagged: row.flagged,
     flagReason: row.flagReason,
     banned: row.banned,
+    trusted: row.trusted,
     self: row.id === selfId,
-    titles: titleIdsOf(row.titles),
+    tags: tagIdsOf(catalog, row.titles),
   };
 }
 
@@ -74,7 +77,7 @@ export async function listPlayers(
     desc(players.lastSeenAt),
     players.id,
   ];
-  const [rows, totals, eventMultiplier] = await Promise.all([
+  const [rows, totals, eventMultiplier, catalog] = await Promise.all([
     db
       .select(listColumns)
       .from(players)
@@ -84,9 +87,10 @@ export async function listPlayers(
       .offset((query.page - 1) * ADMIN_PAGE_SIZE),
     db.select({ total: count() }).from(players).where(where),
     getEventMultiplier(db, now),
+    loadTags(db),
   ]);
   return {
-    players: rows.map((row) => toAdminPlayer(row, query.selfId, now)),
+    players: rows.map((row) => toAdminPlayer(row, query.selfId, now, catalog)),
     total: totals[0]?.total ?? 0,
     page: query.page,
     pageSize: ADMIN_PAGE_SIZE,
@@ -108,27 +112,38 @@ export function patchToColumns(patch: AdminPlayerPatch): PgUpdateSetSource<typeo
     set.flagReason = patch.flagged ? ADMIN_FLAG_REASON : null;
   }
   if (patch.banned !== undefined) set.banned = patch.banned;
+  if (patch.trusted !== undefined) {
+    set.trusted = patch.trusted;
+    // Trusting a player clears the flag they carry now, unless the same patch sets it.
+    if (patch.trusted && patch.flagged === undefined) {
+      set.flagged = false;
+      set.flagReason = null;
+    }
+  }
   if (patch.clearNickname) {
     set.nickname = null;
     set.nicknameKey = null;
   }
-  if (patch.grantTitle !== undefined) set.titles = grantTitleSql(patch.grantTitle);
-  else if (patch.revokeTitle !== undefined) set.titles = revokeTitleSql(patch.revokeTitle);
+  if (patch.grantTag !== undefined) set.titles = grantTagSql(patch.grantTag);
+  else if (patch.revokeTag !== undefined) set.titles = revokeTagSql(patch.revokeTag);
   return set;
 }
 
 /** One log entry per kind of change in an admin patch. */
-function logAdminPatch(db: Db, id: string, patch: AdminPlayerPatch, nickname: string | null): void {
+function logAdminPatch(db: Db, id: string, patch: AdminPlayerPatch, nickname: string | null, tagLabel: string | null): void {
   const changes: [string, string, unknown][] = [];
   if (patch.banned !== undefined) changes.push([patch.banned ? 'admin_ban' : 'admin_unban', patch.banned ? 'Jogador banido' : 'Banimento removido', null]);
   if (patch.flagged !== undefined) {
     changes.push([patch.flagged ? 'admin_flag' : 'admin_unflag', patch.flagged ? 'Marca de suspeito colocada' : 'Marca de suspeito removida', null]);
   }
+  if (patch.trusted !== undefined) {
+    changes.push([patch.trusted ? 'admin_trust' : 'admin_untrust', patch.trusted ? 'Marcado como confiável (o anticheat não marca mais)' : 'Marca de confiável removida', null]);
+  }
   if (patch.multiplier !== undefined) changes.push(['admin_multiplier', `Multiplicador do jogador: ×${patch.multiplier}`, { multiplier: patch.multiplier }]);
   if (patch.testAccount !== undefined) changes.push(['admin_test_account', patch.testAccount ? 'Marcado como conta de teste' : 'Conta de teste desmarcada', null]);
   if (patch.clearNickname) changes.push(['admin_clear_nickname', 'Apelido removido', null]);
-  if (patch.grantTitle !== undefined) changes.push(['admin_title_grant', `Título concedido: ${patch.grantTitle}`, { title: patch.grantTitle }]);
-  if (patch.revokeTitle !== undefined) changes.push(['admin_title_revoke', `Título removido: ${patch.revokeTitle}`, { title: patch.revokeTitle }]);
+  if (patch.grantTag !== undefined) changes.push(['admin_tag_grant', `Tag dada: ${tagLabel ?? patch.grantTag}`, { tag: patch.grantTag }]);
+  if (patch.revokeTag !== undefined) changes.push(['admin_tag_revoke', `Tag tirada: ${tagLabel ?? patch.revokeTag}`, { tag: patch.revokeTag }]);
   for (const [kind, message, detail] of changes) {
     logEvent(db, { level: 'info', kind, message, playerId: id, nickname, route: '/api/admin/players/[id]', detail });
   }
@@ -143,10 +158,16 @@ export async function patchPlayer(
   now: number = Date.now(),
 ): Promise<AdminPlayerResponse> {
   if (!z.uuid().safeParse(id).success) throw new ApiFailure('not_found');
-  if (patch.grantTitle !== undefined && patch.revokeTitle !== undefined) {
-    throw new ApiFailure('invalid', 'Dê ou tire um título por vez.');
+  if (patch.grantTag !== undefined && patch.revokeTag !== undefined) {
+    throw new ApiFailure('invalid', 'Dê ou tire uma tag por vez.');
   }
-  if (patch.grantTitle !== undefined) await assertTitleFree(db, patch.grantTitle, id);
+  let tagLabel: string | null = null;
+  if (patch.grantTag !== undefined) {
+    const tag = await requireTag(db, patch.grantTag);
+    await assertTagFree(db, tag, id);
+    tagLabel = tag.label;
+  }
+  // Taking away the id of a deleted tag is harmless (it is already gone from everyone), so no check.
   const set = patchToColumns(patch);
   const rows =
     Object.keys(set).length === 0
@@ -154,8 +175,8 @@ export async function patchPlayer(
       : await db.update(players).set(set).where(eq(players.id, id)).returning(listColumns);
   const row = rows[0];
   if (!row) throw new ApiFailure('not_found');
-  logAdminPatch(db, id, patch, row.nickname);
-  return { player: toAdminPlayer(row, selfId, now) };
+  logAdminPatch(db, id, patch, row.nickname, tagLabel);
+  return { player: toAdminPlayer(row, selfId, now, await loadTags(db)) };
 }
 
 /**
@@ -183,5 +204,5 @@ export async function resetPlayerPassword(db: Db, id: string, selfId: string | n
     nickname: row.nickname,
     route: '/api/admin/players/[id]/password-reset',
   });
-  return { player: toAdminPlayer(row, selfId, now), temporaryPassword };
+  return { player: toAdminPlayer(row, selfId, now, await loadTags(db)), temporaryPassword };
 }

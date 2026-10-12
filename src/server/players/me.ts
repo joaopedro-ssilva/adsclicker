@@ -8,6 +8,7 @@ import { sharedDeps } from '../hackathon/deps';
 import { effectiveMultiplier } from './multiplier';
 import { readProgressEpoch } from './progressEpoch';
 import { toCloudInfo, toMe } from './summary';
+import { getTagCatalog } from './tags';
 
 /** GET /api/me: who this browser is. No session is not an error: the first sync creates one. */
 export async function getMe(
@@ -24,7 +25,7 @@ export async function getMe(
   const bonus = await classroomBonusFor(db, player.id, hackathon);
   return {
     body: {
-      me: toMe(player),
+      me: toMe(player, await getTagCatalog(db, now)),
       multiplier: effectiveMultiplier(eventMultiplier, player.multiplier),
       ...(bonus ? { bonus } : {}),
       cloud: toCloudInfo(player),

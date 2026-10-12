@@ -66,6 +66,14 @@ export async function connectTestDb(options: { database?: string } = {}): Promis
     close: () => client.end({ timeout: 5 }),
     reset: async () => {
       await db.execute(sql`truncate table players, sessions, feed_events, app_config, rate_limits cascade`);
+      // The tag catalogue goes back to what the migration seeds: the two launch tags, as they came.
+      await db.execute(sql`delete from player_tags where id not in ('primeiro-platinado', 'turma-zero')`);
+      await db.execute(sql`
+        insert into player_tags (id, label, description, color, visibility, single, position) values
+          ('primeiro-platinado', 'Primeiro Platinado', 'O primeiro jogador a conquistar todas as conquistas.', '#f2c744', 'public', true, 0),
+          ('turma-zero', 'Turma Zero', 'Jogou na fase de testes, antes do lançamento oficial.', '#6fd6e6', 'public', false, 1)
+        on conflict (id) do update set label = excluded.label, description = excluded.description, color = excluded.color,
+          visibility = excluded.visibility, single = excluded.single, position = excluded.position`);
     },
   };
 }

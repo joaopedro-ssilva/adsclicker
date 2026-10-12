@@ -27,6 +27,12 @@ describe('patchToColumns', () => {
     expect(patchToColumns({ clearNickname: true })).toEqual({ nickname: null, nicknameKey: null });
   });
 
+  it('trusting a player clears the current flag, unless the same patch sets it', () => {
+    expect(patchToColumns({ trusted: true })).toEqual({ trusted: true, flagged: false, flagReason: null });
+    expect(patchToColumns({ trusted: true, flagged: true })).toEqual({ trusted: true, flagged: true, flagReason: ADMIN_FLAG_REASON });
+    expect(patchToColumns({ trusted: false })).toEqual({ trusted: false });
+  });
+
   it('an empty patch changes nothing', () => {
     expect(patchToColumns({})).toEqual({});
   });

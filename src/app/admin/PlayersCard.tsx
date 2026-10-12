@@ -4,16 +4,18 @@ import type { AdminPlayer } from '@/shared/api';
 import { Button, Panel } from '@/ui/kit';
 import { PlayerRow } from './PlayerRow';
 import type { AdminPlayersState } from './useAdminPlayers';
+import type { AdminTagsState } from './useAdminTags';
 
 const SEARCH_DELAY_MS = 300;
 
 interface PlayersCardProps {
   list: AdminPlayersState;
   onChanged: (player: AdminPlayer) => void;
+  catalog: AdminTagsState;
 }
 
 /** Searchable, paginated player table. Rows expand into their actions. */
-export function PlayersCard({ list, onChanged }: PlayersCardProps) {
+export function PlayersCard({ list, onChanged, catalog }: PlayersCardProps) {
   const { data, error, loading, page, setPage, setSearch, reload } = list;
   const [text, setText] = useState('');
   const [openId, setOpenId] = useState<string | null>(null);
@@ -101,6 +103,7 @@ export function PlayersCard({ list, onChanged }: PlayersCardProps) {
                     open={openId === player.id}
                     onToggle={() => setOpenId(openId === player.id ? null : player.id)}
                     onChanged={onChanged}
+                    catalog={catalog}
                   />
                 ))
               )}

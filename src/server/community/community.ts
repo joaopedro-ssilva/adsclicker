@@ -5,7 +5,7 @@ import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { feedEvents, players, rankedCondition } from '../db/schema';
 import { flaggedAreRanked } from '../players/ranking';
-import { titlesForWire } from '../players/titles';
+import { getTagCatalog, publicTagsOf } from '../players/tags';
 import { createTtlCache } from './cache';
 
 export const FEED_SIZE = 30;
@@ -36,7 +36,7 @@ function isFeedKind(kind: string): kind is FeedItem['kind'] {
 async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
   // Raw sql`` params are not mapped by Drizzle: pass the instant as text and cast it.
   const onlineSince = new Date(now - ONLINE_WINDOW_MS).toISOString();
-  const [totals, feedRows, eventMultiplier] = await Promise.all([
+  const [totals, feedRows, eventMultiplier, catalog] = await Promise.all([
     db
       .select({
         players: sql<number>`count(*)::int`,
@@ -63,12 +63,13 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
       .orderBy(desc(feedEvents.createdAt))
       .limit(FEED_SIZE),
     getEventMultiplier(db, now),
+    getTagCatalog(db, now),
   ]);
 
   const row = totals[0];
   const feed: FeedItem[] = [];
   for (const event of feedRows) {
-    const titles = titlesForWire(event.titles);
+    const tags = publicTagsOf(catalog, event.titles);
     if (event.nickname !== null && isFeedKind(event.kind)) {
       feed.push({
         id: event.id,
@@ -76,7 +77,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
         kind: event.kind,
         detail: event.detail === '' ? null : event.detail,
         at: event.createdAt.getTime(),
-        ...(titles ? { titles } : {}),
+        ...(tags ? { tags } : {}),
       });
     }
   }

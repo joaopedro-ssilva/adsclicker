@@ -376,32 +376,37 @@
 }
 
 /* Player titles (shared/titles.ts): a small badge next to the nickname, also used by /admin. */
-.title-badge {
+.tag-badges {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-width: 0;
+  cursor: help;
+}
+
+.tag-badge {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   gap: 4px;
   padding: 0 5px;
-  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--tag-fg) 35%, transparent);
+  color: var(--tag-fg);
+  background: var(--tag-bg);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.04em;
   line-height: 1.5;
   text-transform: uppercase;
   white-space: nowrap;
-  cursor: help;
 }
 
-.title-badge[data-tone='gold'] {
-  color: #3a2600;
-  background: #f2c744;
+/* Seen only on /admin. */
+.tag-badge[data-admin-only] {
+  border-style: dashed;
+  border-color: var(--tag-fg);
 }
 
-.title-badge[data-tone='cyan'] {
-  color: #05323a;
-  background: #6fd6e6;
-}
-
-.title-badge-more {
+.tag-badge-more {
   opacity: 0.75;
 }

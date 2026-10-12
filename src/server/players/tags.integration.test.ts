@@ -1,5 +1,5 @@
 /**
- * Titles, the bulk "Turma Zero" grant, the launch reset and the progress epoch, against Postgres
+ * Tags (the catalogue, giving and showing them), the bulk "Turma Zero" grant, the launch reset and the progress epoch, against Postgres
  * (`adsclicker_titles_test`). Skips itself when the database cannot be reached, like the other
  * integration tests.
  */
@@ -9,7 +9,9 @@ import { serializeState } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import { LAUNCH_RESET_PHRASE, adminPlayerPatchSchema } from '@/shared/api';
 import type { SyncRequest } from '@/shared/api';
-import { patchPlayer } from '../admin/players';
+import { formatNumber } from '@/game/engine';
+import { playerStats } from '../admin/playerStats';
+import { listPlayers, patchPlayer } from '../admin/players';
 import { requireSession } from '../auth/context';
 import { login } from '../auth/login';
 import { SESSION_COOKIE, readSessionToken } from '../auth/session';
@@ -32,7 +34,7 @@ import { resetForLaunch, previewLaunchReset } from './launchReset';
 import { getMe } from './me';
 import { readProgressEpoch } from './progressEpoch';
 import { syncPlayer } from './sync';
-import { grantTurmaZeroToAll, turmaZeroPreview } from './titles';
+import { clearTagCache, createTag, deleteTag, grantTurmaZeroToAll, listAdminTags, turmaZeroPreview, updateTag } from './tags';
 import { connectTestDb } from '../testing/db';
 import { playWindows } from '../testing/play';
 
@@ -63,7 +65,7 @@ async function expectFailure(promise: Promise<unknown>, code: string): Promise<A
   return error as ApiFailure;
 }
 
-describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
+describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
   if (!testDb) return;
   const { db } = testDb;
 
@@ -71,6 +73,7 @@ describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
     await testDb.reset();
     clearCommunityCache();
     clearLeaderboardCache();
+    clearTagCache();
     resetEventMultiplierCache();
   });
 
@@ -101,64 +104,181 @@ describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
 
   const holders = async () => (await db.select({ id: players.id, titles: players.titles }).from(players)).filter((row) => row.titles.length > 0);
 
-  describe('granting and removing a title', () => {
-    it('grants and removes one title, and repeating either changes nothing', async () => {
+  describe('giving and taking a tag', () => {
+    it('gives and takes one tag, and repeating either changes nothing', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
-      const granted = await patchPlayer(db, ana.id, { grantTitle: 'turma-zero' }, null);
-      expect(granted.player.titles).toEqual(['turma-zero']);
-      const again = await patchPlayer(db, ana.id, { grantTitle: 'turma-zero' }, null);
-      expect(again.player.titles).toEqual(['turma-zero']);
+      const granted = await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
+      expect(granted.player.tags).toEqual(['turma-zero']);
+      const again = await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
+      expect(again.player.tags).toEqual(['turma-zero']);
 
-      const both = await patchPlayer(db, ana.id, { grantTitle: 'primeiro-platinado' }, null);
+      const both = await patchPlayer(db, ana.id, { grantTag: 'primeiro-platinado' }, null);
       // Highest priority first.
-      expect(both.player.titles).toEqual(['primeiro-platinado', 'turma-zero']);
+      expect(both.player.tags).toEqual(['primeiro-platinado', 'turma-zero']);
 
-      const removed = await patchPlayer(db, ana.id, { revokeTitle: 'turma-zero' }, null);
-      expect(removed.player.titles).toEqual(['primeiro-platinado']);
-      const removedAgain = await patchPlayer(db, ana.id, { revokeTitle: 'turma-zero' }, null);
-      expect(removedAgain.player.titles).toEqual(['primeiro-platinado']);
+      const removed = await patchPlayer(db, ana.id, { revokeTag: 'turma-zero' }, null);
+      expect(removed.player.tags).toEqual(['primeiro-platinado']);
+      const removedAgain = await patchPlayer(db, ana.id, { revokeTag: 'turma-zero' }, null);
+      expect(removedAgain.player.tags).toEqual(['primeiro-platinado']);
     });
 
-    it('does not let a single-holder title go to a second player, until the first one loses it', async () => {
+    it('does not let a single-holder tag go to a second player, until the first one loses it', async () => {
       const ana = await newPlayer({ nickname: 'Ana', ip: '10.0.0.1' });
       const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
-      await patchPlayer(db, ana.id, { grantTitle: 'primeiro-platinado' }, null);
-      const failure = await expectFailure(patchPlayer(db, bia.id, { grantTitle: 'primeiro-platinado' }, null), 'invalid');
+      await patchPlayer(db, ana.id, { grantTag: 'primeiro-platinado' }, null);
+      const failure = await expectFailure(patchPlayer(db, bia.id, { grantTag: 'primeiro-platinado' }, null), 'invalid');
       expect(failure.message).toContain('Ana');
-      await patchPlayer(db, ana.id, { revokeTitle: 'primeiro-platinado' }, null);
-      const moved = await patchPlayer(db, bia.id, { grantTitle: 'primeiro-platinado' }, null);
-      expect(moved.player.titles).toEqual(['primeiro-platinado']);
+      await patchPlayer(db, ana.id, { revokeTag: 'primeiro-platinado' }, null);
+      const moved = await patchPlayer(db, bia.id, { grantTag: 'primeiro-platinado' }, null);
+      expect(moved.player.tags).toEqual(['primeiro-platinado']);
     });
 
-    it('refuses granting and revoking in the same call, and the schema refuses unknown titles', async () => {
+    it('refuses giving and taking in the same call, and refuses a tag that does not exist', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
-      await expectFailure(patchPlayer(db, ana.id, { grantTitle: 'turma-zero', revokeTitle: 'turma-zero' }, null), 'invalid');
-      expect(adminPlayerPatchSchema.safeParse({ grantTitle: 'rei-do-clicker' }).success).toBe(false);
-      expect(adminPlayerPatchSchema.safeParse({ grantTitle: 'turma-zero' }).success).toBe(true);
+      await expectFailure(patchPlayer(db, ana.id, { grantTag: 'turma-zero', revokeTag: 'turma-zero' }, null), 'invalid');
+      await expectFailure(patchPlayer(db, ana.id, { grantTag: 'rei-do-clicker' }, null), 'invalid');
+      expect(adminPlayerPatchSchema.safeParse({ grantTag: '' }).success).toBe(false);
+      expect(adminPlayerPatchSchema.safeParse({ grantTag: 'turma-zero' }).success).toBe(true);
     });
   });
 
-  describe('showing titles', () => {
+  describe('showing tags', () => {
     it('puts them on the board entries, the feed and the player\'s own answer, highest priority first', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
       const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
-      await patchPlayer(db, ana.id, { grantTitle: 'turma-zero' }, null);
-      await patchPlayer(db, ana.id, { grantTitle: 'primeiro-platinado' }, null);
+      await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
+      await patchPlayer(db, ana.id, { grantTag: 'primeiro-platinado' }, null);
       await db.insert(feedEvents).values({ playerId: ana.id, kind: 'hire', detail: 'angelo' });
       await db.insert(feedEvents).values({ playerId: bia.id, kind: 'hire', detail: 'angelo' });
 
       const board = await getLeaderboard(db, 'coins', T0);
       const byName = new Map(board.entries.map((entry) => [entry.nickname, entry]));
-      expect(byName.get('Ana')?.titles).toEqual(['primeiro-platinado', 'turma-zero']);
-      // A player without titles adds nothing to the payload: old and new clients read the same shape.
-      expect(byName.get('Bia')).not.toHaveProperty('titles');
+      expect(byName.get('Ana')?.tags).toEqual([
+        { id: 'primeiro-platinado', label: 'Primeiro Platinado', description: 'O primeiro jogador a conquistar todas as conquistas.', color: '#f2c744' },
+        { id: 'turma-zero', label: 'Turma Zero', description: 'Jogou na fase de testes, antes do lançamento oficial.', color: '#6fd6e6' },
+      ]);
+      // A player without tags adds nothing to the payload.
+      expect(byName.get('Bia')).not.toHaveProperty('tags');
 
       const community = await getCommunity(db, T0);
-      expect(community.feed.find((item) => item.nickname === 'Ana')?.titles).toEqual(['primeiro-platinado', 'turma-zero']);
-      expect(community.feed.find((item) => item.nickname === 'Bia')).not.toHaveProperty('titles');
+      expect(community.feed.find((item) => item.nickname === 'Ana')?.tags?.map((tag) => tag.id)).toEqual(['primeiro-platinado', 'turma-zero']);
+      expect(community.feed.find((item) => item.nickname === 'Bia')).not.toHaveProperty('tags');
 
       const me = await getMe(db, ana.headers, T0 + 10 * 60_000);
-      expect(me.body.me?.titles).toEqual(['primeiro-platinado', 'turma-zero']);
+      expect(me.body.me?.tags?.map((tag) => tag.id)).toEqual(['primeiro-platinado', 'turma-zero']);
+    });
+
+    it('keeps admin-only tags off the boards, the feed and the player\'s own answer, but lists them on /admin', async () => {
+      const ana = await newPlayer({ nickname: 'Ana' });
+      const { tag: watch } = await createTag(db, { label: 'De olho', color: '#ff6b6b', visibility: 'admin' });
+      await patchPlayer(db, ana.id, { grantTag: watch.id }, null);
+      await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
+      await db.insert(feedEvents).values({ playerId: ana.id, kind: 'hire', detail: 'angelo' });
+
+      const entry = (await getLeaderboard(db, 'coins', T0)).entries.find((row) => row.nickname === 'Ana');
+      expect(entry?.tags?.map((tag) => tag.id)).toEqual(['turma-zero']);
+      expect((await getCommunity(db, T0)).feed[0]?.tags?.map((tag) => tag.id)).toEqual(['turma-zero']);
+      expect((await getMe(db, ana.headers, T0 + 10 * 60_000)).body.me?.tags?.map((tag) => tag.id)).toEqual(['turma-zero']);
+
+      const listed = await listPlayers(db, { search: 'Ana', page: 1, selfId: null }, T0);
+      expect(listed.players[0]?.tags).toEqual(['turma-zero', watch.id]);
+
+      // Turning it public shows it at once on this instance (the catalogue cache is cleared by the change).
+      await updateTag(db, watch.id, { visibility: 'public' });
+      clearLeaderboardCache();
+      const shown = (await getLeaderboard(db, 'coins', T0 + 1)).entries.find((row) => row.nickname === 'Ana');
+      expect(shown?.tags?.map((tag) => tag.id)).toEqual(['turma-zero', watch.id]);
+    });
+  });
+
+  describe('the tag catalogue', () => {
+    it('creates tags with readable ids, last in priority, and counts who holds each one', async () => {
+      const first = await createTag(db, { label: 'Campeão do Semestre', description: 'Venceu o semestre.', color: '#b48cff', visibility: 'public' });
+      expect(first.tag).toEqual({
+        id: 'campeao-do-semestre',
+        label: 'Campeão do Semestre',
+        description: 'Venceu o semestre.',
+        color: '#b48cff',
+        visibility: 'public',
+        single: false,
+        holders: 0,
+      });
+      const again = await createTag(db, { label: 'Campeão do semestre!', color: '#b48cff', visibility: 'admin', single: true });
+      expect(again.tag).toMatchObject({ id: 'campeao-do-semestre-2', visibility: 'admin', single: true, description: '' });
+
+      const ana = await newPlayer({ nickname: 'Ana' });
+      await patchPlayer(db, ana.id, { grantTag: first.tag.id }, null);
+      const { tags } = await listAdminTags(db);
+      expect(tags.map((tag) => [tag.id, tag.holders])).toEqual([
+        ['primeiro-platinado', 0],
+        ['turma-zero', 0],
+        ['campeao-do-semestre', 1],
+        ['campeao-do-semestre-2', 0],
+      ]);
+    });
+
+    it('edits name, description, colour and visibility, and refuses making single a tag two players hold', async () => {
+      const ana = await newPlayer({ nickname: 'Ana', ip: '10.0.0.1' });
+      const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
+      const edited = await updateTag(db, 'turma-zero', { label: 'Turma Zero!', description: 'Pioneiros.', color: '#7bd88f', visibility: 'admin' });
+      expect(edited.tag).toMatchObject({ id: 'turma-zero', label: 'Turma Zero!', description: 'Pioneiros.', color: '#7bd88f', visibility: 'admin' });
+
+      await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
+      await patchPlayer(db, bia.id, { grantTag: 'turma-zero' }, null);
+      const refused = await expectFailure(updateTag(db, 'turma-zero', { single: true }), 'invalid');
+      expect(refused.message).toContain('2 jogadores');
+      await patchPlayer(db, bia.id, { revokeTag: 'turma-zero' }, null);
+      expect((await updateTag(db, 'turma-zero', { single: true })).tag).toMatchObject({ single: true, holders: 1 });
+      await expectFailure(updateTag(db, 'nao-existe', { label: 'x' }), 'invalid');
+    });
+
+    it('deletes a tag and takes it from every player in the same step', async () => {
+      const ana = await newPlayer({ nickname: 'Ana', ip: '10.0.0.1' });
+      const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
+      const { tag } = await createTag(db, { label: 'Veterano', color: '#ff9f43', visibility: 'public' });
+      await patchPlayer(db, ana.id, { grantTag: tag.id }, null);
+      await patchPlayer(db, bia.id, { grantTag: tag.id }, null);
+      await patchPlayer(db, bia.id, { grantTag: 'turma-zero' }, null);
+
+      expect(await deleteTag(db, tag.id)).toEqual({ removedFrom: 2 });
+      const rows = await db.select({ nickname: players.nickname, titles: players.titles }).from(players);
+      expect(Object.fromEntries(rows.map((row) => [row.nickname, row.titles]))).toEqual({ Ana: [], Bia: ['turma-zero'] });
+      expect((await listAdminTags(db)).tags.map((row) => row.id)).toEqual(['primeiro-platinado', 'turma-zero']);
+      await expectFailure(deleteTag(db, tag.id), 'invalid');
+      // Taking away a deleted tag is harmless.
+      expect((await patchPlayer(db, ana.id, { revokeTag: tag.id }, null)).player.tags).toEqual([]);
+    });
+
+    it('turns the Turma Zero tools off when that tag is deleted', async () => {
+      await newPlayer({ nickname: 'Ana' });
+      await deleteTag(db, 'turma-zero');
+      await expectFailure(turmaZeroPreview(db), 'invalid');
+      await expectFailure(grantTurmaZeroToAll(db), 'invalid');
+      expect((await previewLaunchReset(db)).withoutTurmaZero).toBe(0);
+    });
+  });
+
+  describe('a player\'s statistics on /admin', () => {
+    it('reads the account and the cloud save', async () => {
+      const ana = await newPlayer({ nickname: 'Ana', windows: 4 });
+      const stats = await playerStats(db, ana.id, ana.now);
+      expect(stats.hasSave).toBe(true);
+      const section = (title: string) => stats.sections.find((entry) => entry.title === title);
+      const value = (title: string, label: string) => section(title)?.rows.find((row) => row.label === label)?.value;
+      expect(section('Conta')?.rows.find((row) => row.label === 'Apelido')?.value).toBe('Ana');
+      expect(value('Progresso', 'Turmas formadas')).toBe(String(ana.last.counters.graduations));
+      expect(value('Contadores', 'Cliques')).toBe(formatNumber(ana.last.counters.clicks, { integer: true }));
+      expect(value('Coleção', 'Conquistas')).toMatch(/^\d+ \/ \d+$/);
+      expect(section('Conta')?.rows.find((row) => row.label === 'Criada em')?.at).toEqual(expect.any(Number));
+    });
+
+    it('shows only the account for a player who never synced, and refuses unknown ids', async () => {
+      const [row] = await db.insert(players).values({ nickname: 'Cris', nicknameKey: 'cris' }).returning({ id: players.id });
+      const stats = await playerStats(db, row!.id, T0);
+      expect(stats).toMatchObject({ hasSave: false });
+      expect(stats.sections.map((section) => section.title)).toEqual(['Conta']);
+      await expectFailure(playerStats(db, '00000000-0000-4000-8000-000000000000', T0), 'not_found');
+      await expectFailure(playerStats(db, 'nao-e-uuid', T0), 'not_found');
     });
   });
 
@@ -177,9 +297,9 @@ describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
       expect(await grantTurmaZeroToAll(db)).toEqual({ granted: 0, alreadyHad: 2 });
     });
 
-    it('keeps the other titles a player already holds', async () => {
+    it('keeps the other tags a player already holds', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
-      await patchPlayer(db, ana.id, { grantTitle: 'primeiro-platinado' }, null);
+      await patchPlayer(db, ana.id, { grantTag: 'primeiro-platinado' }, null);
       await grantTurmaZeroToAll(db);
       const [row] = await db.select({ titles: players.titles }).from(players).where(eq(players.id, ana.id));
       expect([...(row?.titles ?? [])].sort()).toEqual(['primeiro-platinado', 'turma-zero']);
@@ -223,10 +343,10 @@ describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
       expect(await readProgressEpoch(db)).toBe(0);
     });
 
-    it('clears progress, flags, boards, totals, feed and Hackathon, and keeps accounts, passwords, sessions and titles', async () => {
+    it('clears progress, flags, boards, totals, feed and Hackathon, and keeps accounts, passwords, sessions and tags', async () => {
       const ana = await newPlayer({ nickname: 'Ana', ip: '10.0.0.1' });
       const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
-      await patchPlayer(db, ana.id, { grantTitle: 'turma-zero' }, null);
+      await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
       await patchPlayer(db, bia.id, { testAccount: true, banned: true }, null);
       await db.update(players).set({ flagged: true, flagReason: 'Ganho alto demais' }).where(eq(players.id, ana.id));
       await db.insert(feedEvents).values({ playerId: ana.id, kind: 'hire', detail: 'angelo' });
@@ -294,7 +414,7 @@ describe.skipIf(!testDb)('titles and launch reset against Postgres', () => {
       // The account still logs in with its password and has no cloud save to bring back.
       const logged = await login(db, { nickname: 'Ana', password: 'senha-padrao' }, { ip: '10.0.0.9', currentToken: null, now: T0 + 2 });
       expect(logged.body.cloud).toBeNull();
-      expect(logged.body.me.titles).toEqual(['turma-zero']);
+      expect(logged.body.me.tags?.map((tag) => tag.id)).toEqual(['turma-zero']);
     });
 
     it('is safe to run twice: the second run clears nothing more and only moves the epoch', async () => {

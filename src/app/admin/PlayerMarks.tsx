@@ -2,9 +2,9 @@ import { formatNumber } from '@/game/engine/format';
 import type { AdminPlayer } from '@/shared/api';
 import { Badge } from '@/ui/kit';
 
-/** The state badges of a player row: this browser, test account, suspect (with the reason) and banned. */
+/** The state badges of a player row: this browser, test account, suspect (with the reason), banned and trusted. */
 export function PlayerMarks({ player }: { player: AdminPlayer }) {
-  const hasMarks = player.self || player.testAccount || player.flagged || player.banned || player.multiplier !== 1;
+  const hasMarks = player.self || player.testAccount || player.flagged || player.banned || player.trusted || player.multiplier !== 1;
   if (!hasMarks) return <span className="muted">-</span>;
   return (
     <span className="admin-marks">
@@ -20,6 +20,11 @@ export function PlayerMarks({ player }: { player: AdminPlayer }) {
         </Badge>
       ) : null}
       {player.banned ? <Badge tone="bad">Banido</Badge> : null}
+      {player.trusted ? (
+        <Badge tone="good" title="O anticheat não marca este jogador">
+          Confiável
+        </Badge>
+      ) : null}
       {player.flagged && player.flagReason ? <span className="admin-flag-reason">{player.flagReason}</span> : null}
     </span>
   );
