@@ -91,7 +91,9 @@ export const achievements: AchievementDef[] = [
     scenery: 'casa-automatica',
   }),
   ach('cps-1e7', 'production', 'Dez Milhões por Segundo', '⚡', 'Produza 10 milhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e7' }, { scenery: 'estudio' }),
-  ach('cps-1e10', 'production', 'Cachoeira de ADScoins', '🌊', 'Produza 10 bilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e10' }),
+  ach('cps-1e10', 'production', 'Cachoeira de ADScoins', '🌊', 'Produza 10 bilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e10' }, {
+    scenery: 'cofre',
+  }),
   ach('cps-1e13', 'production', 'Rack Cheio', '🗄️', 'Produza 10 trilhões de ADScoins por segundo.', { kind: 'coinsPerSecond', gte: '1e13' }, {
     scenery: 'datacenter',
   }),
@@ -254,7 +256,9 @@ export const achievements: AchievementDef[] = [
   ach('streak-25', 'events', 'Firewall Humano', '🧱', 'Defenda 25 invasões seguidas.', counter('bestEventStreak', 25), {
     skin: 'wagner-cavaleiro',
   }),
-  ach('streak-50', 'events', 'Sentinela', '🛰️', 'Defenda 50 invasões seguidas. Nem um pacote passou.', counter('bestEventStreak', 50)),
+  ach('streak-50', 'events', 'Sentinela', '🛰️', 'Defenda 50 invasões seguidas. Nem um pacote passou.', counter('bestEventStreak', 50), {
+    skin: 'wagner-elite',
+  }),
   ach('streak-100', 'events', 'Zero Dia', '🏰', 'Defenda 100 invasões seguidas. Nenhuma vulnerabilidade foi explorada.', counter('bestEventStreak', 100), {
     skin: 'wagner-sentinela',
   }),
@@ -264,11 +268,15 @@ export const achievements: AchievementDef[] = [
 
   // ------------------------------------------------------------------ sprints (6)
   ach('sprint-1', 'sprints', 'Primeiro Sprint', '🏁', 'Conclua 1 sprint.', counter('sprintsCompleted', 1)),
-  ach('sprint-5', 'sprints', 'Time Entregando', '📦', 'Conclua 5 sprints.', counter('sprintsCompleted', 5)),
+  ach('sprint-5', 'sprints', 'Time Entregando', '📦', 'Conclua 5 sprints.', counter('sprintsCompleted', 5), {
+    scenery: 'sala-de-planning',
+  }),
   ach('sprint-25', 'sprints', 'Ritmo de Equipe', '🔁', 'Conclua 25 sprints.', counter('sprintsCompleted', 25), { skin: 'b1-scrum' }),
   ach('sprint-50', 'sprints', 'Cinquenta Retrospectivas', '📊', 'Conclua 50 sprints.', counter('sprintsCompleted', 50), { scenery: 'feira' }),
   ach('sprint-100', 'sprints', 'Cem Sprints', '💯', 'Conclua 100 sprints.', counter('sprintsCompleted', 100), { skin: 'b1-arquiteta' }),
-  ach('sprint-fail-10', 'sprints', 'Prazo é uma Sugestão', '⏰', 'Deixe 10 sprints vencerem sem cumprir a meta.', counter('sprintsFailed', 10)),
+  ach('sprint-fail-10', 'sprints', 'Prazo é uma Sugestão', '⏰', 'Deixe 10 sprints vencerem sem cumprir a meta.', counter('sprintsFailed', 10), {
+    skin: 'b1-burndown',
+  }),
 
   // ------------------------------------------------------------------ graduation (8)
   ach('grad-1', 'graduation', 'Primeira Formatura', '🎓', 'Faça a primeira Formatura.', counter('graduations', 1), {
@@ -318,13 +326,15 @@ export const achievements: AchievementDef[] = [
 
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
-  ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 77 skins.', { kind: 'skinsOwned', gte: 77 }),
-  ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
-  ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
+  ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }, { scenery: 'camarim' }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 86 skins.', { kind: 'skinsOwned', gte: 86 }, { theme: 'holografico' }),
+  ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }, { theme: 'prata' }),
+  ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }, { theme: 'platina' }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),
   ach('days-7', 'collection', 'Sequência de Sete', '🗓️', 'Jogue 7 dias seguidos. Frequência de 100%.', counter('bestDayStreak', 7), { scenery: 'por-do-sol' }),
-  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha todas as skins raras.', { kind: 'rarityOwned', rarity: 'rare' }),
+  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha todas as skins raras.', { kind: 'rarityOwned', rarity: 'rare' }, {
+    skin: 'b2-curadora',
+  }),
   ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha todas as skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic' }, {
     skin: 'b2-prisma',
   }),
@@ -335,14 +345,14 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ secret (6)
   ach('secret-logo', 'secret', 'Curioso Demais', '🔎', 'Clique 10 vezes no logo do jogo.', { kind: 'secret', trigger: 'logo-clicks' }, { theme: 'terminal' }, true),
   ach('secret-night-owl', 'secret', 'Coruja da Madrugada', '🦉', 'Jogue entre 3h e 5h da manhã.', { kind: 'secret', trigger: 'night-owl' }, { scenery: 'madrugada' }, true),
-  ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, undefined, true),
+  ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, { skin: 'angelo-escala' }, true),
   ach('secret-idle', 'secret', 'Observador Paciente', '👀', 'Fique 1 minuto sem clicar com o jogo aberto.', { kind: 'secret', trigger: 'idle-watcher' }, { theme: 'roxo' }, true),
   ach('secret-offline', 'secret', 'Bom Retorno', '🌙', 'Recolha o ganho offline 5 vezes.', counter('offlineCollections', 5), { skin: 'gladimir-pescador' }, true),
   ach('secret-dedicacao', 'secret', 'Vida Acadêmica', '⌛', 'Jogue por 10 horas no total.', counter('playSeconds', 36000), { scenery: 'biblioteca' }, true),
-  ach('secret-friday', 'secret', 'Deploy de Sexta', '🚀', 'Jogue numa sexta-feira às 17:59. Sexta ninguém faz deploy, mas todo mundo faz.', { kind: 'secret', trigger: 'friday-deploy' }, undefined, true),
-  ach('secret-404', 'secret', 'Erro 404', '🧭', 'Tenha exatamente 404 ADScoins. Saldo não encontrado.', { kind: 'secret', trigger: 'error-404' }, undefined, true),
-  ach('secret-wallpaper', 'secret', 'Papel de Parede', '🖼️', 'Fique 5 minutos com o painel lateral escondido, só admirando o cenário.', { kind: 'secret', trigger: 'wallpaper' }, undefined, true),
-  ach('secret-fitting', 'secret', 'Provador', '🪞', 'Troque de skin 10 vezes em 1 minuto. Nada serviu de primeira.', { kind: 'secret', trigger: 'fitting-room' }, undefined, true),
-  ach('secret-lettuce', 'secret', 'Mão de Alface', '🥬', 'Venda com prejuízo na Bolsa do Pablo. A planilha chorou.', { kind: 'secret', trigger: 'lettuce-hands' }, undefined, true),
-  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não derrote nenhum bug na mão. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, undefined, true),
+  ach('secret-friday', 'secret', 'Deploy de Sexta', '🚀', 'Jogue numa sexta-feira às 17:59. Sexta ninguém faz deploy, mas todo mundo faz.', { kind: 'secret', trigger: 'friday-deploy' }, { skin: 'guto-sextou' }, true),
+  ach('secret-404', 'secret', 'Erro 404', '🧭', 'Tenha exatamente 404 ADScoins. Saldo não encontrado.', { kind: 'secret', trigger: 'error-404' }, { skin: 'gladimir-explorador' }, true),
+  ach('secret-wallpaper', 'secret', 'Papel de Parede', '🖼️', 'Fique 5 minutos com o painel lateral escondido, só admirando o cenário.', { kind: 'secret', trigger: 'wallpaper' }, { scenery: 'aurora' }, true),
+  ach('secret-fitting', 'secret', 'Provador', '🪞', 'Troque de skin 10 vezes em 1 minuto. Nada serviu de primeira.', { kind: 'secret', trigger: 'fitting-room' }, { skin: 'b2-look' }, true),
+  ach('secret-lettuce', 'secret', 'Mão de Alface', '🥬', 'Venda com prejuízo na Bolsa do Pablo. A planilha chorou.', { kind: 'secret', trigger: 'lettuce-hands' }, { skin: 'pablo-trader' }, true),
+  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não derrote nenhum bug na mão. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, { skin: 'wagner-cafe' }, true),
 ];

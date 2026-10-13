@@ -26,7 +26,7 @@ const make = (seed: SceneSeed): SceneryDef => ({
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 31 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 35 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const sceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
@@ -277,5 +277,37 @@ export const sceneries: SceneryDef[] = [
     floats: true,
     palette: ['#0a0620', '#2a1a5a', '#1a1040'],
     scene: 'deep space with purple nebulae, a ringed planet, distant moons and a spiral galaxy (no ground at all, open space)',
+  }),
+  make({
+    id: 'cofre',
+    name: 'Cofre de ADScoins',
+    description: 'Um cofre gigante cheio até a boca e moedas caindo do teto. Dez bilhões por segundo precisam morar em algum lugar.',
+    ambient: 'confetti',
+    palette: ['#2a2210', '#6b5320', '#8a6a24'],
+    scene: 'inside a giant bank vault with a huge round open steel vault door on one side, mountains of shiny gold coins piled along the back wall and at the sides, gold coins falling from the ceiling, warm golden light',
+  }),
+  make({
+    id: 'sala-de-planning',
+    name: 'Sala de Planning',
+    description: 'Quadro kanban, post-its por toda parte e uma mesa de reunião. Cinco sprints entregues saíram daqui.',
+    ambient: 'none',
+    palette: ['#dfe7ef', '#b9c7d6', '#8a7a68'],
+    scene: 'agile meeting room with a big kanban board full of colorful sticky notes on the back wall, a long meeting table with laptops and coffee cups at one side, a whiteboard with a burndown chart, bright office light',
+  }),
+  make({
+    id: 'camarim',
+    name: 'Camarim',
+    description: 'Araras de roupa, espelho com luzes e cabides para todo lado. Vinte e cinco looks e contando.',
+    ambient: 'dust',
+    palette: ['#3a1f2e', '#7a3a5a', '#5a3a2a'],
+    scene: 'backstage dressing room with clothing racks full of colorful outfits, a vanity mirror framed by round light bulbs, hangers, hat boxes and a folding screen, warm pink light',
+  }),
+  make({
+    id: 'aurora',
+    name: 'Aurora no Campus',
+    description: 'O campus à noite sob uma aurora verde e roxa. Cinco minutos só olhando, e valeu cada um.',
+    ambient: 'stars',
+    palette: ['#0a1430', '#1f6a5a', '#2a3040'],
+    scene: 'university campus at night under a bright green and purple aurora borealis, old buildings with a few lit windows, dark pine trees, a lamp-lit path, starry sky',
   }),
 ];

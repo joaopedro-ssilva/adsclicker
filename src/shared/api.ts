@@ -263,6 +263,38 @@ export const leaderboardResponseSchema = z.object({
 });
 export type LeaderboardResponse = z.infer<typeof leaderboardResponseSchema>;
 
+/** GET /api/players/profile?nickname= — the public card of a ranked player, opened from the ranking. */
+export const playerProfileSchema = z.object({
+  nickname: z.string(),
+  /** What they have on screen now: professor, the skin that professor wears, the scenery. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  scenery: z.string(),
+  online: z.boolean(),
+  /** Epoch ms of the account creation. */
+  memberSince: z.number(),
+  tags: z.array(publicTagSchema).optional(),
+  stats: z.object({
+    /** Decimal strings. */
+    lifetimeCoins: z.string(),
+    coinsPerSecond: z.string(),
+    clickValue: z.string(),
+    graduations: z.number(),
+    diplomasEarned: z.number(),
+    playSeconds: z.number(),
+    professorsHired: z.number(),
+    maestrias: z.number(),
+    clicks: z.number(),
+    maxCombo: z.number(),
+    bestEventStreak: z.number(),
+    sprintsCompleted: z.number(),
+    achievements: z.number(),
+    skins: z.number(),
+    sceneries: z.number(),
+  }),
+});
+export type PlayerProfile = z.infer<typeof playerProfileSchema>;
+
 /** GET /api/me/ranks — this player's position on each board, or null when not ranked. */
 export const ranksResponseSchema = z.object({
   ranks: z.record(boardSchema, z.number().int().nullable()),

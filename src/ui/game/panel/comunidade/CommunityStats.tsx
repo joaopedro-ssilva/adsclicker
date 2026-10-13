@@ -44,7 +44,10 @@ export function CommunityStats({ data }: { data: CommunityResponse }) {
           <Icon name="coin" size={16} />
           ADScoins da comunidade
         </span>
-        <NumberTicker className="community-hero-value" value={formatNumber(data.coins)} numericHint={hint(data.coins)} />
+        <span className="community-hero-amount">
+          <Icon name="coin" size={28} />
+          <NumberTicker className="community-hero-value" value={formatNumber(data.coins)} numericHint={hint(data.coins)} />
+        </span>
       </div>
 
       <div className="community-stats">

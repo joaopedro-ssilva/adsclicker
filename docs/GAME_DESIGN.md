@@ -69,7 +69,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ### Conforto e temas (Bruna B2)
 - Libera compra em lote. Pesquisas dão `costMult` (descontos) e aumentam duração de buffs e janelas de evento.
-- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 9 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques) e Ouro (Mestre dos Mestres). Liberados por conquistas.
+- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 12 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques), Ouro (Mestre dos Mestres), Prata (Vitrine Cheia, 25 conquistas), Platina (Parede de Troféus, 50 conquistas) e Holográfico (Álbum Completo). Liberados por conquistas.
 
 ### Invasões (Wagner)
 - A cada 75 a 150 s (× `eventInterval`) surge uma ameaça numa posição aleatória do palco. Ela some depois de `windowMs` (× `eventWindow`). O jogador precisa clicar `clicksRequired` vezes nela.
@@ -173,7 +173,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (77)
+### Skins (86)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -200,29 +200,35 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | gladimir | `gladimir-mestre` | Mestre da Galáxia | legendary | túnica bege de cavaleiro espacial, sabre de luz azul | capuz |
 | gladimir | `gladimir-pescador` | Pescador de Dados | common | colete de pesca, vara e balde | chapéu de pescador |
 | gladimir | `gladimir-bibliotecario` | Bibliotecário | rare | cardigã e pilha de livros |  |
+| gladimir | `gladimir-explorador` | Registro Não Encontrado | rare | colete de explorador, mapa aberto e lupa (Erro 404) | |
 | gladimir | `gladimir-guardiao` | Guardião do Backup | epic | armadura e escudo em forma de disquete | elmo |
 | gladimir | `gladimir-drone` | Piloto Automático | epic | camisa cinza, controle e drone |  |
 | gladimir | `gladimir-arquivista` | Arquivista Eterno | mythic | manto azul com runas de dados e tomo luminoso | capuz de luz |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |
+| b2 | `b2-look` | Look do Dia | rare | casaco longo colorido e sacolas de compras (Provador) | |
 | b2 | `b2-darkmode` | Dark Mode | epic | toda de preto com detalhes neon roxos | |
 | b2 | `b2-paleta` | Paleta Viva | legendary | vestido em degradê arco-íris, pincel gigante | |
 | b2 | `b2-obra` | Designer de Capacete | common | macacão e planta na mão | capacete de obra |
 | b2 | `b2-pixel` | Pixel Perfeita | epic | roupa de quadrados e régua gigante |  |
+| b2 | `b2-curadora` | Curadora de Moda | epic | vestido preto, fita métrica, tesoura dourada (Colecionador de Raras) | |
 | b2 | `b2-prisma` | Musa do Prisma | mythic | vestido de cristal que quebra a luz | tiara de prisma |
 | wagner | `wagner-default` | All Black | common (padrão) | camiseta preta, calça cargo, crachá | |
 | wagner | `wagner-hacker` | Capuz Verde | common | moletom com capuz e código verde, notebook | |
 | wagner | `wagner-agente` | Agente Secreto | rare | terno preto, gravata fina, fone espiral | óculos escuros |
 | wagner | `wagner-firewall` | Firewall | epic | armadura de tijolos com chamas laranja | |
 | wagner | `wagner-cripto` | Cavaleiro da Criptografia | legendary | armadura prateada com cadeado no peito, escudo com chave | elmo |
+| wagner | `wagner-elite` | Hacker de Elite | legendary | sobretudo preto com código verde, luvas táticas, notebook brilhando (Sentinela, 50 seguidas) | |
 | wagner | `wagner-detetive` | Detetive | rare | sobretudo e lupa | chapéu |
 | wagner | `wagner-ferias` | Wagner de Férias | rare | camisa florida, boia de patinho, coco gelado | chapéu de palha e óculos escuros |
+| wagner | `wagner-cafe` | Café com Firewall | rare | roupão preto, pantufas de cadeado e caneca (Deixa Comigo) | |
 | wagner | `wagner-cavaleiro` | Cavaleiro do Cadeado | epic | armadura negra, espada em forma de chave | elmo aberto |
 | wagner | `wagner-sentinela` | Sentinela Zero | mythic | armadura negra de contornos vermelhos, lança de energia | elmo fechado |
 | guto | `guto-default` | Camisa Florida | common (padrão) | camisa havaiana, bermuda, chinelo | |
 | guto | `guto-churrasqueiro` | Mestre do Churrasco | common | avental, espeto na mão, pano no ombro | |
 | guto | `guto-pagodeiro` | Pagodeiro | rare | camisa aberta, pandeiro na mão | chapéu panamá |
+| guto | `guto-sextou` | Sextou | rare | mochila, chave do carro e servidor pegando fogo (Deploy de Sexta) | |
 | guto | `guto-dj` | DJ do Deploy | epic | jaqueta neon, fones no pescoço, controladora | |
 | guto | `guto-astronauta` | Astronauta da Nuvem | legendary | traje espacial branco com nuvens azuis | capacete de astronauta |
 | guto | `guto-paladino` | Paladino da Nuvem | epic | armadura de placas, capa azul, espada e escudo com nuvem |  |
@@ -234,11 +240,13 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | b1 | `b1-lancamento` | Dia de Lançamento | epic | macacão roxo de astronauta com foguete nas costas | |
 | b1 | `b1-rainha` | Rainha do CSS | legendary | vestido roxo com capa, cetro com chaves `{ }` | coroa |
 | b1 | `b1-scrum` | Scrum Master | rare | colete cheio de botões e apito |  |
+| b1 | `b1-burndown` | Burndown em Chamas | rare | blazer amassado, extintor e gráfico em chamas (Prazo é uma Sugestão) | |
 | b1 | `b1-arquiteta` | Arquiteta de Grid | epic | capa e compasso gigante |  |
 | b1 | `b1-imperatriz` | Imperatriz do Roadmap | mythic | manto imperial roxo com estrelas | coroa gigante |
 | angelo | `angelo-default` | Social e Gravata | common (padrão) | camisa social, gravata, calça social | |
 | angelo | `angelo-terno` | Terno de Reunião | common | terno completo, pasta de documentos | |
 | angelo | `angelo-maestro` | Maestro | rare | fraque, batuta na mão | |
+| angelo | `angelo-escala` | Coordenador de Escala | rare | polo com crachá, apito, prancheta com a grade de horários (Professor Rotativo) | |
 | angelo | `angelo-paraninfo` | Paraninfo | epic | beca preta de formatura com faixa âmbar, canudo na mão | capelo |
 | angelo | `angelo-rei` | Herança Real | legendary | manto real vermelho com arminho, cetro | coroa |
 | angelo | `angelo-capitao` | Capitão da Quadra | epic | uniforme de capitão e troféu de padel |  |
@@ -247,14 +255,15 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | pablo | `pablo-default` | Suéter e Camisa | common (padrão) | suéter azul sobre camisa branca | |
 | pablo | `pablo-cientista` | Cientista | common | jaleco branco, prancheta com fórmulas | |
 | pablo | `pablo-enxadrista` | Enxadrista | rare | colete xadrez, peça de rei na mão | |
+| pablo | `pablo-trader` | Day Trader | rare | terno amassado, gravata frouxa, tablet com gráfico caindo, alface no bolso (Mão de Alface) | |
 | pablo | `pablo-mago` | Mago dos Algoritmos | epic | manto azul com estrelas, cajado com árvore binária | chapéu de mago |
 | pablo | `pablo-galactico` | Arquimago do Código | legendary | manto escuro com runas de prata, capuz e cajado de cristal | sim |
 | pablo | `pablo-garagem` | Hacker de Garagem | legendary | jaqueta ciberpunk com neon rosa e ciano, visor holográfico, fone de ouvido | visor |
 | pablo | `pablo-oraculo` | Oráculo | legendary | túnica clara e esfera de dados flutuando |  |
-| pablo | `pablo-sensei` | Sensei dos Oito | legendary | quimono branco e dourado, faixa preta com 8 listras e 8 medalhões das Maestrias, pergaminho | |
+| pablo | `pablo-sensei` | Sensei dos Oito | legendary | quimono branco e dourado, faixa preta com 8 listras e 8 medalhões das Maestrias, pergaminho | bandana vermelha de pontas longas |
 | pablo | `pablo-singularidade` | A Singularidade | mythic | manto de céu estrelado com galáxias | capuz |
 
-### Cenários (31)
+### Cenários (35)
 
 | id | Nome | Ambiente | Cena |
 | --- | --- | --- | --- |
@@ -289,6 +298,10 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | `castelo` | Castelo | leaves | castelo numa colina, campo e montanhas (Corpo Docente) |
 | `masmorra` | Masmorra | dust | pedra, tochas e baú (Turma Enxuta) |
 | `galaxia` | Galáxia | stars | nebulosas e planetas, **sem chão**: o professor flutua (floats), sem sombra de contato (todas as lendárias) |
+| `cofre` | Cofre de ADScoins | confetti | cofre gigante com montanhas de moedas e moedas caindo (Cachoeira de ADScoins) |
+| `sala-de-planning` | Sala de Planning | none | quadro kanban, post-its e mesa de reunião (Time Entregando) |
+| `camarim` | Camarim | dust | araras de roupa, espelho com luzes, cabides (Provador Lotado) |
+| `aurora` | Aurora no Campus | stars | campus à noite sob aurora verde e roxa (Papel de Parede) |
 
 ## 7. Ritmo (metas do balanceamento)
 

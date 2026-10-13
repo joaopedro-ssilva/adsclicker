@@ -595,6 +595,65 @@ const sensei = {
 };
 calls.push({ label: 'skins-v5-sensei', images: [sensei] });
 
+// 12) Rewards for achievements that had none: nine bodies (one per sheet, so each outfit gets the room),
+//     the Sensei's headband, and four sceneries drawn over a shipped scenery for the style.
+const V6_BODIES = [
+  ['gladimir-explorador', 'a khaki explorer vest with many pockets over a plaid shirt, cargo shorts, hiking boots, holding an open paper map in one hand and a big magnifying glass in the other'],
+  ['b2-look', 'a long colourful fashion coat in pink and yellow colour blocks over a black turtleneck, black trousers, white sneakers, holding colourful shopping bags in both hands'],
+  ['b2-curadora', 'a fashion curator: an elegant black designer dress with a pink sash, a yellow tailor measuring tape draped around the neck stub, a red pincushion bracelet, holding big golden scissors and a small fabric swatch book; chic, not comic'],
+  ['wagner-cafe', 'a cozy black bathrobe with green trim over black pajamas, fluffy grey slippers shaped like padlocks, holding a steaming white coffee mug, relaxed pose'],
+  ['wagner-elite', 'an elite hacker: a long black trench coat with thin glowing green lines of code running down it, black tactical gloves, black combat boots, holding an open laptop whose screen glows green, two small green holographic terminal windows floating close to the body; cool and serious, not comic'],
+  ['b1-burndown', 'a rumpled purple blazer over a striped t-shirt, jeans, one sneaker untied, a red fire extinguisher in one hand and a small chart board with a falling line and little orange flames on it in the other'],
+  ['angelo-escala', 'a navy polo shirt with a staff badge, khaki trousers, brown shoes, a whistle on a cord around the neck stub, holding a clipboard with a colourful timetable grid and a stopwatch'],
+  ['pablo-trader', 'a wrinkled grey business suit, a loose red tie, white shirt, holding a tablet showing a red falling stock chart, a small green lettuce leaf sticking out of the breast pocket'],
+];
+const V6_GUTO = [
+  ['guto-sextou', 'a blue t-shirt, jeans, sneakers, a backpack on the back, car keys in one hand and a small grey server box with little orange flames on top under the other arm'],
+];
+const senseiHead = {
+  ...headVariantSheet('pablo'),
+  file: 'heads-skin4-pablo.png',
+  keys: ['_ref', 'pablo-sensei'],
+};
+senseiHead.text = senseiHead.text
+  .replace(`${(HEAD_VARIANTS.pablo?.length ?? 0) + 1} times`, '2 times')
+  .replace(
+    /Left to right after the plain one: .*$/,
+    'Left to right after the plain one: an epic martial-arts headband tied around the forehead over the hair: a wide crimson red band with a small gold emblem in the middle and two long red tails flowing out to one side, the tails stay close to the head.',
+  );
+const v6Scenery = (id, ref, desc) => ({
+  file: `scenery-${id}.png`,
+  kind: 'scenery',
+  keys: [id],
+  refs: [`ref-scenery-${ref}.png`],
+  text: `a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. ${HK_STYLE} Side view scene: ${desc}. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.`,
+});
+const V6_SCENERIES = [
+  v6Scenery('cofre', 'trofeus', 'inside a giant bank vault with a huge round open steel vault door on one side, mountains of shiny gold coins piled along the back wall and at the sides, gold coins falling from the ceiling, warm golden light'),
+  v6Scenery('sala-de-planning', 'coordenacao', 'an agile meeting room with a big kanban board full of colourful sticky notes on the back wall, a long meeting table with laptops and coffee cups at one side, a whiteboard with a downward chart, bright office light'),
+  v6Scenery('camarim', 'estudio', 'a backstage dressing room with clothing racks full of colourful outfits, a vanity mirror framed by round light bulbs, hangers, hat boxes and a folding screen, warm pink light'),
+  v6Scenery('aurora', 'neve', 'a university campus at night under a bright green and purple aurora borealis, old buildings with a few lit windows, dark pine trees, a lamp-lit path, starry sky'),
+];
+calls.push(
+  ...V6_BODIES.map((item) => ({ label: `skins-v6-${item[0]}`, images: [v3BodySheet(`skins-v6-${item[0]}.png`, [item])] })),
+  ...V6_GUTO.map((item) => ({
+    label: `skins-v6-${item[0]}`,
+    images: [v3BodySheet(`skins-v6-${item[0]}.png`, [item], { rules: GUTO_RULES, sheet: { darkSkin: true } })],
+  })),
+  { label: 'heads-skin4-pablo', images: [senseiHead] },
+  ...V6_SCENERIES.map((image) => ({ label: image.file.replace('.png', ''), images: [image] })),
+);
+
+// Style references for the sceneries above: a shipped scenery, enlarged.
+fs.mkdirSync(RAW_DIR, { recursive: true });
+for (const ref of new Set(V6_SCENERIES.flatMap((image) => image.refs))) {
+  const id = ref.replace(/^ref-scenery-|\.png$/g, '');
+  const source = path.join(ROOT, 'public', 'assets', 'sceneries', `${id}.png`);
+  if (!fs.existsSync(source)) continue;
+  const { width = 480, height = 270 } = await sharp(source).metadata();
+  await sharp(source).resize(width * 3, height * 3, { kernel: 'nearest' }).png().toFile(path.join(RAW_DIR, ref));
+}
+
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const professor of Object.keys(HEAD_VARIANTS)) {

@@ -24,9 +24,9 @@ Você começa com o Edécio e um café. Cada clique rende ADScoins, cada aula re
 
 | | |
 | --- | --- |
-| 🎭 **75 skins** | Das comuns às míticas, uma mítica para cada professor |
-| 🏞️ **31 cenários** | Da sala de aula à galáxia |
-| 🎨 **9 temas** | Cores diferentes para a interface |
+| 🎭 **86 skins** | Das comuns às míticas, uma mítica para cada professor |
+| 🏞️ **35 cenários** | Da sala de aula à galáxia, passando pelo cofre de ADScoins |
+| 🎨 **12 temas** | Cores diferentes para a interface |
 | 🏆 **129 conquistas** | Algumas secretas |
 
 Tudo é liberado jogando. Não há compras.
@@ -35,7 +35,7 @@ Tudo é liberado jogando. Não há compras.
 
 - Oito professores, cada um com sua **Maestria**, uma mecânica especial que você escolhe a cada formatura.
 - **Monitores** que automatizam compras, pesquisas, invasões e sprints.
-- Save na nuvem, ranking e estatísticas da turma.
+- Save na nuvem, ranking com o perfil de cada jogador e estatísticas da turma.
 
 ## Créditos
 

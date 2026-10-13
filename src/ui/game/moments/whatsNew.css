@@ -1,0 +1,148 @@
+/* Patch announcement (WhatsNew.tsx). */
+.whats-new {
+  display: grid;
+  gap: 12px;
+}
+
+.whats-new ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.whats-new-skins {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.whats-new-skin {
+  --rarity: var(--border);
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  align-content: start;
+  padding: 0 6px 8px;
+  background: var(--surface-raised);
+  border: 2px solid var(--rarity);
+  text-align: center;
+}
+
+.whats-new-skin[data-rarity='rare'] {
+  --rarity: var(--rare);
+}
+
+.whats-new-skin[data-rarity='epic'] {
+  --rarity: var(--epic);
+}
+
+.whats-new-skin[data-rarity='legendary'] {
+  --rarity: var(--legendary);
+}
+
+/* Same framing as the Album skin card: the sprite hangs from the top, the feet stay inside. */
+.whats-new-sprite {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: calc(100% + 12px);
+  height: 188px;
+  margin: 0 -6px 4px;
+  padding-top: 8px;
+  overflow: hidden;
+  background: linear-gradient(to top, color-mix(in srgb, var(--rarity) 22%, var(--bg)), var(--bg) 85%);
+}
+
+.whats-new-sprite[data-secret='true'] > * {
+  filter: brightness(0) invert(0.22);
+}
+
+.whats-new-skin h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.whats-new-hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.whats-new-heading {
+  margin: 4px 0 0;
+  font-size: 15px;
+}
+
+.whats-new-sceneries {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.whats-new-sceneries li,
+.whats-new-themes li {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.whats-new-scenery {
+  height: 84px;
+  border: 2px solid var(--border);
+}
+
+.whats-new-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.whats-new-swatch {
+  display: grid;
+  grid-template-columns: repeat(4, 22px);
+  border: 2px solid var(--border);
+}
+
+.whats-new-swatch i {
+  display: block;
+  height: 22px;
+}
+
+.whats-new-scenery-secret {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 8px, var(--surface) 8px, var(--surface) 16px);
+  color: var(--text-muted);
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.whats-new-feature {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-raised);
+  border: 2px solid var(--accent);
+}
+
+.whats-new-feature h3 {
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.whats-new-feature p {
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .whats-new-feature {
+    grid-template-columns: auto 1fr;
+  }
+
+  .whats-new-feature > :last-child {
+    grid-column: 1 / -1;
+  }
+}

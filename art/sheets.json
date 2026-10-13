@@ -901,6 +901,108 @@
       "keys": [
         "pablo-sensei"
       ]
+    },
+    {
+      "file": "skins-v6-gladimir-explorador.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-explorador"
+      ]
+    },
+    {
+      "file": "skins-v6-b2-look.png",
+      "kind": "skin",
+      "keys": [
+        "b2-look"
+      ]
+    },
+    {
+      "file": "skins-v6-b2-curadora.png",
+      "kind": "skin",
+      "keys": [
+        "b2-curadora"
+      ]
+    },
+    {
+      "file": "skins-v6-wagner-cafe.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-cafe"
+      ]
+    },
+    {
+      "file": "skins-v6-wagner-elite.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-elite"
+      ]
+    },
+    {
+      "file": "skins-v6-b1-burndown.png",
+      "kind": "skin",
+      "keys": [
+        "b1-burndown"
+      ]
+    },
+    {
+      "file": "skins-v6-angelo-escala.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-escala"
+      ]
+    },
+    {
+      "file": "skins-v6-pablo-trader.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-trader"
+      ]
+    },
+    {
+      "file": "skins-v6-guto-sextou.png",
+      "kind": "skin",
+      "keys": [
+        "guto-sextou"
+      ],
+      "darkSkin": true
+    },
+    {
+      "file": "heads-skin4-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-sensei"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
+    },
+    {
+      "file": "scenery-cofre.png",
+      "kind": "scenery",
+      "keys": [
+        "cofre"
+      ]
+    },
+    {
+      "file": "scenery-sala-de-planning.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-de-planning"
+      ]
+    },
+    {
+      "file": "scenery-camarim.png",
+      "kind": "scenery",
+      "keys": [
+        "camarim"
+      ]
+    },
+    {
+      "file": "scenery-aurora.png",
+      "kind": "scenery",
+      "keys": [
+        "aurora"
+      ]
     }
   ]
 }

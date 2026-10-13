@@ -29,11 +29,32 @@
   gap: var(--space-5);
 }
 
+.album-group-heading {
+  margin: 0 0 var(--space-3);
+  font: inherit;
+}
+
+.album-group[data-collapsed='true'] .album-group-heading {
+  margin-bottom: 0;
+}
+
+/* The whole header is the fold button: portrait, name, count and chevron. */
 .album-group-head {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  width: 100%;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.album-group-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .album-group-head .panel-portrait {
@@ -41,13 +62,27 @@
   border: 2px solid var(--border);
 }
 
-.album-group-head h3 {
+.album-group-name {
   flex: 1;
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.album-group-chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  rotate: 180deg;
+}
+
+.album-group[data-collapsed='true'] .album-group-chevron {
+  rotate: 0deg;
+}
+
+.album-group-head:hover .album-group-chevron {
+  color: var(--text);
 }
 
 /* Skins */

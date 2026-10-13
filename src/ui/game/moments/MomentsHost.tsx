@@ -7,12 +7,18 @@ import { useMoments } from './momentsStore';
 import { OfflineReport } from './OfflineReport';
 import { UnlockCards } from './UnlockCards';
 import { UnlockCeremony } from './UnlockCeremony';
+import { WhatsNew } from './WhatsNew';
+import { useWhatsNew } from './whatsNew';
 
-/** Shows the offline report first, then the queued ceremonies one at a time. Quick unlock cards wait for a free screen. */
+/**
+ * Shows the offline report first, then the queued ceremonies one at a time, then the patch announcement.
+ * Quick unlock cards wait for a free screen.
+ */
 export function MomentsHost() {
   const offline = useGame((store) => store.offlineReport);
   const current = useMoments((store) => store.queue[0]);
   const dismiss = useMoments((store) => store.dismiss);
+  const whatsNew = useWhatsNew();
 
   let scene = null;
   if (offline) {
@@ -29,6 +35,8 @@ export function MomentsHost() {
       ) : (
         <UnlockCeremony key={current.id} moment={current} onClose={close} />
       );
+  } else if (whatsNew.open) {
+    scene = <WhatsNew onClose={whatsNew.close} />;
   }
 
   return (

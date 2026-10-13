@@ -35,6 +35,7 @@ const EXPECTED_SKIN_IDS = [
   'gladimir-pescador',
   'gladimir-maker',
   'gladimir-bibliotecario',
+  'gladimir-explorador',
   'gladimir-piloto',
   'gladimir-drone',
   'gladimir-guardiao',
@@ -44,8 +45,10 @@ const EXPECTED_SKIN_IDS = [
   'b2-postit',
   'b2-obra',
   'b2-wireframe',
+  'b2-look',
   'b2-darkmode',
   'b2-pixel',
+  'b2-curadora',
   'b2-paleta',
   'b2-prisma',
   'wagner-default',
@@ -53,13 +56,16 @@ const EXPECTED_SKIN_IDS = [
   'wagner-agente',
   'wagner-detetive',
   'wagner-ferias',
+  'wagner-cafe',
   'wagner-firewall',
   'wagner-cavaleiro',
   'wagner-cripto',
+  'wagner-elite',
   'wagner-sentinela',
   'guto-default',
   'guto-churrasqueiro',
   'guto-pagodeiro',
+  'guto-sextou',
   'guto-dj',
   'guto-paladino',
   'guto-capitao',
@@ -69,6 +75,7 @@ const EXPECTED_SKIN_IDS = [
   'b1-po',
   'b1-flexbox',
   'b1-scrum',
+  'b1-burndown',
   'b1-lancamento',
   'b1-arquiteta',
   'b1-rainha',
@@ -77,6 +84,7 @@ const EXPECTED_SKIN_IDS = [
   'angelo-terno',
   'angelo-maestro',
   'angelo-padel',
+  'angelo-escala',
   'angelo-paraninfo',
   'angelo-capitao',
   'angelo-reitor',
@@ -85,6 +93,7 @@ const EXPECTED_SKIN_IDS = [
   'pablo-default',
   'pablo-cientista',
   'pablo-enxadrista',
+  'pablo-trader',
   'pablo-mago',
   'pablo-garagem',
   'pablo-galactico',
@@ -115,6 +124,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'gladimir-pescador': 'common',
   'gladimir-maker': 'rare',
   'gladimir-bibliotecario': 'rare',
+  'gladimir-explorador': 'rare',
   'gladimir-piloto': 'epic',
   'gladimir-mestre': 'legendary',
   'gladimir-drone': 'epic',
@@ -124,22 +134,27 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'b2-postit': 'common',
   'b2-obra': 'common',
   'b2-wireframe': 'rare',
+  'b2-look': 'rare',
   'b2-darkmode': 'epic',
   'b2-pixel': 'epic',
+  'b2-curadora': 'epic',
   'b2-paleta': 'legendary',
   'b2-prisma': 'mythic',
   'wagner-default': 'common',
   'wagner-hacker': 'common',
   'wagner-agente': 'rare',
   'wagner-detetive': 'rare',
+  'wagner-cafe': 'rare',
   'wagner-firewall': 'epic',
   'wagner-cripto': 'legendary',
   'wagner-ferias': 'rare',
   'wagner-cavaleiro': 'epic',
+  'wagner-elite': 'legendary',
   'wagner-sentinela': 'mythic',
   'guto-default': 'common',
   'guto-churrasqueiro': 'common',
   'guto-pagodeiro': 'rare',
+  'guto-sextou': 'rare',
   'guto-dj': 'epic',
   'guto-paladino': 'epic',
   'guto-capitao': 'epic',
@@ -149,6 +164,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'b1-po': 'common',
   'b1-flexbox': 'rare',
   'b1-scrum': 'rare',
+  'b1-burndown': 'rare',
   'b1-lancamento': 'epic',
   'b1-arquiteta': 'epic',
   'b1-rainha': 'legendary',
@@ -157,6 +173,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'angelo-terno': 'common',
   'angelo-maestro': 'rare',
   'angelo-padel': 'rare',
+  'angelo-escala': 'rare',
   'angelo-paraninfo': 'epic',
   'angelo-capitao': 'epic',
   'angelo-rei': 'legendary',
@@ -166,6 +183,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'pablo-cientista': 'common',
   'pablo-enxadrista': 'rare',
   'pablo-garagem': 'legendary',
+  'pablo-trader': 'rare',
   'pablo-mago': 'epic',
   'pablo-galactico': 'legendary',
   'pablo-oraculo': 'legendary',
@@ -208,6 +226,7 @@ const SKINS_WITH_HEADGEAR = [
   'angelo-rei',
   'angelo-reitor',
   'pablo-garagem',
+  'pablo-sensei',
   'pablo-mago',
   'pablo-galactico',
 ];
@@ -244,6 +263,10 @@ const EXPECTED_SCENERY_IDS = [
   'castelo',
   'masmorra',
   'galaxia',
+  'cofre',
+  'sala-de-planning',
+  'camarim',
+  'aurora',
 ];
 
 const EXPECTED_AMBIENT: Record<string, string> = {
@@ -278,6 +301,10 @@ const EXPECTED_AMBIENT: Record<string, string> = {
   castelo: 'leaves',
   masmorra: 'dust',
   galaxia: 'stars',
+  cofre: 'confetti',
+  'sala-de-planning': 'none',
+  camarim: 'dust',
+  aurora: 'stars',
 };
 
 const ORIGINAL_UPGRADE_NAMES = [
@@ -677,7 +704,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 77 skins of the design, with their rarities', () => {
+  it('has exactly the 86 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -704,7 +731,7 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has exactly the 31 sceneries of the design with one default, and only the Galáxia floats', () => {
+  it('has exactly the 35 sceneries of the design with one default, and only the Galáxia floats', () => {
     expect(sceneryIds).toEqual(EXPECTED_SCENERY_IDS);
     expect(content.sceneries.filter((scenery) => scenery.default === true).map((scenery) => scenery.id)).toEqual([
       'sala-de-aula',
@@ -720,8 +747,8 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has the 8 HUD themes with one default and legible contrast', () => {
-    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro']);
+  it('has the 12 HUD themes with one default and legible contrast', () => {
+    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro', 'prata', 'platina', 'holografico']);
     expect(content.themes.filter((theme) => theme.default === true).map((theme) => theme.id)).toEqual(['escuro']);
     const luminance = (hex: string): number => {
       const channels = [1, 3, 5].map((start) => {
