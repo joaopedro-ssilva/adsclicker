@@ -173,7 +173,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (75)
+### Skins (76)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -190,6 +190,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | edecio | `edecio-samurai` | Samurai | legendary | armadura samurai azul-petróleo, katana | kabuto com chifres |
 | edecio | `edecio-gauchao` | Gauchão | rare | bombacha, lenço e cuia de chimarrão | chapéu |
 | edecio | `edecio-formando` | Formando de 1900 | epic | terno antigo e bengala | cartola |
+| edecio | `edecio-luvas` | Luvas de Clique | epic | luvas vermelhas gigantes de desenho animado, camiseta com cursor | |
 | edecio | `edecio-lenda` | Lenda do Joinha | legendary | traje dourado e mão gigante de joinha |  |
 | edecio | `edecio-primordial` | O Joinha Primordial | mythic | túnica celestial branca e dourada, manopla de ouro | auréola |
 | gladimir | `gladimir-default` | Xadrez de Sempre | common (padrão) | camisa xadrez, calça cáqui, crachá | |

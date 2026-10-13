@@ -295,7 +295,9 @@ export const achievements: AchievementDef[] = [
     metric: 'clicks',
     lte: 0,
   }, { skin: 'gladimir-drone' }),
-  ach('grad-click-share', 'graduation', 'Só no Clique', '👆', 'Forme uma turma em que 70% das ADScoins vieram de cliques.', { kind: 'lastRunClickShare', gte: 0.7 }),
+  ach('grad-click-share', 'graduation', 'Só no Clique', '👆', 'Forme uma turma em que 70% das ADScoins vieram de cliques.', { kind: 'lastRunClickShare', gte: 0.7 }, {
+    skin: 'edecio-luvas',
+  }),
   ach('grad-lean', 'graduation', 'Turma Enxuta', '🎒', 'Forme uma turma com aulas compradas de no máximo 3 professores. Os outros só assinam a ata.', {
     kind: 'lastRun',
     metric: 'investedProfessors',
@@ -315,7 +317,7 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 75 skins.', { kind: 'skinsOwned', gte: 75 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 76 skins.', { kind: 'skinsOwned', gte: 76 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),

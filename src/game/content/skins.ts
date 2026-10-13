@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 75 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 76 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -131,6 +131,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#2b2b33', '#8c6a3b', '#e8e0cc'],
       artPrompt: 'old-fashioned black frock coat suit, waistcoat with a pocket watch chain, white shirt, holding a wooden cane, tall top hat',
+    },
+    {
+      id: 'edecio-luvas',
+      name: 'Luvas de Clique',
+      rarity: 'epic',
+      description: 'Luvas vermelhas gigantes de desenho animado. Cada clique vale por dez, e a turma inteira escuta.',
+      palette: ['#e0282e', '#f4f4f4', '#8a1015'],
+      artPrompt: 'white t-shirt with a red mouse-cursor print, red track pants, red sneakers, both hands in huge oversized puffy red cartoon gloves',
     },
     {
       id: 'edecio-samurai',
