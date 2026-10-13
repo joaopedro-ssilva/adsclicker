@@ -433,3 +433,11 @@ Every generation call, in order. Style base used in all prompts:
 ## scenery-sala-de-planning.png (gpt-image-2, medium)
 
 > a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: an agile meeting room with a big kanban board full of colourful sticky notes on the back wall, a long meeting table with laptops and coffee cups at one side, a whiteboard with a downward chart, bright office light. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-camarim.png (ChatGPT, manual)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: a backstage dressing room with clothing racks full of colourful outfits, a vanity mirror framed by round light bulbs, hangers, hat boxes and a folding screen, warm pink light. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
+
+## scenery-aurora.png (ChatGPT, manual)
+
+> a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: a university campus at night under a bright green and purple aurora borealis, old buildings with a few lit windows, dark pine trees, a lamp-lit path, starry sky. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.
