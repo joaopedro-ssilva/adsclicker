@@ -20,6 +20,7 @@ const themes = pick(content.themes, PATCH.themes);
 /** The patch announcement: a sneak peek of the new skins on their professors, plus the new sceneries and themes. */
 export function WhatsNew({ onClose }: { onClose: () => void }) {
   const owned = useGame((store) => store.state.skins);
+  const ownedSceneries = useGame((store) => store.state.sceneries);
   const openAlbum = useUi((store) => store.openAlbum);
 
   const toAlbum = () => {
@@ -46,32 +47,51 @@ export function WhatsNew({ onClose }: { onClose: () => void }) {
       <div className="whats-new">
         <p className="muted">
           Chegaram <b>{skins.length} skins</b>, <b>{sceneries.length} cenários</b> e <b>{themes.length} temas</b>, todos
-          recompensas de conquistas. Uma espiadinha:
+          recompensas de conquistas. Uma espiadinha (as mais raras você descobre jogando):
         </p>
 
         <ul className="whats-new-skins">
-          {skins.map((skin) => (
-            <li key={skin.id} className="whats-new-skin" data-rarity={skin.rarity}>
-              <div className="whats-new-sprite">
-                <Character {...characterSprite(skin.professor, skin.id)} scale={2} idle shadow={false} label={skin.name} />
-              </div>
-              <h3>{skin.name}</h3>
-              <RarityBadge rarity={skin.rarity} />
-              <p className="whats-new-hint">{unlockHint('skin', skin.id, owned[skin.id] === true)}</p>
-            </li>
-          ))}
+          {skins.map((skin) => {
+            const have = owned[skin.id] === true;
+            const secret = !have && (PATCH.secretRarities as readonly string[]).includes(skin.rarity);
+            return (
+              <li key={skin.id} className="whats-new-skin" data-rarity={skin.rarity}>
+                <div className="whats-new-sprite" data-secret={secret}>
+                  <Character
+                    {...characterSprite(skin.professor, skin.id)}
+                    scale={2}
+                    idle={!secret}
+                    shadow={false}
+                    label={secret ? 'Skin secreta' : skin.name}
+                  />
+                </div>
+                <h3>{secret ? '???' : skin.name}</h3>
+                <RarityBadge rarity={skin.rarity} />
+                <p className="whats-new-hint">{unlockHint('skin', skin.id, have)}</p>
+              </li>
+            );
+          })}
         </ul>
 
         <h3 className="whats-new-heading">Cenários</h3>
         <ul className="whats-new-sceneries">
-          {sceneries.map((scenery) => (
-            <li key={scenery.id}>
-              <Scenery scenery={scenery} className="whats-new-scenery" focusY={0.45}>
-                <span className="sr-only">{scenery.name}</span>
-              </Scenery>
-              <span>{scenery.name}</span>
-            </li>
-          ))}
+          {sceneries.map((scenery) => {
+            const secret = ownedSceneries[scenery.id] !== true && (PATCH.secretSceneries as readonly string[]).includes(scenery.id);
+            return (
+              <li key={scenery.id}>
+                {secret ? (
+                  <div className="whats-new-scenery whats-new-scenery-secret" aria-label="Cenário secreto">
+                    ?
+                  </div>
+                ) : (
+                  <Scenery scenery={scenery} className="whats-new-scenery" focusY={0.45}>
+                    <span className="sr-only">{scenery.name}</span>
+                  </Scenery>
+                )}
+                <span>{secret ? '???' : scenery.name}</span>
+              </li>
+            );
+          })}
         </ul>
 
         <h3 className="whats-new-heading">Temas</h3>

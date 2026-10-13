@@ -53,6 +53,10 @@
   background: linear-gradient(to top, color-mix(in srgb, var(--rarity) 22%, var(--bg)), var(--bg) 85%);
 }
 
+.whats-new-sprite[data-secret='true'] > * {
+  filter: brightness(0) invert(0.22);
+}
+
 .whats-new-skin h3 {
   margin: 0;
   font-size: 14px;
@@ -102,4 +106,13 @@
 .whats-new-swatch i {
   display: block;
   height: 22px;
+}
+
+.whats-new-scenery-secret {
+  display: grid;
+  place-items: center;
+  background: repeating-linear-gradient(45deg, var(--bg), var(--bg) 8px, var(--surface) 8px, var(--surface) 16px);
+  color: var(--text-muted);
+  font-size: 32px;
+  font-weight: 700;
 }

@@ -22,6 +22,9 @@ export const PATCH = {
   ],
   sceneries: ['cofre', 'aurora', 'sala-de-planning', 'camarim'],
   themes: ['holografico', 'platina', 'prata'],
+  /** Kept as a silhouette with "???" until the player owns them, so the best ones stay a surprise. */
+  secretRarities: ['epic', 'legendary'],
+  secretSceneries: ['aurora', 'camarim'],
 } as const;
 
 const KEY = 'adsclicker.seenPatch';
