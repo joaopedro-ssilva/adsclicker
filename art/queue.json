@@ -1005,6 +1005,161 @@
       "refs": [
         "skins-1.png"
       ]
+    },
+    {
+      "file": "skins-v6-gladimir-explorador.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-explorador"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a khaki explorer vest with many pockets over a plaid shirt, cargo shorts, hiking boots, holding an open paper map in one hand and a big magnifying glass in the other.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-b2-look.png",
+      "kind": "skin",
+      "keys": [
+        "b2-look"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a long colourful fashion coat in pink and yellow colour blocks over a black turtleneck, black trousers, white sneakers, holding colourful shopping bags in both hands.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-b2-curadora.png",
+      "kind": "skin",
+      "keys": [
+        "b2-curadora"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a fashion curator: an elegant black designer dress with a pink sash, a yellow tailor measuring tape draped around the neck stub, a red pincushion bracelet, holding big golden scissors and a small fabric swatch book; chic, not comic.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-wagner-cafe.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-cafe"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a cozy black bathrobe with green trim over black pajamas, fluffy grey slippers shaped like padlocks, holding a steaming white coffee mug, relaxed pose.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-wagner-elite.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-elite"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) an elite hacker: a long black trench coat with thin glowing green lines of code running down it, black tactical gloves, black combat boots, holding an open laptop whose screen glows green, two small green holographic terminal windows floating close to the body; cool and serious, not comic.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-b1-burndown.png",
+      "kind": "skin",
+      "keys": [
+        "b1-burndown"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a rumpled purple blazer over a striped t-shirt, jeans, one sneaker untied, a red fire extinguisher in one hand and a small chart board with a falling line and little orange flames on it in the other.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-angelo-escala.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-escala"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a navy polo shirt with a staff badge, khaki trousers, brown shoes, a whistle on a cord around the neck stub, holding a clipboard with a colourful timetable grid and a stopwatch.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-pablo-trader.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-trader"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a wrinkled grey business suit, a loose red tie, white shirt, holding a tablet showing a red falling stock chart, a small green lettuce leaf sticking out of the breast pocket.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "skins-v6-guto-sextou.png",
+      "kind": "skin",
+      "keys": [
+        "guto-sextou"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare MEDIUM BROWN skin (colour #9a6a45, clearly darker than the bodies of the reference image), and the hands and every other bit of visible skin have that same medium brown colour) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a blue t-shirt, jeans, sneakers, a backpack on the back, car keys in one hand and a small grey server box with little orange flames on top under the other arm.",
+      "refs": [
+        "skins-1.png"
+      ]
+    },
+    {
+      "file": "heads-skin4-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-sensei"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it. First open the reference image ref-head-pablo.png in the current directory: it is this character's head. Draw that SAME character's head 2 times in a single row, well spaced, not touching, front view, all exactly the same size: same face, same skin tone, same hair colour, same expression, same chunky pixel style and outline; big chibi heads only, no neck, no body. The first head on the left is plain, exactly like the reference. Each of the others wears different headgear, drawn as part of the head, with the face fully visible. Left to right after the plain one: an epic martial-arts headband tied around the forehead over the hair: a wide crimson red band with a small gold emblem in the middle and two long red tails flowing out to one side, the tails stay close to the head.",
+      "refs": [
+        "ref-head-pablo.png"
+      ]
+    },
+    {
+      "file": "scenery-cofre.png",
+      "kind": "scenery",
+      "keys": [
+        "cofre"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: inside a giant bank vault with a huge round open steel vault door on one side, mountains of shiny gold coins piled along the back wall and at the sides, gold coins falling from the ceiling, warm golden light. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.",
+      "refs": [
+        "ref-scenery-trofeus.png"
+      ]
+    },
+    {
+      "file": "scenery-sala-de-planning.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-de-planning"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: an agile meeting room with a big kanban board full of colourful sticky notes on the back wall, a long meeting table with laptops and coffee cups at one side, a whiteboard with a downward chart, bright office light. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.",
+      "refs": [
+        "ref-scenery-coordenacao.png"
+      ]
+    },
+    {
+      "file": "scenery-camarim.png",
+      "kind": "scenery",
+      "keys": [
+        "camarim"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: a backstage dressing room with clothing racks full of colourful outfits, a vanity mirror framed by round light bulbs, hangers, hat boxes and a folding screen, warm pink light. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.",
+      "refs": [
+        "ref-scenery-estudio.png"
+      ]
+    },
+    {
+      "file": "scenery-aurora.png",
+      "kind": "scenery",
+      "keys": [
+        "aurora"
+      ],
+      "prompt": "a wide 16:9 landscape pixel-art game background, 16-bit SNES style, crisp chunky pixels, limited palette, no characters, no people, no text, no UI. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. Side view scene: a university campus at night under a bright green and purple aurora borealis, old buildings with a few lit windows, dark pine trees, a lamp-lit path, starry sky. There is a clear, flat, uncluttered floor area in the lower third of the image where a character will stand; the details of the scene stay in the upper two thirds and at the sides.",
+      "refs": [
+        "ref-scenery-neve.png"
+      ]
     }
   ]
 }

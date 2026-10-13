@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 77 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 86 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -212,6 +212,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'knit cardigan over a collared shirt, corduroy trousers, carrying a tall stack of books',
     },
     {
+      id: 'gladimir-explorador',
+      name: 'Registro Não Encontrado',
+      rarity: 'rare',
+      description: 'Colete de explorador, mapa aberto e lupa. O SELECT voltou vazio, então ele foi procurar pessoalmente.',
+      palette: ['#b08d57', '#5b7a3a', '#efe2c0'],
+      artPrompt: 'khaki explorer vest with many pockets over a plaid shirt, cargo shorts, hiking boots, holding an open paper map in one hand and a big magnifying glass in the other',
+    },
+    {
       id: 'gladimir-piloto',
       name: 'Piloto Rebelde',
       rarity: 'epic',
@@ -292,6 +300,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'flat grey outfit drawn like a UI wireframe, boxes with crossed diagonal lines and placeholder rectangles, grey shoes',
     },
     {
+      id: 'b2-look',
+      name: 'Look do Dia',
+      rarity: 'rare',
+      description: 'Casaco longo colorido e sacolas de compras. Dez trocas depois, finalmente serviu.',
+      palette: ['#f472b6', '#fbbf24', '#22d3ee'],
+      artPrompt: 'a long colorful fashion coat in pink and yellow color blocks, black turtleneck, black trousers, white sneakers, holding colorful shopping bags in both hands',
+    },
+    {
       id: 'b2-darkmode',
       name: 'Dark Mode',
       rarity: 'epic',
@@ -306,6 +322,14 @@ export const skins: SkinDef[] = [
       description: 'Roupa feita de quadrados e uma régua gigante. Aqui nenhum pixel sai do lugar.',
       palette: ['#ec4899', '#4cc9f0', '#f2f2f2'],
       artPrompt: 'outfit made of colorful square pixel blocks, holding a giant ruler',
+    },
+    {
+      id: 'b2-curadora',
+      name: 'Curadora de Moda',
+      rarity: 'epic',
+      description: 'Fita métrica no pescoço, tesoura dourada e um álbum de tecidos. Toda rara passou pelo crivo dela.',
+      palette: ['#1f1f2b', '#ec4899', '#e8c25a'],
+      artPrompt: 'elegant black designer dress with a pink sash, a yellow tailor measuring tape draped around the neck, a pincushion bracelet, holding big golden scissors and a fabric swatch book',
     },
     {
       id: 'b2-paleta',
@@ -371,6 +395,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'colorful Hawaiian shirt, board shorts, sunglasses, straw hat, rubber duck pool float around the waist, holding a coconut drink, flip-flops',
     },
     {
+      id: 'wagner-cafe',
+      name: 'Café com Firewall',
+      rarity: 'rare',
+      description: 'Roupão preto, pantufas de cadeado e caneca na mão. A Super invasão chegou, o firewall que lute.',
+      palette: ['#1f1f26', '#22c55e', '#e8e8ee'],
+      artPrompt: 'a cozy black bathrobe with green trim over black pajamas, fluffy slippers shaped like padlocks, holding a steaming coffee mug, relaxed pose',
+    },
+    {
       id: 'wagner-firewall',
       name: 'Firewall',
       rarity: 'epic',
@@ -395,6 +427,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#c7ccd6', '#22c55e', '#f5c542'],
       artPrompt: 'shining silver knight armor with a big padlock emblem on the chest plate, shield decorated with a golden key, steel boots',
+    },
+    {
+      id: 'wagner-elite',
+      name: 'Hacker de Elite',
+      rarity: 'legendary',
+      description: 'Sobretudo preto com código verde correndo, luvas táticas e um notebook que brilha. Cinquenta invasões e nenhum pacote passou.',
+      palette: ['#0b0f0c', '#22ff66', '#3a4a40'],
+      artPrompt: 'a long black hacker trench coat with glowing green code lines running down it, black tactical gloves, black boots, holding an open glowing laptop, small floating green holographic terminal windows close to the body',
     },
     {
       id: 'wagner-sentinela',
@@ -432,6 +472,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#f5e6c8', '#2f9e8f', '#e07a1f'],
       artPrompt: 'open linen shirt over a white t-shirt, light trousers, loafers, holding a tambourine',
+    },
+    {
+      id: 'guto-sextou',
+      name: 'Sextou',
+      rarity: 'rare',
+      description: 'Mochila nas costas, chave do carro na mão e um servidor pegando fogo debaixo do braço. Deploy de sexta, 17:59.',
+      palette: ['#2f6fdb', '#f97316', '#e5e7eb'],
+      artPrompt: 'a blue t-shirt, jeans, sneakers, a backpack on the back, car keys in one hand and a small server box with little orange flames under the other arm',
     },
     {
       id: 'guto-dj',
@@ -512,6 +560,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'vest covered in colorful pin badges, whistle on a lanyard',
     },
     {
+      id: 'b1-burndown',
+      name: 'Burndown em Chamas',
+      rarity: 'rare',
+      description: 'Extintor numa mão e o gráfico de burndown pegando fogo na outra. O prazo era só uma sugestão.',
+      palette: ['#7c3aed', '#ef4444', '#f5f5f5'],
+      artPrompt: 'a rumpled purple blazer over a striped t-shirt, jeans, one sneaker untied, a red fire extinguisher in one hand and a small chart board with a falling line and little orange flames in the other',
+    },
+    {
       id: 'b1-lancamento',
       name: 'Dia de Lançamento',
       rarity: 'epic',
@@ -580,6 +636,14 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#f2f2f2', '#1e2a4a', '#f59e0b'],
       artPrompt: 'padel sportswear: white and navy polo shirt, navy shorts, white sneakers, wristband, holding a padel racket',
+    },
+    {
+      id: 'angelo-escala',
+      name: 'Coordenador de Escala',
+      rarity: 'rare',
+      description: 'Prancheta com a grade de horários, apito e cronômetro. Vinte trocas de professor por minuto, e a escala fecha.',
+      palette: ['#1e3a8a', '#f59e0b', '#e5e7eb'],
+      artPrompt: 'a navy polo shirt with a staff badge, khaki trousers, a whistle on a cord around the neck, a stopwatch, holding a clipboard with a colorful timetable grid',
     },
     {
       id: 'angelo-paraninfo',
@@ -653,6 +717,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'black and white checkered vest over a white shirt, holding a chess king piece, dark trousers, dress shoes',
     },
     {
+      id: 'pablo-trader',
+      name: 'Day Trader',
+      rarity: 'rare',
+      description: 'Terno amassado, gravata frouxa e um tablet com o gráfico despencando. Ainda tem uma alface no bolso.',
+      palette: ['#4b5563', '#dc2626', '#4ade80'],
+      artPrompt: 'a wrinkled grey business suit, a loose red tie, white shirt, holding a tablet showing a red falling stock chart, a small green lettuce leaf sticking out of the breast pocket',
+    },
+    {
       id: 'pablo-mago',
       name: 'Mago dos Algoritmos',
       rarity: 'epic',
@@ -691,9 +763,10 @@ export const skins: SkinDef[] = [
       id: 'pablo-sensei',
       name: 'Sensei dos Oito',
       rarity: 'legendary',
-      description: 'Oito faixas, oito mestres, nenhum horário livre. O pergaminho é o diploma de quem aguentou todos.',
+      description: 'Oito faixas, oito mestres, nenhum horário livre. A bandana na testa avisa: a aula de hoje vai até o último combo.',
+      headgear: true,
       palette: ['#f4f1e6', '#1b1b1f', '#d4a937'],
-      artPrompt: 'white martial arts gi with gold trim, black belt with eight coloured stripes and eight small medallions, holding a rolled scroll',
+      artPrompt: 'white martial arts gi with gold trim, black belt with eight coloured stripes and eight small medallions, holding a rolled scroll, red martial arts headband with long flowing tails',
     },
     {
       id: 'pablo-singularidade',

@@ -120,4 +120,43 @@ export const themes: ThemeDef[] = [
       textMuted: '#cdb77a',
     },
   },
+  {
+    id: 'prata',
+    name: 'Prata',
+    description: 'Grafite e prata escovada. Vinte e cinco conquistas já pedem uma vitrine.',
+    colors: {
+      bg: '#121417',
+      surface: '#1c1f24',
+      surfaceRaised: '#282c33',
+      border: '#8a929e',
+      text: '#f0f3f7',
+      textMuted: '#b4bcc8',
+    },
+  },
+  {
+    id: 'platina',
+    name: 'Platina',
+    description: 'Claro, frio e brilhante como uma placa de platina. Cinquenta troféus na parede.',
+    colors: {
+      bg: '#eef0f3',
+      surface: '#ffffff',
+      surfaceRaised: '#e2e6ec',
+      border: '#9aa3b0',
+      text: '#1b1f26',
+      textMuted: '#4a5260',
+    },
+  },
+  {
+    id: 'holografico',
+    name: 'Holográfico',
+    description: 'Fundo de madrepérola escura com bordas que mudam de cor. Só para quem completou o álbum.',
+    colors: {
+      bg: '#0e0b1a',
+      surface: '#171330',
+      surfaceRaised: '#221c45',
+      border: '#7fd8e8',
+      text: '#f5f0ff',
+      textMuted: '#c3b6ec',
+    },
+  },
 ];

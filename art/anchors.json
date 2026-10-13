@@ -199,6 +199,10 @@
     "x": 30,
     "y": 80
   },
+  "heads/pablo-sensei": {
+    "x": 22,
+    "y": 55
+  },
   "heads/pablo-singularidade": {
     "x": 26,
     "y": 57
@@ -243,6 +247,10 @@
     "x": 20,
     "y": 3
   },
+  "skins/angelo-escala": {
+    "x": 24,
+    "y": 2
+  },
   "skins/angelo-maestro": {
     "x": 19,
     "y": 6
@@ -270,6 +278,10 @@
   "skins/b1-arquiteta": {
     "x": 19,
     "y": 3
+  },
+  "skins/b1-burndown": {
+    "x": 21,
+    "y": 5
   },
   "skins/b1-default": {
     "x": 21,
@@ -299,6 +311,10 @@
     "x": 20,
     "y": 4
   },
+  "skins/b2-curadora": {
+    "x": 27,
+    "y": 2
+  },
   "skins/b2-darkmode": {
     "x": 17,
     "y": 2
@@ -306,6 +322,10 @@
   "skins/b2-default": {
     "x": 17,
     "y": 1
+  },
+  "skins/b2-look": {
+    "x": 22,
+    "y": 2
   },
   "skins/b2-obra": {
     "x": 14,
@@ -415,6 +435,10 @@
     "x": 13,
     "y": 6
   },
+  "skins/gladimir-explorador": {
+    "x": 29,
+    "y": 1
+  },
   "skins/gladimir-guardiao": {
     "x": 16,
     "y": 1
@@ -463,6 +487,10 @@
     "x": 22,
     "y": 4
   },
+  "skins/guto-sextou": {
+    "x": 18,
+    "y": 2
+  },
   "skins/guto-tempestade": {
     "x": 27,
     "y": 10
@@ -503,9 +531,17 @@
     "x": 17,
     "y": 2
   },
+  "skins/pablo-trader": {
+    "x": 20,
+    "y": 2
+  },
   "skins/wagner-agente": {
     "x": 14,
     "y": 2
+  },
+  "skins/wagner-cafe": {
+    "x": 16,
+    "y": 1
   },
   "skins/wagner-cavaleiro": {
     "x": 21,
@@ -521,6 +557,10 @@
   },
   "skins/wagner-detetive": {
     "x": 20,
+    "y": 2
+  },
+  "skins/wagner-elite": {
+    "x": 22,
     "y": 2
   },
   "skins/wagner-ferias": {
