@@ -375,6 +375,10 @@
     "x": 16,
     "y": 2
   },
+  "skins/edecio-luvas": {
+    "x": 26,
+    "y": 2
+  },
   "skins/edecio-primordial": {
     "x": 16,
     "y": 3
@@ -490,6 +494,10 @@
   "skins/pablo-oraculo": {
     "x": 14,
     "y": 5
+  },
+  "skins/pablo-sensei": {
+    "x": 19,
+    "y": 2
   },
   "skins/pablo-singularidade": {
     "x": 17,
