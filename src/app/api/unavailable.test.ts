@@ -14,6 +14,7 @@ import { GET as community } from './community/route';
 import { GET as leaderboard } from './leaderboard/route';
 import { GET as me } from './me/route';
 import { GET as ranks } from './me/ranks/route';
+import { GET as profile } from './players/profile/route';
 import { POST as sync } from './sync/route';
 
 const origin = { origin: 'http://localhost:3000', host: 'localhost:3000', 'content-type': 'application/json' };
@@ -35,6 +36,7 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
     ['sync', () => sync(post('/api/sync', { save: '{"version":1}', baseRev: 0 }))],
     ['me', () => me(get('/api/me'))],
     ['ranks', () => ranks(get('/api/me/ranks'))],
+    ['profile', () => profile(get('/api/players/profile?nickname=maria'))],
     ['nickname', () => account(post('/api/account/nickname', { nickname: 'Maria', password: 'segredo1' }))],
     ['login', () => login(post('/api/auth/login', { nickname: 'maria', password: 'segredo1' }))],
     ['logout', () => logout(post('/api/auth/logout', {}))],

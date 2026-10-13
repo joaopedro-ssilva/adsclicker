@@ -23,6 +23,7 @@ import {
   communityResponseSchema,
   leaderboardResponseSchema,
   loginResponseSchema,
+  playerProfileSchema,
   meResponseSchema,
   okResponseSchema,
   ranksResponseSchema,
@@ -100,6 +101,8 @@ export const api = {
   leaderboard: (board: Board, signal?: AbortSignal) =>
     call('GET', `/api/leaderboard?board=${board}`, leaderboardResponseSchema, { signal }),
   community: (signal?: AbortSignal) => call('GET', '/api/community', communityResponseSchema, { signal }),
+  profile: (nickname: string, signal?: AbortSignal) =>
+    call('GET', `/api/players/profile?nickname=${encodeURIComponent(nickname)}`, playerProfileSchema, { signal }),
 
   admin: {
     players: (search: string, page: number) =>

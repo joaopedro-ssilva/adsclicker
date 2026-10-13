@@ -143,3 +143,31 @@
     height: calc(100dvh - 24px);
   }
 }
+
+/* A newer build is live (UpdateWatcher): a small bar floating over the bottom of the screen. */
+.update-note {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  translate: -50% 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 2px solid var(--accent);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.update-note button {
+  padding: 4px 10px;
+  font: inherit;
+  color: var(--bg);
+  background: var(--accent);
+  border: 0;
+  cursor: pointer;
+}

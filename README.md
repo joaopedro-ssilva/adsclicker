@@ -35,7 +35,7 @@ Tudo é liberado jogando. Não há compras.
 
 - Oito professores, cada um com sua **Maestria**, uma mecânica especial que você escolhe a cada formatura.
 - **Monitores** que automatizam compras, pesquisas, invasões e sprints.
-- Save na nuvem, ranking e estatísticas da turma.
+- Save na nuvem, ranking com o perfil de cada jogador e estatísticas da turma.
 
 ## Créditos
 

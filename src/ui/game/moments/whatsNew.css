@@ -116,3 +116,33 @@
   font-size: 32px;
   font-weight: 700;
 }
+
+.whats-new-feature {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--surface-raised);
+  border: 2px solid var(--accent);
+}
+
+.whats-new-feature h3 {
+  margin: 0 0 2px;
+  font-size: 15px;
+}
+
+.whats-new-feature p {
+  margin: 0;
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .whats-new-feature {
+    grid-template-columns: auto 1fr;
+  }
+
+  .whats-new-feature > :last-child {
+    grid-column: 1 / -1;
+  }
+}

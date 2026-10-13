@@ -16,6 +16,7 @@ import { MobileNotice } from './stage/MobileNotice';
 import { Stage } from './stage/Stage';
 import { GameEffects } from './wiring/GameEffects';
 import { ThemedRoot } from './wiring/ThemedRoot';
+import { UpdateWatcher } from './wiring/UpdateWatcher';
 
 function GameScreen() {
   const hackathon = useHackathon((store) => store.mode === 'hackathon');
@@ -39,6 +40,7 @@ function GameScreen() {
       <GameEffects />
       <CloudRoot />
       <HackathonInviteWatcher />
+      <UpdateWatcher />
     </>
   );
 }

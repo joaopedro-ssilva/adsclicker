@@ -4,7 +4,7 @@ import { useGame } from '@/game/store';
 import { audio } from '@/ui/audio';
 import { Character } from '@/ui/art/Character';
 import { Scenery } from '@/ui/art/Scenery';
-import { Button, Modal, RarityBadge } from '@/ui/kit';
+import { Button, Icon, Modal, RarityBadge } from '@/ui/kit';
 import { unlockHint } from '../panel/album/albumData';
 import { characterSprite } from '../shared/characterProps';
 import { useUi } from '../shared/uiStore';
@@ -22,10 +22,16 @@ export function WhatsNew({ onClose }: { onClose: () => void }) {
   const owned = useGame((store) => store.state.skins);
   const ownedSceneries = useGame((store) => store.state.sceneries);
   const openAlbum = useUi((store) => store.openAlbum);
+  const setTab = useUi((store) => store.setTab);
 
   const toAlbum = () => {
     audio.play('unlock');
     openAlbum('skins');
+    onClose();
+  };
+
+  const toRanking = () => {
+    setTab('comunidade');
     onClose();
   };
 
@@ -107,6 +113,20 @@ export function WhatsNew({ onClose }: { onClose: () => void }) {
             </li>
           ))}
         </ul>
+
+        <div className="whats-new-feature">
+          <Icon name="trophy" size={28} />
+          <div>
+            <h3>Perfil dos jogadores</h3>
+            <p className="muted">
+              Na aba Turma, clique em alguém do ranking para ver o professor em cena, a skin, o cenário e as estatísticas da
+              pessoa.
+            </p>
+          </div>
+          <Button size="sm" variant="secondary" onClick={toRanking}>
+            Ver ranking
+          </Button>
+        </div>
       </div>
     </Modal>
   );

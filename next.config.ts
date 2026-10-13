@@ -15,6 +15,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Baked into the client so an open tab can tell that a newer build is live (/api/version, UpdateWatcher).
+  env: { NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA ?? 'dev' },
   // Lets a production build be checked (NEXT_DIST_DIR=.next-build) while a dev server holds .next.
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
   async headers() {

@@ -6,6 +6,7 @@ import { BOARD_INFO } from './boards';
 import { GuestNotice } from './GuestNotice';
 import { LeaderboardRow } from './LeaderboardRow';
 import { OwnRankLine } from './OwnRankLine';
+import { PlayerProfile } from './PlayerProfile';
 
 /** Rows shown before "ver mais": a hundred rows at once would push the feed far down the tab. */
 const PAGE = 10;
@@ -21,6 +22,7 @@ interface LeaderboardSectionProps {
 
 export function LeaderboardSection({ board, onBoard, data, loading, me, ranks }: LeaderboardSectionProps) {
   const [shown, setShown] = useState<{ board: Board; count: number }>({ board, count: PAGE });
+  const [profile, setProfile] = useState<string | null>(null);
   const count = shown.board === board ? shown.count : PAGE;
 
   const ownNick = me?.ranked && me.nickname ? me.nickname.toLowerCase() : null;
@@ -61,9 +63,10 @@ export function LeaderboardSection({ board, onBoard, data, loading, me, ranks }:
         </EmptyState>
       ) : (
         <>
+          <p className="community-note">Clique num jogador para ver o perfil dele.</p>
           <ul className="community-list" data-qa="community-list">
             {visible.map((entry) => (
-              <LeaderboardRow key={entry.rank} entry={entry} own={isOwn(entry.nickname)} />
+              <LeaderboardRow key={entry.rank} entry={entry} own={isOwn(entry.nickname)} onOpen={setProfile} />
             ))}
           </ul>
           {entries.length > count ? (
@@ -82,6 +85,7 @@ export function LeaderboardSection({ board, onBoard, data, loading, me, ranks }:
       )}
 
       {!ownInList ? <OwnRankLine me={me} board={board} rank={ranks?.[board]} /> : null}
+      {profile ? <PlayerProfile nickname={profile} onClose={() => setProfile(null)} /> : null}
     </Section>
   );
 }
