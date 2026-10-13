@@ -26,6 +26,7 @@ const EXPECTED_SKIN_IDS = [
   'edecio-ceo',
   'edecio-gladiador',
   'edecio-formando',
+  'edecio-luvas',
   'edecio-samurai',
   'edecio-lenda',
   'edecio-primordial',
@@ -88,6 +89,7 @@ const EXPECTED_SKIN_IDS = [
   'pablo-garagem',
   'pablo-galactico',
   'pablo-oraculo',
+  'pablo-sensei',
   'pablo-singularidade',
 ];
 
@@ -107,6 +109,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'edecio-samurai': 'legendary',
   'edecio-lenda': 'legendary',
   'edecio-primordial': 'mythic',
+  'edecio-luvas': 'epic',
   'gladimir-default': 'common',
   'gladimir-dba': 'common',
   'gladimir-pescador': 'common',
@@ -166,6 +169,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'pablo-mago': 'epic',
   'pablo-galactico': 'legendary',
   'pablo-oraculo': 'legendary',
+  'pablo-sensei': 'legendary',
   'pablo-singularidade': 'mythic',
 };
 
@@ -673,7 +677,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 75 skins of the design, with their rarities', () => {
+  it('has exactly the 77 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);

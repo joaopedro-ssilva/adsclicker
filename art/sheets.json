@@ -887,6 +887,20 @@
       "keys": [
         "galaxia"
       ]
+    },
+    {
+      "file": "skins-v5-luvas.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-luvas"
+      ]
+    },
+    {
+      "file": "skins-v5-sensei.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-sensei"
+      ]
     }
   ]
 }

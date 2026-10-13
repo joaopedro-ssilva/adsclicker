@@ -573,6 +573,28 @@ calls.push(
   { label: 'scenery-galaxia', images: [galaxy] },
 );
 
+// 10) Reward of "Só no Clique": Edécio with giant red cartoon gloves. One body alone on the sheet, so the gloves can be big.
+const clickGloves = {
+  ...v3BodySheet('skins-v5-luvas.png', [
+    [
+      'edecio-luvas',
+      'a white t-shirt with a red mouse-cursor print, red track pants and red sneakers; BOTH hands are inside HUGE oversized puffy red cartoon gloves, each glove almost as big as the torso, round and shiny, one glove raised in a fist and the other giving a thumbs-up, the gloves stay close to the body and inside the sprite',
+    ],
+  ]),
+};
+calls.push({ label: 'skins-v5-luvas', images: [clickGloves] });
+
+// 11) Reward of "Oito Mestres": Pablo as a martial-arts master of the eight Maestrias.
+const sensei = {
+  ...v3BodySheet('skins-v5-sensei.png', [
+    [
+      'pablo-sensei',
+      'a martial-arts grandmaster: a white kung-fu gi with gold trim and wide sleeves, a black belt with eight thin coloured stripes (red, blue, pink, green, orange, purple, yellow, cyan) and eight small round gold medallions hanging from it, white wrapped shins, black kung-fu slippers, holding a rolled parchment scroll tied with a red ribbon; calm and wise, not comic',
+    ],
+  ]),
+};
+calls.push({ label: 'skins-v5-sensei', images: [sensei] });
+
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const professor of Object.keys(HEAD_VARIANTS)) {
