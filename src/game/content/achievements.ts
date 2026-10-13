@@ -310,14 +310,16 @@ export const achievements: AchievementDef[] = [
   ach('diplomas-100', 'graduation', 'Parede de Diplomas', '🖼️', 'Ganhe 100 diplomas no total.', { kind: 'diplomasEarned', gte: 100 }, { skin: 'angelo-reitor' }),
   ach('diplomas-10000', 'graduation', 'Gráfica Sobrecarregada', '🖨️', 'Ganhe 10.000 diplomas no total.', { kind: 'diplomasEarned', gte: 10000 }, { scenery: 'grafica' }),
   ach('tree-5', 'graduation', 'Raízes Fundas', '🌱', 'Tenha 5 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 5 }, { theme: 'floresta' }),
-  ach('maestrias-all', 'graduation', 'Oito Mestres', '🎓', 'Libere a Maestria dos 8 professores. Cada um com a sua especialidade e nenhum com tempo livre.', { kind: 'maestrias', unlocked: 8 }),
+  ach('maestrias-all', 'graduation', 'Oito Mestres', '🎓', 'Libere a Maestria dos 8 professores. Cada um com a sua especialidade e nenhum com tempo livre.', { kind: 'maestrias', unlocked: 8 }, {
+    skin: 'pablo-sensei',
+  }),
   ach('maestrias-max', 'graduation', 'Mestre dos Mestres', '🧙', 'Leve uma Maestria ao nível 5. O resto da turma que espere o próximo diploma.', { kind: 'maestrias', unlocked: 1, level: 5 }, { theme: 'ouro' }),
   ach('tree-15', 'graduation', 'Árvore Frondosa', '🌳', 'Tenha 15 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 15 }, { scenery: 'jardim' }),
 
   // ------------------------------------------------------------------ collection (6)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 76 skins.', { kind: 'skinsOwned', gte: 76 }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 77 skins.', { kind: 'skinsOwned', gte: 77 }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),

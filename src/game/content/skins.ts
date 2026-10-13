@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 76 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 77 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -686,6 +686,14 @@ export const skins: SkinDef[] = [
       description: 'Túnica clara e uma esfera de dados flutuando. Já sabe o resultado, só confere a complexidade.',
       palette: ['#e8e6f5', '#6366f1', '#a5b4fc'],
       artPrompt: 'light flowing robe, floating glowing orb of data',
+    },
+    {
+      id: 'pablo-sensei',
+      name: 'Sensei dos Oito',
+      rarity: 'legendary',
+      description: 'Oito faixas, oito mestres, nenhum horário livre. O pergaminho é o diploma de quem aguentou todos.',
+      palette: ['#f4f1e6', '#1b1b1f', '#d4a937'],
+      artPrompt: 'white martial arts gi with gold trim, black belt with eight coloured stripes and eight small medallions, holding a rolled scroll',
     },
     {
       id: 'pablo-singularidade',

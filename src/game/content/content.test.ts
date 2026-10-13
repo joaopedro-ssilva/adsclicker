@@ -89,6 +89,7 @@ const EXPECTED_SKIN_IDS = [
   'pablo-garagem',
   'pablo-galactico',
   'pablo-oraculo',
+  'pablo-sensei',
   'pablo-singularidade',
 ];
 
@@ -168,6 +169,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'pablo-mago': 'epic',
   'pablo-galactico': 'legendary',
   'pablo-oraculo': 'legendary',
+  'pablo-sensei': 'legendary',
   'pablo-singularidade': 'mythic',
 };
 
@@ -675,7 +677,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 76 skins of the design, with their rarities', () => {
+  it('has exactly the 77 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);

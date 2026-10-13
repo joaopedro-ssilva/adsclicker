@@ -584,6 +584,17 @@ const clickGloves = {
 };
 calls.push({ label: 'skins-v5-luvas', images: [clickGloves] });
 
+// 11) Reward of "Oito Mestres": Pablo as a martial-arts master of the eight Maestrias.
+const sensei = {
+  ...v3BodySheet('skins-v5-sensei.png', [
+    [
+      'pablo-sensei',
+      'a martial-arts grandmaster: a white kung-fu gi with gold trim and wide sleeves, a black belt with eight thin coloured stripes (red, blue, pink, green, orange, purple, yellow, cyan) and eight small round gold medallions hanging from it, white wrapped shins, black kung-fu slippers, holding a rolled parchment scroll tied with a red ribbon; calm and wise, not comic',
+    ],
+  ]),
+};
+calls.push({ label: 'skins-v5-sensei', images: [sensei] });
+
 // Reference heads for the head-variant calls: the processed head, enlarged, on the same magenta background.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const professor of Object.keys(HEAD_VARIANTS)) {

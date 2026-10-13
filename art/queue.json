@@ -994,6 +994,17 @@
       "refs": [
         "skins-1.png"
       ]
+    },
+    {
+      "file": "skins-v5-sensei.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-sensei"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the pixel-art style of the reference image exactly: same chunky 16-bit pixels, same thick dark outline, same shading and palette richness. It shows 1 separate HEADLESS chibi character bodies in a single row. Each body ends at a short neck stub at the top (the neck stub is bare light tan skin) - NO head, NO face, NO hair, NO hat, NO helmet. Tiny cute chibi proportions (short body, small arms and legs), front view, standing, held items stay close to the body. Bodies are well spaced, not touching, all the same size. All bodies have the same height and the same proportions as the bodies of the reference image. Outfits left to right: (a) a martial-arts grandmaster: a white kung-fu gi with gold trim and wide sleeves, a black belt with eight thin coloured stripes (red, blue, pink, green, orange, purple, yellow, cyan) and eight small round gold medallions hanging from it, white wrapped shins, black kung-fu slippers, holding a rolled parchment scroll tied with a red ribbon; calm and wise, not comic.",
+      "refs": [
+        "skins-1.png"
+      ]
     }
   ]
 }

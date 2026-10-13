@@ -894,6 +894,13 @@
       "keys": [
         "edecio-luvas"
       ]
+    },
+    {
+      "file": "skins-v5-sensei.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-sensei"
+      ]
     }
   ]
 }
