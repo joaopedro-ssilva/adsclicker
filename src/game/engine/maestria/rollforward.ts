@@ -5,6 +5,8 @@ import { shiftMaestriaTimers } from './timers';
 import { atLevel, steadyCoinsPerSecond } from './production';
 import { maestriaLevel } from './slots';
 
+/** Stored charges that make a spend a "triple" one (an achievement counts it). */
+const TRIPLE_CHARGES = 3;
 
 /** Charges the Rollforward can hold at the current level; 0 when it is not unlocked. */
 export function rollforwardMaxCharges(state: GameState, content: GameContent): number {
@@ -40,6 +42,8 @@ export function fireRollforward(state: GameState, content: GameContent, emit: Em
 
   const ms = rollforwardJumpMs(state, content);
   const coins = steadyCoinsPerSecond(state, content).mul(ms / 1000);
+  state.counters.rollforwards += 1;
+  if (roll.charges >= TRIPLE_CHARGES) state.counters.tripleRollforwards += 1;
   roll.charges -= 1;
   if (coins.gt(0)) {
     state.coins = state.coins.add(coins);

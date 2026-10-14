@@ -167,7 +167,9 @@ export function graduate(
   liquidateBolsa(state, content);
   const diplomas = diplomasForRun(state, content, stats);
   const cap = diplomaCap(state, content);
-  const capped = cap !== null && diplomasFor(state.runCoins, content, stats) > cap;
+  const worth = diplomasFor(state.runCoins, content, stats);
+  const capped = cap !== null && worth > cap;
+  if (cap !== null && worth >= cap) state.counters.cappedGraduations += 1;
   // Horas complementares: one diploma per band filled, outside the cap.
   const bonus = horasBandsFilled(state, content);
   const index = getIndex(content);

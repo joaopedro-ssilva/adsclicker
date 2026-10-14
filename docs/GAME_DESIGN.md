@@ -69,7 +69,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ### Conforto e temas (Bruna B2)
 - Libera compra em lote. Pesquisas dão `costMult` (descontos) e aumentam duração de buffs e janelas de evento.
-- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 12 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques), Ouro (Mestre dos Mestres), Prata (Vitrine Cheia, 25 conquistas), Platina (Parede de Troféus, 50 conquistas) e Holográfico (Álbum Completo). Liberados por conquistas.
+- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 17 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques), Ouro (Mestre dos Mestres), Prata (Vitrine Cheia, 25 conquistas), Platina (Parede de Troféus, 50 conquistas), Holográfico (Álbum Completo), Grego (Volta ao Mundo), Arco-íris (Paleta Infinita, com brilho de vidro líquido), Fita Magnética (Carga Tripla), Pregão (Carteira Diversificada) e Vidro (Teto de Vidro). Liberados por conquistas.
 
 ### Invasões (Wagner)
 - A cada 75 a 150 s (× `eventInterval`) surge uma ameaça numa posição aleatória do palco. Ela some depois de `windowMs` (× `eventWindow`). O jogador precisa clicar `clicksRequired` vezes nela.
@@ -146,7 +146,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ## 5. Conquistas
 
-~129. Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
+151 (22 delas ligadas às Maestrias, aos Monitores e à coleção: Panteão, Volta ao Mundo, Paleta Infinita, Cem por Cento, Platina e outras). Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
 
 | Família | Quantas | Exemplos |
 | --- | --- | --- |
@@ -173,7 +173,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (86)
+### Skins (95)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -203,7 +203,16 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | gladimir | `gladimir-explorador` | Registro Não Encontrado | rare | colete de explorador, mapa aberto e lupa (Erro 404) | |
 | gladimir | `gladimir-guardiao` | Guardião do Backup | epic | armadura e escudo em forma de disquete | elmo |
 | gladimir | `gladimir-drone` | Piloto Automático | epic | camisa cinza, controle e drone |  |
-| gladimir | `gladimir-arquivista` | Arquivista Eterno | mythic | manto azul com runas de dados e tomo luminoso | capuz de luz |
+| gladimir | `gladimir-arquivista` | Arquivista Eterno | legendary | manto azul com runas de dados e tomo luminoso | capuz de luz |
+| gladimir | `gladimir-viajante` | Viajante do Tempo | epic | casaco de couro, cachecol listrado e relógio de bolso | óculos de latão |
+| gladimir | `gladimir-neyglad` | NeyGlad | legendary | camisa amarela número 10 e taça de campeão | |
+| gladimir | `gladimir-robo` | Gladbot | mythic | corpo de robô com o rosto dele na tela | cabeça de robô |
+| edecio | `edecio-garimpeiro` | Garimpeiro | epic | colete de couro, bateia e picareta | chapéu de garimpeiro |
+| b2 | `b2-componentes` | Biblioteca de Componentes | rare | roupa branca com botões e cartões encaixados | |
+| wagner | `wagner-dedetizador` | Dedetizador | epic | macacão amarelo e tanque de veneno | capuz e óculos |
+| b1 | `b1-keynote` | Keynote | epic | gola alta preta, blazer e clicker | headset |
+| angelo | `angelo-certificado` | Certificado na Mão | rare | camisa azul e certificado emoldurado | |
+| angelo | `angelo-ninja` | Ninja | legendary | traje índigo de shinobi e faixa vermelha | capuz e máscara |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |
@@ -263,7 +272,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | pablo | `pablo-sensei` | Sensei dos Oito | legendary | quimono branco e dourado, faixa preta com 8 listras e 8 medalhões das Maestrias, pergaminho | bandana vermelha de pontas longas |
 | pablo | `pablo-singularidade` | A Singularidade | mythic | manto de céu estrelado com galáxias | capuz |
 
-### Cenários (35)
+### Cenários (42)
 
 | id | Nome | Ambiente | Cena |
 | --- | --- | --- | --- |

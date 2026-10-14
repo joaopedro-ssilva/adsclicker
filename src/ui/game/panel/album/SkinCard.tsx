@@ -5,6 +5,7 @@ import { Character } from '@/ui/art/Character';
 import { Button, Icon, RarityBadge } from '@/ui/kit';
 import { characterSprite } from '../../shared/characterProps';
 import { unlockHint } from './albumData';
+import { mythicFrameVariables } from '../../stage/mythicEffects';
 import { FavouriteStar } from './FavouriteStar';
 
 interface SkinCardProps {
@@ -20,7 +21,7 @@ interface SkinCardProps {
 export const SkinCard = memo(function SkinCard({ skin, owned, equipped, favourite, onEquip, onFavourite }: SkinCardProps) {
   const hint = unlockHint('skin', skin.id, owned);
   return (
-    <article className="skin-card" data-rarity={skin.rarity} data-owned={owned} data-equipped={equipped}>
+    <article className="skin-card" data-rarity={skin.rarity} data-owned={owned} data-equipped={equipped} style={mythicFrameVariables(skin.id)}>
       <div className="skin-card-stage">
         <div className="skin-card-sprite" data-locked={!owned}>
           <Character

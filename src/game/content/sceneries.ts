@@ -26,7 +26,7 @@ const make = (seed: SceneSeed): SceneryDef => ({
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 35 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 42 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const sceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
@@ -309,5 +309,61 @@ export const sceneries: SceneryDef[] = [
     ambient: 'stars',
     palette: ['#0a1430', '#1f6a5a', '#2a3040'],
     scene: 'university campus at night under a bright green and purple aurora borealis, old buildings with a few lit windows, dark pine trees, a lamp-lit path, starry sky',
+  }),
+  make({
+    id: 'panteao',
+    name: 'Panteão',
+    description: 'Um salão de mármore com oito pedestais de ouro, um para cada mítico. Cada professor no seu pedestal, e nenhum reclama da altura.',
+    ambient: 'stars',
+    palette: ['#e9e4d8', '#d9c48a', '#b8ad94'],
+    scene: 'mythic Greek pantheon hall of white marble with tall fluted columns, eight empty marble pedestals lit by shafts of golden light from an open roof, golden laurel details, drifting clouds seen between the columns, a mystical glow',
+  }),
+  make({
+    id: 'arvore-ancestral',
+    name: 'Árvore Ancestral',
+    description: 'Uma árvore colossal com runas douradas no tronco e lanternas nos galhos. O currículo inteiro cresceu aqui.',
+    ambient: 'leaves',
+    palette: ['#1b3a2a', '#3f7a4a', '#4a3a24'],
+    scene: 'colossal mythological ancient tree filling the background, its trunk as wide as a building with glowing golden runes and hanging lanterns, giant roots arching over a mossy clearing, fireflies and soft light rays through the leaves',
+  }),
+  make({
+    id: 'sala-de-guerra',
+    name: 'Sala de Guerra',
+    description: 'Telões com o mapa da rede, consoles escuros e luzes de alerta. Vinte e cinco enxames depois, o bug já nem se atreve.',
+    ambient: 'code',
+    palette: ['#10151f', '#2a1a22', '#2a2f3a'],
+    scene: 'cyber security war room with a wall of big screens showing a world network map with red and green nodes and lines, rows of dark consoles with glowing monitors at the sides, red alert lights, cables on the floor edges',
+  }),
+  make({
+    id: 'palco',
+    name: 'Palco do Show',
+    description: 'Holofotes coloridos, torres de som e uma plateia de celulares erguidos. A festa de lançamento merecia esse público.',
+    ambient: 'confetti',
+    palette: ['#1a1030', '#5a2a7a', '#2a1a2a'],
+    scene: 'big concert stage seen from the stage itself, with colourful spotlights, speaker towers and a lighting truss at the sides, and a huge cheering crowd with raised hands and phone lights filling the background',
+  }),
+  make({
+    id: 'wall-street',
+    name: 'Wall Street',
+    description: 'Arranha-céus de vidro e pedra, um touro dourado na calçada e bandeiras sem texto. Uma hora inteira de produção em lucro, e ainda dá para uma foto.',
+    ambient: 'confetti',
+    palette: ['#bcd3e6', '#d9c48a', '#8a8a92'],
+    scene: 'luxurious financial district street by day, tall elegant skyscrapers of glass and stone, a large golden bull statue and a golden statue on a pedestal at the sides, marble pavement, flags without text, golden light',
+  }),
+  make({
+    id: 'sala-dos-monitores',
+    name: 'Sala dos Monitores',
+    description: 'Quatro mesas gamer com monitor triplo, torre com RGB e cadeira de piloto. Os monitores trabalham, e a iluminação também.',
+    ambient: 'code',
+    palette: ['#150a2a', '#3a1a5a', '#1a1a2e'],
+    scene: 'big gaming room with four desks along the back wall, each with an extravagant gaming setup, triple monitors, RGB-lit towers, glowing keyboards, big gaming chairs, LED strips on the walls in purple, cyan and pink',
+  }),
+  make({
+    id: 'sala-dos-professores',
+    name: 'Sala dos Professores',
+    description: 'Mesa grande, canecas de café, pilhas de prova e uma cafeteira que nunca descansa. O Domínio máximo dos oito cabe aqui.',
+    ambient: 'dust',
+    palette: ['#f0dcb8', '#c9a878', '#7a5a3a'],
+    scene: 'cosy teachers lounge with a big wooden table with coffee mugs and stacks of papers, comfortable armchairs, a coffee machine and a notice board with timetables at the back, bookshelves, a warm afternoon light through a window',
   }),
 ];

@@ -26,6 +26,15 @@ export function createCounters(): Record<CounterKey, number> {
     playSeconds: 0,
     offlineCollections: 0,
     cafesBought: 0,
+    goldenModes: 0,
+    rollforwards: 0,
+    tripleRollforwards: 0,
+    swarmsWon: 0,
+    swarmsCleared: 0,
+    festas: 0,
+    bolsaProfitSeconds: 0,
+    designFreeLevels: 0,
+    cappedGraduations: 0,
   };
 }
 

@@ -27,6 +27,7 @@ const EXPECTED_SKIN_IDS = [
   'edecio-gladiador',
   'edecio-formando',
   'edecio-luvas',
+  'edecio-garimpeiro',
   'edecio-samurai',
   'edecio-lenda',
   'edecio-primordial',
@@ -39,13 +40,17 @@ const EXPECTED_SKIN_IDS = [
   'gladimir-piloto',
   'gladimir-drone',
   'gladimir-guardiao',
+  'gladimir-viajante',
   'gladimir-mestre',
   'gladimir-arquivista',
+  'gladimir-neyglad',
+  'gladimir-robo',
   'b2-default',
   'b2-postit',
   'b2-obra',
   'b2-wireframe',
   'b2-look',
+  'b2-componentes',
   'b2-darkmode',
   'b2-pixel',
   'b2-curadora',
@@ -59,6 +64,7 @@ const EXPECTED_SKIN_IDS = [
   'wagner-cafe',
   'wagner-firewall',
   'wagner-cavaleiro',
+  'wagner-dedetizador',
   'wagner-cripto',
   'wagner-elite',
   'wagner-sentinela',
@@ -78,6 +84,7 @@ const EXPECTED_SKIN_IDS = [
   'b1-burndown',
   'b1-lancamento',
   'b1-arquiteta',
+  'b1-keynote',
   'b1-rainha',
   'b1-imperatriz',
   'angelo-default',
@@ -85,10 +92,12 @@ const EXPECTED_SKIN_IDS = [
   'angelo-maestro',
   'angelo-padel',
   'angelo-escala',
+  'angelo-certificado',
   'angelo-paraninfo',
   'angelo-capitao',
   'angelo-reitor',
   'angelo-rei',
+  'angelo-ninja',
   'angelo-chanceler',
   'pablo-default',
   'pablo-cientista',
@@ -119,6 +128,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'edecio-lenda': 'legendary',
   'edecio-primordial': 'mythic',
   'edecio-luvas': 'epic',
+  'edecio-garimpeiro': 'epic',
   'gladimir-default': 'common',
   'gladimir-dba': 'common',
   'gladimir-pescador': 'common',
@@ -129,12 +139,16 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'gladimir-mestre': 'legendary',
   'gladimir-drone': 'epic',
   'gladimir-guardiao': 'epic',
-  'gladimir-arquivista': 'mythic',
+  'gladimir-arquivista': 'legendary',
+  'gladimir-viajante': 'epic',
+  'gladimir-neyglad': 'legendary',
+  'gladimir-robo': 'mythic',
   'b2-default': 'common',
   'b2-postit': 'common',
   'b2-obra': 'common',
   'b2-wireframe': 'rare',
   'b2-look': 'rare',
+  'b2-componentes': 'rare',
   'b2-darkmode': 'epic',
   'b2-pixel': 'epic',
   'b2-curadora': 'epic',
@@ -149,6 +163,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'wagner-cripto': 'legendary',
   'wagner-ferias': 'rare',
   'wagner-cavaleiro': 'epic',
+  'wagner-dedetizador': 'epic',
   'wagner-elite': 'legendary',
   'wagner-sentinela': 'mythic',
   'guto-default': 'common',
@@ -167,6 +182,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'b1-burndown': 'rare',
   'b1-lancamento': 'epic',
   'b1-arquiteta': 'epic',
+  'b1-keynote': 'epic',
   'b1-rainha': 'legendary',
   'b1-imperatriz': 'mythic',
   'angelo-default': 'common',
@@ -174,6 +190,8 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'angelo-maestro': 'rare',
   'angelo-padel': 'rare',
   'angelo-escala': 'rare',
+  'angelo-certificado': 'rare',
+  'angelo-ninja': 'legendary',
   'angelo-paraninfo': 'epic',
   'angelo-capitao': 'epic',
   'angelo-rei': 'legendary',
@@ -205,6 +223,12 @@ const SKINS_WITH_HEADGEAR = [
   'gladimir-mestre',
   'gladimir-guardiao',
   'gladimir-arquivista',
+  'gladimir-viajante',
+  'gladimir-robo',
+  'edecio-garimpeiro',
+  'wagner-dedetizador',
+  'b1-keynote',
+  'angelo-ninja',
   'b2-prisma',
   'b2-obra',
   'wagner-agente',
@@ -267,6 +291,13 @@ const EXPECTED_SCENERY_IDS = [
   'sala-de-planning',
   'camarim',
   'aurora',
+  'panteao',
+  'arvore-ancestral',
+  'sala-de-guerra',
+  'palco',
+  'wall-street',
+  'sala-dos-monitores',
+  'sala-dos-professores',
 ];
 
 const EXPECTED_AMBIENT: Record<string, string> = {
@@ -305,6 +336,13 @@ const EXPECTED_AMBIENT: Record<string, string> = {
   'sala-de-planning': 'none',
   camarim: 'dust',
   aurora: 'stars',
+  panteao: 'stars',
+  'arvore-ancestral': 'leaves',
+  'sala-de-guerra': 'code',
+  palco: 'confetti',
+  'wall-street': 'confetti',
+  'sala-dos-monitores': 'code',
+  'sala-dos-professores': 'dust',
 };
 
 const ORIGINAL_UPGRADE_NAMES = [
@@ -704,7 +742,7 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 86 skins of the design, with their rarities', () => {
+  it('has exactly the 95 skins of the design, with their rarities', () => {
     expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
@@ -731,7 +769,7 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has exactly the 35 sceneries of the design with one default, and only the Galáxia floats', () => {
+  it('has exactly the 42 sceneries of the design with one default, and only the Galáxia floats', () => {
     expect(sceneryIds).toEqual(EXPECTED_SCENERY_IDS);
     expect(content.sceneries.filter((scenery) => scenery.default === true).map((scenery) => scenery.id)).toEqual([
       'sala-de-aula',
@@ -747,8 +785,8 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has the 12 HUD themes with one default and legible contrast', () => {
-    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro', 'prata', 'platina', 'holografico']);
+  it('has the 17 HUD themes with one default and legible contrast', () => {
+    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro', 'prata', 'platina', 'holografico', 'grego', 'arco-iris', 'fita-magnetica', 'pregao', 'vidro']);
     expect(content.themes.filter((theme) => theme.default === true).map((theme) => theme.id)).toEqual(['escuro']);
     const luminance = (hex: string): number => {
       const channels = [1, 3, 5].map((start) => {
@@ -776,9 +814,9 @@ describe('content: skins, sceneries and themes', () => {
 });
 
 describe('content: achievements', () => {
-  it('has about 130 achievements spread over the families of the design', () => {
-    expect(content.achievements.length).toBeGreaterThanOrEqual(125);
-    expect(content.achievements.length).toBeLessThanOrEqual(135);
+  it('has about 150 achievements spread over the families of the design', () => {
+    expect(content.achievements.length).toBeGreaterThanOrEqual(145);
+    expect(content.achievements.length).toBeLessThanOrEqual(160);
     const count = (family: string) => content.achievements.filter((a) => a.family === family).length;
     expect(count('click')).toBeGreaterThanOrEqual(10);
     expect(count('production')).toBeGreaterThanOrEqual(12);
@@ -938,5 +976,81 @@ describe('content: Domínio, milestones and the new skins', () => {
       if (condition.kind === 'mastery' && condition.professor) expect(professorSet.has(condition.professor)).toBe(true);
       if (condition.kind === 'rarityOwned') expect(content.skins.some((s) => s.rarity === condition.rarity)).toBe(true);
     }
+  });
+});
+
+describe('content: the collection feats', () => {
+  const byId = (id: string) => content.achievements.find((a) => a.id === id);
+  const rewardOf = (kind: 'skin' | 'scenery' | 'theme', id: string) => content.achievements.find((a) => a.reward?.[kind] === id);
+
+  it('keeps exactly one mythic skin per professor, with the two Gladimir feats in place', () => {
+    for (const id of PROFESSOR_IDS) {
+      expect(content.skins.filter((skin) => skin.professor === id && skin.rarity === 'mythic'), id).toHaveLength(1);
+    }
+    expect(rewardOf('skin', 'gladimir-robo')?.id).toBe('monitors-max');
+    expect(rewardOf('skin', 'gladimir-arquivista')?.id).toBe('mastery-gladimir');
+    expect(content.skins.find((skin) => skin.id === 'gladimir-arquivista')?.rarity).toBe('legendary');
+  });
+
+  it('hands out the approved rewards', () => {
+    const rewards: Record<string, { skin?: string; scenery?: string; theme?: string } | undefined> = {
+      'mythics-all': { scenery: 'panteao' },
+      'sceneries-all': { theme: 'grego' },
+      'themes-all': { theme: 'arco-iris' },
+      'tree-complete': { scenery: 'arvore-ancestral' },
+      'achievements-100': { skin: 'gladimir-neyglad' },
+      platinum: undefined,
+      'joinha-100': { skin: 'edecio-garimpeiro' },
+      'rollforward-50': { skin: 'gladimir-viajante' },
+      'rollforward-triple': { theme: 'fita-magnetica' },
+      'swarm-clear': { skin: 'wagner-dedetizador' },
+      'swarm-25': { scenery: 'sala-de-guerra' },
+      'festa-25': { scenery: 'palco' },
+      'releases-10': { skin: 'b1-keynote' },
+      'horas-full': { skin: 'angelo-certificado' },
+      'bolsa-hour': { scenery: 'wall-street' },
+      'bolsa-portfolio': { theme: 'pregao' },
+      'design-500': { skin: 'b2-componentes' },
+      'maestrias-doctorate': { skin: 'angelo-ninja' },
+      'monitors-all': { scenery: 'sala-dos-monitores' },
+      'monitors-max': { skin: 'gladimir-robo' },
+      'mastery-all-cap': { scenery: 'sala-dos-professores' },
+      'cap-reached': { theme: 'vidro' },
+    };
+    for (const [id, reward] of Object.entries(rewards)) expect(byId(id)?.reward, id).toEqual(reward);
+  });
+
+  it('keeps the collection-wide feats reachable: no cosmetic they ask for is behind them', () => {
+    const volta = byId('sceneries-all');
+    const paleta = byId('themes-all');
+    const platina = byId('platinum');
+    // A feat never asks for its own reward.
+    expect(volta?.condition).toEqual({ kind: 'everyOwned', of: 'sceneries' });
+    expect(paleta?.condition).toEqual({ kind: 'everyOwned', of: 'themes', except: ['arco-iris'] });
+    expect(platina?.condition).toEqual({ kind: 'everyAchievement', except: ['platinum'] });
+    const collectionWide = new Set(['sceneries-all', 'themes-all', 'platinum']);
+    // Every scenery comes from a feat that is not one of the collection-wide ones.
+    for (const scenery of content.sceneries.filter((s) => s.default !== true)) {
+      expect(collectionWide.has(rewardOf('scenery', scenery.id)?.id ?? ''), scenery.id).toBe(false);
+    }
+    // Themes: the only collection-wide reward among the ones asked for is the Grego (Volta ao Mundo), which does not need the Paleta.
+    for (const theme of content.themes.filter((t) => t.default !== true && t.id !== 'arco-iris')) {
+      const source = rewardOf('theme', theme.id)?.id ?? '';
+      expect(['themes-all', 'platinum'].includes(source), theme.id).toBe(false);
+    }
+    // Nothing is rewarded by Platina, and the 100 achievements can be met without it.
+    expect(platina?.reward).toBeUndefined();
+    expect(content.achievements.length - 1).toBeGreaterThan(100);
+  });
+
+  it('reads the real caps of the game', () => {
+    expect(byId('mastery-all-cap')?.condition).toEqual({ kind: 'mastery', rank: content.balance.mastery.cap });
+    expect(byId('horas-full')?.condition).toEqual({ kind: 'horasBands', gte: Math.max(...content.maestrias.horas.bands) });
+    expect(byId('releases-10')?.condition).toEqual({ kind: 'releaseVersions', gte: content.maestrias.releases.maxVersions });
+    expect(byId('monitors-all')?.condition).toEqual({ kind: 'monitors', gte: content.monitors.length });
+    expect(byId('monitors-max')?.condition).toEqual({ kind: 'monitors', gte: content.monitors.length, maxed: true });
+    expect(byId('maestrias-doctorate')?.condition).toEqual({ kind: 'maestrias', unlocked: PROFESSOR_IDS.length, level: 5 });
+    // Mestre dos Mestres stays: one Maestria at level 5.
+    expect(byId('maestrias-max')?.condition).toEqual({ kind: 'maestrias', unlocked: 1, level: 5 });
   });
 });

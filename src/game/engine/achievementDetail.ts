@@ -1,11 +1,13 @@
 import { PROFESSOR_IDS } from '../content/types';
 import type { AchievementDef, Condition, CounterKey, GameContent } from '../content/types';
-import { cleanRunSteps, lastRunValue, measureCondition } from './achievements';
+import { achievementsDone, bolsaHeld, cleanRunSteps, lastRunValue, measureCondition, monitorsReached, ownedCount, prestigeProgress } from './achievements';
 import type { Probe } from './achievements';
 import { getIndex } from './contentIndex';
 import { parseDecimal } from './decimal';
 import { levelOf } from './economy';
 import { formatDuration, formatNumber, formatPercent } from './format';
+import { horasBandsFilled } from './maestria/horas';
+import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
 import { masteryRank } from './mastery';
 import type { GameState } from './state';
@@ -39,6 +41,15 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   playSeconds: 'segundos de jogo',
   offlineCollections: 'coletas offline',
   cafesBought: 'cafés comprados',
+  goldenModes: 'modos dourados',
+  rollforwards: 'Rollforwards usados',
+  tripleRollforwards: 'Rollforwards com 3 cargas guardadas',
+  swarmsWon: 'Super invasões vencidas',
+  swarmsCleared: 'Super invasões limpas',
+  festas: 'festas de lançamento',
+  bolsaProfitSeconds: 'de lucro na Bolsa',
+  designFreeLevels: 'níveis de graça',
+  cappedGraduations: 'formaturas no teto de diplomas',
 };
 
 const n = (value: number) => formatNumber(Math.floor(value));
@@ -55,6 +66,7 @@ function nameList(names: string[], max = 3): string {
 
 function counterText(state: GameState, counter: CounterKey, target: number): string {
   const value = state.counters[counter];
+  if (counter === 'bolsaProfitSeconds') return `${formatDuration(Math.min(value, target) * 1000)} / ${formatDuration(target * 1000)} de produção em lucro`;
   if (counter === 'playSeconds') return `${formatDuration(Math.min(value, target) * 1000)} / ${formatDuration(target * 1000)} de jogo`;
   return pair(value, target, COUNTER_UNIT[counter]);
 }
@@ -216,6 +228,36 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       const level = needed > 1 ? ` no nível ${n(needed)}` : '';
       return { text: `${n(Math.min(count, condition.unlocked))} de ${n(condition.unlocked)} Maestrias${level}`, note: null };
     }
+    case 'everyOwned': {
+      const { owned, total } = ownedCount(state, content, condition.of, condition.except);
+      const unit = condition.of === 'sceneries' ? 'cenários' : 'temas';
+      const list = (condition.of === 'sceneries' ? content.sceneries : content.themes).filter((item) => !(condition.except ?? []).includes(item.id));
+      const have = condition.of === 'sceneries' ? state.sceneries : state.themes;
+      const missing = list.filter((item) => !have[item.id]);
+      return { text: pair(owned, total, unit), note: missing.length > 0 ? `Ainda falta: ${nameList(missing.map((item) => item.name))}.` : null };
+    }
+    case 'everyAchievement': {
+      const { done, total } = achievementsDone(state, content, condition.except);
+      return { text: pair(done, total, 'conquistas'), note: 'Todas as outras conquistas do jogo, as secretas também.' };
+    }
+    case 'prestigeComplete': {
+      const { levels, total } = prestigeProgress(state, content);
+      const open = content.prestigeNodes.filter((node) => (state.prestige[node.id] ?? 0) < node.maxLevel);
+      return { text: pair(levels, total, 'níveis da árvore'), note: open.length > 0 ? `Falta evoluir: ${nameList(open.map((node) => node.name))}.` : null };
+    }
+    case 'releaseVersions':
+      return { text: `versão ${n(Math.min(releaseVersions(state, content), condition.gte))}.0 / ${n(condition.gte)}.0 nesta turma`, note: 'Vale a turma em andamento: ao se formar, as versões voltam ao zero.' };
+    case 'horasBands':
+      return { text: pair(horasBandsFilled(state, content), condition.gte, 'faixas de horas nesta turma'), note: 'Vale a turma em andamento e exige a Maestria do Angelo no nível máximo.' };
+    case 'bolsaPortfolio': {
+      const { held, total } = bolsaHeld(state, content);
+      return { text: pair(held, total, 'investimentos em carteira'), note: 'Os quatro ativos e o Fundo, todos com dinheiro aplicado ao mesmo tempo.' };
+    }
+    case 'monitors':
+      return {
+        text: pair(monitorsReached(state, content, condition.maxed === true), condition.gte, condition.maxed ? 'monitores no nível máximo' : 'monitores contratados'),
+        note: null,
+      };
   }
 }
 

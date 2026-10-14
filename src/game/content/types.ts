@@ -97,7 +97,23 @@ export type CounterKey =
   | 'playSeconds'
   | 'offlineCollections'
   /** Cafés bought for the Hackathon mode; the server credits the difference at each sync. */
-  | 'cafesBought';
+  | 'cafesBought'
+  /** Times the golden mode of Edécio (Joinha de Ouro) started. */
+  | 'goldenModes'
+  /** Rollforward charges spent, and the ones spent while three were stored. */
+  | 'rollforwards'
+  | 'tripleRollforwards'
+  /** Super invasões won (the boss fell) and cleared (every bug and the boss fell). */
+  | 'swarmsWon'
+  | 'swarmsCleared'
+  /** Times the Festa de lançamento was fired. */
+  | 'festas'
+  /** Profit the Bolsa de tokens paid, counted in seconds of the class's production. */
+  | 'bolsaProfitSeconds'
+  /** Free levels the Design System gave to other classes. */
+  | 'designFreeLevels'
+  /** Graduations whose run was worth the diploma cap or more. */
+  | 'cappedGraduations';
 
 /** Counters of the current run only: they start again at every graduation (GameState.run). */
 export type RunCounterKey = 'levelsBought';
@@ -151,6 +167,20 @@ export type Condition =
   | { kind: 'lastRunClean' }
   /** At least `unlocked` Maestrias are unlocked, each at level `level` or more (default 1). */
   | { kind: 'maestrias'; unlocked: number; level?: number }
+  /** Every scenery (or theme) of the game is owned, except the ones named: the rewards of the achievement itself. */
+  | { kind: 'everyOwned'; of: 'sceneries' | 'themes'; except?: string[] }
+  /** Every achievement of the game is unlocked, except the ones named (the achievement itself). */
+  | { kind: 'everyAchievement'; except?: string[] }
+  /** Every node of the Formatura tree is at its maximum level. */
+  | { kind: 'prestigeComplete' }
+  /** B1's Releases reached this version in the current run. */
+  | { kind: 'releaseVersions'; gte: number }
+  /** Angelo's Horas complementares has this many bands filled in the current run. */
+  | { kind: 'horasBands'; gte: number }
+  /** The assets and the Fundo of the Bolsa are all held at the same time. */
+  | { kind: 'bolsaPortfolio' }
+  /** At least `gte` Monitores are hired, or at their top level when `maxed`. */
+  | { kind: 'monitors'; gte: number; maxed?: boolean }
   /** Fired by name from the UI or engine (easter eggs): useGame.getState().triggerSecret(id). */
   | { kind: 'secret'; trigger: string };
 

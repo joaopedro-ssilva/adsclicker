@@ -10,6 +10,10 @@
 /** Ids of the tags that came with the launch. They are ordinary tags (editable, deletable); a few tools look them up by id. */
 export const PRIMEIRO_PLATINADO_TAG = 'primeiro-platinado';
 export const TURMA_ZERO_TAG = 'turma-zero';
+/** Given by the server to every ranked player whose save holds the "Platina" achievement (see players/sync.ts). */
+export const PLATINADO_TAG = 'platinado';
+/** Id of the achievement that earns it. */
+export const PLATINA_ACHIEVEMENT = 'platinum';
 
 /** public: badge on the boards, the feed and the player's own line. admin: only on /admin. */
 export const TAG_VISIBILITIES = ['public', 'admin'] as const;

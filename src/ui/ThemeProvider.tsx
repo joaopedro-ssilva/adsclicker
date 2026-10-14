@@ -29,6 +29,7 @@ export function ThemeProvider({ theme, accent, reducedMotion = false, className,
         className={className ? `ui-theme ${className}` : 'ui-theme'}
         style={themeVariables(theme, accent)}
         data-scheme={colorScheme(theme)}
+        data-theme={theme?.id}
         data-reduced-motion={reduced}
       >
         {children}

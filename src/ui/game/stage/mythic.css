@@ -1,60 +1,614 @@
-/* Mythic skins: a slow glow and pixel sparkles behind the professor. Every layer is hidden until its animation runs,
-   so reduced motion (which cancels animations) shows none of it. */
+/* Mythic skins: one effect of its own for each (MythicAura.tsx draws the layers, mythicEffects.ts says which skin gets which).
+   Everything is hard-edged shapes and stepped animations, no blur. The layers sit behind the professor and a little around
+   them, in container units of the aura (cqh follows the size of the professor, in the game and in photo mode). Every layer
+   is invisible until its animation runs, so reduced motion (which cancels animations) shows none of it. --fx and --fx2 are
+   the colours of the effect, --u is the size of one art pixel. */
 
 .mythic-aura {
   position: absolute;
   inset: -8% -45% -4%;
   z-index: -1;
   pointer-events: none;
+  container-type: size;
 }
 
-.mythic-aura-glow {
+.mythic-aura :is(span, i, svg) {
   position: absolute;
-  inset: 0;
+}
+
+/* The layers that show: hidden until an animation turns them on. Groups (orbit, arm, fan) stay at full opacity. */
+.fx-rays,
+.fx-thumb,
+.fx-frame,
+.fx-lines,
+.fx-sweep,
+.fx-bit,
+.fx-ping,
+.fx-beam,
+.fx-hex,
+.fx-scan,
+.fx-cloud,
+.fx-flash,
+.fx-bolt,
+.fx-link,
+.fx-star,
+.fx-dust,
+.fx-halo,
+.fx-leaf,
+.fx-chip,
+.fx-disk,
+.fx-orb,
+.fx-pull {
   opacity: 0;
-  /* Hard colour bands, not a soft blur: the halo reads as pixel art and stays visible on any scenery. */
-  background: radial-gradient(
-    ellipse at 50% 55%,
-    color-mix(in srgb, var(--mythic) 62%, transparent) 0 30%,
-    color-mix(in srgb, var(--mythic) 40%, transparent) 30% 44%,
-    color-mix(in srgb, var(--mythic) 22%, transparent) 44% 56%,
-    color-mix(in srgb, var(--mythic) 10%, transparent) 56% 66%,
-    transparent 66%
-  );
-  animation: mythic-glow 3.2s steps(6) infinite;
 }
 
-.mythic-aura i {
-  position: absolute;
+/* Sprites drawn with box-shadows (a 3px cell) follow the size of the art pixel. */
+.fx-thumb,
+.fx-cloud,
+.fx-star,
+.fx-leaf,
+.fx-orb {
+  width: 3px;
+  height: 3px;
+  transform-origin: 0 0;
+  scale: calc(var(--u, 3) / 3);
+}
+
+/* Shared motion ---------------------------------------------------------------------------------------------- */
+
+@keyframes fx-fade-in {
+  to {
+    opacity: var(--o, 1);
+  }
+}
+
+@keyframes fx-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes fx-turn-back {
+  to {
+    rotate: -360deg;
+  }
+}
+
+/* Rising particles (thumbs, bits): up from the feet to above the head, drifting a little. */
+@keyframes fx-rise {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  78% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: calc(var(--dx, 0) * 1cqw) -72cqh;
+  }
+}
+
+/* Falling particles (leaves, chips, dust), from above the head to below the feet. */
+@keyframes fx-fall {
+  0% {
+    opacity: 0;
+    translate: 0 -8cqh;
+  }
+
+  8% {
+    opacity: 1;
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    translate: calc(var(--dx, 0) * 1cqw) 104cqh;
+  }
+}
+
+@keyframes fx-sway {
+  from {
+    rotate: -28deg;
+  }
+
+  to {
+    rotate: 28deg;
+  }
+}
+
+@keyframes fx-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Edécio: golden rays and thumbs up -------------------------------------------------------------------------- */
+
+.fx-rays {
+  left: 50%;
+  top: 46%;
+  width: 240cqh;
+  height: 240cqh;
+  margin: -120cqh 0 0 -120cqh;
+  background: repeating-conic-gradient(var(--fx) 0 6deg, transparent 6deg 18deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0 70%, transparent 70.4%);
+  mask-image: radial-gradient(circle, #000 0 70%, transparent 70.4%);
+  --o: 0.5;
+  animation:
+    fx-fade-in 0.9s steps(4) forwards,
+    fx-turn 90s steps(180) infinite;
+}
+
+.fx-rays-inner {
+  width: 170cqh;
+  height: 170cqh;
+  margin: -85cqh 0 0 -85cqh;
+  background: repeating-conic-gradient(from 9deg, var(--fx2) 0 4deg, transparent 4deg 18deg);
+  --o: 0.55;
+  animation:
+    fx-fade-in 0.9s steps(4) forwards,
+    fx-turn-back 70s steps(140) infinite;
+}
+
+.fx-thumb {
   left: var(--x);
-  bottom: var(--y);
-  width: calc(var(--s) * 4px);
-  height: calc(var(--s) * 4px);
-  color: var(--mythic);
-  /* A white core with coloured arms and a dark edge, so a sparkle shows on light and dark sceneries alike. */
-  background: #fff;
-  outline: 2px solid rgb(20 8 24 / 0.55);
-  box-shadow:
-    calc(var(--s) * 4px) 0 currentcolor,
-    calc(var(--s) * -4px) 0 currentcolor,
-    0 calc(var(--s) * 4px) currentcolor,
-    0 calc(var(--s) * -4px) currentcolor;
-  opacity: 0;
-  animation: mythic-spark var(--t) steps(8) var(--d) infinite;
+  bottom: 6%;
+  animation: fx-rise var(--t) steps(14) var(--d) infinite;
 }
 
-.mythic-aura i:nth-of-type(3n) {
-  color: #fff4c2;
+/* Gladimir, the robot: scan lines, data bits, antenna pulses ---------------------------------------------------- */
+
+.fx-frame {
+  inset: 3% 8%;
+  background:
+    linear-gradient(var(--fx), var(--fx)) 0 0 / 18px 3px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 0 0 / 3px 18px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 100% 0 / 18px 3px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 100% 0 / 3px 18px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 0 100% / 18px 3px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 0 100% / 3px 18px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 100% 100% / 18px 3px no-repeat,
+    linear-gradient(var(--fx), var(--fx)) 100% 100% / 3px 18px no-repeat;
+  animation: fx-blink 1.8s steps(3) infinite;
 }
 
-.mythic-aura i:nth-of-type(4n + 1) {
-  color: #ffd1e6;
-}
-
-@keyframes mythic-glow {
+@keyframes fx-blink {
   0%,
   100% {
-    opacity: 0.6;
+    opacity: 0.95;
+  }
+
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.fx-lines {
+  inset: 3% 8%;
+  background: repeating-linear-gradient(0deg, var(--fx) 0 2px, transparent 2px 8px);
+  animation: fx-lines 0.8s steps(8) infinite;
+}
+
+@keyframes fx-lines {
+  from {
+    opacity: 0.22;
+    background-position: 0 0;
+  }
+
+  to {
+    opacity: 0.22;
+    background-position: 0 8px;
+  }
+}
+
+.fx-sweep {
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 8px;
+  background: var(--fx2);
+  box-shadow:
+    0 8px 0 color-mix(in srgb, var(--fx) 60%, transparent),
+    0 16px 0 color-mix(in srgb, var(--fx) 30%, transparent);
+  animation: fx-sweep 3.6s steps(22) infinite;
+}
+
+@keyframes fx-sweep {
+  0% {
+    opacity: 0;
+    translate: 0 104cqh;
+  }
+
+  8%,
+  92% {
+    opacity: 0.9;
+  }
+
+  100% {
+    opacity: 0;
+    translate: 0 -6cqh;
+  }
+}
+
+.fx-bit {
+  left: var(--x);
+  bottom: 4%;
+  width: 5px;
+  height: 5px;
+  background: var(--fx);
+  outline: 1px solid #052a3c;
+  animation: fx-rise var(--t) steps(14) var(--d) infinite;
+}
+
+.fx-bit:nth-child(3n + 1) {
+  background: var(--fx2);
+}
+
+.fx-ping {
+  left: var(--x);
+  top: 7%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid var(--fx2);
+  opacity: 0;
+  animation: fx-ping 1.9s steps(5) var(--d) infinite;
+}
+
+.fx-ping::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: var(--fx);
+}
+
+@keyframes fx-ping {
+  0% {
+    opacity: 1;
+    scale: 0.3;
+  }
+
+  100% {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+
+/* Bruna B2: a spectrum fanning out of white light and sweeping around ------------------------------------------- */
+
+.fx-fan {
+  left: 50%;
+  top: 52%;
+  width: 0;
+  height: 0;
+  animation: fx-turn 24s steps(96) infinite;
+}
+
+.fx-fan-back {
+  animation-delay: -12s;
+}
+
+.fx-beam {
+  left: 0;
+  top: 0;
+  width: 120cqh;
+  height: 11px;
+  margin-top: -5px;
+  transform-origin: 0 50%;
+  rotate: var(--a);
+  /* A dark rim under the colour, both in dashes, so a beam reads on light and dark sceneries. */
+  background:
+    linear-gradient(90deg, var(--c) 0 38%, transparent 38% 43%, var(--c) 43% 68%, transparent 68% 73%, var(--c) 73% 92%, transparent 92%) center / 100% 7px no-repeat,
+    linear-gradient(90deg, rgb(24 10 40 / 0.45) 0 38%, transparent 38% 43%, rgb(24 10 40 / 0.45) 43% 68%, transparent 68% 73%, rgb(24 10 40 / 0.45) 73% 92%, transparent 92%) center / 100% 11px no-repeat;
+  --o: 0.88;
+  animation: fx-fade-in 0.8s steps(3) forwards;
+}
+
+.fx-beam-white {
+  --c: #ffffff;
+  width: 64cqh;
+}
+
+/* Wagner: hexagonal plates orbiting and a scan now and then ------------------------------------------------------- */
+
+.fx-orbit {
+  left: 50%;
+  top: 52%;
+  width: 0;
+  height: 0;
+  animation: fx-turn 18s steps(72) infinite;
+}
+
+.fx-arm {
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  rotate: var(--a);
+}
+
+.fx-hex {
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 34px;
+  margin: -17px 0 0 -15px;
+  translate: 47cqh 0;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+  background: #2a0a0f;
+  --o: 0.92;
+  /* The plate turns against the orbit, so it stays upright (a hexagon looks the same every 60 degrees). */
+  animation:
+    fx-fade-in 0.7s steps(3) forwards,
+    fx-turn-back 18s steps(72) infinite;
+}
+
+.fx-hex::before,
+.fx-hex::after {
+  content: '';
+  position: absolute;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+.fx-hex::before {
+  inset: 3px;
+  background: var(--fx);
+}
+
+.fx-hex::after {
+  inset: 9px 8px;
+  background: var(--fx2);
+}
+
+.fx-scan {
+  top: -6%;
+  bottom: -4%;
+  left: 0;
+  width: 10px;
+  background: repeating-linear-gradient(0deg, var(--fx) 0 8px, transparent 8px 12px);
+  box-shadow:
+    -12px 0 0 color-mix(in srgb, var(--fx) 55%, transparent),
+    -24px 0 0 color-mix(in srgb, var(--fx) 28%, transparent);
+  animation: fx-scan 9s steps(30) 2s infinite;
+}
+
+@keyframes fx-scan {
+  0% {
+    opacity: 0;
+    translate: -4cqw 0;
+  }
+
+  3%,
+  24% {
+    opacity: 0.9;
+  }
+
+  24% {
+    translate: 100cqw 0;
+  }
+
+  27%,
+  100% {
+    opacity: 0;
+    translate: 100cqw 0;
+  }
+}
+
+/* Guto: dark clouds and lightning ---------------------------------------------------------------------------------- */
+
+.fx-cloud {
+  left: var(--x);
+  top: var(--y);
+  animation: fx-cloud var(--t) steps(30) var(--d) infinite alternate;
+}
+
+@keyframes fx-cloud {
+  from {
+    opacity: 0.96;
+    translate: -4cqw 0;
+  }
+
+  to {
+    opacity: 0.96;
+    translate: 6cqw 0;
+  }
+}
+
+.fx-flash {
+  left: var(--x);
+  top: 0;
+  width: 46cqw;
+  height: 40cqh;
+  margin-left: -16cqw;
+  background: var(--fx);
+  animation: fx-flash var(--t) steps(1) var(--d) infinite;
+}
+
+@keyframes fx-flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  91% {
+    opacity: 0.16;
+  }
+
+  92.5% {
+    opacity: 0;
+  }
+
+  93.5% {
+    opacity: 0.12;
+  }
+
+  95% {
+    opacity: 0;
+  }
+}
+
+.fx-bolt {
+  left: var(--x);
+  top: 7cqh;
+  width: 30px;
+  height: 78cqh;
+  filter: drop-shadow(2px 0 0 #3b2f00) drop-shadow(-2px 0 0 #3b2f00);
+  animation: fx-bolt var(--t) steps(1) var(--d) infinite;
+}
+
+.fx-bolt i {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--fx) 0 62%, #fffbe0 62%);
+  clip-path: polygon(52% 0, 18% 38%, 46% 38%, 8% 72%, 34% 72%, 0 100%, 86% 52%, 56% 52%, 94% 24%, 66% 24%, 92% 0);
+}
+
+@keyframes fx-bolt {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  91% {
+    opacity: 1;
+  }
+
+  92.5% {
+    opacity: 0;
+  }
+
+  93.5% {
+    opacity: 1;
+  }
+
+  97% {
+    opacity: 0;
+  }
+}
+
+/* Bruna B1: a constellation that draws itself, star dust ---------------------------------------------------------- */
+
+.fx-links {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.fx-link {
+  stroke: var(--fx2);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: crispEdges;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: fx-link 9s steps(6) var(--d) infinite;
+}
+
+@keyframes fx-link {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 100;
+  }
+
+  1% {
+    opacity: 0.9;
+  }
+
+  10% {
+    stroke-dashoffset: 0;
+  }
+
+  80% {
+    opacity: 0.9;
+    stroke-dashoffset: 0;
+  }
+
+  90%,
+  100% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+}
+
+.fx-star {
+  left: var(--x);
+  top: var(--y);
+  animation: fx-star 9s steps(6) var(--d) infinite;
+}
+
+@keyframes fx-star {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+
+  4% {
+    opacity: 1;
+    scale: calc(var(--u, 3) / 3 * 1.6);
+  }
+
+  9%,
+  80% {
+    opacity: 1;
+    scale: calc(var(--u, 3) / 3);
+  }
+
+  90%,
+  100% {
+    opacity: 0;
+    scale: calc(var(--u, 3) / 3);
+  }
+}
+
+.fx-dust {
+  left: var(--x);
+  top: 0;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  box-shadow: 4px 4px 0 -1px var(--fx2);
+  animation: fx-fall var(--t) steps(26) var(--d) infinite;
+}
+
+.fx-dust:nth-child(3n) {
+  background: var(--fx2);
+}
+
+/* Angelo: laurel, gold confetti and a banded halo ------------------------------------------------------------------ */
+
+.fx-halo {
+  left: 50%;
+  top: 24%;
+  width: 100cqh;
+  height: 100cqh;
+  margin: -50cqh 0 0 -50cqh;
+  background: radial-gradient(
+    circle,
+    rgb(255 248 225 / 0.6) 0 20%,
+    rgb(245 197 66 / 0.34) 20% 33%,
+    rgb(255 248 225 / 0.26) 33% 46%,
+    rgb(245 197 66 / 0.16) 46% 58%,
+    rgb(255 248 225 / 0.1) 58% 68%,
+    transparent 68%
+  );
+  animation: fx-halo 4s steps(6) infinite;
+}
+
+@keyframes fx-halo {
+  0%,
+  100% {
+    opacity: 0.65;
   }
 
   50% {
@@ -62,31 +616,115 @@
   }
 }
 
-/* A hard two-pixel outline in the mythic colour, hugging the sprite. */
-.actor[data-mythic='true'] .character-squash {
-  filter: drop-shadow(3px 0 0 var(--mythic)) drop-shadow(-3px 0 0 var(--mythic)) drop-shadow(0 3px 0 var(--mythic))
-    drop-shadow(0 -3px 0 var(--mythic)) drop-shadow(0 0 0 #fff);
+.fx-leaf {
+  left: var(--x);
+  top: 0;
+  animation:
+    fx-fall var(--t) steps(28) var(--d) infinite,
+    fx-sway 1.6s steps(4) infinite alternate;
 }
 
-@keyframes mythic-spark {
+.fx-chip {
+  left: var(--x);
+  top: 0;
+  width: 4px;
+  height: 7px;
+  background: var(--fx);
+  box-shadow: 0 0 0 1px #6b4d00;
+  animation:
+    fx-fall var(--t) steps(26) var(--d) infinite,
+    fx-spin 0.9s steps(4) infinite;
+}
+
+.fx-chip:nth-child(3n) {
+  background: var(--fx2);
+}
+
+/* Pablo: the accretion ring, an orbit of stars and bits pulled inward ---------------------------------------------- */
+
+.fx-disk {
+  left: 50%;
+  top: 56%;
+  width: 150cqh;
+  height: 150cqh;
+  margin: -75cqh 0 0 -75cqh;
+  rotate: -12deg;
+  scale: 1 0.3;
+  --o: 0.85;
+  animation: fx-fade-in 1s steps(4) forwards;
+}
+
+.fx-disk i {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(
+    #ff9a2e 0 40deg,
+    #fff3d1 40deg 54deg,
+    #8b5cf6 54deg 118deg,
+    #ff9a2e 118deg 196deg,
+    #fff3d1 196deg 210deg,
+    #8b5cf6 210deg 290deg,
+    #ffcf70 290deg 360deg
+  );
+  -webkit-mask-image: radial-gradient(circle, transparent 0 46%, #000 46.5% 72%, transparent 72.4%);
+  mask-image: radial-gradient(circle, transparent 0 46%, #000 46.5% 72%, transparent 72.4%);
+  animation: fx-turn 20s steps(80) infinite;
+}
+
+.fx-orbit-slow {
+  top: 54%;
+  animation-duration: 44s;
+}
+
+.fx-orb {
+  left: 0;
+  top: 0;
+  translate: 52cqh 0;
+  --o: 1;
+  animation:
+    fx-fade-in 0.8s steps(3) var(--d) forwards,
+    fx-twinkle 2.4s steps(2) var(--d) infinite;
+}
+
+@keyframes fx-twinkle {
+  50% {
+    scale: calc(var(--u, 3) / 3 * 0.66);
+  }
+}
+
+.fx-pull {
+  left: 50%;
+  top: 54%;
+  width: 5px;
+  height: 5px;
+  background: #ffcf70;
+  outline: 1px solid #1a0f3a;
+  animation: fx-pull var(--t) steps(14) var(--d) infinite;
+}
+
+.fx-pull:nth-child(3n) {
+  background: #fff3d1;
+}
+
+.fx-pull:nth-child(3n + 1) {
+  background: #b79bff;
+}
+
+@keyframes fx-pull {
   0% {
     opacity: 0;
-    transform: translateY(0) scale(0.4);
+    translate: calc(var(--sx) * 1cqh) calc(var(--sy) * 1cqh);
+    scale: 1;
   }
 
-  25% {
+  14% {
     opacity: 1;
-    transform: translateY(-6px) scale(1);
-  }
-
-  70% {
-    opacity: 1;
-    transform: translateY(-16px) scale(0.8);
   }
 
   100% {
     opacity: 0;
-    transform: translateY(-22px) scale(0.3);
+    translate: 0 0;
+    scale: 0.2;
   }
 }
 
@@ -109,4 +747,10 @@
   50% {
     transform: translateY(-12px);
   }
+}
+
+/* A cloud cell is two art pixels wide (its drawing uses a 6px unit). */
+.fx-cloud {
+  width: 6px;
+  height: 6px;
 }

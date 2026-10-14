@@ -171,6 +171,8 @@ function settle(state: GameState, content: GameContent, swarm: ActiveSwarm, emit
     gain(state, coins, 'events');
   }
   state.maestria.swarm.active = null;
+  if (swarm.bossDefeated) state.counters.swarmsWon += 1;
+  if (cleared) state.counters.swarmsCleared += 1;
   emit({
     type: 'swarmEnd',
     uid: swarm.uid,

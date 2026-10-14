@@ -78,6 +78,7 @@ export function applyDesignSystem(
 
   const list = [...gifts].map(([giftId, levels]) => ({ id: giftId, levels }));
   if (list.length > 0) {
+    state.counters.designFreeLevels += list.reduce((sum, gift) => sum + gift.levels, 0);
     emit({ type: 'designSystem', from: id, gifts: list });
     for (const milestone of crossed) emit({ type: 'milestone', id: milestone.id, level: milestone.level });
   }

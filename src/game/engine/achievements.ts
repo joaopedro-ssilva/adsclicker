@@ -4,6 +4,8 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, parseDecimal, ratio } from './decimal';
 import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
+import { horasBandsFilled } from './maestria/horas';
+import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
 import { masteryLevels, masteryRank } from './mastery';
 import type { GameState, LastRun } from './state';
@@ -194,7 +196,69 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       const done = steps.filter(Boolean).length;
       return { progress: done / steps.length, met: done === steps.length };
     }
+    case 'everyOwned': {
+      const { owned, total } = ownedCount(state, content, condition.of, condition.except);
+      return { progress: total === 0 ? 0 : owned / total, met: total > 0 && owned === total };
+    }
+    case 'everyAchievement': {
+      const { done, total } = achievementsDone(state, content, condition.except);
+      return { progress: total === 0 ? 0 : done / total, met: total > 0 && done === total };
+    }
+    case 'prestigeComplete': {
+      const { levels, total } = prestigeProgress(state, content);
+      return { progress: total === 0 ? 0 : levels / total, met: total > 0 && levels === total };
+    }
+    case 'releaseVersions':
+      return measureAtLeast(releaseVersions(state, content), condition.gte);
+    case 'horasBands':
+      return measureAtLeast(horasBandsFilled(state, content), condition.gte);
+    case 'bolsaPortfolio': {
+      const { held, total } = bolsaHeld(state, content);
+      return { progress: total === 0 ? 0 : held / total, met: total > 0 && held === total };
+    }
+    case 'monitors':
+      return measureAtLeast(monitorsReached(state, content, condition.maxed === true), condition.gte);
   }
+}
+
+/** Sceneries or themes owned out of all those of the game, leaving out the ones an achievement hands out itself. */
+export function ownedCount(state: GameState, content: GameContent, of: 'sceneries' | 'themes', except: string[] = []): { owned: number; total: number } {
+  const list = (of === 'sceneries' ? content.sceneries : content.themes).filter((item) => !except.includes(item.id));
+  const have = of === 'sceneries' ? state.sceneries : state.themes;
+  return { owned: list.filter((item) => have[item.id]).length, total: list.length };
+}
+
+/** Achievements unlocked out of all those of the game, leaving out the ones named. */
+export function achievementsDone(state: GameState, content: GameContent, except: string[] = []): { done: number; total: number } {
+  const list = content.achievements.filter((def) => !except.includes(def.id));
+  return { done: list.filter((def) => state.achievements[def.id] !== undefined).length, total: list.length };
+}
+
+/** Levels owned in the Formatura tree and the levels of the whole tree. */
+export function prestigeProgress(state: GameState, content: GameContent): { levels: number; total: number } {
+  let levels = 0;
+  let total = 0;
+  for (const node of content.prestigeNodes) {
+    total += node.maxLevel;
+    levels += Math.min(node.maxLevel, state.prestige[node.id] ?? 0);
+  }
+  return { levels, total };
+}
+
+/** Assets of the Bolsa (the Fundo counted as one more) with something held, and how many there are. */
+export function bolsaHeld(state: GameState, content: GameContent): { held: number; total: number } {
+  const bolsa = state.maestria.bolsa;
+  const assets = content.maestrias.bolsa.assets;
+  const held = assets.filter((def) => bolsa.assets[def.id]?.held.units.gt(0)).length + (bolsa.fund.units.gt(0) ? 1 : 0);
+  return { held, total: assets.length + 1 };
+}
+
+/** Monitores hired, or at their top level when `maxed`. */
+export function monitorsReached(state: GameState, content: GameContent, maxed: boolean): number {
+  return content.monitors.filter((def) => {
+    const level = state.monitors.units[def.id]?.level ?? 0;
+    return maxed ? level >= def.levels.length : level >= 1;
+  }).length;
 }
 
 /** 0..1 progress of an achievement, or null when not measurable. 1 once unlocked. */

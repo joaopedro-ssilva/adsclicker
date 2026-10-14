@@ -159,3 +159,20 @@ input[type='range'] {
     scroll-behavior: auto !important;
   }
 }
+
+/* Arco-íris: the one theme with a look beyond its colours, a liquid-glass sheen on the big surfaces (no blur, no motion). */
+
+.ui-theme[data-theme='arco-iris'] {
+  background:
+    linear-gradient(115deg, rgb(255 90 140 / 0.14), rgb(255 200 80 / 0.1) 22%, rgb(90 230 150 / 0.1) 44%, rgb(80 190 255 / 0.12) 66%, rgb(180 120 255 / 0.16)),
+    var(--bg);
+}
+
+.ui-theme[data-theme='arco-iris'] :is(.game-panel, .side-panel, .ui-panel, .ui-modal) {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.03) 38%, rgb(160 120 255 / 0.1) 72%, rgb(80 220 255 / 0.12)),
+    var(--surface);
+  box-shadow:
+    inset 0 2px 0 rgb(255 255 255 / 0.3),
+    inset 0 -2px 0 rgb(0 0 0 / 0.25);
+}

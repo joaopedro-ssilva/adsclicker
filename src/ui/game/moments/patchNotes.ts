@@ -28,6 +28,36 @@ export interface Patch {
 /** Newest first. The first one is "the latest patch": the one announced by itself and tracked as unread. */
 export const PATCHES: readonly Patch[] = [
   {
+    id: '2026-10-pontas-soltas',
+    date: '2026-10-14',
+    title: 'Pontas soltas e feitos lendários',
+    summary: '22 conquistas novas, cada mítica com efeito próprio e várias melhorias no dia a dia.',
+    skins: [
+      'edecio-garimpeiro',
+      'gladimir-viajante',
+      'wagner-dedetizador',
+      'b1-keynote',
+      'angelo-certificado',
+      'b2-componentes',
+      'angelo-ninja',
+      'gladimir-neyglad',
+      'gladimir-robo',
+    ],
+    sceneries: ['panteao', 'arvore-ancestral', 'sala-de-guerra', 'palco', 'wall-street', 'sala-dos-monitores', 'sala-dos-professores'],
+    themes: ['grego', 'arco-iris', 'fita-magnetica', 'pregao', 'vidro'],
+    secretRarities: ['epic', 'legendary', 'mythic'],
+    secretSceneries: ['panteao', 'arvore-ancestral', 'sala-de-guerra'],
+    notes: [
+      'Conquistas novas para quem já domina as Maestrias: modo dourado, Rollforward, Super invasão, Festa, Releases, Horas, Bolsa, Design System e Monitores. Cada uma dá skin, cenário ou tema.',
+      'Duas de coleção: Volta ao Mundo (todos os cenários) e Paleta Infinita (todos os temas). E a Platina, para quem faz todas as outras: a recompensa é uma tag de diamante no ranking.',
+      'Gladimir ganhou uma nova mítica. O Arquivista Eterno virou lendária e continua sendo o prêmio do Domínio máximo dele.',
+      'Cada skin mítica agora tem um efeito próprio no palco, e a moldura no Álbum e na cerimônia segue a cor dele. Tudo some em "reduzir movimento".',
+      'Álbum: filtros por professor e raridade, favoritos e, nas conquistas, o "o que falta" de cada uma.',
+      'Modo foto para tirar print sem a interface, atalhos de teclado e um resumo da turma depois de cada Formatura.',
+      'Nas configurações dá para desligar o som do clique no professor.',
+    ],
+  },
+  {
     id: '2026-10-recompensas',
     date: '2026-10-13',
     title: 'Novidades na sala!',

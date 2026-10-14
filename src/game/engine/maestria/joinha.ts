@@ -47,6 +47,7 @@ export function maybeStartGolden(state: GameState, content: GameContent, stats: 
   if (stats.comboMax <= 0 || state.combo.steps < stats.comboMax || !goldenReady(state, now)) return false;
   const endsAt = now + joinhaSeconds(state, content) * 1000;
   state.maestria.joinha = { activeUntil: endsAt, readyAt: endsAt + joinhaRechargeSeconds(state, content) * 1000 };
+  state.counters.goldenModes += 1;
   emit({ type: 'joinhaStart', endsAt });
   return true;
 }

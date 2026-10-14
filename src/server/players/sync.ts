@@ -3,7 +3,9 @@ import type { SQL } from 'drizzle-orm';
 import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 import { content } from '@/game/content';
 import { deserializeState, serializeState } from '@/game/engine';
+import type { GameState } from '@/game/engine/state';
 import type { CloudBonusPayload, SyncRequest, SyncResponse } from '@/shared/api';
+import { PLATINADO_TAG, PLATINA_ACHIEVEMENT } from '@/shared/tags';
 import { createGuest } from '../auth/guest';
 import { findSessionWithSave, sessionCookie } from '../auth/session';
 import { getEventMultiplier } from '../config/eventMultiplier';
@@ -22,7 +24,7 @@ import { effectiveMultiplier } from './multiplier';
 import { isRollback, judgeSave } from './plausibility';
 import { coinsOutOfRange, projectState } from './projection';
 import { isRanked, toCloudSave, toMe } from './summary';
-import { getTagCatalog } from './tags';
+import { getTagCatalog, grantTagSql } from './tags';
 
 export interface SyncInput {
   request: SyncRequest;
@@ -144,6 +146,7 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   const flagReason = suspect && !verdict.ok ? verdict.reason.slice(0, FLAG_REASON_MAX) : player.flagReason;
   const ranked = isRanked({ ...player, flagged });
   const drafts = ranked ? diffFeed(previous, parsed) : [];
+  const platinado = shouldGrantPlatinado(player, parsed, ranked, catalog);
 
   const values = {
     save: serializeState(parsed),
@@ -151,6 +154,7 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
     lastSeenAt: new Date(now),
     flagged,
     flagReason,
+    ...(platinado ? { titles: grantTagSql(PLATINADO_TAG) } : {}),
     ...projectState(parsed),
   };
   // The epoch is part of the write: a reset that commits between our read and our write makes it match nothing.
@@ -170,8 +174,36 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
 
   await creditClassroom(db, student, parsed.counters, hackathon, now);
 
-  const me = toMe({ ...player, flagged }, catalog);
+  if (platinado) {
+    logEvent(db, {
+      level: 'info',
+      kind: 'tag_platinado',
+      message: `Tag Platinado concedida a ${player.nickname ?? player.id.slice(0, 8)}.`,
+      playerId: player.id,
+      nickname: player.nickname,
+      route: '/api/sync',
+      detail: { tag: PLATINADO_TAG, rev: newRev },
+    });
+  }
+
+  const titles = platinado ? [...player.titles, PLATINADO_TAG] : player.titles;
+  const me = toMe({ ...player, titles, flagged }, catalog);
   return { body: { status: 'ok', rev: newRev, serverTime: now, multiplier, ...(bonus ? { bonus } : {}), me }, cookies };
+}
+
+/**
+ * The Platinado tag goes to a ranked player (nickname, not flagged, banned or a test account) whose synced save holds
+ * the Platina achievement, once: nothing happens when the tag is held already or the admin deleted it from the catalogue.
+ */
+export function shouldGrantPlatinado(
+  player: Pick<PlayerRow, 'titles'>,
+  save: GameState,
+  ranked: boolean,
+  catalog: readonly PlayerTagRow[],
+): boolean {
+  if (!ranked || player.titles.includes(PLATINADO_TAG)) return false;
+  if (save.achievements[PLATINA_ACHIEVEMENT] === undefined) return false;
+  return catalog.some((tag) => tag.id === PLATINADO_TAG);
 }
 
 function conflictBody(player: PlayerRow, multiplier: number, bonus: CloudBonusPayload | undefined, catalog: readonly PlayerTagRow[]): SyncResponse {
