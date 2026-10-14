@@ -253,16 +253,3 @@ export async function grantTurmaZeroToAll(db: Db): Promise<AdminTurmaZeroResult>
   });
   return result;
 }
-
-/**
- * Accounts eligible for Turma Zero that do not hold it (shown as a warning before the launch reset, which resets `rev`).
- * 0 when the tag was deleted: there is nothing left to warn about.
- */
-export async function countWithoutTurmaZero(db: Pick<Db, 'select'>): Promise<number> {
-  if (!(await findTag(db, TURMA_ZERO_TAG))) return 0;
-  const [row] = await db
-    .select({ n: sql<number>`count(*)::int` })
-    .from(players)
-    .where(and(testPhaseAccount(), sql`not ${holds(TURMA_ZERO_TAG)}`));
-  return row?.n ?? 0;
-}

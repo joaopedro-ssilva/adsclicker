@@ -19,6 +19,8 @@
     "db:up": "docker compose up -d --wait",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/server/db/migrate.ts",
+    "db:backup": "tsx scripts/db/backup.ts",
+    "db:restore": "tsx scripts/db/restore.ts",
     "art:generate": "node scripts/art/generate.mjs"
   },
   "dependencies": {
