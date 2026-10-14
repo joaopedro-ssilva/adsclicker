@@ -1,6 +1,7 @@
 import { desc, eq, lt, sql } from 'drizzle-orm';
 import { FEED_KINDS, LOG_RETENTION_DAYS, LOG_RETENTION_MAX_ROWS, ONLINE_WINDOW_MS } from '@/shared/api';
 import type { CommunityResponse, FeedItem } from '@/shared/api';
+import { ONLINE_DISPLAY_BONUS } from '@/shared/onlineBonus';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { feedEvents, players, rankedCondition } from '../db/schema';
@@ -13,11 +14,11 @@ export const FEED_SIZE = 30;
 const FEED_KEEP_MS = LOG_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const PRUNE_EVERY_MS = 60 * 60 * 1000;
 
-/** Players that count in the totals: everyone who is not banned or a test account (nickname or not); flagged ones only in the test phase. */
-const counted = () =>
-  flaggedAreRanked()
-    ? sql`not ${players.banned} and not ${players.testAccount}`
-    : sql`not ${players.banned} and not ${players.flagged} and not ${players.testAccount}`;
+/** Players that count as people: everyone who is not banned or a test account, flagged ones included (they are still playing). */
+const counted = () => sql`not ${players.banned} and not ${players.testAccount}`;
+
+/** Whose numbers go into the sums: flagged players' coins, clicks and graduations stay out (only in the test phase they count). */
+const summed = () => (flaggedAreRanked() ? sql`true` : sql`not ${players.flagged}`);
 
 /** to_char prints " 1.5000000000e+05" (zero as " 0.0000000000e+00"); the game wants "1.5e5". */
 export function cleanCoins(text: string | null): string {
@@ -41,10 +42,10 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
       .select({
         players: sql<number>`count(*)::int`,
         online: sql<number>`(count(*) filter (where ${players.lastSeenAt} > ${onlineSince}::timestamptz))::int`,
-        coins: sql<string | null>`to_char(coalesce(sum(${players.lifetimeCoins}), 0), '9.9999999999EEEE')`,
-        graduations: sql<number>`coalesce(sum(${players.graduations}), 0)::int`,
-        clicks: sql<string>`coalesce(sum(${players.clicks}), 0)::text`,
-        achievements: sql<number>`coalesce(sum(${players.achievements}), 0)::int`,
+        coins: sql<string | null>`to_char(coalesce(sum(${players.lifetimeCoins}) filter (where ${summed()}), 0), '9.9999999999EEEE')`,
+        graduations: sql<number>`coalesce(sum(${players.graduations}) filter (where ${summed()}), 0)::int`,
+        clicks: sql<string>`coalesce(sum(${players.clicks}) filter (where ${summed()}), 0)::text`,
+        achievements: sql<number>`coalesce(sum(${players.achievements}) filter (where ${summed()}), 0)::int`,
       })
       .from(players)
       .where(counted()),
@@ -84,7 +85,7 @@ async function loadCommunity(db: Db, now: number): Promise<CommunityResponse> {
 
   pruneFeedLater(db, now);
   return {
-    online: row?.online ?? 0,
+    online: (row?.online ?? 0) + ONLINE_DISPLAY_BONUS,
     players: row?.players ?? 0,
     coins: cleanCoins(row?.coins ?? null),
     graduations: row?.graduations ?? 0,

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { formatNumber } from '@/game/engine/format';
 import { api } from '@/shared/apiClient';
+import { ONLINE_DISPLAY_BONUS } from '@/shared/onlineBonus';
 
 interface Totals {
   players: number;
@@ -18,7 +19,7 @@ export function TotalsBar({ refreshKey }: { refreshKey: number }) {
   useEffect(() => {
     const abort = new AbortController();
     void api.community(abort.signal).then((result) => {
-      if (result.ok) setTotals({ players: result.data.players, online: result.data.online });
+      if (result.ok) setTotals({ players: result.data.players, online: Math.max(0, result.data.online - ONLINE_DISPLAY_BONUS) });
     });
     return () => abort.abort();
   }, [refreshKey]);
