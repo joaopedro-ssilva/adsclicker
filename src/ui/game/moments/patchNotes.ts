@@ -29,9 +29,9 @@ export interface Patch {
 export const PATCHES: readonly Patch[] = [
   {
     id: '2026-10-pontas-soltas',
-    date: '2026-10-14',
+    date: '2026-10-15',
     title: 'Pontas soltas e feitos lendários',
-    summary: '22 conquistas novas, cada mítica com efeito próprio e várias melhorias no dia a dia.',
+    summary: '22 conquistas novas, um Gladimir que ninguém esperava, o celular arrumado e várias melhorias no dia a dia.',
     skins: [
       'edecio-garimpeiro',
       'gladimir-viajante',
@@ -48,13 +48,15 @@ export const PATCHES: readonly Patch[] = [
     secretRarities: ['epic', 'legendary', 'mythic'],
     secretSceneries: ['panteao', 'arvore-ancestral', 'sala-de-guerra'],
     notes: [
-      'Conquistas novas para quem já domina as Maestrias: modo dourado, Rollforward, Super invasão, Festa, Releases, Horas, Bolsa, Design System e Monitores. Cada uma dá skin, cenário ou tema.',
-      'Duas de coleção: Volta ao Mundo (todos os cenários) e Paleta Infinita (todos os temas). E a Platina, para quem faz todas as outras: a recompensa é uma tag de diamante no ranking.',
-      'Gladimir ganhou uma nova mítica. O Arquivista Eterno virou lendária e continua sendo o prêmio do Domínio máximo dele.',
-      'Cada skin mítica agora tem um efeito próprio no palco, e a moldura no Álbum e na cerimônia segue a cor dele. Tudo some em "reduzir movimento".',
-      'Álbum: filtros por professor e raridade, favoritos e, nas conquistas, o "o que falta" de cada uma.',
-      'Modo foto para tirar print sem a interface, atalhos de teclado e um resumo da turma depois de cada Formatura.',
-      'Nas configurações dá para desligar o som do clique no professor.',
+      'Vinte e duas conquistas novas para quem já domina as Maestrias e os Monitores: modo dourado, Rollforward, Super invasão, Festa, Releases, Horas, Bolsa e Design System. Cada uma dá skin, cenário ou tema.',
+      'Duas de coleção, Volta ao Mundo (todos os cenários) e Paleta Infinita (todos os temas), e a Platina para quem fizer todas as outras: o prêmio é a tag 💎 Platinado no ranking.',
+      'O Gladimir ganhou uma mítica nova. O Arquivista Eterno virou lendária e continua sendo o prêmio do Domínio máximo dele.',
+      'As míticas brilham na cor da própria skin, de um jeito mais discreto, e a moldura no Álbum e na cerimônia segue a mesma cor.',
+      'Celular arrumado: uma fila de professores só, o palco livre e as habilidades e Maestrias numa barra embaixo do professor.',
+      'Álbum com o topo fixo, filtros por professor, raridade e favoritos, e cada conquista mostra o que falta.',
+      'Modo foto (o olho no topo do palco), atalhos de teclado (a lista está em Config) e um resumo da turma depois de cada Formatura, com seus recordes.',
+      'Jornal do Campus: este aqui. Toda novidade nova aparece nele, e o botão de jornal no topo do palco abre de novo quando quiser.',
+      'Em Config dá para desligar o som do clique e os efeitos do cenário.',
     ],
   },
   {
