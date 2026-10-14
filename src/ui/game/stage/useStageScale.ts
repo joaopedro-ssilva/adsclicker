@@ -5,6 +5,8 @@ import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 const SPRITE_HEIGHT = 112;
 const MIN_SCALE = 2;
 const MAX_SCALE = 5;
+/** Photo mode lets the professor grow until it fills the screen. */
+const MAX_PHOTO_SCALE = 9;
 
 interface StageScale {
   ref: RefObject<HTMLDivElement | null>;
@@ -16,7 +18,7 @@ interface StageScale {
  * Picks the largest whole-number sprite scale that leaves room for the HUD around the professor.
  * `reserved` (a stable function) returns the height the HUD takes: top bar, bubble, roster.
  */
-export function useStageScale(reserved: (stage: { width: number; height: number }) => number): StageScale {
+export function useStageScale(reserved: (stage: { width: number; height: number }) => number, photo = false): StageScale {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(3);
 
@@ -28,13 +30,13 @@ export function useStageScale(reserved: (stage: { width: number; height: number 
       const room = box.height - reserved(box);
       const byHeight = Math.floor(room / SPRITE_HEIGHT);
       const byWidth = Math.floor((box.width * 0.5) / 64);
-      setScale(Math.max(MIN_SCALE, Math.min(MAX_SCALE, byHeight, byWidth)));
+      setScale(Math.max(MIN_SCALE, Math.min(photo ? MAX_PHOTO_SCALE : MAX_SCALE, byHeight, byWidth)));
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(node);
     return () => observer.disconnect();
-  }, [reserved]);
+  }, [reserved, photo]);
 
   return { ref, scale };
 }

@@ -64,7 +64,7 @@ function onClick(event: Extract<GameEvent, { type: 'click' }>): void {
     fx.shake({ intensity: 8, duration: 360 });
     fx.sparkles({ ...point, count: 30, color: GOLD });
   }
-  audio.play(event.crit ? 'crit' : 'click');
+  if (settings.clickSound) audio.play(event.crit ? 'crit' : 'click');
 }
 
 function onInvasionEnd(event: Extract<GameEvent, { type: 'invasionDefended' | 'invasionMissed' }>): void {

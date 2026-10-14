@@ -42,7 +42,7 @@ export function applyOffline(state: GameState, content: GameContent, now: number
   const coins = coinsPerSecondWith(state, content, stats).mul((countedMs / 1000) * stats.offlineRate);
   if (coins.lte(ZERO)) return null;
 
-  gain(state, coins);
+  gain(state, coins, 'offline');
   state.counters.offlineCollections += 1;
   emit({ type: 'offline', coins, awayMs });
   afterAction(state, content, now, emit);

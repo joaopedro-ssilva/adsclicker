@@ -7,18 +7,22 @@ import { useMoments } from './momentsStore';
 import { OfflineReport } from './OfflineReport';
 import { UnlockCards } from './UnlockCards';
 import { UnlockCeremony } from './UnlockCeremony';
+import { useJournal } from './journalStore';
 import { WhatsNew } from './WhatsNew';
-import { useWhatsNew } from './patchNotes';
+import { useJournalDriver } from './patchNotes';
 
 /**
- * Shows the offline report first, then the queued ceremonies one at a time, then the patch announcement.
+ * Shows the offline report first, then the queued ceremonies one at a time, then the Jornal do Campus (which
+ * opens by itself for a new patch and from the stage button).
  * Quick unlock cards wait for a free screen.
  */
 export function MomentsHost() {
   const offline = useGame((store) => store.offlineReport);
   const current = useMoments((store) => store.queue[0]);
   const dismiss = useMoments((store) => store.dismiss);
-  const whatsNew = useWhatsNew();
+  const journalOpen = useJournal((store) => store.open);
+  const closeJournal = useJournal((store) => store.close);
+  useJournalDriver(!offline && !current);
 
   let scene = null;
   if (offline) {
@@ -35,8 +39,8 @@ export function MomentsHost() {
       ) : (
         <UnlockCeremony key={current.id} moment={current} onClose={close} />
       );
-  } else if (whatsNew.open) {
-    scene = <WhatsNew onClose={whatsNew.close} />;
+  } else if (journalOpen) {
+    scene = <WhatsNew onClose={closeJournal} />;
   }
 
   return (

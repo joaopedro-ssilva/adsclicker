@@ -169,6 +169,7 @@ function sellFrom(state: GameState, content: GameContent, holding: BolsaHolding,
   // Only the profit is new money: the principal was already counted when it was first earned.
   state.runCoins = state.runCoins.add(profit);
   state.lifetimeCoins = state.lifetimeCoins.add(profit);
+  state.run.extraCoins = state.run.extraCoins.add(profit);
   return { payout, profit, capped };
 }
 
