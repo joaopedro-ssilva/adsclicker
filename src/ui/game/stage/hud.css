@@ -160,8 +160,9 @@
   grid-template-rows: minmax(0, 1fr);
 }
 
+/* Photo mode: no shade at the top (there is no HUD to read) and a lighter one at the bottom, so the floor keeps its depth. */
 .stage-ui[data-photo='on']::before {
-  display: none;
+  background: linear-gradient(transparent 62%, rgb(5 7 13 / 0.38));
 }
 
 /* Balance */

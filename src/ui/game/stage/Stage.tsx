@@ -29,17 +29,13 @@ function reservedHeight({ width }: { width: number; height: number }): number {
   return width < 640 ? 176 : 372;
 }
 
-/** Photo mode keeps only a margin around the professor. */
-function photoReservedHeight({ width }: { width: number; height: number }): number {
-  return width < 640 ? 48 : 72;
-}
-
 /** The left side of the game screen: scenery, the professor and everything that happens around them. */
 export function Stage() {
   const sceneryId = useGameState((state) => state.equippedScenery);
   const scenery = sceneryById.get(sceneryId) ?? FALLBACK_SCENERY;
   const photo = useUi((store) => store.photo);
-  const { ref, scale } = useStageScale(photo ? photoReservedHeight : reservedHeight, photo);
+  // Photo mode measures like the normal stage, so the professor keeps the size it had.
+  const { ref, scale } = useStageScale(reservedHeight);
 
   useEffect(() => {
     registerAnchor('stage', ref.current);
