@@ -1,5 +1,5 @@
 /**
- * Tags (the catalogue, giving and showing them), the bulk "Turma Zero" grant, the launch reset and the progress epoch, against Postgres
+ * Tags (the catalogue, giving and showing them), the bulk "Turma Zero" grant and the progress epoch, against Postgres
  * (`adsclicker_titles_test`). Skips itself when the database cannot be reached, like the other
  * integration tests.
  */
@@ -8,33 +8,24 @@ import { eq, sql } from 'drizzle-orm';
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { serializeState } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
-import { LAUNCH_RESET_PHRASE, adminPlayerPatchSchema } from '@/shared/api';
+import { adminPlayerPatchSchema } from '@/shared/api';
 import { PLATINADO_TAG, PLATINA_ACHIEVEMENT } from '@/shared/tags';
 import type { SyncRequest } from '@/shared/api';
 import { formatNumber } from '@/game/engine';
 import { playerStats } from '../admin/playerStats';
 import { listPlayers, patchPlayer } from '../admin/players';
 import { requireSession } from '../auth/context';
-import { login } from '../auth/login';
 import { SESSION_COOKIE, readSessionToken } from '../auth/session';
 import { clearCommunityCache, getCommunity } from '../community/community';
 import { clearLeaderboardCache, getLeaderboard, getRanks } from '../community/leaderboard';
 import { resetEventMultiplierCache } from '../config/eventMultiplier';
 import {
   feedEvents,
-  hackathonCollection,
-  hackathonItems,
-  hackathonProfiles,
-  hackathonRuns,
-  hackathonStages,
   players,
-  sessions,
 } from '../db/schema';
 import { ApiFailure } from '../http/errors';
 import { setNickname } from './account';
-import { resetForLaunch, previewLaunchReset } from './launchReset';
 import { getMe } from './me';
-import { readProgressEpoch } from './progressEpoch';
 import { syncPlayer } from './sync';
 import { clearTagCache, createTag, deleteTag, grantTurmaZeroToAll, listAdminTags, turmaZeroPreview, updateTag } from './tags';
 import { logEvent } from '../logs/log';
@@ -70,7 +61,7 @@ async function expectFailure(promise: Promise<unknown>, code: string): Promise<A
   return error as ApiFailure;
 }
 
-describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
+describe.skipIf(!testDb)('tags and the progress epoch against Postgres', () => {
   if (!testDb) return;
   const { db } = testDb;
 
@@ -348,7 +339,6 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
       await deleteTag(db, 'turma-zero');
       await expectFailure(turmaZeroPreview(db), 'invalid');
       await expectFailure(grantTurmaZeroToAll(db), 'invalid');
-      expect((await previewLaunchReset(db)).withoutTurmaZero).toBe(0);
     });
   });
 
@@ -400,155 +390,17 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
     });
   });
 
-  describe('the launch reset', () => {
-    async function seedHackathon(playerId: string) {
-      await db.insert(hackathonProfiles).values({ playerId, head: 'h' });
-      await db.insert(hackathonItems).values({
-        id: crypto.randomUUID(),
-        playerId,
-        base: 'tool-a',
-        rarity: 'rare',
-        level: 1,
-        affixes: [],
-        quality: 0.5,
-        createdAt: T0,
-      });
-      await db.insert(hackathonRuns).values({
-        id: crypto.randomUUID(),
-        playerId,
-        stageId: '1-1',
-        seed: 1,
-        auto: false,
-        build: {},
-        stage: {},
-        startedAt: new Date(T0),
-      });
-      await db.insert(hackathonStages).values({ playerId, stageId: '1-1', clears: 1 });
-      await db.insert(hackathonCollection).values({ playerId, base: 'tool-a' });
-    }
-
-    it('asks for the exact phrase and touches nothing without it', async () => {
-      const ana = await newPlayer({ nickname: 'Ana' });
-      await expectFailure(resetForLaunch(db, 'zerar', T0), 'invalid');
-      await expectFailure(resetForLaunch(db, '', T0), 'invalid');
-      const [row] = await db.select().from(players).where(eq(players.id, ana.id));
-      expect(row?.save).not.toBeNull();
-      expect(row?.rev).toBe(ana.rev);
-      expect(await readProgressEpoch(db)).toBe(0);
-    });
-
-    it('clears progress, flags, boards, totals, feed and Hackathon, and keeps accounts, passwords, sessions and tags', async () => {
-      const ana = await newPlayer({ nickname: 'Ana', ip: '10.0.0.1' });
-      const bia = await newPlayer({ nickname: 'Bia', seed: 2, ip: '10.0.0.2' });
-      await patchPlayer(db, ana.id, { grantTag: 'turma-zero' }, null);
-      await patchPlayer(db, bia.id, { testAccount: true, banned: true }, null);
-      await db.update(players).set({ flagged: true, flagReason: 'Ganho alto demais' }).where(eq(players.id, ana.id));
-      await db.insert(feedEvents).values({ playerId: ana.id, kind: 'hire', detail: 'angelo' });
-      await seedHackathon(ana.id);
-      await seedHackathon(bia.id);
-
-      const [before] = await db.select().from(players).where(eq(players.id, ana.id));
-      const feedBefore = (await db.select().from(feedEvents)).length; // two 'joined' plus the hire
-      expect(feedBefore).toBe(3);
-
-      const preview = await previewLaunchReset(db);
-      expect(preview).toMatchObject({ epoch: 0, players: 2, feedEvents: feedBefore, hackathonRows: 10, withoutTurmaZero: 1 });
-
-      const result = await resetForLaunch(db, ` ${LAUNCH_RESET_PHRASE} `, T0);
-      expect(result).toEqual({
-        epoch: 1,
-        players: 2,
-        playersWithProgress: 2,
-        feedEvents: feedBefore,
-        hackathonProfiles: 2,
-        hackathonItems: 2,
-        hackathonRuns: 2,
-        hackathonStages: 2,
-        hackathonCollection: 2,
-      });
-
-      const [after] = await db.select().from(players).where(eq(players.id, ana.id));
-      expect(after).toMatchObject({
-        save: null,
-        rev: 0,
-        lifetimeCoinsText: '0',
-        lifetimeCoinsLog: 0,
-        diplomasEarned: 0,
-        graduations: 0,
-        clicks: 0,
-        achievements: 0,
-        professors: 1,
-        playSeconds: 0,
-        avatarProfessor: 'edecio',
-        avatarSkin: '',
-        flagged: false,
-        flagReason: null,
-        progressEpoch: 1,
-        // kept
-        nickname: 'Ana',
-        nicknameKey: before?.nicknameKey,
-        passwordHash: before?.passwordHash,
-        titles: ['turma-zero'],
-      });
-      expect(after?.passwordHash).not.toBeNull();
-      // Moderation marks of the test accounts are not "test-phase flags": they stay.
-      const [kept] = await db.select().from(players).where(eq(players.id, bia.id));
-      expect(kept).toMatchObject({ testAccount: true, banned: true });
-
-      expect(await db.select().from(sessions)).toHaveLength(2);
-      for (const table of [feedEvents, hackathonProfiles, hackathonItems, hackathonRuns, hackathonStages, hackathonCollection]) {
-        expect(await db.select().from(table)).toHaveLength(0);
-      }
-
-      // The boards, the totals and the feed are empty right away, on this instance too.
-      expect((await getLeaderboard(db, 'coins', T0 + 1)).entries[0]).toMatchObject({ nickname: 'Ana', value: '0', diplomas: 0 });
-      const community = await getCommunity(db, T0 + 1);
-      expect(community).toMatchObject({ coins: '0', graduations: 0, clicks: '0', achievements: 0, feed: [] });
-
-      // The account still logs in with its password and has no cloud save to bring back.
-      const logged = await login(db, { nickname: 'Ana', password: 'senha-padrao' }, { ip: '10.0.0.9', currentToken: null, now: T0 + 2 });
-      expect(logged.body.cloud).toBeNull();
-      expect(logged.body.me.tags?.map((tag) => tag.id)).toEqual(['turma-zero']);
-    });
-
-    it('is safe to run twice: the second run clears nothing more and only moves the epoch', async () => {
-      const ana = await newPlayer({ nickname: 'Ana' });
-      await seedHackathon(ana.id);
-      await resetForLaunch(db, LAUNCH_RESET_PHRASE, T0);
-      const second = await resetForLaunch(db, LAUNCH_RESET_PHRASE, T0 + 1);
-      expect(second).toMatchObject({
-        epoch: 2,
-        players: 1,
-        playersWithProgress: 0,
-        feedEvents: 0,
-        hackathonProfiles: 0,
-        hackathonItems: 0,
-        hackathonRuns: 0,
-        hackathonStages: 0,
-        hackathonCollection: 0,
-      });
-      expect((await previewLaunchReset(db)).players).toBe(0);
-    });
-
-    it('runs in one transaction: a failure in the middle leaves everything as it was', async () => {
-      const ana = await newPlayer({ nickname: 'Ana' });
-      const feedBefore = (await db.select().from(feedEvents)).length;
-      // A check constraint that rejects the new epoch makes the players update fail after the epoch bump.
-      await db.execute(sql`alter table players add constraint reset_blocker check (progress_epoch = 0)`);
-      try {
-        await expect(resetForLaunch(db, LAUNCH_RESET_PHRASE, T0)).rejects.toThrow();
-        expect(await readProgressEpoch(db)).toBe(0);
-        const [row] = await db.select().from(players).where(eq(players.id, ana.id));
-        expect(row?.save).not.toBeNull();
-        expect(await db.select().from(feedEvents)).toHaveLength(feedBefore);
-        expect(feedBefore).toBeGreaterThan(0);
-      } finally {
-        await db.execute(sql`alter table players drop constraint reset_blocker`);
-      }
-    });
-  });
-
   describe('the progress epoch', () => {
+    /**
+     * The state the one-time launch reset left in production (the code that did it is gone): the counter at 1 and every
+     * account at epoch 1 with its progress blank. Written straight into the tables.
+     */
+    async function moveToEpochOne() {
+      await db.execute(sql`insert into app_config (key, value, updated_at) values ('progress_epoch', to_jsonb(1), now())
+        on conflict (key) do update set value = to_jsonb(1)`);
+      await db.execute(sql`update players set progress_epoch = 1, save = null, rev = 0, lifetime_coins_text = '0',
+        lifetime_coins = 0, lifetime_coins_log = 0, diplomas_earned = 0, graduations = 0, clicks = 0, achievements = 0`);
+    }
     it('lets a device that sends no epoch (an old client) sync as before the reset', async () => {
       const [first] = savesOf(1);
       const created = await syncPlayer(db, { request: body(first!, 0), token: null, ip: '10.0.0.1', now: T0 });
@@ -557,7 +409,7 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
 
     it('refuses a save from before the reset, writes nothing and leaves the board clean', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
-      await resetForLaunch(db, LAUNCH_RESET_PHRASE, T0 + 60 * 60_000);
+      await moveToEpochOne();
 
       // The returning tester: epoch 0 (or none), a full old save, the revision it had.
       for (const epoch of [0, undefined]) {
@@ -587,7 +439,7 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
 
     it('takes progress again once the device carries the new epoch, from a fresh game', async () => {
       const ana = await newPlayer({ nickname: 'Ana' });
-      await resetForLaunch(db, LAUNCH_RESET_PHRASE, T0 + 60 * 60_000);
+      await moveToEpochOne();
       const me = await getMe(db, ana.headers, T0 + 2 * 60 * 60_000);
       expect(me.body.epoch).toBe(1);
 
@@ -604,7 +456,7 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
     });
 
     it('creates a guest after the reset at the current epoch, and tells a device without a session the epoch', async () => {
-      await resetForLaunch(db, LAUNCH_RESET_PHRASE, T0);
+      await moveToEpochOne();
       const anonymous = await getMe(db, new Headers(), T0 + 1);
       expect(anonymous.body).toMatchObject({ me: null, epoch: 1 });
 

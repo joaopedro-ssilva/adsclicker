@@ -25,6 +25,9 @@ npm-debug.log*
 /art/preview/
 /.next-build/
 
+# database dumps (npm run db:backup): player data and password hashes, never committed
+/backups/
+
 # dev account save (npm run dev:save)
 /dev-save.txt
 

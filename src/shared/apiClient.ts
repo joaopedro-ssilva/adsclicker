@@ -10,8 +10,6 @@ import {
   adminLogsResponseSchema,
   adminPasswordResetResponseSchema,
   adminPlayerResponseSchema,
-  adminLaunchResetPreviewSchema,
-  adminLaunchResetResultSchema,
   adminPlayersResponseSchema,
   adminPlayerStatsSchema,
   adminTagDeleteResponseSchema,
@@ -124,8 +122,5 @@ export const api = {
       call('GET', `/api/admin/logs?${new URLSearchParams(query).toString()}`, adminLogsResponseSchema, { signal }),
     activity: (query: Record<string, string>, signal?: AbortSignal) =>
       call('GET', `/api/admin/activity?${new URLSearchParams(query).toString()}`, adminActivityResponseSchema, { signal }),
-    launchResetPreview: () => call('GET', '/api/admin/launch-reset', adminLaunchResetPreviewSchema),
-    launchReset: (phrase: string) =>
-      call('POST', '/api/admin/launch-reset', adminLaunchResetResultSchema, { body: { phrase } }),
   },
 };

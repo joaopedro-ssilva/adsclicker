@@ -106,10 +106,9 @@ Protegido pelo login que já existe (`ADMIN_USER` / `ADMIN_PASSWORD`, cookie `ad
 - Lista de jogadores com busca e paginação: apelido, online, último acesso, progresso, marcas.
 - Evento global: multiplicador para todos.
 - Por jogador: multiplicador, conta de teste, marcar/desmarcar, banir, remover apelido ofensivo.
-- **Jogador confiável** (`POST /api/admin/players/[id]` com `trusted`): botão "Limpar de vez (confiável)". Limpa a marca de suspeito atual e grava `players.trusted = true`: daí em diante o teste de plausibilidade continua rodando a cada sync, mas um save reprovado **não marca** o jogador; o caso vai para o log como `sync_suspect_trusted` (info, com o motivo) em vez de `sync_suspect`. O jogador fica no ranking. A marca manual de suspeito continua funcionando e, por ser manual, não é limpa pelo sync. "Tirar confiável" volta ao normal. O reset de lançamento mantém a marca.
-- **Redefinir senha** (`POST /api/admin/players/[id]/password-reset`, sem corpo, atrás da sessão de admin e da checagem de mesma origem): para quem perdeu a senha (o jogo não tem e-mail e a senha só existe como hash scrypt). O servidor gera uma senha temporária de 12 caracteres (`randomInt`, alfabeto sem 0/O/1/l/I), grava o hash como qualquer senha, apaga **todas** as sessões do jogador e devolve `{ player, temporaryPassword }` uma única vez. A senha nunca é guardada em claro nem entra no log (`admin_password_reset` leva só o id e o apelido). Só vale para conta com apelido (visitante: `invalid`); funciona com ou sem senha anterior. O admin mostra a senha numa caixa com botão de copiar, e ela se perde ao sair ou recarregar. O jogador entra com apelido + senha temporária e a troca em `POST /api/account/password` (senha atual + nova, que já existia; as outras sessões caem).
+- **Jogador confiável** (`POST /api/admin/players/[id]` com `trusted`): botão "Limpar de vez (confiável)". Limpa a marca de suspeito atual e grava `players.trusted = true`: daí em diante o teste de plausibilidade continua rodando a cada sync, mas um save reprovado **não marca** o jogador; o caso vai para o log como `sync_suspect_trusted` (info, com o motivo) em vez de `sync_suspect`. O jogador fica no ranking. A marca manual de suspeito continua funcionando e, por ser manual, não é limpa pelo sync. "Tirar confiável" volta ao normal.- **Redefinir senha** (`POST /api/admin/players/[id]/password-reset`, sem corpo, atrás da sessão de admin e da checagem de mesma origem): para quem perdeu a senha (o jogo não tem e-mail e a senha só existe como hash scrypt). O servidor gera uma senha temporária de 12 caracteres (`randomInt`, alfabeto sem 0/O/1/l/I), grava o hash como qualquer senha, apaga **todas** as sessões do jogador e devolve `{ player, temporaryPassword }` uma única vez. A senha nunca é guardada em claro nem entra no log (`admin_password_reset` leva só o id e o apelido). Só vale para conta com apelido (visitante: `invalid`); funciona com ou sem senha anterior. O admin mostra a senha numa caixa com botão de copiar, e ela se perde ao sair ou recarregar. O jogador entra com apelido + senha temporária e a troca em `POST /api/account/password` (senha atual + nova, que já existia; as outras sessões caem).
 - **Estatísticas do jogador** (`GET /api/admin/players/[id]/stats`): ao abrir "Gerenciar", o admin mostra tudo sobre o jogador. A conta vem da linha (`players`); o progresso é lido do próprio save na nuvem (o mesmo parse do sync): ADScoins, por segundo e por clique, turmas formadas, diplomas, professores e homenageados, pesquisas, árvore, conquistas, skins, cenários, temas, Maestrias, monitores, todos os contadores e a turma atual. Quem tem perfil no Hackathon ganha uma seção com cargo, nível, vitórias e itens. Sem save na nuvem, só a conta.
-- Tags (criar, editar, apagar, dar e tirar), Turma Zero em massa e o reset de lançamento: ver "Tags e reset de lançamento" abaixo.
+- Tags (criar, editar, apagar, dar e tirar), Turma Zero em massa: ver "Tags" abaixo. Não existe ação do admin que apague ou zere o progresso de vários jogadores.
 - "Este navegador": o jogador da sessão atual aparece destacado, para aplicar ×10 ou ×50 em si mesmo numa demonstração.
 
 ## Camadas de segurança
@@ -144,9 +143,9 @@ npm run db:migrate           # aplica as migrações
 npm run dev
 ```
 
-Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `npm run db:migrate` apontando para ele e fazer o deploy.
+Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `npm run db:migrate` apontando para ele e fazer o deploy. Antes de mexer no banco de produção, faça um backup (`npm run db:backup`, ver "Backup e restauração").
 
-## Tags e reset de lançamento
+## Tags, época de progresso e backup
 
 ### Tags
 
@@ -157,47 +156,63 @@ Produção: criar o banco gerenciado, cadastrar as variáveis na Vercel, rodar `
 - **Interface:** selo ao lado do apelido com a cor da tag (o texto escurece ou fica branco conforme a cor), no ranking, na linha "você está em Nº lugar" e no mural; as demais, com a descrição, no `title`. No admin a linha do jogador mostra todas.
 - **Admin, catálogo:** `GET /api/admin/tags` (lista, com quantos jogadores têm cada uma), `POST /api/admin/tags` (cria), `POST /api/admin/tags/[id]` (edita qualquer campo; tornar exclusiva uma tag que dois jogadores têm é recusado), `DELETE /api/admin/tags/[id]` (apaga e tira de todos os jogadores na mesma transação; responde `removedFrom`).
 - **Admin, por jogador** (`POST /api/admin/players/[id]` com `grantTag` ou `revokeTag`): dar e tirar são idempotentes. Dar uma tag que não existe é recusado; dar uma tag exclusiva a um segundo jogador é recusado com o nome de quem a tem.
-- **Admin, em massa** (`GET/POST /api/admin/titles/turma-zero`): "Dar Turma Zero a todos os jogadores atuais" dá a tag `turma-zero` a toda conta **com apelido e com ao menos um sync aceito** (`rev > 0`). O GET mostra a contagem (elegíveis, que já têm, que receberão) antes de confirmar. Repetir não faz nada (a segunda execução concede 0). Mantém as outras tags de cada jogador. Se a tag `turma-zero` for apagada, a ferramenta avisa e não faz nada (e o aviso do reset de lançamento some).
+- **Admin, em massa** (`GET/POST /api/admin/titles/turma-zero`): "Dar Turma Zero a todos os jogadores atuais" dá a tag `turma-zero` a toda conta **com apelido e com ao menos um sync aceito** (`rev > 0`). O GET mostra a contagem (elegíveis, que já têm, que receberão) antes de confirmar. Repetir não faz nada (a segunda execução concede 0). Mantém as outras tags de cada jogador. Se a tag `turma-zero` for apagada, a ferramenta avisa e não faz nada.
 
-### Reset de lançamento
+### Nada apaga o progresso de todos
 
-`POST /api/admin/launch-reset` com a frase `ZERAR PROGRESSO` (o GET devolve a contagem do que seria tocado). Numa **única transação**:
+O "reset de lançamento" (botão no `/admin`, rota `POST /api/admin/launch-reset` e a função que zerava todas as contas) foi **removido do código**: ele rodou uma vez em produção e não existe mais nenhum botão, rota ou função que apague ou zere o progresso de vários jogadores de uma vez. O que sobrou no `/admin` age sobre **um** jogador (banir, marcar, tags, redefinir senha, limpar apelido, confiável, multiplicador) ou só **acrescenta** (Turma Zero em massa, que apenas dá a tag). A poda de logs e do mural (abaixo) só tira linhas antigas de log, nunca contas nem saves. As tabelas e colunas continuam como estavam.
 
-| O que | Efeito |
-| --- | --- |
-| Save na nuvem, revisão, resumo de progresso (ADScoins, diplomas, formaturas, cliques, conquistas, professores, tempo de jogo, avatar) | voltam ao valor de quem nunca jogou, para **todas** as contas |
-| Posição no ranking e totais da comunidade | somem junto (são calculados sobre essas colunas) |
-| Marcas de suspeito (`flagged`, motivo) | limpas |
-| Mural (`feed_events`) | esvaziado |
-| Hackathon (perfis, itens, partidas, fases, coleção) | esvaziado |
-| Época de progresso | sobe de 1 |
-| **Mantidos** | contas, apelidos, senhas, sessões, tags, marca de confiável, conta de teste, multiplicador do jogador, banimento, multiplicador do evento global, contadores de limite de taxa |
+### Época de progresso (herança do reset único)
 
-Responde quantas linhas tocou em cada tabela (`players` = contas atualizadas, `playersWithProgress` = as que tinham algo a apagar). É seguro rodar duas vezes: a segunda não apaga mais nada (`playersWithProgress: 0`) e só sobe a época mais um. Cuidado: rodar de novo **depois** que os jogadores já recomeçaram apaga o progresso novo deles também.
+O reset que rodou em produção deixou uma **época de progresso**: um contador em `app_config` (`progress_epoch`, hoje 1 em produção), copiado para `players.progress_epoch` de cada conta. O aparelho guarda a época que viu (junto da revisão, em `adsclicker.cloud`) e a manda em todo `POST /api/sync` (`epoch`; ausente ou nunca aprendida = 0). O mecanismo continua só como **leitura**, porque tirá-lo deixaria um aparelho de testador, com o save antigo, repovoar o ranking:
 
-### O que o jogador vê depois do reset (época de progresso)
+- Época diferente da conta: o servidor **não grava nada** e responde `{ status: 'reset', epoch }` (também com `force`). A gravação do sync inclui a época na condição.
+- O aparelho então guarda o save antigo à parte (`localStorage`, chave `adsclicker.preResetSave`, nunca enviado), recomeça o jogo do zero, adota a época nova e mostra **uma vez** o aviso "O jogo foi zerado para o lançamento". Um aparelho sem progresso real (até 60 s de jogo) recomeça em silêncio.
+- Um aparelho novo, que nunca sincronizou e sem progresso, apenas entra na época atual (vem em `GET /api/me`). Um convidado criado agora já nasce na época atual.
+- Nada mais no código **sobe** o contador (a função que fazia isso saiu junto com o reset). Os testes simulam o estado de produção escrevendo a época direto na tabela.
 
-O aparelho de um testador ainda guarda o save antigo. Para que ele não repovoe o ranking, existe uma **época de progresso**: um contador em `app_config` (`progress_epoch`, 0 até o primeiro reset), copiado para `players.progress_epoch` de cada conta. O aparelho guarda a época que viu (junto da revisão, em `adsclicker.cloud`) e a manda em todo `POST /api/sync` (`epoch`; ausente ou nunca aprendida = 0, a fase de testes).
+## Backup e restauração
 
-- Época diferente da conta: o servidor **não grava nada** e responde `{ status: 'reset', epoch }` (também com `force`). A gravação do sync inclui a época na condição, então um reset que acontece no meio de um sync também o derruba.
-- O aparelho então guarda o save antigo à parte (`localStorage`, chave `adsclicker.preResetSave`, nunca enviado), recomeça o jogo do zero, adota a época nova e mostra **uma vez** o aviso "O jogo foi zerado para o lançamento". Apelido, senha e tags continuam (a sessão não muda). Um aparelho sem progresso real (até 60 s de jogo) recomeça em silêncio, sem aviso.
-- Um aparelho novo, que nunca sincronizou e sem progresso, apenas entra na época atual (vem em `GET /api/me`). Um convidado criado depois do reset já nasce na época atual.
-- Entrar com a conta num aparelho sem save traz a conta zerada (sem save na nuvem). Num aparelho com save antigo, o primeiro sync dispara o fluxo acima.
-- Páginas abertas com o código antigo (sem `epoch`) continuam jogando só no navegador: o servidor recusa o sync com `reset`, que o código antigo trata como falha. Ao recarregar, o código novo assume. O save antigo nunca chega ao ranking.
-- O save de antes só fica guardado no aparelho; não há tela para restaurá-lo (hoje só pelo console do navegador).
+O banco é a única cópia do progresso dos jogadores. Faça o backup **antes de qualquer mudança de banco** (migração, deploy grande) e de tempos em tempos.
 
-### Passo a passo no dia do lançamento
+### Fazer um backup (de produção)
 
-1. **Backup do banco de produção** (snapshot do provedor ou `pg_dump`). O reset não tem volta.
-2. **Aplicar as migrações em produção, antes do deploy.** A produção ainda não tem a migração do Hackathon (`drizzle/0001_whole_wasp.sql`), e há a nova, dos títulos e da época (`drizzle/0002_mushy_grandmaster.sql`, duas colunas em `players`, ambas aditivas). Com `DATABASE_URL` apontando para a produção (URL com pooler): `npm run db:migrate`. O comando aplica `0001` e `0002` em ordem e é seguro repetir. O código antigo continua funcionando com as colunas novas.
-3. **Deploy** do código desta versão. Confira `GET /api/me`: a resposta traz `"epoch": 0`.
-4. Entrar em `/admin`. Conferir que o **evento global** está em "Sem evento" (o reset não mexe nele).
-5. Card **Lançamento**, "Dar Turma Zero a todos os jogadores atuais": ler a contagem, confirmar. **Isto vem antes do reset**: depois dele ninguém tem sync aceito e o botão não encontraria mais ninguém.
-6. **Primeiro Platinado:** na lista de jogadores, buscar pelo apelido, Gerenciar, "Dar Primeiro Platinado". Só um jogador pode tê-lo.
-7. Conferir na aba Turma do jogo que os selos aparecem.
-8. Card **Lançamento**, "Zerar progresso para o lançamento": ler a contagem e o aviso (se ainda houver elegíveis sem Turma Zero, volte ao passo 5), digitar `ZERAR PROGRESSO`, "Zerar agora". Anotar o relatório.
-9. Conferir: ranking vazio (ou só com zeros), `GET /api/me` com `"epoch": 1`, e abrir o jogo num aparelho de testador (aviso de reset, jogo do zero, selo ainda ao lado do apelido).
-10. Abrir o jogo ao público. **Não rodar o reset de novo** depois disso.
+`npm run db:backup` grava um dump completo em `backups/adsclicker-AAAAMMDD-HHMMSSZ.dump` (hora UTC), no formato custom do PostgreSQL (`pg_dump --format=custom --no-owner --no-privileges`). Só lê o banco. Mostra o nome e o tamanho do arquivo e nunca imprime a URL nem a senha (nem nos erros).
+
+- **Ferramenta.** Usa o `pg_dump` do PATH; se não houver, roda o do Docker (`postgres:17`, o Docker Desktop precisa estar aberto; a imagem baixa na primeira vez).
+- **URL.** Lê `DATABASE_URL` do ambiente ou do `.env.local` (como `npm run db:migrate`), ou `BACKUP_DATABASE_URL`, que tem prioridade quando existe. No Neon, use a **conexão direta** (a do painel com "Pooled connection" **desligado**, host sem `-pooler`): o pooler (PgBouncer) não é feito para `pg_dump`/`pg_restore`. Se a URL em uso for a do pooler, o comando já tira o `-pooler` do host sozinho (use `--keep-pooler` para impedir). A URL do Neon traz `?sslmode=require`; o TLS é respeitado.
+- **Comando (PowerShell), sem gravar a URL de produção em arquivo:**
+
+  ```powershell
+  $env:BACKUP_DATABASE_URL = "postgresql://USUARIO:SENHA@ep-xxxx.regiao.aws.neon.tech/neondb?sslmode=require"
+  npm run db:backup
+  Remove-Item Env:BACKUP_DATABASE_URL
+  ```
+
+- **Quando.** Antes de cada migração ou deploy que mexa no banco, e pelo menos uma vez por semana (ou por dia, se o jogo tiver muita gente). O banco é pequeno: um dump leva segundos.
+- **Onde guardar.** `backups/` está no `.gitignore` e **nunca** vai para o Git: o dump tem dados dos jogadores e os hashes das senhas. Copie os arquivos para um lugar privado e fora deste computador (um disco externo ou um armazenamento na nuvem só seu), e guarde os últimos 4 a 8. Não mande por chat nem e-mail.
+
+### Restaurar
+
+`npm run db:restore -- backups/arquivo.dump --yes-i-know` restaura o dump no banco de `DATABASE_URL` (ou `BACKUP_DATABASE_URL`). Sem `--yes-i-know` ele só mostra o destino (host mascarado, nome do banco) e se recusa. Roda numa transação única: se algo falhar, nada muda.
+
+- Sem `--clean` o destino precisa estar **vazio** (um banco novo): se as tabelas já existem, o comando para com erro e não muda nada.
+- Com `--clean` as tabelas do dump são apagadas e recriadas antes: os dados delas são **substituídos**. Só use para recuperação de desastre, com a URL certa.
+- **Conferir um backup num banco local** (copiar a produção para testar):
+
+  ```powershell
+  npm run db:up                     # Postgres local na porta 5439
+  docker exec adsclicker-db psql -U adsclicker -d postgres -c "create database adsclicker_restore_test"
+  $env:DATABASE_URL = "postgres://adsclicker:adsclicker@localhost:5439/adsclicker_restore_test"
+  npm run db:restore -- backups/arquivo.dump --yes-i-know
+  ```
+
+  Depois conte as linhas (`docker exec adsclicker-db psql -U adsclicker -d adsclicker_restore_test -c "select count(*) from players"`) e compare com o painel. Para apagar o banco de teste: `drop database adsclicker_restore_test`.
+- Em produção, restaurar é uma decisão de emergência: restaure primeiro num banco novo do Neon (uma branch ou um projeto novo), confira, e só então aponte o `DATABASE_URL` da Vercel para ele.
+
+### O que o Neon oferece além disso
+
+O painel do Neon tem **restauração para um ponto no tempo** (point-in-time restore) e **branches** (cópia instantânea do banco, útil para testar uma migração sem tocar na produção). A janela de restauração depende do plano e não dá para vê-la daqui: confira a retenção do plano no painel (Settings, restore window) e, se for curta, aumente a frequência do `db:backup`. O backup do `db:backup` é seu e independe do provedor.
 
 ## Logs
 
@@ -222,9 +237,9 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Banir, marcar, tirar a marca, confiável, multiplicador, conta de teste, apelido removido, tag dada/tirada | `admin_ban`, `admin_unban`, `admin_flag`, `admin_unflag`, `admin_multiplier`, `admin_test_account`, `admin_clear_nickname`, `admin_trust`, `admin_untrust`, `admin_tag_grant`, `admin_tag_revoke` | `patchPlayer` |
 | Tag criada, editada, apagada | `admin_tag_create`, `admin_tag_update`, `admin_tag_delete` | `createTag`, `updateTag`, `deleteTag` |
 | Senha redefinida pelo admin (sem a senha) | `admin_password_reset` | `resetPlayerPassword` |
-| Multiplicador do evento, Turma Zero em massa, reset de lançamento (com as contagens) | `admin_event_multiplier`, `admin_turma_zero`, `admin_launch_reset` | rota do evento, `grantTurmaZeroToAll`, `resetForLaunch` |
+| Multiplicador do evento, Turma Zero em massa (com as contagens) | `admin_event_multiplier`, `admin_turma_zero` | rota do evento, `grantTurmaZeroToAll` |
 
-A marca de suspeito só é limpa pelo admin (`admin_unflag`) ou pelo reset de lançamento; o sync nunca a limpa.
+A marca de suspeito só é limpa pelo admin (`admin_unflag`); o sync nunca a limpa.
 
 **Fora do caminho da requisição.** A escrita é agendada com `after()` do Next (depois da resposta); fora de uma requisição ela dispara sem ser esperada. Todo erro dela é engolido: logar nunca derruba nem atrasa nada. Os testes desligam `logEvent` (`NODE_ENV=test`); `writeLog` é testado direto.
 
@@ -236,4 +251,4 @@ A marca de suspeito só é limpa pelo admin (`admin_unflag`) ou pelo reset de la
 
 ### Atividades (`feed_events`)
 
-Todas as linhas da tabela do mural (o jogo mostra só as 30 mais recentes), com apelido, o texto igual ao do mural público (`feedAction`) e a hora; filtro por tipo e busca por apelido. O mural público e o cache de 10 s não mudaram. A retenção do mural era de 14 dias e sem limite de linhas; agora é a mesma dos logs (30 dias, 100 000 linhas), podada na carga da comunidade (no máximo de hora em hora por instância) e ao abrir a visão. O reset de lançamento apaga este histórico, e a tela avisa.
+Todas as linhas da tabela do mural (o jogo mostra só as 30 mais recentes), com apelido, o texto igual ao do mural público (`feedAction`) e a hora; filtro por tipo e busca por apelido. O mural público e o cache de 10 s não mudaram. A retenção do mural era de 14 dias e sem limite de linhas; agora é a mesma dos logs (30 dias, 100 000 linhas), podada na carga da comunidade (no máximo de hora em hora por instância) e ao abrir a visão. A poda é a única coisa que remove linhas desta tabela: só as mais velhas que o prazo ou acima do limite; contas e saves nunca são tocados.

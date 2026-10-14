@@ -7,11 +7,11 @@ import { ThemeProvider } from '@/ui/ThemeProvider';
 import { logout } from './actions';
 import { BrowserCard } from './BrowserCard';
 import { EventCard } from './EventCard';
-import { LaunchCard } from './LaunchCard';
 import { LogsCard } from './LogsCard';
 import { PlayersCard } from './PlayersCard';
 import { TagsCard } from './TagsCard';
 import { TotalsBar } from './TotalsBar';
+import { TurmaZeroCard } from './TurmaZeroCard';
 import { useAdminPlayers } from './useAdminPlayers';
 import { useAdminTags } from './useAdminTags';
 import { useSelfPlayer } from './useSelfPlayer';
@@ -60,7 +60,7 @@ export function AdminPanel() {
           <BrowserCard player={self.player} loading={self.loading} onChanged={onPlayerChanged} />
         </div>
 
-        <LaunchCard
+        <TurmaZeroCard
           onChanged={() => {
             list.reload();
             setTotalsKey((value) => value + 1);

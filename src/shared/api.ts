@@ -507,41 +507,6 @@ export type AdminTurmaZeroPreview = z.infer<typeof adminTurmaZeroPreviewSchema>;
 export const adminTurmaZeroResultSchema = z.object({ granted: z.number().int(), alreadyHad: z.number().int() });
 export type AdminTurmaZeroResult = z.infer<typeof adminTurmaZeroResultSchema>;
 
-/** The phrase the admin types to run the launch reset. */
-export const LAUNCH_RESET_PHRASE = 'ZERAR PROGRESSO';
-
-/** GET /api/admin/launch-reset: what the reset would touch right now. */
-export const adminLaunchResetPreviewSchema = z.object({
-  epoch: z.number().int(),
-  /** Players that hold progress (a cloud save or any progress column off its default). */
-  players: z.number().int(),
-  feedEvents: z.number().int(),
-  hackathonRows: z.number().int(),
-  /** Accounts with a nickname that synced and still lack Turma Zero: give it BEFORE resetting. */
-  withoutTurmaZero: z.number().int(),
-});
-export type AdminLaunchResetPreview = z.infer<typeof adminLaunchResetPreviewSchema>;
-
-export const adminLaunchResetRequestSchema = z.object({ phrase: z.string().max(100) });
-export type AdminLaunchResetRequest = z.infer<typeof adminLaunchResetRequestSchema>;
-
-/** POST /api/admin/launch-reset: rows touched, per table, and the new epoch. */
-export const adminLaunchResetResultSchema = z.object({
-  /** The new progress epoch. */
-  epoch: z.number().int(),
-  /** Accounts updated (all of them: each moves to the new epoch). */
-  players: z.number().int(),
-  /** Of those, how many actually held progress to clear (0 on a second run). */
-  playersWithProgress: z.number().int(),
-  feedEvents: z.number().int(),
-  hackathonProfiles: z.number().int(),
-  hackathonItems: z.number().int(),
-  hackathonRuns: z.number().int(),
-  hackathonStages: z.number().int(),
-  hackathonCollection: z.number().int(),
-});
-export type AdminLaunchResetResult = z.infer<typeof adminLaunchResetResultSchema>;
-
 // ---------------------------------------------------------------------------
 // Admin: server log and class activity (GET /api/admin/logs, /api/admin/activity)
 // ---------------------------------------------------------------------------

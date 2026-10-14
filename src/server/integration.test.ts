@@ -8,6 +8,7 @@ import { content } from '@/game/content';
 import { deserializeState, serializeState } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import type { SyncRequest } from '@/shared/api';
+import { ONLINE_DISPLAY_BONUS } from '@/shared/onlineBonus';
 import { listPlayers, patchPlayer, resetPlayerPassword } from './admin/players';
 import { currentPlayer, requireSession } from './auth/context';
 import { login, logout } from './auth/login';
@@ -588,7 +589,8 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       await insert({ nickname: 'D', nicknameKey: 'd', lifetimeCoins: '1e+30', testAccount: true, clicks: 9, lastSeenAt: new Date(T0) });
 
       const community = await getCommunity(db, T0);
-      expect(community).toMatchObject({ online: 1, players: 2, graduations: 3, clicks: '750', achievements: 5, eventMultiplier: 1, updatedAt: T0 });
+      // The flagged player counts as a player and as online, but not in the sums; the display adds ONLINE_DISPLAY_BONUS.
+      expect(community).toMatchObject({ online: 2 + ONLINE_DISPLAY_BONUS, players: 3, graduations: 3, clicks: '750', achievements: 5, eventMultiplier: 1, updatedAt: T0 });
       expect(Number(community.coins)).toBe(3000);
     });
 
@@ -620,7 +622,7 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     });
 
     it('serves zeros for an empty community', async () => {
-      expect(await getCommunity(db, T0)).toMatchObject({ online: 0, players: 0, coins: '0', clicks: '0', graduations: 0, achievements: 0, feed: [] });
+      expect(await getCommunity(db, T0)).toMatchObject({ online: ONLINE_DISPLAY_BONUS, players: 0, coins: '0', clicks: '0', graduations: 0, achievements: 0, feed: [] });
     });
   });
 
