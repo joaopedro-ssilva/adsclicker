@@ -10,7 +10,6 @@ export function SoundSettings() {
   const musicVolume = useGame((store) => store.state.settings.musicVolume);
   const muted = useGame((store) => store.state.settings.muted);
   const musicEnabled = useGame((store) => store.state.settings.musicEnabled);
-  const clickSound = useGame((store) => store.state.settings.clickSound);
   const updateSettings = useGame((store) => store.updateSettings);
 
   return (
@@ -35,13 +34,6 @@ export function SoundSettings() {
             updateSettings({ sfxVolume: value });
           }}
           onCommit={() => audio.play('buy')}
-        />
-        <ToggleRow
-          label="Som do clique"
-          hint="Só o clique no professor; os outros efeitos ficam"
-          checked={clickSound}
-          testId="setting-click-sound"
-          onChange={(value) => updateSettings({ clickSound: value })}
         />
         <ToggleRow
           label="Música de fundo"

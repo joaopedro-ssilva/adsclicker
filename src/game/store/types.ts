@@ -201,10 +201,6 @@ export interface AchievementView {
   unlockedAt: number | null;
   /** 0..1, when the condition is measurable. */
   progress: number | null;
-  /** "3.214 / 5.000 cliques" for a locked, non-secret achievement. */
-  text: string | null;
-  /** The next step, when the goal is not a plain counter. */
-  note: string | null;
 }
 
 export interface OfflineReport {
@@ -237,8 +233,6 @@ export interface GameActions {
   equipSkin(id: string): void;
   equipScenery(id: string): void;
   equipTheme(id: string): void;
-  /** Stars or unstars an owned skin, scenery or theme. */
-  toggleFavourite(kind: 'skin' | 'scenery' | 'theme', id: string): void;
 
   /** A click on the invasion currently on stage. */
   hitInvasion(): void;

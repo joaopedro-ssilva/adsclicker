@@ -3,20 +3,9 @@ import { formatDuration, formatNumber } from '@/game/engine/format';
 import { festaText } from '@/game/engine/views';
 import { useBolsaView, useFestaView, useGame, useRollforwardView, useSwarmView } from '@/game/store';
 import type { BolsaView, FestaView, RollforwardView, SwarmView } from '@/game/engine/views';
-import { Keycap, Meter, Tooltip } from '@/ui/kit';
+import { Meter, Tooltip } from '@/ui/kit';
 import { LayerReveal } from '../LayerReveal';
-import { shortcutKey } from '../shortcutList';
-import type { ShortcutId } from '../shortcutList';
 import { useBolsaPanel } from './bolsa/bolsaPanelStore';
-
-/** The keycap on the corner of a button, hidden on touch screens by the stylesheet. */
-function Key({ id }: { id: ShortcutId }) {
-  return (
-    <span className="ability-key" aria-hidden="true">
-      <Keycap>{shortcutKey(id)}</Keycap>
-    </span>
-  );
-}
 
 function RollforwardButton({ view }: { view: RollforwardView }) {
   const fire = useGame((store) => store.fireRollforward);
@@ -42,7 +31,6 @@ function RollforwardButton({ view }: { view: RollforwardView }) {
         </Meter>
         <span className="ability-name">Rollforward</span>
         <span className="ability-caption">{caption}</span>
-        <Key id="rollforward" />
         {view.maxCharges > 1 ? (
           <span className="maestria-pips" aria-hidden="true">
             {Array.from({ length: view.maxCharges }, (_, index) => (
@@ -77,7 +65,6 @@ function SwarmButton({ view }: { view: SwarmView }) {
         </Meter>
         <span className="ability-name">Super invasão</span>
         <span className="ability-caption">{caption}</span>
-        <Key id="swarm" />
       </button>
     </Tooltip>
   );
@@ -105,7 +92,6 @@ function FestaButton({ view }: { view: FestaView }) {
         </Meter>
         <span className="ability-name">Festa de lançamento</span>
         <span className="ability-caption">{caption}</span>
-        <Key id="festa" />
       </button>
     </Tooltip>
   );
@@ -131,7 +117,6 @@ function BolsaButton({ view }: { view: BolsaView }) {
         </Meter>
         <span className="ability-name">Bolsa de tokens</span>
         <span className="ability-caption">{caption}</span>
-        <Key id="bolsa" />
       </button>
     </Tooltip>
   );

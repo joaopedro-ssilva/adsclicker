@@ -4,26 +4,22 @@ import { audio } from '@/ui/audio';
 import { Scenery } from '@/ui/art/Scenery';
 import { Button, Icon } from '@/ui/kit';
 import { unlockHint } from './albumData';
-import { FavouriteStar } from './FavouriteStar';
 
 interface SceneryCardProps {
   scenery: SceneryDef;
   owned: boolean;
   equipped: boolean;
-  favourite: boolean;
   onEquip: (id: string) => void;
-  onFavourite: (id: string) => void;
 }
 
 /** A scenery with a live thumbnail (no particles, to keep fourteen of them cheap). */
-export const SceneryCard = memo(function SceneryCard({ scenery, owned, equipped, favourite, onEquip, onFavourite }: SceneryCardProps) {
+export const SceneryCard = memo(function SceneryCard({ scenery, owned, equipped, onEquip }: SceneryCardProps) {
   const hint = unlockHint('scenery', scenery.id, owned);
   return (
     <article className="album-scenery-card" data-owned={owned} data-equipped={equipped}>
       <div className="album-scenery-card-thumb" data-locked={!owned}>
         <Scenery scenery={scenery} ambient="none" focusY={0.7} className="album-scenery-card-art" />
         {!owned ? <Icon name="lock" size={24} className="album-scenery-card-lock" /> : null}
-        {owned ? <FavouriteStar name={scenery.name} favourite={favourite} onToggle={() => onFavourite(scenery.id)} /> : null}
       </div>
       <h3>{owned ? scenery.name : '???'}</h3>
       {owned ? (

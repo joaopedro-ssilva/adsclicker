@@ -1,4 +1,5 @@
-import { useHasFeature } from '@/game/store';
+import { useGame, useHasFeature } from '@/game/store';
+import { content } from '@/game/content';
 import { audio } from '@/ui/audio';
 import { Button } from '@/ui/kit';
 import { useUi } from '../../shared/uiStore';
@@ -27,6 +28,12 @@ export function AlbumTab() {
   const openAlbum = useUi((ui) => ui.openAlbum);
   const section: AlbumSection = stored === 'temas' && !hudThemes ? 'skins' : stored;
 
+  const owned = useGame((store) => store.state.skins);
+  const ownedSkins = content.skins.filter((skin) => owned[skin.id]).length;
+
+  const mythics = content.skins.filter((skin) => skin.rarity === 'mythic');
+  const ownedMythics = mythics.filter((skin) => owned[skin.id]).length;
+
   const items = SECTIONS.filter((item) => item.value !== 'temas' || hudThemes);
 
   return (
@@ -48,6 +55,12 @@ export function AlbumTab() {
           </Button>
         ))}
       </div>
+
+      {section === 'skins' ? (
+        <p className="panel-hint album-count">
+          {ownedSkins}/{content.skins.length} skins na coleção. Desbloqueie as outras com conquistas. Míticas: {ownedMythics}/{mythics.length}.
+        </p>
+      ) : null}
 
       {section === 'skins' ? <SkinsSection /> : null}
       {section === 'cenarios' ? <SceneriesSection /> : null}

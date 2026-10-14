@@ -172,13 +172,6 @@
   transform: scale(0.8);
 }
 
-/* Keys are for the keyboard: a touch screen has no use for the hint. */
-@media (pointer: coarse) {
-  .ability-key {
-    display: none;
-  }
-}
-
 .ability[data-state='ready'] {
   border-color: var(--accent);
   animation: ability-ready 1.2s steps(2) infinite;

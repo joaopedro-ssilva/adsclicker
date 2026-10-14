@@ -220,9 +220,6 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       equipTheme(id) {
         run((state) => engine.equipTheme(state, content, id), true);
       },
-      toggleFavourite(kind, id) {
-        run((state) => engine.toggleFavourite(state, content, kind, id), true);
-      },
 
       hitInvasion() {
         run((state, emit) => engine.hitInvasion(state, content, now(), rng, emit));

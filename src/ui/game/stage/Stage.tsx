@@ -3,7 +3,6 @@ import { useEffect } from 'react';
 import { content, useGameState } from '@/game/store';
 import { Scenery } from '@/ui/art/Scenery';
 import { cssVariables } from '@/ui/theme';
-import { useUi } from '../shared/uiStore';
 import { registerAnchor } from '../wiring/stageRefs';
 import { Abilities } from './Abilities';
 import { Actor } from './Actor';
@@ -13,7 +12,6 @@ import { BolsaPanel } from './maestria/bolsa/BolsaPanel';
 import { FestaLayer } from './maestria/FestaLayer';
 import { MaestriaDock } from './maestria/MaestriaDock';
 import { ReleaseTag } from './maestria/ReleaseTag';
-import { PhotoExit } from './PhotoExit';
 import { SwarmLayer } from './maestria/SwarmLayer';
 import { SwarmSummary } from './maestria/SwarmSummary';
 import { Roster } from './Roster';
@@ -29,17 +27,11 @@ function reservedHeight({ width }: { width: number; height: number }): number {
   return width < 640 ? 176 : 372;
 }
 
-/** Photo mode keeps only a margin around the professor. */
-function photoReservedHeight({ width }: { width: number; height: number }): number {
-  return width < 640 ? 48 : 72;
-}
-
 /** The left side of the game screen: scenery, the professor and everything that happens around them. */
 export function Stage() {
   const sceneryId = useGameState((state) => state.equippedScenery);
   const scenery = sceneryById.get(sceneryId) ?? FALLBACK_SCENERY;
-  const photo = useUi((store) => store.photo);
-  const { ref, scale } = useStageScale(photo ? photoReservedHeight : reservedHeight, photo);
+  const { ref, scale } = useStageScale(reservedHeight);
 
   useEffect(() => {
     registerAnchor('stage', ref.current);
@@ -47,21 +39,6 @@ export function Stage() {
   }, [ref]);
 
   if (!scenery) return null;
-  if (photo) {
-    // Photo mode: the scenery, its ambient particles, the professor (and the mythic aura) and the way out. The game runs on.
-    return (
-      <section className="stage-root" aria-label="Palco" ref={ref} data-photo="on">
-        <Scenery scenery={scenery} focusY={0.65} className="stage-scenery">
-          <div className="stage-ui" data-photo="on" style={cssVariables({ '--scale': String(scale) })}>
-            <div className="stage-play">
-              <Actor scale={scale} photo />
-            </div>
-            <PhotoExit />
-          </div>
-        </Scenery>
-      </section>
-    );
-  }
   return (
     <section className="stage-root" aria-label="Palco" ref={ref}>
       <Scenery scenery={scenery} focusY={0.65} className="stage-scenery">

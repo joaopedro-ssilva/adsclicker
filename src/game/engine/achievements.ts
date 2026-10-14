@@ -6,7 +6,7 @@ import { Decimal, parseDecimal, ratio } from './decimal';
 import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
 import { maestriaLevel } from './maestria/slots';
 import { masteryLevels, masteryRank } from './mastery';
-import type { GameState, LastRun } from './state';
+import type { GameState } from './state';
 import { achievementCount, computeStats } from './stats';
 import type { Stats } from './stats';
 
@@ -48,16 +48,6 @@ function measureAtLeast(value: number, target: number): Measure {
 
 function measureDecimal(value: Decimal, target: Decimal): Measure {
   return { progress: ratio(value, target), met: value.gte(target) };
-}
-
-/** The metric a `lastRun` condition limits. */
-export function lastRunValue(last: LastRun, metric: 'seconds' | 'clicks' | 'investedProfessors'): number {
-  return metric === 'seconds' ? last.seconds : metric === 'clicks' ? last.clicks : last.investedProfessors;
-}
-
-/** The four parts of a clean run: no sprint failed, no invasion missed, a sprint done, an invasion defended. */
-export function cleanRunSteps(last: LastRun): boolean[] {
-  return [last.sprintsFailed === 0, last.eventsMissed === 0, last.sprintsCompleted >= 1, last.eventsDefended >= 1];
 }
 
 export function measureCondition(state: GameState, content: GameContent, condition: Condition, probe: Probe): Measure {
@@ -173,15 +163,12 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       return measureAtLeast(state.calendar.gradsToday, condition.gte);
     case 'lastRun': {
       const last = state.lastRun;
-      if (!last) return { progress: 0, met: false };
-      const value = lastRunValue(last, condition.metric);
-      // "At most" goal: the closer the run was to the limit, the fuller the bar.
-      return { progress: value <= condition.lte ? 1 : fraction(condition.lte, value), met: value <= condition.lte };
+      if (!last) return measureBoolean(false);
+      const value = condition.metric === 'seconds' ? last.seconds : condition.metric === 'clicks' ? last.clicks : last.investedProfessors;
+      return measureBoolean(value <= condition.lte);
     }
-    case 'lastRunClickShare': {
-      const share = state.lastRun?.clickShare ?? 0;
-      return { progress: fraction(share, condition.gte), met: state.lastRun !== null && share >= condition.gte };
-    }
+    case 'lastRunClickShare':
+      return measureBoolean(state.lastRun !== null && state.lastRun.clickShare >= condition.gte);
     case 'maestrias': {
       const needed = condition.level ?? 1;
       const count = PROFESSOR_IDS.filter((id) => maestriaLevel(state, id) >= needed).length;
@@ -189,10 +176,13 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'lastRunClean': {
       const last = state.lastRun;
-      if (last === null) return { progress: 0, met: false };
-      const steps = cleanRunSteps(last);
-      const done = steps.filter(Boolean).length;
-      return { progress: done / steps.length, met: done === steps.length };
+      return measureBoolean(
+        last !== null &&
+          last.sprintsFailed === 0 &&
+          last.eventsMissed === 0 &&
+          last.sprintsCompleted >= 1 &&
+          last.eventsDefended >= 1,
+      );
     }
   }
 }

@@ -45,7 +45,6 @@ export function fireRollforward(state: GameState, content: GameContent, emit: Em
     state.coins = state.coins.add(coins);
     state.runCoins = state.runCoins.add(coins);
     state.lifetimeCoins = state.lifetimeCoins.add(coins);
-    state.run.extraCoins = state.run.extraCoins.add(coins);
   }
   shiftMaestriaTimers(state, ms);
   emit({ type: 'rollforward', ms, coins });

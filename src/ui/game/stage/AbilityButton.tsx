@@ -3,8 +3,6 @@ import { memo } from 'react';
 import { formatDuration } from '@/game/engine/format';
 import type { AbilityView } from '@/game/store';
 import { Keycap, Meter, Tooltip } from '@/ui/kit';
-import { shortcutKey } from './shortcutList';
-import type { ShortcutId } from './shortcutList';
 
 interface AbilityButtonProps {
   ability: AbilityView;
@@ -40,7 +38,7 @@ export const AbilityButton = memo(
           <span className="ability-name">{ability.name}</span>
           <span className="ability-caption">{caption}</span>
           <span className="ability-key" aria-hidden="true">
-            <Keycap>{shortcutKey(`ability-${slot}` as ShortcutId)}</Keycap>
+            <Keycap>{slot}</Keycap>
           </span>
         </button>
       </Tooltip>

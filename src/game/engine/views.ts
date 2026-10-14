@@ -12,8 +12,7 @@ import type {
   ProfessorView,
   ResearchView,
 } from '../store/types';
-import { createProbe } from './achievements';
-import { achievementDetail } from './achievementDetail';
+import { achievementProgress, createProbe } from './achievements';
 import { abilityCooldownLeft } from './buffs';
 import { getIndex } from './contentIndex';
 import type { LevelledDef } from './contentIndex';
@@ -275,14 +274,11 @@ export function achievementViews(state: GameState, content: GameContent): Achiev
   const probe = createProbe(state, content);
   return content.achievements.map((def) => {
     const unlockedAt = state.achievements[def.id];
-    const detail = achievementDetail(state, content, def, probe);
     return {
       id: def.id,
       unlocked: unlockedAt !== undefined,
       unlockedAt: unlockedAt ?? null,
-      progress: detail.progress,
-      text: detail.text,
-      note: detail.note,
+      progress: achievementProgress(state, content, def, probe),
     };
   });
 }

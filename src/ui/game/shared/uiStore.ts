@@ -12,23 +12,16 @@ interface UiStore {
   albumSection: AlbumSection;
   /** False while the player hid the panel to see the whole scenery. Opening a tab shows it again. */
   panelOpen: boolean;
-  /** Photo mode: only the professor and the scenery are on screen. */
-  photo: boolean;
   setTab(tab: PanelTab): void;
   togglePanel(): void;
   openAlbum(section: AlbumSection): void;
-  setPhoto(photo: boolean): void;
-  togglePhoto(): void;
 }
 
 export const useUi = create<UiStore>((set) => ({
   tab: 'aulas',
   albumSection: 'skins',
   panelOpen: true,
-  photo: false,
   setTab: (tab) => set({ tab, panelOpen: true }),
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
   openAlbum: (albumSection) => set({ tab: 'album', albumSection, panelOpen: true }),
-  setPhoto: (photo) => set({ photo }),
-  togglePhoto: () => set((state) => ({ photo: !state.photo })),
 }));

@@ -53,11 +53,6 @@
   }
 }
 
-/* Photo mode: the notices that float over the game go too (the ones inside the stage are not rendered at all). */
-body:has(.game[data-photo='on']) :is(.unlock-cards, .update-note) {
-  display: none;
-}
-
 /* Loading */
 
 .loading {

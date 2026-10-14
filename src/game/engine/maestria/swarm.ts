@@ -168,7 +168,7 @@ function settle(state: GameState, content: GameContent, swarm: ActiveSwarm, emit
     const fromProduction = steadyCoinsPerSecond(state, content).mul(seconds);
     const floor = clickValueWith(state, content, stats).mul((content.balance.rewardClickFloor * seconds) / FLOOR_REFERENCE_SECONDS);
     coins = Decimal.max(fromProduction, floor).mul(stats.eventReward);
-    gain(state, coins, 'events');
+    gain(state, coins);
   }
   state.maestria.swarm.active = null;
   emit({

@@ -15,8 +15,6 @@ import { hitInvasion as hitInvasionRaw } from './invasions';
 import { acceptSprint as acceptSprintRaw } from './sprints';
 import type { GameState } from './state';
 
-export { favouriteKey, toggleFavourite } from './favourites';
-export type { FavouriteKind } from './favourites';
 export { click } from './click';
 export type { ClickPosition } from './click';
 export {

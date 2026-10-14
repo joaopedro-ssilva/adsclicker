@@ -105,6 +105,4 @@ export const iconLabels: Record<IconName, string> = {
   arrowUp: 'Subir',
   plus: 'Mais',
   x: 'Fechar',
-  eye: 'Olho',
-  news: 'Jornal',
 };

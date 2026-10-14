@@ -13,7 +13,6 @@ import { useUi } from './shared/uiStore';
 import { SidePanel } from './panel/SidePanel';
 import { LoadingScreen } from './stage/LoadingScreen';
 import { MobileNotice } from './stage/MobileNotice';
-import { ShortcutsHost } from './stage/ShortcutsHost';
 import { Stage } from './stage/Stage';
 import { GameEffects } from './wiring/GameEffects';
 import { ThemedRoot } from './wiring/ThemedRoot';
@@ -21,19 +20,12 @@ import { UpdateWatcher } from './wiring/UpdateWatcher';
 
 function GameScreen() {
   const hackathon = useHackathon((store) => store.mode === 'hackathon');
-  const photo = useUi((store) => store.photo) && !hackathon;
-  const panelOpen = useUi((store) => store.panelOpen) && !photo;
+  const panelOpen = useUi((store) => store.panelOpen);
   return (
     <>
-      {photo ? null : <MobileNotice />}
+      <MobileNotice />
       {/* The Hackathon takes the whole screen; the classroom splits it between stage and panel. */}
-      <main
-        className="game"
-        data-mode={hackathon ? 'hackathon' : 'classroom'}
-        data-panel={panelOpen ? 'open' : 'closed'}
-        data-photo={photo ? 'on' : 'off'}
-        data-shake-root
-      >
+      <main className="game" data-mode={hackathon ? 'hackathon' : 'classroom'} data-panel={panelOpen ? 'open' : 'closed'} data-shake-root>
         <div className="game-stage">{hackathon ? <HackathonScreen /> : <Stage />}</div>
         {hackathon || !panelOpen ? null : (
           <div className="game-panel">
@@ -42,10 +34,8 @@ function GameScreen() {
         )}
       </main>
       {/* Outside the shaking root: effects, notifications and ceremonies must not shake with the screen. */}
-      {/* Photo mode shows no numbers, no coins and no toasts: without the layers, the calls to them do nothing. */}
-      {photo ? null : <FxLayer />}
-      {photo ? null : <ToastStack />}
-      {hackathon ? null : <ShortcutsHost />}
+      <FxLayer />
+      <ToastStack />
       <MomentsHost />
       <GameEffects />
       <CloudRoot />

@@ -38,7 +38,6 @@ function runSegment(state: GameState, content: GameContent, from: number, to: nu
       const value = clickValueWith(state, content, stats).mul(clicks);
       gain(state, value);
       state.run.clickCoins = state.run.clickCoins.add(value);
-      state.run.autoClickCoins = state.run.autoClickCoins.add(value);
       emit({ type: 'click', value, crit: false, comboSteps: 0, auto: true });
     }
   }

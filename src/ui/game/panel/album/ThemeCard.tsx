@@ -4,44 +4,38 @@ import { audio } from '@/ui/audio';
 import { Button, Icon } from '@/ui/kit';
 import { cssVariables } from '@/ui/theme';
 import { unlockHint } from './albumData';
-import { FavouriteStar } from './FavouriteStar';
 
 interface ThemeCardProps {
   theme: ThemeDef;
   owned: boolean;
   equipped: boolean;
-  favourite: boolean;
   onEquip: (id: string) => void;
-  onFavourite: (id: string) => void;
 }
 
 /** A HUD theme with a miniature of its own colours. */
-export const ThemeCard = memo(function ThemeCard({ theme, owned, equipped, favourite, onEquip, onFavourite }: ThemeCardProps) {
+export const ThemeCard = memo(function ThemeCard({ theme, owned, equipped, onEquip }: ThemeCardProps) {
   const hint = unlockHint('theme', theme.id, owned);
   const { bg, surface, surfaceRaised, border, text, textMuted } = theme.colors;
   return (
     <article className="theme-card" data-owned={owned} data-equipped={equipped}>
-      <div className="theme-card-side">
-        <div
-          className="theme-card-preview"
-          data-locked={!owned}
-          style={cssVariables({
-            '--t-bg': bg,
-            '--t-surface': surface,
-            '--t-raised': surfaceRaised,
-            '--t-border': border,
-            '--t-text': text,
-            '--t-muted': textMuted,
-          })}
-          aria-hidden="true"
-        >
-          <span className="theme-card-title">Aa</span>
-          <span className="theme-card-bar" />
-          <span className="theme-card-chip" />
-          <span className="theme-card-line" />
-          {!owned ? <Icon name="lock" size={24} className="theme-card-lock" /> : null}
-        </div>
-        {owned ? <FavouriteStar name={theme.name} favourite={favourite} onToggle={() => onFavourite(theme.id)} /> : null}
+      <div
+        className="theme-card-preview"
+        data-locked={!owned}
+        style={cssVariables({
+          '--t-bg': bg,
+          '--t-surface': surface,
+          '--t-raised': surfaceRaised,
+          '--t-border': border,
+          '--t-text': text,
+          '--t-muted': textMuted,
+        })}
+        aria-hidden="true"
+      >
+        <span className="theme-card-title">Aa</span>
+        <span className="theme-card-bar" />
+        <span className="theme-card-chip" />
+        <span className="theme-card-line" />
+        {!owned ? <Icon name="lock" size={24} className="theme-card-lock" /> : null}
       </div>
       <div className="theme-card-text">
         <h3>{owned ? theme.name : '???'}</h3>

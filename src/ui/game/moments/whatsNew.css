@@ -1,4 +1,4 @@
-/* Jornal do Campus (WhatsNew.tsx). */
+/* Patch announcement (WhatsNew.tsx). */
 .whats-new {
   display: grid;
   gap: 12px;
@@ -145,39 +145,4 @@
   .whats-new-feature > :last-child {
     grid-column: 1 / -1;
   }
-}
-
-/* Jornal do Campus: one folding section per patch. */
-.journal {
-  display: grid;
-  gap: 8px;
-}
-
-.journal .whats-new {
-  padding: 8px 0 4px;
-}
-
-.whats-new-skin[data-rarity='mythic'] {
-  --rarity: var(--mythic);
-}
-
-.whats-new-notes {
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-}
-
-.whats-new-notes li {
-  position: relative;
-  padding-left: 14px;
-}
-
-.whats-new-notes li::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: 0.55em;
-  width: 5px;
-  height: 5px;
-  background: var(--accent);
 }

@@ -100,68 +100,10 @@
 }
 
 .stage-tools {
-  position: relative;
   grid-area: tools;
   justify-self: end;
   display: flex;
-  gap: 6px;
-}
-
-/* Wide stage: the five tools in one row. The "mais" button only exists on narrow stages. */
-.tools-extra {
-  display: contents;
-}
-
-.tool-wrap.tools-more {
-  display: none;
-}
-
-.tool-wrap {
-  position: relative;
-  display: inline-flex;
-}
-
-/* Something new in the Jornal: a small dot on the corner of the button. */
-.tool-dot {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 10px;
-  height: 10px;
-  background: var(--bad);
-  border: 2px solid var(--bg);
-  pointer-events: none;
-}
-
-/* Photo mode: the way out is a small eye in the corner. It fades after a few seconds without input. */
-.photo-exit {
-  position: absolute;
-  top: var(--space-3);
-  right: var(--space-3);
-  z-index: 3;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 400ms;
-}
-
-.photo-exit[data-awake='true'],
-.photo-exit:focus-within {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .photo-exit {
-    transition: none;
-  }
-}
-
-.stage-ui[data-photo='on'] {
-  grid-template-rows: minmax(0, 1fr);
-}
-
-.stage-ui[data-photo='on']::before {
-  display: none;
+  gap: var(--space-2);
 }
 
 /* Balance */
@@ -259,30 +201,9 @@
     display: block;
   }
 
-  /* Two buttons tall, as before the stage had five tools: the sound and "mais", which opens the rest in a row to its left. */
   .stage-tools {
     flex-direction: column;
-  }
-
-  .tool-wrap.tools-more {
-    display: inline-flex;
-  }
-
-  .tools-extra {
-    position: absolute;
-    top: 0;
-    right: calc(100% + 6px);
-    z-index: 4;
-    display: none;
     gap: 6px;
-    padding: 4px;
-    background: color-mix(in srgb, var(--bg) 88%, transparent);
-    border: 2px solid var(--border);
-    box-shadow: 3px 3px 0 var(--shadow-color);
-  }
-
-  .stage-tools[data-open='true'] .tools-extra {
-    display: flex;
   }
 
   .balance {

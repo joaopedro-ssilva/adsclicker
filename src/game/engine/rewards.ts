@@ -50,6 +50,6 @@ export function grantReward(
   const floor = clickValueWith(state, content, stats).mul(content.balance.rewardClickFloor);
   const multiplier = source === 'invasion' ? stats.eventReward : stats.sprintReward;
   const amount = Decimal.max(fromProduction, floor).mul(multiplier).mul(share);
-  gain(state, amount, source === 'invasion' ? 'events' : 'sprints');
+  gain(state, amount);
   return { kind: 'coins', amount };
 }

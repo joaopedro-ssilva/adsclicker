@@ -10,10 +10,6 @@ interface AchievementRowProps {
   unlockedAt: number | null;
   /** 0..1, rounded by the caller so the row only re-renders on visible changes. */
   progress: number | null;
-  /** "3.214 / 5.000 cliques" for a locked, non-secret achievement. */
-  text: string | null;
-  /** The next step, when the goal is not a plain counter. */
-  note: string | null;
 }
 
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -36,7 +32,7 @@ function rewardChips(def: AchievementDef): RewardChip[] {
 }
 
 /** One achievement. A locked secret one shows nothing but "???". */
-export const AchievementRow = memo(function AchievementRow({ def, unlocked, unlockedAt, progress, text, note }: AchievementRowProps) {
+export const AchievementRow = memo(function AchievementRow({ def, unlocked, unlockedAt, progress }: AchievementRowProps) {
   const hidden = def.secret === true && !unlocked;
   const chips = hidden ? [] : rewardChips(def);
 
@@ -58,12 +54,8 @@ export const AchievementRow = memo(function AchievementRow({ def, unlocked, unlo
             ))}
           </ul>
         ) : null}
-        {!unlocked && !hidden && progress !== null ? (
-          <div className="achievement-progress">
-            <ProgressBar value={progress} max={1} ariaLabel={`Progresso de ${def.name}`} size="sm" segmented segments={10} />
-            {text ? <span className="achievement-progress-text">{text}</span> : null}
-            {note ? <span className="achievement-progress-note">{note}</span> : null}
-          </div>
+        {!unlocked && progress !== null && progress > 0 && !hidden ? (
+          <ProgressBar value={progress} max={1} ariaLabel={`Progresso de ${def.name}`} size="sm" segmented segments={10} />
         ) : null}
       </div>
       <span className="achievement-status">
