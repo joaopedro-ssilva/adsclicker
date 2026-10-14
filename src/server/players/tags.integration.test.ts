@@ -3,11 +3,13 @@
  * (`adsclicker_titles_test`). Skips itself when the database cannot be reached, like the other
  * integration tests.
  */
+import { readFileSync } from 'node:fs';
 import { eq, sql } from 'drizzle-orm';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { serializeState } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import { LAUNCH_RESET_PHRASE, adminPlayerPatchSchema } from '@/shared/api';
+import { PLATINADO_TAG, PLATINA_ACHIEVEMENT } from '@/shared/tags';
 import type { SyncRequest } from '@/shared/api';
 import { formatNumber } from '@/game/engine';
 import { playerStats } from '../admin/playerStats';
@@ -35,8 +37,11 @@ import { getMe } from './me';
 import { readProgressEpoch } from './progressEpoch';
 import { syncPlayer } from './sync';
 import { clearTagCache, createTag, deleteTag, grantTurmaZeroToAll, listAdminTags, turmaZeroPreview, updateTag } from './tags';
+import { logEvent } from '../logs/log';
 import { connectTestDb } from '../testing/db';
 import { playWindows } from '../testing/play';
+
+vi.mock('../logs/log', async (importOriginal) => ({ ...(await importOriginal<typeof import('../logs/log')>()), logEvent: vi.fn() }));
 
 const testDb = await connectTestDb({ database: 'adsclicker_titles_test' });
 afterAll(async () => {
@@ -71,6 +76,7 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
 
   beforeEach(async () => {
     await testDb.reset();
+    vi.mocked(logEvent).mockClear();
     clearCommunityCache();
     clearLeaderboardCache();
     clearTagCache();
@@ -188,6 +194,94 @@ describe.skipIf(!testDb)('tags and launch reset against Postgres', () => {
       clearLeaderboardCache();
       const shown = (await getLeaderboard(db, 'coins', T0 + 1)).entries.find((row) => row.nickname === 'Ana');
       expect(shown?.tags?.map((tag) => tag.id)).toEqual(['turma-zero', watch.id]);
+    });
+  });
+
+  describe('the Platinado tag', () => {
+    /** The migration that seeds the tag (the test database is reset to the two launch tags between tests). */
+    const seedPlatinado = () => db.execute(sql.raw(readFileSync('drizzle/0006_platinado_tag.sql', 'utf8')));
+
+    /** Syncs `state` with the Platina achievement for a player who already synced, and returns the answer. */
+    async function earnPlatina(player: Awaited<ReturnType<typeof newPlayer>>, ip = '10.0.0.1') {
+      const state = player.last;
+      state.achievements[PLATINA_ACHIEVEMENT] = player.now;
+      const result = await syncPlayer(db, { request: body(state, player.rev, 0), token: player.token, ip, now: player.now });
+      if (result.body.status !== 'ok') throw new Error(`unexpected ${result.body.status}`);
+      return { result: result.body, now: player.now + 45_000 };
+    }
+
+    /** The event log is switched off under test, so the calls to it are what is checked. */
+    const platinadoLogs = () => vi.mocked(logEvent).mock.calls.map((call) => call[1]).filter((entry) => entry.kind === 'tag_platinado');
+
+    const titlesOf = async (id: string) => (await db.select({ titles: players.titles }).from(players).where(eq(players.id, id)))[0]?.titles ?? [];
+
+    it('is seeded by the migration, last in priority, and the seed can run twice', async () => {
+      await seedPlatinado();
+      await seedPlatinado();
+      const tags = await listAdminTags(db);
+      expect(tags.tags.map((tag) => tag.id)).toEqual(['primeiro-platinado', 'turma-zero', PLATINADO_TAG]);
+      expect(tags.tags[2]).toMatchObject({ label: '💎 Platinado', visibility: 'public', single: false });
+    });
+
+    it('is given to a ranked player with the Platina achievement, once, and logged', async () => {
+      await seedPlatinado();
+      const ana = await newPlayer({ nickname: 'Ana' });
+      expect(await titlesOf(ana.id)).toEqual([]);
+
+      const first = await earnPlatina(ana);
+      expect(await titlesOf(ana.id)).toEqual([PLATINADO_TAG]);
+      expect(first.result.me.tags?.map((tag) => tag.id)).toEqual([PLATINADO_TAG]);
+      expect(platinadoLogs()).toEqual([expect.objectContaining({ kind: 'tag_platinado', playerId: ana.id, nickname: 'Ana' })]);
+
+      // The next sync holds it already: nothing is added or logged again.
+      const again = await syncPlayer(db, { request: body(ana.last, first.result.status === 'ok' ? first.result.rev : 0, 0), token: ana.token, ip: '10.0.0.1', now: first.now });
+      expect(again.body.status).toBe('ok');
+      expect(await titlesOf(ana.id)).toEqual([PLATINADO_TAG]);
+      expect(platinadoLogs()).toHaveLength(1);
+
+      // It shows on the board like any public tag, and Primeiro Platinado is a separate, untouched tag.
+      await patchPlayer(db, ana.id, { grantTag: 'primeiro-platinado' }, null);
+      const entry = (await getLeaderboard(db, 'coins', T0)).entries.find((row) => row.nickname === 'Ana');
+      expect(entry?.tags?.map((tag) => tag.id)).toEqual(['primeiro-platinado', PLATINADO_TAG]);
+    });
+
+    it('is not given without the achievement, to an unranked account, or when the tag was deleted', async () => {
+      await seedPlatinado();
+      const plain = await newPlayer({ nickname: 'Ana' });
+      const synced = await syncPlayer(db, { request: body(plain.last, plain.rev, 0), token: plain.token, ip: '10.0.0.1', now: plain.now });
+      expect(synced.body.status).toBe('ok');
+      expect(await titlesOf(plain.id)).toEqual([]);
+
+      const guest = await newPlayer({ seed: 2, ip: '10.0.0.2' });
+      await earnPlatina(guest, '10.0.0.2');
+      expect(await titlesOf(guest.id)).toEqual([]);
+
+      const banned = await newPlayer({ nickname: 'Bia', seed: 3, ip: '10.0.0.3' });
+      await db.update(players).set({ banned: true }).where(eq(players.id, banned.id));
+      await earnPlatina(banned, '10.0.0.3');
+      expect(await titlesOf(banned.id)).toEqual([]);
+
+      const test = await newPlayer({ nickname: 'Caio', seed: 4, ip: '10.0.0.4' });
+      await db.update(players).set({ testAccount: true }).where(eq(players.id, test.id));
+      await earnPlatina(test, '10.0.0.4');
+      expect(await titlesOf(test.id)).toEqual([]);
+
+      await deleteTag(db, PLATINADO_TAG);
+      const late = await newPlayer({ nickname: 'Duda', seed: 5, ip: '10.0.0.5' });
+      await earnPlatina(late, '10.0.0.5');
+      expect(await titlesOf(late.id)).toEqual([]);
+    });
+
+    it('is given on the first sync after the account becomes ranked', async () => {
+      await seedPlatinado();
+      const guest = await newPlayer({ seed: 6, ip: '10.0.0.6' });
+      const earned = await earnPlatina(guest, '10.0.0.6');
+      expect(await titlesOf(guest.id)).toEqual([]);
+      await setNickname(db, await requireSession(db, guest.headers, earned.now), { nickname: 'Eva', password: 'senha-padrao' }, earned.now);
+      clearTagCache();
+      const rev = earned.result.status === 'ok' ? earned.result.rev : 0;
+      await syncPlayer(db, { request: body(guest.last, rev, 0), token: guest.token, ip: '10.0.0.6', now: earned.now });
+      expect(await titlesOf(guest.id)).toEqual([PLATINADO_TAG]);
     });
   });
 

@@ -28,7 +28,7 @@ const ach = (
 });
 
 /**
- * 129 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
+ * 151 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
  * Every non-default cosmetic is granted by exactly one achievement, and harder ones give rarer skins:
  * common = hire / early clicks, rare = discipline level 25, epic = all research, legendary = level 100
  * or a long-haul challenge; mythic (one per professor) is reserved for the hardest feat of each family
@@ -63,8 +63,11 @@ export const achievements: AchievementDef[] = [
   ach('click-1m', 'click', 'Um Milhão de Joinhas', '🤝', 'Dê 1.000.000 de cliques. Os dedos pedem arrego, o joinha não.', counter('clicks', 1000000), {
     skin: 'edecio-primordial',
   }),
+  ach('joinha-100', 'click', 'Febre do Ouro', '⛏️', 'Entre 100 vezes no modo dourado do Edécio. Quem garimpa joinha não para na primeira pepita.', counter('goldenModes', 100), {
+    skin: 'edecio-garimpeiro',
+  }),
 
-  // ------------------------------------------------------------------ production (15)
+  // ------------------------------------------------------------------ production (20)
   ach('coins-1e3', 'production', 'Troco de Cantina', '🪙', 'Ganhe 1.000 ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e3' }, { scenery: 'cantina' }),
   ach('coins-1e6', 'production', 'Primeiro Milhão', '🏝️', 'Ganhe 1 milhão de ADScoins no total.', { kind: 'lifetimeCoins', gte: '1e6' }, {
     scenery: 'praia',
@@ -115,8 +118,21 @@ export const achievements: AchievementDef[] = [
   ach('research-all', 'production', 'P = NP', '♾️', 'Compre todas as pesquisas do jogo em uma mesma turma. Provado por exaustão.', { kind: 'everyResearch' }, {
     skin: 'pablo-oraculo',
   }),
+  ach('rollforward-50', 'production', 'De Volta para o Futuro', '⏳', 'Use o Rollforward 50 vezes. O commit de amanhã já está em produção hoje.', counter('rollforwards', 50), {
+    skin: 'gladimir-viajante',
+  }),
+  ach('rollforward-triple', 'production', 'Carga Tripla', '🔋', 'Use o Rollforward com 3 cargas guardadas. Guardou, guardou, e soltou o tempo todo de uma vez.', counter('tripleRollforwards', 1), {
+    theme: 'fita-magnetica',
+  }),
+  ach('festa-25', 'production', 'Festa de Arromba', '🎉', 'Dê a Festa de lançamento 10 vezes. O servidor reclamou do barulho, mas dançou junto.', counter('festas', 10), { scenery: 'palco' }),
+  ach('bolsa-hour', 'production', 'Lobo de Wall Street', '🐺', 'Lucre na Bolsa o equivalente a 1 hora de produção. Comprou na baixa, vendeu na alta e manteve a calma.', counter('bolsaProfitSeconds', 3600), {
+    scenery: 'wall-street',
+  }),
+  ach('bolsa-portfolio', 'production', 'Carteira Diversificada', '🧺', 'Tenha dinheiro nos quatro ativos e no Fundo ao mesmo tempo. Nunca ponha todos os tokens na mesma cesta.', { kind: 'bolsaPortfolio' }, {
+    theme: 'pregao',
+  }),
 
-  // ------------------------------------------------------------------ professor (31)
+  // ------------------------------------------------------------------ professor (33)
   // Hiring: common skin
   ach('hire-gladimir', 'professor', 'Que o JOIN Esteja com Você', '🪐', 'Contrate o Gladimir.', hired('gladimir')),
   ach('hire-b2', 'professor', 'Interface Amigável', '🎨', 'Contrate a Bruna B2.', hired('b2'), { skin: 'b2-postit', theme: 'claro' }),
@@ -239,8 +255,14 @@ export const achievements: AchievementDef[] = [
     gte: 500,
   }, { scenery: 'servidor-antigo' }),
   ach('mastery-all-10', 'professor', 'Corpo Docente', '🧑‍🏫', 'Deixe os 8 professores com Domínio 10 ou mais ao mesmo tempo.', { kind: 'mastery', rank: 10 }, { scenery: 'castelo' }),
+  ach('mastery-all-cap', 'professor', 'Mestres da Casa', '🏫', 'Deixe os 8 professores com o Domínio no máximo (40) ao mesmo tempo. Cada um já tem cadeira cativa na sala.', { kind: 'mastery', rank: 40 }, {
+    scenery: 'sala-dos-professores',
+  }),
+  ach('design-500', 'professor', 'Sistema que se Desenha', '🧩', 'Receba 500 níveis de graça do Design System. A Bruna B2 reaproveita componente, e você reaproveita nível.', counter('designFreeLevels', 500), {
+    skin: 'b2-componentes',
+  }),
 
-  // ------------------------------------------------------------------ events (7)
+  // ------------------------------------------------------------------ events (11)
   ach('defend-10', 'events', 'Guarda do Campus', '⛓️', 'Defenda 10 invasões.', counter('eventsDefended', 10), { scenery: 'prisao' }),
   ach('defend-50', 'events', 'Caçador de Ameaças', '🚨', 'Defenda 50 invasões.', counter('eventsDefended', 50), {
     skin: 'edecio-prisioneiro',
@@ -265,8 +287,12 @@ export const achievements: AchievementDef[] = [
   ach('missed-10', 'events', 'Senha 123456 Aprovada', '🔑', 'Deixe 10 invasões escaparem. A segurança agradece a sinceridade.', counter('eventsMissed', 10), {
     skin: 'wagner-ferias',
   }),
+  ach('swarm-clear', 'events', 'Dedetização Completa', '🐛', 'Vença uma Super invasão sem deixar escapar nenhum bug, chefe incluído. Nem um byte de resto.', counter('swarmsCleared', 1), {
+    skin: 'wagner-dedetizador',
+  }),
+  ach('swarm-25', 'events', 'Exterminador', '☠️', 'Vença 25 Super invasões. O Deploy de sexta já pede licença antes de entrar.', counter('swarmsWon', 25), { scenery: 'sala-de-guerra' }),
 
-  // ------------------------------------------------------------------ sprints (6)
+  // ------------------------------------------------------------------ sprints (7)
   ach('sprint-1', 'sprints', 'Primeiro Sprint', '🏁', 'Conclua 1 sprint.', counter('sprintsCompleted', 1)),
   ach('sprint-5', 'sprints', 'Time Entregando', '📦', 'Conclua 5 sprints.', counter('sprintsCompleted', 5), {
     scenery: 'sala-de-planning',
@@ -277,8 +303,11 @@ export const achievements: AchievementDef[] = [
   ach('sprint-fail-10', 'sprints', 'Prazo é uma Sugestão', '⏰', 'Deixe 10 sprints vencerem sem cumprir a meta.', counter('sprintsFailed', 10), {
     skin: 'b1-burndown',
   }),
+  ach('releases-10', 'sprints', 'Versão 10.0', '🔟', 'Chegue à versão 10 dos Releases numa mesma turma. Dez versões e nenhum "hotfix urgente" no meio.', { kind: 'releaseVersions', gte: 10 }, {
+    skin: 'b1-keynote',
+  }),
 
-  // ------------------------------------------------------------------ graduation (8)
+  // ------------------------------------------------------------------ graduation (14)
   ach('grad-1', 'graduation', 'Primeira Formatura', '🎓', 'Faça a primeira Formatura.', counter('graduations', 1), {
     scenery: 'formatura',
   }),
@@ -323,11 +352,25 @@ export const achievements: AchievementDef[] = [
   }),
   ach('maestrias-max', 'graduation', 'Mestre dos Mestres', '🧙', 'Leve uma Maestria ao nível 5. O resto da turma que espere o próximo diploma.', { kind: 'maestrias', unlocked: 1, level: 5 }, { theme: 'ouro' }),
   ach('tree-15', 'graduation', 'Árvore Frondosa', '🌳', 'Tenha 15 nós da árvore de Formatura.', { kind: 'prestigeNodes', gte: 15 }, { scenery: 'jardim' }),
+  ach('tree-complete', 'graduation', 'Árvore Centenária', '🌲', 'Complete a árvore de Formatura, com todos os nós no nível máximo. Cada galho com o seu diploma.', { kind: 'prestigeComplete' }, {
+    scenery: 'arvore-ancestral',
+  }),
+  ach('horas-full', 'graduation', 'Carga Horária Cumprida', '📋', 'Preencha 3 faixas das Horas complementares numa mesma turma. O coordenador carimba sem nem olhar.', { kind: 'horasBands', gte: 3 }, {
+    skin: 'angelo-certificado',
+  }),
+  ach('maestrias-doctorate', 'graduation', 'Doutorado', '📚', 'Leve as 8 Maestrias ao nível 5. A tese tem oito capítulos e nenhuma referência faltando.', { kind: 'maestrias', unlocked: 8, level: 5 }, {
+    skin: 'angelo-ninja',
+  }),
+  ach('monitors-all', 'graduation', 'Monitoria Completa', '🤝', 'Contrate os 4 Monitores. Agora a turma tem quem faça o trabalho chato.', { kind: 'monitors', gte: 4 }, { scenery: 'sala-dos-monitores' }),
+  ach('monitors-max', 'graduation', 'Piloto Automático Total', '🤖', 'Leve os 4 Monitores ao nível máximo. Sobra só o botão de formatura, e olhe lá.', { kind: 'monitors', gte: 4, maxed: true }, {
+    skin: 'gladimir-robo',
+  }),
+  ach('cap-reached', 'graduation', 'Teto de Vidro', '🪟', 'Forme uma turma que valia o teto de diplomas. O resto do lucro bateu no vidro e ficou olhando.', counter('cappedGraduations', 1), { theme: 'vidro' }),
 
-  // ------------------------------------------------------------------ collection (6)
+  // ------------------------------------------------------------------ collection (11)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }, { scenery: 'camarim' }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 86 skins.', { kind: 'skinsOwned', gte: 86 }, { theme: 'holografico' }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 95 skins.', { kind: 'skinsOwned', gte: 95 }, { theme: 'holografico' }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }, { theme: 'prata' }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }, { theme: 'platina' }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),
@@ -340,6 +383,22 @@ export const achievements: AchievementDef[] = [
   }),
   ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha todas as skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary' }, {
     scenery: 'galaxia',
+  }),
+  ach('mythics-all', 'collection', 'Panteão', '🏛️', 'Tenha as 8 skins míticas, uma de cada professor. Cada pedestal com o seu nome gravado.', { kind: 'rarityOwned', rarity: 'mythic' }, {
+    scenery: 'panteao',
+  }),
+  ach('sceneries-all', 'collection', 'Volta ao Mundo', '🗺️', 'Tenha todos os cenários do jogo. Da sala de aula ao Panteão, sem pular o Nether.', { kind: 'everyOwned', of: 'sceneries' }, { theme: 'grego' }),
+  ach('themes-all', 'collection', 'Paleta Infinita', '🖌️', 'Tenha todos os temas do jogo (o Arco-íris é o prêmio e não entra na conta). Combina com tudo, até com o erro de compilação.', {
+    kind: 'everyOwned',
+    of: 'themes',
+    except: ['arco-iris'],
+  }, { theme: 'arco-iris' }),
+  ach('achievements-100', 'collection', 'Cem por Cento', '🎯', 'Conquiste 100 conquistas. São +100% de produção global, redondinho.', { kind: 'achievements', gte: 100 }, {
+    skin: 'gladimir-neyglad',
+  }),
+  ach('platinum', 'collection', 'Platina', '💎', 'Conquiste todas as outras conquistas do jogo, as secretas também. O prêmio é a fama: uma tag de diamante no ranking.', {
+    kind: 'everyAchievement',
+    except: ['platinum'],
   }),
 
   // ------------------------------------------------------------------ secret (6)

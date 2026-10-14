@@ -3,7 +3,8 @@ import type { GameContent, ProfessorId } from '../content/types';
 import { grantAchievementRewards } from './achievements';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
-import { createInitialState, createMonitorsState, createRunStats } from './init';
+import { isValidFavourite } from './favourites';
+import { createInitialState, createMonitorsState, createRecords, createRunStats } from './init';
 import { readMaestria } from './maestria/save';
 import {
   MAX_CARGO_BONUS,
@@ -11,6 +12,7 @@ import {
   MAX_MENTOR_BONUS,
   MIN_DEV_MULTIPLIER,
   MONITOR_SHARES,
+  RECORD_KEYS,
   SAVE_VERSION,
   SPRINT_PICKS,
 } from './state';
@@ -23,7 +25,10 @@ import type {
   GameState,
   LastRun,
   MonitorsState,
+  RecordKey,
+  Records,
   RunStats,
+  RunSummary,
   Settings,
 } from './state';
 
@@ -203,12 +208,58 @@ function readRun(value: unknown): RunStats {
   run.sprintsFailed = Math.floor(readNumber(value.sprintsFailed, 0, 0));
   run.eventsDefended = Math.floor(readNumber(value.eventsDefended, 0, 0));
   run.eventsMissed = Math.floor(readNumber(value.eventsMissed, 0, 0));
+  run.maxCombo = Math.floor(readNumber(value.maxCombo, 0, 0));
+  run.autoClickCoins = readDecimal(value.autoClickCoins);
+  run.eventCoins = readDecimal(value.eventCoins);
+  run.sprintCoins = readDecimal(value.sprintCoins);
+  run.offlineCoins = readDecimal(value.offlineCoins);
+  run.extraCoins = readDecimal(value.extraCoins);
   return run;
+}
+
+function readRecordKeys(value: unknown): RecordKey[] {
+  return Array.isArray(value) ? RECORD_KEYS.filter((key) => value.includes(key)) : [];
+}
+
+function readSummary(value: unknown): RunSummary | undefined {
+  if (!isRecord(value) || !isRecord(value.coins)) return undefined;
+  const coin = (raw: unknown) => readDecimal(raw).toString();
+  return {
+    diplomas: Math.floor(readNumber(value.diplomas, 0, 0)),
+    bonus: Math.floor(readNumber(value.bonus, 0, 0)),
+    capped: value.capped === true,
+    honoured: isProfessorId(value.honoured) ? value.honoured : null,
+    maxCombo: Math.floor(readNumber(value.maxCombo, 0, 0)),
+    coins: {
+      total: coin(value.coins.total),
+      classes: coin(value.coins.classes),
+      clicks: coin(value.coins.clicks),
+      autoClicks: coin(value.coins.autoClicks),
+      events: coin(value.coins.events),
+      sprints: coin(value.coins.sprints),
+      offline: coin(value.coins.offline),
+      other: coin(value.coins.other),
+    },
+    recordsBeaten: readRecordKeys(value.recordsBeaten),
+    recordsStarted: readRecordKeys(value.recordsStarted),
+  };
+}
+
+function readRecords(value: unknown): Records {
+  const records = createRecords();
+  if (!isRecord(value)) return records;
+  records.fastestSeconds = readNumber(value.fastestSeconds, 0, 0);
+  records.mostClicks = Math.floor(readNumber(value.mostClicks, 0, 0));
+  records.biggestCombo = Math.floor(readNumber(value.biggestCombo, 0, 0));
+  records.mostCoins = readDecimal(value.mostCoins);
+  return records;
 }
 
 function readLastRun(value: unknown): LastRun | null {
   if (!isRecord(value)) return null;
+  const summary = readSummary(value.summary);
   return {
+    ...(summary ? { summary } : {}),
     seconds: readNumber(value.seconds, 0, 0),
     clicks: Math.floor(readNumber(value.clicks, 0, 0)),
     investedProfessors: Math.floor(readNumber(value.investedProfessors, 0, 0, PROFESSOR_IDS.length)),
@@ -251,8 +302,10 @@ function readSettings(value: unknown, fallback: Settings): Settings {
     musicVolume: readNumber(value.musicVolume, fallback.musicVolume, 0, 1),
     muted: typeof value.muted === 'boolean' ? value.muted : fallback.muted,
     musicEnabled: typeof value.musicEnabled === 'boolean' ? value.musicEnabled : fallback.musicEnabled,
+    clickSound: typeof value.clickSound === 'boolean' ? value.clickSound : fallback.clickSound,
     reducedMotion: motion === 'on' || motion === 'off' || motion === 'system' ? motion : fallback.reducedMotion,
     floatingNumbers: typeof value.floatingNumbers === 'boolean' ? value.floatingNumbers : fallback.floatingNumbers,
+    sceneryEffects: typeof value.sceneryEffects === 'boolean' ? value.sceneryEffects : fallback.sceneryEffects,
     devMultiplier: readNumber(value.devMultiplier, fallback.devMultiplier, MIN_DEV_MULTIPLIER, MAX_DEV_MULTIPLIER),
   };
 }
@@ -324,6 +377,8 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   if (scenery && state.sceneries[scenery]) state.equippedScenery = scenery;
   const theme = readString(raw.equippedTheme);
   if (theme && state.themes[theme]) state.equippedTheme = theme;
+  // Absent in older saves: starts empty. Unknown ids and cosmetics not owned are dropped.
+  state.favourites = readBooleans(raw.favourites, (key) => isValidFavourite(state, content, key));
 
   if (isRecord(raw.combo)) {
     state.combo = { steps: readNumber(raw.combo.steps, 0, 0), lastClickAt: readNumber(raw.combo.lastClickAt, 0, 0) };
@@ -340,6 +395,7 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
 
   state.run = readRun(raw.run);
   state.lastRun = readLastRun(raw.lastRun);
+  state.records = readRecords(raw.records);
   state.honoured = isProfessorId(raw.honoured) ? raw.honoured : null;
   state.honouredBefore = readBooleans(raw.honouredBefore, isProfessorId);
   state.abilitiesTried = readBooleans(raw.abilitiesTried, (id) => index.abilities.has(id));
@@ -376,7 +432,16 @@ export function serializeState(state: GameState): string {
     coins: state.coins.toString(),
     runCoins: state.runCoins.toString(),
     lifetimeCoins: state.lifetimeCoins.toString(),
-    run: { ...state.run, clickCoins: state.run.clickCoins.toString() },
+    run: {
+      ...state.run,
+      clickCoins: state.run.clickCoins.toString(),
+      autoClickCoins: state.run.autoClickCoins.toString(),
+      eventCoins: state.run.eventCoins.toString(),
+      sprintCoins: state.run.sprintCoins.toString(),
+      offlineCoins: state.run.offlineCoins.toString(),
+      extraCoins: state.run.extraCoins.toString(),
+    },
+    records: { ...state.records, mostCoins: state.records.mostCoins.toString() },
   });
 }
 

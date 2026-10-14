@@ -60,6 +60,7 @@ export function click(
   counters.clicks += 1;
   if (crit) counters.crits += 1;
   counters.maxCombo = Math.max(counters.maxCombo, Math.floor(steps));
+  state.run.maxCombo = Math.max(state.run.maxCombo, Math.floor(steps));
 
   recordSprintEvent(state, content, { kind: 'clicks', amount: 1 });
   if (crit) recordSprintEvent(state, content, { kind: 'crits', amount: 1 });

@@ -90,6 +90,28 @@ describe('save round trip', () => {
     expect(loaded.counters).toEqual(state.counters);
   });
 
+  it('loads a save from before the click sound setting with the sound on, and keeps the choice', () => {
+    const { state, content } = richGame();
+    const raw = JSON.parse(serializeState(state));
+    delete raw.settings.clickSound;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.clickSound).toBe(true);
+    raw.settings.clickSound = false;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.clickSound).toBe(false);
+    raw.settings.clickSound = 'no';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.clickSound).toBe(true);
+  });
+
+  it('loads a save from before the scenery effects setting with them on, and keeps the choice', () => {
+    const { state, content } = richGame();
+    const raw = JSON.parse(serializeState(state));
+    delete raw.settings.sceneryEffects;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.sceneryEffects).toBe(true);
+    raw.settings.sceneryEffects = false;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.sceneryEffects).toBe(false);
+    raw.settings.sceneryEffects = 'no';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.sceneryEffects).toBe(true);
+  });
+
   it('writes decimals as strings', () => {
     const { state } = richGame();
     const raw = JSON.parse(serializeState(state));

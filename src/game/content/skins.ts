@@ -27,7 +27,7 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 86 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
+/** The closed list of 95 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
 export const skins: SkinDef[] = [
   ...make('edecio', [
     {
@@ -141,6 +141,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'white t-shirt with a red mouse-cursor print, red track pants, red sneakers, both hands in huge oversized puffy red cartoon gloves',
     },
     {
+      id: 'edecio-garimpeiro',
+      name: 'Garimpeiro',
+      rarity: 'epic',
+      description: 'Colete de couro, bateia cheia de pepitas e uma picareta. Cem vezes dourado e ainda procurando o próximo joinha.',
+      headgear: true,
+      palette: ['#8a5a2b', '#f5c542', '#4a6b3a'],
+      artPrompt: 'worn brown leather vest over a rolled-sleeve plaid shirt, sturdy trousers, muddy boots, a gold pan full of shiny nuggets in one hand and a pickaxe in the other, small pouch of gold on the belt',
+    },
+    {
       id: 'edecio-samurai',
       name: 'Samurai',
       rarity: 'legendary',
@@ -246,6 +255,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'full steel armor in blue and silver, large shield shaped like a floppy disk, plumed helmet',
     },
     {
+      id: 'gladimir-viajante',
+      name: 'Viajante do Tempo',
+      rarity: 'epic',
+      description: 'Casaco comprido, cachecol listrado e um relógio de bolso gigante. Voltou cinquenta vezes no tempo e ainda esqueceu de salvar.',
+      headgear: true,
+      palette: ['#7a4a26', '#c9a24a', '#4aa8ff'],
+      artPrompt: 'long brown leather coat with brass buttons over a waistcoat, striped scarf, big brass pocket watch on a chain in one hand and a small glowing blue hourglass in the other, brass gears on the belt',
+    },
+    {
       id: 'gladimir-mestre',
       name: 'Mestre da Galáxia',
       rarity: 'legendary',
@@ -257,11 +275,28 @@ export const skins: SkinDef[] = [
     {
       id: 'gladimir-arquivista',
       name: 'Arquivista Eterno',
-      rarity: 'mythic',
+      rarity: 'legendary',
       description: 'Manto azul com capuz de luz e runas de dados. Guarda cada byte desde o começo dos tempos.',
       headgear: true,
       palette: ['#1d4ed8', '#22d3ee', '#e0f2fe'],
       artPrompt: 'long deep blue hooded robe with glowing cyan data runes, holding a glowing tome of data',
+    },
+    {
+      id: 'gladimir-neyglad',
+      name: 'NeyGlad',
+      rarity: 'legendary',
+      description: 'Camisa amarela de craque, número 10 e a taça erguida sobre o ombro. Cem conquistas no placar e nenhuma reclamação ao juiz.',
+      palette: ['#facc15', '#16a34a', '#2563eb'],
+      artPrompt: 'bright yellow football jersey with green trim and the number 10, blue shorts, white socks and football boots, captain armband, holding a golden champions trophy cup above one shoulder with both hands, no logos, no crests',
+    },
+    {
+      id: 'gladimir-robo',
+      name: 'Gladbot',
+      rarity: 'mythic',
+      description: 'Metade professor, metade máquina. A metade humana corrige a prova; a outra já indexou o banco inteiro.',
+      headgear: true,
+      palette: ['#1f2328', '#c7ccd4', '#e5383b'],
+      artPrompt: 'half-human half-machine cyborg: black leather jacket on one half, exposed chrome machinery with a mechanical arm and leg on the other, cyan joint lights',
     },
   ]),
   ...make('b2', [
@@ -306,6 +341,14 @@ export const skins: SkinDef[] = [
       description: 'Casaco longo colorido e sacolas de compras. Dez trocas depois, finalmente serviu.',
       palette: ['#f472b6', '#fbbf24', '#22d3ee'],
       artPrompt: 'a long colorful fashion coat in pink and yellow color blocks, black turtleneck, black trousers, white sneakers, holding colorful shopping bags in both hands',
+    },
+    {
+      id: 'b2-componentes',
+      name: 'Biblioteca de Componentes',
+      rarity: 'rare',
+      description: 'Roupa branca cheia de botões, interruptores e cartões encaixados. Quinhentos níveis de graça: reaproveitar componente também é design.',
+      palette: ['#f5f3ff', '#8b5cf6', '#38bdf8'],
+      artPrompt: 'white outfit with coloured rounded buttons, toggle switches and small cards attached like patches, holding a big purple building block with rounded corners',
     },
     {
       id: 'b2-darkmode',
@@ -420,6 +463,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'black plate armor with green accents, sword shaped like a giant key, open-face helmet',
     },
     {
+      id: 'wagner-dedetizador',
+      name: 'Dedetizador',
+      rarity: 'epic',
+      description: 'Macacão amarelo, tanque de veneno e o spray em punho. Passou por aqui: não sobrou nem um loop infinito.',
+      headgear: true,
+      palette: ['#facc15', '#1b1b1f', '#9aa0aa'],
+      artPrompt: 'yellow and black hazmat-style jumpsuit, black rubber gloves and boots, metal spray tank on the back with a hose, holding the spray nozzle, patch on the chest with a crossed-out bug',
+    },
+    {
       id: 'wagner-cripto',
       name: 'Cavaleiro da Criptografia',
       rarity: 'legendary',
@@ -440,10 +492,10 @@ export const skins: SkinDef[] = [
       id: 'wagner-sentinela',
       name: 'Sentinela Zero',
       rarity: 'mythic',
-      description: 'Armadura negra de contornos vermelhos, elmo com viseira e uma lança de energia. Nenhum pacote passa.',
+      description: 'Armadura negra em camadas com circuitos vermelhos, capa rasgada, escudo hexagonal de energia e uma espada afiada. Nenhum pacote passa.',
       headgear: true,
       palette: ['#15151b', '#ef4444', '#9aa0aa'],
-      artPrompt: 'sleek black armor with glowing red trim, closed helmet with a red crest, round red shield',
+      artPrompt: 'heavy black plate armor in several layers with glowing red circuit lines, big shoulder plates with a padlock emblem, long dark red cape with a tattered edge, red hexagonal energy shield, black sword with a glowing red edge',
     },
   ]),
   ...make('guto', [
@@ -584,6 +636,15 @@ export const skins: SkinDef[] = [
       artPrompt: 'long cape and a giant drafting compass held like a staff',
     },
     {
+      id: 'b1-keynote',
+      name: 'Keynote',
+      rarity: 'epic',
+      description: 'Gola alta preta, blazer escuro e o clicker na mão. Versão 10.0 anunciada, com direito a "mais uma coisa".',
+      headgear: true,
+      palette: ['#15151b', '#a78bfa', '#f2f2f2'],
+      artPrompt: 'elegant black turtleneck, tailored dark blazer, slim trousers, white sneakers, slide clicker in one hand, other hand open in a presenting gesture, conference badge on a lanyard',
+    },
+    {
       id: 'b1-rainha',
       name: 'Rainha do CSS',
       rarity: 'legendary',
@@ -646,6 +707,14 @@ export const skins: SkinDef[] = [
       artPrompt: 'a navy polo shirt with a staff badge, khaki trousers, a whistle on a cord around the neck, a stopwatch, holding a clipboard with a colorful timetable grid',
     },
     {
+      id: 'angelo-certificado',
+      name: 'Certificado na Mão',
+      rarity: 'rare',
+      description: 'Camisa azul de mangas dobradas e um certificado emoldurado com selo dourado. Todas as horas complementares cumpridas, papelada conferida.',
+      palette: ['#93c5fd', '#374151', '#f5c542'],
+      artPrompt: 'proud student look, light blue shirt with rolled sleeves, dark vest, grey trousers, holding up a framed certificate with a gold seal in both hands',
+    },
+    {
       id: 'angelo-paraninfo',
       name: 'Paraninfo',
       rarity: 'epic',
@@ -679,6 +748,15 @@ export const skins: SkinDef[] = [
       headgear: true,
       palette: ['#b91c1c', '#f5c542', '#f5f5f4'],
       artPrompt: 'royal red velvet robe with white ermine fur trim, golden scepter in hand, ornate golden clasp, dark boots',
+    },
+    {
+      id: 'angelo-ninja',
+      name: 'Ninja',
+      rarity: 'legendary',
+      description: 'Traje índigo de shinobi, faixa vermelha e máscara no rosto. Oito Maestrias no talo e ninguém nunca viu ele estudar.',
+      headgear: true,
+      palette: ['#1e1b4b', '#9f1239', '#9ca3af'],
+      artPrompt: 'dark indigo shinobi outfit with wrapped forearms and shins, dark red sash at the waist, split-toe boots, short straight sword on the back, throwing star in one hand',
     },
     {
       id: 'angelo-chanceler',
@@ -772,10 +850,10 @@ export const skins: SkinDef[] = [
       id: 'pablo-singularidade',
       name: 'A Singularidade',
       rarity: 'mythic',
-      description: 'Manto de céu estrelado com capuz e galáxias nas dobras. O resultado chegou antes da pergunta.',
+      description: 'Manto de espaço sideral com nebulosas e constelações bordadas, um cajado com planeta anelado e um buraco negro na palma da mão. O resultado chegou antes da pergunta.',
       headgear: true,
       palette: ['#0f0a2a', '#8b5cf6', '#e0e7ff'],
-      artPrompt: 'long hooded robe made of a starry night sky with swirling galaxies, glowing violet runes',
+      artPrompt: 'long flowing robe of deep space, black and midnight blue with a purple and teal nebula and tiny stars, golden constellation embroidery, golden orbit-ring belt, tall dark staff topped with a small golden ringed planet, a small black hole with a bright orange swirling ring held in one raised hand',
     },
   ]),
 ];

@@ -297,6 +297,153 @@
   color: var(--scene);
 }
 
+/* Summary of the turma that ended */
+
+.gradsum {
+  display: grid;
+  gap: var(--space-3);
+  width: min(560px, 100%);
+  text-align: left;
+}
+
+.gradsum .scene-kicker {
+  text-align: center;
+}
+
+.gradsum-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.gradsum-facts > div {
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 2px solid var(--border);
+}
+
+.gradsum-wide {
+  grid-column: 1 / -1;
+}
+
+.gradsum dt {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.gradsum dd {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.gradsum dd small {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.gradsum-cap {
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  background: color-mix(in srgb, var(--warn) 22%, var(--bg));
+  border: 2px solid var(--warn);
+}
+
+.gradsum-block {
+  padding: 8px 10px;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  border: 2px solid var(--border);
+}
+
+.gradsum-block h3 {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--scene);
+}
+
+.gradsum-block h3 b {
+  margin-left: 6px;
+  color: var(--text);
+}
+
+.gradsum-sources,
+.gradsum-records {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gradsum-sources li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 3.5em;
+  gap: var(--space-2);
+  padding-bottom: 5px;
+  font-size: 13px;
+}
+
+.gradsum-sources b,
+.gradsum-sources em,
+.gradsum-records b {
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.gradsum-sources em {
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.gradsum-sources i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--scene);
+}
+
+.gradsum-records li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'label value' 'tag tag';
+  gap: 0 var(--space-3);
+  font-size: 13px;
+}
+
+.gradsum-records span {
+  grid-area: label;
+}
+
+.gradsum-records b {
+  grid-area: value;
+}
+
+.gradsum-records em {
+  grid-area: tag;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.gradsum-records li[data-beaten='true'] em {
+  color: var(--scene);
+}
+
 /* Offline report (inside the kit modal) */
 
 .offline {

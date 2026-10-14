@@ -644,6 +644,121 @@ calls.push(
   ...V6_SCENERIES.map((image) => ({ label: image.file.replace('.png', ''), images: [image] })),
 );
 
+// 13) Approved achievement rewards: eight skins, three mythic skins redrawn (Gladimir's becomes a robot,
+//     Wagner's and Pablo's get richer versions of the same idea) and seven sceneries.
+const ALONE = 'Draw ONLY this one body, alone in the middle of the image. Do not draw any other body or copy the bodies of the reference image.';
+const RICH = 'This is the rarest outfit in the game: draw it with rich layered detail, ornate trim, several materials and careful shading, clearly more elaborate than the reference bodies, still readable at a small size. No glow, no aura and no particles outside the outline.';
+const V7_BODIES = [
+  ['edecio-garimpeiro', 'a gold prospector: a worn brown leather vest over a rolled-sleeve plaid shirt, sturdy trousers, muddy boots, a gold pan full of shiny nuggets in one hand and a pickaxe in the other, a small pouch of gold on the belt'],
+  ['gladimir-viajante', 'a time traveller: a long brown leather coat with brass buttons over a waistcoat, a striped scarf, a big brass pocket watch on a chain in one hand and a small glowing blue hourglass in the other, brass gears on the belt'],
+  ['wagner-dedetizador', 'a bug exterminator: a yellow and black hazmat-style jumpsuit, black rubber gloves and boots, a metal spray tank on the back with a hose, holding the spray nozzle, a patch on the chest with a crossed-out bug'],
+  ['b1-keynote', 'a keynote speaker on stage: an elegant black turtleneck, a tailored dark blazer, slim trousers, white sneakers, a slide clicker in one hand, the other hand open in a presenting gesture, a conference badge on a lanyard'],
+  ['angelo-certificado', 'a proud student look: a light blue shirt with rolled sleeves, a dark vest, grey trousers, holding up a framed certificate with a gold seal in both hands'],
+  ['b2-componentes', 'a designer made of interface components: a white outfit with coloured rounded buttons, toggle switches and small cards attached like patches, holding a big purple building block with rounded corners'],
+  ['angelo-ninja', 'a ninja: a dark indigo shinobi outfit with wrapped forearms and shins, a dark red sash at the waist, split-toe boots, a short straight sword on the back and a throwing star in one hand; sleek and serious'],
+  ['gladimir-neyglad', 'a football champion: a bright yellow football jersey with green trim and the number 10, blue shorts, white socks and football boots, a captain armband, holding a golden champions trophy cup above one shoulder with both hands; no logos, no crests, no text other than the number'],
+];
+const V7_MYTHIC = [
+  ['gladimir-robo', 'a friendly ROBOT body, entirely mechanical: a white and light-grey boxy torso with a teal screen on the chest showing a small waveform and three little indicator lights, bright blue ribbed flexible arms and legs, grey mechanical hands and chunky white feet, a blue neck joint; at the top, instead of a neck stub, a short blue mechanical neck connector'],
+  ['wagner-sentinela', 'an elite cyber sentinel: heavy black plate armor in several layers with glowing red circuit lines running through it, big shoulder plates with a padlock emblem, a long dark red cape with a tattered edge, a red hexagonal energy shield on one arm showing a honeycomb pattern, and a black sword with a glowing red edge in the other hand'],
+  ['pablo-singularidade', 'a cosmic archmage: a long flowing robe of deep space, black and midnight blue with a purple and teal nebula and tiny stars in the cloth, golden constellation embroidery on the hems and wide sleeves, a golden orbit-ring belt; one hand holds a tall dark staff topped with a small golden ringed planet, the other hand is raised and holds a BLACK HOLE: a small pure-black sphere surrounded by a bright orange and white swirling ring of light'],
+];
+const v7Heads = {
+  edecio: [['edecio-garimpeiro', 'a battered wide-brim prospector hat with a small pickaxe pin']],
+  gladimir: [
+    ['gladimir-viajante', 'round brass steampunk goggles pushed up on the forehead'],
+    ['gladimir-robo', 'a ROBOT HEAD in place of his head: a white rounded boxy helmet-head with two short bright-blue antennas on top and round grey ear pieces, and a big dark-blue screen on the front that shows HIS OWN FACE drawn in light-blue glowing pixels (the same glasses, the same eyes and calm smile, simplified as a screen picture); no skin and no hair anywhere, the whole head is a machine'],
+  ],
+  wagner: [
+    ['wagner-dedetizador', 'a yellow hazmat hood pulled back behind the head and clear safety goggles pushed up on the forehead'],
+    ['wagner-sentinela', 'an ornate black open-face battle helmet with layered plates, thin glowing red lines, two swept-back fins and a raised red visor, face fully visible'],
+  ],
+  b1: [['b1-keynote', 'a slim headset microphone along the cheek']],
+  angelo: [['angelo-ninja', 'a dark indigo ninja hood and a cloth mask covering the mouth and nose, eyes and eyebrows visible, a thin dark red headband']],
+  pablo: [['pablo-singularidade', 'the deep hood of a robe made of outer space, black with a purple nebula and tiny stars, with a thin golden rim and a small golden star at the peak, hood up, face fully visible']],
+};
+HEAD_VARIANTS.b1 ??= [];
+const headSheet7 = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = v7Heads[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    file: `heads-skin7-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+const V7_SCENERIES = [
+  v6Scenery('panteao', 'trofeus', 'a mythic Greek pantheon hall of white marble with tall fluted columns, eight empty marble pedestals lit by shafts of golden light from an open roof, golden laurel details, drifting clouds seen between the columns, a mystical glow'),
+  v6Scenery('arvore-ancestral', 'jardim', 'a colossal mythological ancient tree filling the background, its trunk as wide as a building with glowing golden runes and hanging lanterns, giant roots arching over a mossy clearing, fireflies and soft light rays through the leaves'),
+  v6Scenery('sala-de-guerra', 'datacenter', 'a cyber security war room: a wall of big screens showing a world network map with red and green nodes and lines, rows of dark consoles with glowing monitors at the sides, red alert lights, cables on the floor edges'),
+  v6Scenery('palco', 'arena', 'a big concert stage seen from the stage itself, with colourful spotlights, speaker towers and a lighting truss at the sides, and a huge cheering crowd with raised hands and phone lights filling the background'),
+  v6Scenery('wall-street', 'cidade', 'a luxurious financial district street by day: tall elegant skyscrapers of glass and stone, a large golden bull statue and a golden statue on a pedestal at the sides, marble pavement, flags without text, golden light'),
+  v6Scenery('sala-dos-monitores', 'laboratorio', 'a big gaming room with four desks along the back wall, each with an extravagant gaming setup: triple monitors, RGB-lit towers, glowing keyboards, big gaming chairs, LED strips on the walls in purple, cyan and pink'),
+  v6Scenery('sala-dos-professores', 'coordenacao', 'a cosy teachers lounge: a big wooden table with coffee mugs and stacks of papers, comfortable armchairs, a coffee machine and a notice board with timetables at the back, bookshelves, a warm afternoon light through a window'),
+];
+calls.push(
+  ...V7_BODIES.map((item) => {
+    const sheet = v4BodySheet(`skins-v7-${item[0]}.png`, [item]);
+    return { label: `skins-v7-${item[0]}`, images: [{ ...sheet, text: `${sheet.text} ${ALONE}` }] };
+  }),
+  ...V7_MYTHIC.map((item) => {
+    const sheet = v4BodySheet(`skins-v7-${item[0]}.png`, [item]);
+    return { label: `skins-v7-${item[0]}`, images: [{ ...sheet, text: `${sheet.text} ${ALONE} ${RICH}` }] };
+  }),
+  ...Object.keys(v7Heads).map((professor) => ({ label: `heads-skin7-${professor}`, images: [headSheet7(professor)] })),
+  ...V7_SCENERIES.map((image) => ({ label: image.file.replace('.png', ''), images: [image] })),
+);
+V6_SCENERIES.push(...V7_SCENERIES);
+
+// 14) Redrawn after the owner's review. These sheets are the only ones that write these ids (see V8_REDRAWN below).
+const V8_BODIES = [
+  ['gladimir-neyglad', 'a football champion: a bright yellow football jersey with green trim and the number 10, blue shorts, white socks with green stripes and black football boots, a captain armband on one arm; ONE hand holds a golden champions trophy cup up at shoulder height, the OTHER arm hangs relaxed at his side with a normal open hand; exactly two arms and two hands, both the same size; no logos, no crests, no text other than the number'],
+];
+const V8_MYTHIC = [
+  ['gladimir-robo', 'a cyborg, half man and half machine, split down the middle: the left half of the body is human in a black leather jacket over a dark t-shirt, dark trousers and a black boot; the right half is chrome machinery with exposed grey metal plates, pistons and cables, a fully mechanical chrome arm and hand with visible joints, a mechanical leg, small cyan lights in the joints; the jacket is torn along the middle where the metal shows through; serious and cool, not comic'],
+];
+const v8Heads = {
+  gladimir: [
+    ['gladimir-robo', 'a CYBORG HEAD split down the middle: the LEFT half is his own normal face and short grey hair, with the left lens of his black rectangular glasses; the RIGHT half is a chrome metal skull with exposed grey plates, rivets and a few cables, no hair and no skin, and a glowing red eye where his right eye would be, with two small cyan lights on the metal; the split line runs straight from the top of the head to the chin; serious, not comic'],
+  ],
+  wagner: [
+    ['wagner-sentinela', 'an ornate black open-face battle helmet with layered plates, thin glowing red lines, two swept-back fins and a raised red visor, face fully visible; his two eyes are identical, symmetric and both clearly drawn the same way'],
+  ],
+  pablo: [
+    ['pablo-singularidade', 'the deep hood of a robe made of outer space, black with a purple nebula and tiny stars, with a thin golden rim along its edge, hood up, face fully visible; the top of the hood is smooth and rounded with nothing on it (no star, no ornament)'],
+  ],
+};
+const headSheet8 = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = v8Heads[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    v8: true,
+    file: `heads-skin8-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+const V8_REDRAWN = new Set([...V8_BODIES, ...V8_MYTHIC].map((i) => i[0]).concat(Object.values(v8Heads).flat().map((i) => i[0])));
+calls.push(
+  ...V8_BODIES.map((item) => {
+    const sheet = v4BodySheet(`skins-v8-${item[0]}.png`, [item]);
+    return { label: `skins-v8-${item[0]}`, images: [{ ...sheet, v8: true, text: `${sheet.text} ${ALONE}` }] };
+  }),
+  ...V8_MYTHIC.map((item) => {
+    const sheet = v4BodySheet(`skins-v8-${item[0]}.png`, [item]);
+    return { label: `skins-v8-${item[0]}`, images: [{ ...sheet, v8: true, text: `${sheet.text} ${ALONE} ${RICH}` }] };
+  }),
+  ...Object.keys(v8Heads).map((professor) => ({ label: `heads-skin8-${professor}`, images: [headSheet8(professor)] })),
+);
+
 // Style references for the sceneries above: a shipped scenery, enlarged.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const ref of new Set(V6_SCENERIES.flatMap((image) => image.refs))) {
@@ -666,6 +781,11 @@ for (const professor of Object.keys(HEAD_VARIANTS)) {
     .flatten({ background: '#ff00ff' })
     .png()
     .toFile(path.join(RAW_DIR, `ref-head-${professor}.png`));
+}
+
+// Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
+for (const c of calls) {
+  for (const im of c.images) if (!im.v8) im.keys = im.keys.map((key) => (V8_REDRAWN.has(key) ? `_${key}` : key));
 }
 
 // ---- write --------------------------------------------------------------------------------

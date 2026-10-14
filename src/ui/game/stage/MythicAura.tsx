@@ -1,6 +1,6 @@
 import { cssVariables } from '@/ui/theme';
 
-/** Position (% of the box), pixel size, delay and duration of each sparkle. Fixed, so the aura never re-rolls. */
+/** Position (% of the box), size in art pixels, delay and duration of each sparkle. Fixed, so the aura never re-rolls. */
 // They sit on the sides and above the professor: one behind the body would never be seen.
 const SPARKLES = [
   { x: 4, y: 16, s: 2, d: 0, t: 2.6 },
@@ -21,12 +21,17 @@ const SPARKLES = [
   { x: 2, y: 34, s: 1, d: 3.1, t: 2.4 },
 ];
 
-/** A banded halo and pixel sparkles around a mythic skin (the hard outline on the sprite itself is in mythic.css). Everything is animation-driven, so reduced motion hides it. */
+/**
+ * The glow around a mythic professor: a banded halo and rising pixel sparkles, the same for every skin. The colours
+ * (--fx, --fx2) and the pixel size (--u) come from the .actor, which also draws the outline on the sprite (mythic.css);
+ * the colour table is in mythicEffects.ts. Sparkles only show while their animation runs, so reduced motion keeps the
+ * still halo and outline.
+ */
 export function MythicAura() {
   return (
     <div className="mythic-aura" aria-hidden="true">
       <span className="mythic-aura-glow" />
-      {SPARKLES.map((spark, index) => (
+      {SPARKLES.filter((_, index) => index % 2 === 0).map((spark, index) => (
         <i
           key={index}
           style={cssVariables({

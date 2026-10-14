@@ -7,7 +7,7 @@ import { createRunStats } from './init';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { masteryRank } from './mastery';
 import { recordGraduationDay } from './session';
-import type { GameState } from './state';
+import type { GameState, RecordKey, RunSummary } from './state';
 import { computeStats, hasFeature } from './stats';
 import type { Stats } from './stats';
 
@@ -106,6 +106,46 @@ export function keptProfessors(state: GameState, content: GameContent): Set<Prof
   return kept;
 }
 
+/** Files the run against the personal bests and moves them. A mark that was not set yet is started, not beaten. */
+function updateRecords(state: GameState): Pick<RunSummary, 'recordsBeaten' | 'recordsStarted'> {
+  const { run, records } = state;
+  const beaten: RecordKey[] = [];
+  const started: RecordKey[] = [];
+  const file = (key: RecordKey, better: boolean, hadMark: boolean) => {
+    if (!better) return;
+    (hadMark ? beaten : started).push(key);
+  };
+  file('fastestSeconds', run.seconds > 0 && (records.fastestSeconds <= 0 || run.seconds < records.fastestSeconds), records.fastestSeconds > 0);
+  file('mostClicks', run.clicks > records.mostClicks, records.mostClicks > 0);
+  file('biggestCombo', run.maxCombo > records.biggestCombo, records.biggestCombo > 0);
+  file('mostCoins', state.runCoins.gt(records.mostCoins), records.mostCoins.gt(0));
+  if (run.seconds > 0 && (records.fastestSeconds <= 0 || run.seconds < records.fastestSeconds)) records.fastestSeconds = run.seconds;
+  records.mostClicks = Math.max(records.mostClicks, run.clicks);
+  records.biggestCombo = Math.max(records.biggestCombo, run.maxCombo);
+  records.mostCoins = Decimal.max(records.mostCoins, state.runCoins);
+  return { recordsBeaten: beaten, recordsStarted: started };
+}
+
+/** Where the coins of the run came from. The classes are what is left, so the parts add up to the total paid. */
+function coinSources(state: GameState): RunSummary['coins'] {
+  const { run } = state;
+  const clicks = Decimal.max(ZERO, run.clickCoins.sub(run.autoClickCoins));
+  const classes = Decimal.max(
+    ZERO,
+    state.runCoins.sub(clicks).sub(run.autoClickCoins).sub(run.eventCoins).sub(run.sprintCoins).sub(run.offlineCoins).sub(run.extraCoins),
+  );
+  return {
+    total: state.runCoins.toString(),
+    classes: classes.toString(),
+    clicks: clicks.toString(),
+    autoClicks: run.autoClickCoins.toString(),
+    events: run.eventCoins.toString(),
+    sprints: run.sprintCoins.toString(),
+    offline: run.offlineCoins.toString(),
+    other: run.extraCoins.toString(),
+  };
+}
+
 /**
  * Graduation: pays diplomas and resets the run. Resets coins, runCoins, levels, research, hires
  * (except the first professor and those kept by prestige nodes), buffs, invasion and streak, sprint,
@@ -126,6 +166,10 @@ export function graduate(
   // The Bolsa is cashed in first: its profit is part of the run, and nothing it holds carries over.
   liquidateBolsa(state, content);
   const diplomas = diplomasForRun(state, content, stats);
+  const cap = diplomaCap(state, content);
+  const worth = diplomasFor(state.runCoins, content, stats);
+  const capped = cap !== null && worth > cap;
+  if (cap !== null && worth >= cap) state.counters.cappedGraduations += 1;
   // Horas complementares: one diploma per band filled, outside the cap.
   const bonus = horasBandsFilled(state, content);
   const index = getIndex(content);
@@ -140,6 +184,15 @@ export function graduate(
     sprintsFailed: state.run.sprintsFailed,
     eventsDefended: state.run.eventsDefended,
     eventsMissed: state.run.eventsMissed,
+    summary: {
+      diplomas: diplomas + bonus,
+      bonus,
+      capped,
+      honoured: state.honoured,
+      maxCombo: state.run.maxCombo,
+      coins: coinSources(state),
+      ...updateRecords(state),
+    },
   };
   state.run = createRunStats();
   state.honoured = honour !== null && state.hired[honour] ? honour : null;

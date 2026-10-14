@@ -6,22 +6,37 @@ import { ComboMeter } from './ComboMeter';
 import { FirstNudge } from './FirstNudge';
 import { GoldenState } from './maestria/GoldenState';
 import { MythicAura } from './MythicAura';
+import { cssVariables } from '@/ui/theme';
+import { mythicEffectOf, mythicStageVariables } from './mythicEffects';
 import { SpeechBubble } from './SpeechBubble';
 
 const floatingSceneries = new Set(content.sceneries.filter((scenery) => scenery.floats).map((scenery) => scenery.id));
 
-/** The professor on stage with what lives around them: speech bubble, combo thermometer and the first hint. */
-export function Actor({ scale }: { scale: number }) {
-  const mythic = useGameState((state) => skinById(state.equippedSkin[state.activeProfessor] ?? '')?.rarity === 'mythic');
+/**
+ * The professor on stage with what lives around them: speech bubble, combo thermometer and the first hint.
+ * On phones the combo and the golden mode live in the dock instead (PhoneDock.tsx). In photo mode only the professor and the mythic aura remain.
+ */
+export function Actor({ scale, photo = false, compact = false }: { scale: number; photo?: boolean; compact?: boolean }) {
+  // The id of the equipped skin when it has an effect of its own (the mythic ones, see mythicEffects.ts).
+  const mythic = useGameState((state) => {
+    if (!state.settings.sceneryEffects) return null;
+    const id = state.equippedSkin[state.activeProfessor] ?? '';
+    return skinById(id)?.rarity === 'mythic' && mythicEffectOf(id) ? id : null;
+  });
   const floating = useGameState((state) => floatingSceneries.has(state.equippedScenery));
   return (
-    <div className="actor" data-floating={floating} data-mythic={mythic}>
+    <div
+      className="actor"
+      data-floating={floating}
+      data-mythic={mythic !== null}
+      style={mythic ? { ...mythicStageVariables(mythic), ...cssVariables({ '--u': String(scale) }) } : undefined}
+    >
       {mythic ? <MythicAura /> : null}
-      <SpeechBubble />
+      {photo ? null : <SpeechBubble />}
       <ClickerButton scale={scale} floating={floating} />
-      <ComboMeter />
-      <GoldenState />
-      <FirstNudge />
+      {photo || compact ? null : <ComboMeter />}
+      {photo || compact ? null : <GoldenState />}
+      {photo ? null : <FirstNudge />}
     </div>
   );
 }

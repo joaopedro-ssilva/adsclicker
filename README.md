@@ -24,10 +24,10 @@ Você começa com o Edécio e um café. Cada clique rende ADScoins, cada aula re
 
 | | |
 | --- | --- |
-| 🎭 **86 skins** | Das comuns às míticas, uma mítica para cada professor |
-| 🏞️ **35 cenários** | Da sala de aula à galáxia, passando pelo cofre de ADScoins |
-| 🎨 **12 temas** | Cores diferentes para a interface |
-| 🏆 **129 conquistas** | Algumas secretas |
+| 🎭 **95 skins** | Das comuns às míticas, uma mítica para cada professor |
+| 🏞️ **42 cenários** | Da sala de aula à galáxia, passando pelo cofre de ADScoins |
+| 🎨 **17 temas** | Cores diferentes para a interface |
+| 🏆 **151 conquistas** | Algumas secretas |
 
 Tudo é liberado jogando. Não há compras.
 

@@ -4,7 +4,7 @@ import { getIndex } from './contentIndex';
 import { ZERO } from './decimal';
 import { createMaestriaState } from './maestria/slots';
 import { SAVE_VERSION } from './state';
-import type { GameState, MonitorsState, RunStats, Settings } from './state';
+import type { GameState, MonitorsState, Records, RunStats, Settings } from './state';
 
 export function createCounters(): Record<CounterKey, number> {
   return {
@@ -26,6 +26,15 @@ export function createCounters(): Record<CounterKey, number> {
     playSeconds: 0,
     offlineCollections: 0,
     cafesBought: 0,
+    goldenModes: 0,
+    rollforwards: 0,
+    tripleRollforwards: 0,
+    swarmsWon: 0,
+    swarmsCleared: 0,
+    festas: 0,
+    bolsaProfitSeconds: 0,
+    designFreeLevels: 0,
+    cappedGraduations: 0,
   };
 }
 
@@ -39,7 +48,17 @@ export function createRunStats(): RunStats {
     sprintsFailed: 0,
     eventsDefended: 0,
     eventsMissed: 0,
+    maxCombo: 0,
+    autoClickCoins: ZERO,
+    eventCoins: ZERO,
+    sprintCoins: ZERO,
+    offlineCoins: ZERO,
+    extraCoins: ZERO,
   };
+}
+
+export function createRecords(): Records {
+  return { fastestSeconds: 0, mostClicks: 0, biggestCombo: 0, mostCoins: ZERO };
 }
 
 export function createMonitorsState(): MonitorsState {
@@ -54,8 +73,10 @@ export function defaultSettings(): Settings {
     musicVolume: 0.35,
     muted: false,
     musicEnabled: false,
+    clickSound: true,
     reducedMotion: 'system',
     floatingNumbers: true,
+    sceneryEffects: true,
     devMultiplier: 1,
   };
 }
@@ -100,6 +121,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     equippedScenery: index.defaultScenery,
     themes: index.defaultTheme ? { [index.defaultTheme]: true } : {},
     equippedTheme: index.defaultTheme,
+    favourites: {},
 
     combo: { steps: 0, lastClickAt: 0 },
     autoClickCarry: 0,
@@ -114,6 +136,7 @@ export function createInitialState(content: GameContent, now: number): GameState
 
     run: createRunStats(),
     lastRun: null,
+    records: createRecords(),
     honoured: null,
     honouredBefore: {},
     abilitiesTried: {},

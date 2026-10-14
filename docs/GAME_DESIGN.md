@@ -69,7 +69,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ### Conforto e temas (Bruna B2)
 - Libera compra em lote. Pesquisas dão `costMult` (descontos) e aumentam duração de buffs e janelas de evento.
-- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 12 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques), Ouro (Mestre dos Mestres), Prata (Vitrine Cheia, 25 conquistas), Platina (Parede de Troféus, 50 conquistas) e Holográfico (Álbum Completo). Liberados por conquistas.
+- Temas da HUD: só cores (fundo, superfícies, bordas, texto). 17 temas: padrão escuro, claro, alto contraste, terminal verde, pastel, Floresta (Raízes Fundas), Roxo (Observador Paciente), Vermelho (Meio Caminho Andado, 50 mil cliques), Ouro (Mestre dos Mestres), Prata (Vitrine Cheia, 25 conquistas), Platina (Parede de Troféus, 50 conquistas), Holográfico (Álbum Completo), Grego (Volta ao Mundo), Arco-íris (Paleta Infinita, com brilho de vidro líquido), Fita Magnética (Carga Tripla), Pregão (Carteira Diversificada) e Vidro (Teto de Vidro). Liberados por conquistas.
 
 ### Invasões (Wagner)
 - A cada 75 a 150 s (× `eventInterval`) surge uma ameaça numa posição aleatória do palco. Ela some depois de `windowMs` (× `eventWindow`). O jogador precisa clicar `clicksRequired` vezes nela.
@@ -87,7 +87,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 - Sinergia: cada disciplina ganha `synergy` (base 5%) por cada outro professor contratado. Pesquisas aumentam.
 - **Formatura** (prestígio): disponível com o Angelo contratado. `diplomas = floor((runCoins / base)^exponent × diplomaGain)`, com `base = 2e19` e `exponent = 0.5`: a primeira formatura de um jogador ativo (cerca de 2 h 45) rende uns 10 diplomas, e cada formatura seguinte exige 4× mais ADScoins da corrida para dobrar os diplomas dela. Só pode formar se ganhar pelo menos 1. **Limite por corrida**: uma formatura paga no máximo `10 × 1,3^formaturas já feitas` diplomas (10, 13, 16, 21, 27...); ADScoins além disso não rendem diploma, então esperar não compensa. A aba Formatura mostra "n/limite diplomas desta turma". O bônus de produção dos diplomas (+1% cada) para em +100%, e a aba mostra esse valor, não o produto bruto. Constantes em `balance.graduation.cap`; as turmas do simulador (ativo) vão de 2 h 26 na primeira a ~20 min na 12ª.
 - Zera: moedas, `runCoins`, níveis, pesquisas, contratações (menos Edécio e os mantidos por nós de prestígio), buffs, invasão, sprint, combo, recargas.
-- Mantém: diplomas, árvore, conquistas, skins, cenários, temas, contadores, configurações.
+- Mantém: diplomas, árvore, conquistas, skins, cenários, temas, contadores, configurações (incluindo "Efeitos do cenário", que liga e desliga as partículas dos cenários e o brilho das skins míticas; ligado por padrão).
 - **Árvore de prestígio**: ~20 nós em 4 ramos — `core` (tronco: produção global, manter professores, ganho de diplomas), `click`, `idle`, `events`. Nós têm nível máximo e custo crescente (1 a 30 diplomas no primeiro nível, dobrando a cada nível; a árvore inteira custa ~1.900 diplomas, algo como 12 formaturas).
 
 ### Domínio (todos os professores)
@@ -146,7 +146,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 ## 5. Conquistas
 
-~129. Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
+151 (22 delas ligadas às Maestrias, aos Monitores e à coleção: Panteão, Volta ao Mundo, Paleta Infinita, Cem por Cento, Platina e outras). Cada conquista dá +1% de produção global. Algumas dão skin, cenário ou tema.
 
 | Família | Quantas | Exemplos |
 | --- | --- | --- |
@@ -161,7 +161,7 @@ Escala sugerida das 24 disciplinas na ordem de contratação (o simulador ajusta
 
 Gatilhos secretos que a UI dispara com `triggerSecret(id)`: `logo-clicks` (clicar 10× no logo), `konami` (código Konami), `night-owl` (jogar entre 3h e 5h), `swap-spree` (trocar de professor 20× em 1 minuto), `idle-watcher` (1 minuto sem clicar com o jogo aberto), `joinha` (digitar "muito legal"), `friday-deploy` (jogar numa sexta às 17:59), `error-404` (saldo exato de 404 ADScoins inteiras), `wallpaper` (5 minutos com o painel lateral escondido), `fitting-room` (10 trocas de skin em 1 minuto), `lettuce-hands` (vender com prejuízo na Bolsa) e `hands-off` (disparar a Super invasão sem derrotar nenhum bug na mão). Os outros secretos usam condições normais.
 
-Conquistas novas que olham a turma inteira (Sem Mouse, O(1), Turma Enxuta, Só no Clique, Semestre Perfeito) são julgadas no instante da Formatura, sobre os números da turma que acabou (`state.run`, guardado em `lastRun`). "Turma Enxuta" conta professores com níveis comprados (o Angelo exige os 6 anteriores contratados, então "contratar poucos" seria impossível). "Só no Clique" pede 70% das ADScoins da turma vindas de cliques, manuais ou automáticos. "Sem Mouse" só é possível com cliques automáticos, que não contam como cliques. "Mateada" conta tempo de sessão apenas enquanto o jogador age (deixar a aba aberta não vale). "Set Fechado" e "Sequência de Sete" usam o dia do relógio local do jogador.
+Conquistas novas que olham a turma inteira (Sem Mouse, O(1), Turma Enxuta, Só no Clique, Semestre Perfeito) são julgadas no instante da Formatura, sobre os números da turma que acabou (`state.run`, guardado em `lastRun`). "Turma Enxuta" conta professores com níveis comprados (o Angelo exige os 6 anteriores contratados, então "contratar poucos" seria impossível). "Só no Clique" pede 70% das ADScoins da turma vindas de cliques, manuais ou automáticos. "Sem Mouse" só é possível com cliques automáticos, que não contam como cliques. "Festa de Arromba" pede 10 Festas de lançamento no total (o id continua `festa-25`) e "Carga Horária Cumprida" pede 3 faixas das Horas complementares numa mesma turma (o id continua `horas-full`). "Mateada" conta tempo de sessão apenas enquanto o jogador age (deixar a aba aberta não vale). "Set Fechado" e "Sequência de Sete" usam o dia do relógio local do jogador.
 
 Raridades de skin: comum, rara, épica, lendária e **mítica**, a mais alta. Há uma mítica por professor, sempre a recompensa da maior façanha de cada linha (Um Milhão de Joinhas, Domínio no máximo do Gladimir, todas as épicas, 50 invasões seguidas, 1.000 habilidades, Semestre Perfeito, 25 Formaturas, Formatura em menos de 3 minutos). No palco, uma skin mítica ganha brilho rosa e faíscas de pixel (desligados com "reduzir movimento"); no Álbum, moldura dupla própria.
 
@@ -173,7 +173,7 @@ Pixel art caricato: corpo pequeno, cabeça grande. **Corpo e cabeça são camada
 
 Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `heads/<skinId>.png` (cabeça com acessório), `sceneries/<sceneryId>.png`. Skin id = `<professor>-<slug>`.
 
-### Skins (86)
+### Skins (95)
 
 | Professor | id | Nome | Raridade | Roupa | Chapéu |
 | --- | --- | --- | --- | --- | --- |
@@ -203,7 +203,16 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | gladimir | `gladimir-explorador` | Registro Não Encontrado | rare | colete de explorador, mapa aberto e lupa (Erro 404) | |
 | gladimir | `gladimir-guardiao` | Guardião do Backup | epic | armadura e escudo em forma de disquete | elmo |
 | gladimir | `gladimir-drone` | Piloto Automático | epic | camisa cinza, controle e drone |  |
-| gladimir | `gladimir-arquivista` | Arquivista Eterno | mythic | manto azul com runas de dados e tomo luminoso | capuz de luz |
+| gladimir | `gladimir-arquivista` | Arquivista Eterno | legendary | manto azul com runas de dados e tomo luminoso | capuz de luz |
+| gladimir | `gladimir-viajante` | Viajante do Tempo | epic | casaco de couro, cachecol listrado e relógio de bolso | óculos de latão |
+| gladimir | `gladimir-neyglad` | NeyGlad | legendary | camisa amarela número 10 e taça de campeão | |
+| gladimir | `gladimir-robo` | Gladbot | mythic | corpo de robô com o rosto dele na tela | cabeça de robô |
+| edecio | `edecio-garimpeiro` | Garimpeiro | epic | colete de couro, bateia e picareta | chapéu de garimpeiro |
+| b2 | `b2-componentes` | Biblioteca de Componentes | rare | roupa branca com botões e cartões encaixados | |
+| wagner | `wagner-dedetizador` | Dedetizador | epic | macacão amarelo e tanque de veneno | capuz e óculos |
+| b1 | `b1-keynote` | Keynote | epic | gola alta preta, blazer e clicker | headset |
+| angelo | `angelo-certificado` | Certificado na Mão | rare | camisa azul e certificado emoldurado | |
+| angelo | `angelo-ninja` | Ninja | legendary | traje índigo de shinobi e faixa vermelha | capuz e máscara |
 | b2 | `b2-default` | Blazer Rosa | common (padrão) | blazer rosa, camiseta branca, calça preta | |
 | b2 | `b2-postit` | Mural de Post-its | common | roupa coberta de post-its coloridos, caneta na mão | |
 | b2 | `b2-wireframe` | Wireframe | rare | roupa cinza com caixas e X de wireframe | |
@@ -263,7 +272,7 @@ Arquivos em `public/assets/`: `skins/<skinId>.png`, `heads/<professorId>.png`, `
 | pablo | `pablo-sensei` | Sensei dos Oito | legendary | quimono branco e dourado, faixa preta com 8 listras e 8 medalhões das Maestrias, pergaminho | bandana vermelha de pontas longas |
 | pablo | `pablo-singularidade` | A Singularidade | mythic | manto de céu estrelado com galáxias | capuz |
 
-### Cenários (35)
+### Cenários (42)
 
 | id | Nome | Ambiente | Cena |
 | --- | --- | --- | --- |

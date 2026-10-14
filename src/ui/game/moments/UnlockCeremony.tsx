@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { fx } from '@/ui/fx';
 import { Button, RarityBadge } from '@/ui/kit';
 import { useMediaQuery } from '@/ui/useMediaQuery';
+import { mythicEffectOf } from '../stage/mythicEffects';
 import { equipUnlock } from './equipUnlock';
 import type { UnlockMoment } from './momentsStore';
 import { SceneOverlay } from './SceneOverlay';
@@ -24,7 +25,7 @@ export function UnlockCeremony({ moment, onClose }: UnlockCeremonyProps) {
   const subject = unlockSubject(moment);
   const narrow = useMediaQuery('(max-width: 640px)');
   const legendary = moment.rarity === 'legendary' || moment.rarity === 'mythic';
-  const color = RARITY_COLOR[moment.rarity];
+  const color = (subject?.item === 'skin' ? mythicEffectOf(subject.def.id)?.color : undefined) ?? RARITY_COLOR[moment.rarity];
 
   useEffect(() => {
     const w = window.innerWidth;

@@ -109,6 +109,50 @@ export interface RunStats {
   sprintsFailed: number;
   eventsDefended: number;
   eventsMissed: number;
+  /** Highest combo step reached in the run. */
+  maxCombo: number;
+  /**
+   * Where the run's coins came from, besides clickCoins (which also holds the automatic clicks). The coins of the
+   * classes are what is left of runCoins, so the parts always add up to what the game paid.
+   */
+  autoClickCoins: Decimal;
+  /** Rewards of invasions and swarms. */
+  eventCoins: Decimal;
+  sprintCoins: Decimal;
+  offlineCoins: Decimal;
+  /** Bolsa profit and Rollforward jumps. */
+  extraCoins: Decimal;
+}
+
+/** The personal bests, over every graduation. Zero = not set yet. */
+export interface Records {
+  /** Seconds of the fastest run that ended in a graduation. */
+  fastestSeconds: number;
+  mostClicks: number;
+  biggestCombo: number;
+  /** Most coins earned in one run. */
+  mostCoins: Decimal;
+}
+
+export type RecordKey = keyof Records;
+export const RECORD_KEYS: readonly RecordKey[] = ['fastestSeconds', 'mostClicks', 'biggestCombo', 'mostCoins'];
+
+/** The summary of the run a graduation closed, shown by the graduation scene. Coins are Decimal strings. */
+export interface RunSummary {
+  /** Diplomas the graduation paid, Horas complementares included. */
+  diplomas: number;
+  /** Of those, the ones paid by Horas complementares, outside the cap. */
+  bonus: number;
+  /** The run was worth more diplomas than the cap allowed. */
+  capped: boolean;
+  /** The honoured professor of the run that ended. */
+  honoured: ProfessorId | null;
+  maxCombo: number;
+  coins: { total: string; classes: string; clicks: string; autoClicks: string; events: string; sprints: string; offline: string; other: string };
+  /** Records this run beat (there was a mark before). */
+  recordsBeaten: RecordKey[];
+  /** Records that had no mark and were set by this run. */
+  recordsStarted: RecordKey[];
 }
 
 /** What the run closed by the latest graduation looked like, for the achievements that judge a whole run. */
@@ -123,6 +167,8 @@ export interface LastRun {
   sprintsFailed: number;
   eventsDefended: number;
   eventsMissed: number;
+  /** Missing in the saves of before the summary existed. */
+  summary?: RunSummary;
 }
 
 export interface Settings {
@@ -132,8 +178,12 @@ export interface Settings {
   musicVolume: number;
   muted: boolean;
   musicEnabled: boolean;
+  /** The sound of clicking the professor (crit and golden clicks included). Every other effect is unaffected. */
+  clickSound: boolean;
   reducedMotion: 'system' | 'on' | 'off';
   floatingNumbers: boolean;
+  /** Ambient particles of the sceneries and the glow of mythic skins. The scenery image and the professor stay either way. */
+  sceneryEffects: boolean;
   /**
    * Admin/dev knob: multiplies every source of coins. 1 in normal play.
    * Set from the /admin page for demos and quick progression tests.
@@ -183,6 +233,8 @@ export interface GameState {
   equippedScenery: string;
   themes: Record<string, boolean>;
   equippedTheme: string;
+  /** Starred cosmetics, keyed "skin:<id>", "scenery:<id>" or "theme:<id>" (see favourites.ts). Cosmetic only. */
+  favourites: Record<string, boolean>;
 
   // Click layer
   combo: { steps: number; lastClickAt: number };
@@ -215,6 +267,8 @@ export interface GameState {
 
   run: RunStats;
   lastRun: LastRun | null;
+  /** Personal bests. */
+  records: Records;
 
   /** Honoured professor of the current run, picked at the last graduation. */
   honoured: ProfessorId | null;

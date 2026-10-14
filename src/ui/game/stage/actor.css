@@ -243,7 +243,7 @@
 }
 
 /* Compact stage */
-@container stage (max-width: 639px) {
+.stage-root[data-compact='true'] {
   .actor {
     bottom: 6px;
   }
@@ -252,42 +252,6 @@
     max-width: 210px;
     padding: 6px 10px;
     font-size: 12px;
-  }
-
-  /* Right of the professor: the left column belongs to the sprint card and the buffs. */
-  .combo-slot {
-    right: auto;
-    left: calc(100% + 8px);
-    bottom: 6%;
-  }
-
-  .combo {
-    min-width: 0;
-    padding: 5px 6px 4px;
-    gap: 4px;
-  }
-
-  .combo-multiplier {
-    font-size: 15px;
-  }
-
-  .combo-cells {
-    width: 20px;
-    padding: 2px;
-    gap: 2px;
-  }
-
-  /* Every other cell: the thermometer stays short enough to fit beside the professor. */
-  .combo-cells i {
-    height: 6px;
-  }
-
-  .combo-cells i:nth-child(even) {
-    display: none;
-  }
-
-  .combo-label {
-    font-size: 8px;
   }
 
   .nudge {

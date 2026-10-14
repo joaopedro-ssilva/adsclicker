@@ -172,6 +172,13 @@
   transform: scale(0.8);
 }
 
+/* Keys are for the keyboard: a touch screen has no use for the hint. */
+@media (pointer: coarse) {
+  .ability-key {
+    display: none;
+  }
+}
+
 .ability[data-state='ready'] {
   border-color: var(--accent);
   animation: ability-ready 1.2s steps(2) infinite;
@@ -528,102 +535,8 @@
   }
 }
 
-/* Compact stage */
-@container stage (max-width: 639px) {
-  /* Narrow column on the left: it must never reach the professor in the middle. */
-  .stage-left {
-    left: var(--space-2);
-    width: 116px;
-    gap: var(--space-2);
-  }
-
-  .buffs {
-    gap: 4px;
-  }
-
-  .buff {
-    padding: 3px 6px 6px;
-  }
-
-  .buff-name {
-    display: none;
-  }
-
-  .sprint-head {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 2px var(--space-2);
-  }
-
-  .sprint-head .sprint-sub,
-  .sprint-reward {
-    display: none;
-  }
-
-  .sprint-time {
-    grid-column: 1 / -1;
-  }
-
-  .sprint-title {
-    font-size: 12px;
-  }
-
-  .sprint-toggle .sprint-title {
-    font-size: 9px;
-  }
-
-  .sprint-slot {
-    position: relative;
-  }
-
-  /* Opened by the player: the list floats over the stage instead of pushing everything down. */
-  .sprint-offers[data-open='true'] ul {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 6px);
-    z-index: 6;
-    width: min(300px, calc(100cqw - 16px));
-    padding: var(--space-2);
-    background: var(--surface);
-    border: 2px solid var(--border);
-    box-shadow: var(--shadow);
-  }
-
-  .stage-right {
-    right: var(--space-2);
-  }
-
-  .abilities {
-    gap: var(--space-2);
-  }
-
-  .ability {
-    display: grid;
-    grid-template-columns: auto;
-    grid-template-areas:
-      'ring'
-      'caption';
-    justify-items: center;
-    width: 64px;
-    padding: 4px;
-    row-gap: 0;
-  }
-
-  .ability-name {
-    display: none;
-  }
-
-  .ability .ui-meter {
-    --meter-size: 48px;
-  }
-
-  .ability-caption {
-    font-size: 9px;
-  }
-
-  .sprint {
-    padding: var(--space-2);
-  }
-
+/* Compact stage: the sprint, buffs and abilities live in the phone dock (PhoneDock.tsx, phone.css). */
+.stage-root[data-compact='true'] {
   .invasion-body {
     width: 80px;
     height: 80px;

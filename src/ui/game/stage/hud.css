@@ -100,10 +100,71 @@
 }
 
 .stage-tools {
+  position: relative;
   grid-area: tools;
   justify-self: end;
   display: flex;
-  gap: var(--space-2);
+  gap: 6px;
+}
+
+/* Wide stage: the five tools in one row. The "mais" button only exists on narrow stages. */
+.tools-extra {
+  display: contents;
+}
+
+.tool-wrap.tools-more {
+  display: none;
+}
+
+.tool-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Something new in the Jornal: a small dot on the corner of the button. */
+.tool-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--bad);
+  border: 2px solid var(--bg);
+  pointer-events: none;
+}
+
+/* Photo mode: the way out is a small eye in the corner. It fades after a few seconds without input. */
+.photo-exit {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  z-index: 3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms;
+}
+
+.photo-exit[data-awake='true'],
+.photo-exit:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-exit {
+    transition: none;
+  }
+}
+
+/* Photo mode keeps the three rows of the stage: the hidden header and roster take the room they had. */
+.photo-ghost {
+  display: contents;
+  visibility: hidden;
+}
+
+/* Photo mode: no shade at the top (there is no HUD to read) and a lighter one at the bottom, so the floor keeps its depth. */
+.stage-ui[data-photo='on']::before {
+  background: linear-gradient(transparent 62%, rgb(5 7 13 / 0.38));
 }
 
 /* Balance */
@@ -175,12 +236,11 @@
 }
 
 /* Narrow stage (phones, and split screens): one row with logo, balance and tools. */
-@container stage (max-width: 639px) {
+.stage-root[data-compact='true'] {
   .stage-head {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: 'logo balance tools';
-    /* At the top: the tools stack three buttons high, and a balance centred on them would sit on the professor's face. */
-    align-items: start;
+    align-items: center;
     column-gap: var(--space-2);
     padding: var(--space-2) var(--space-2) 0;
   }
@@ -201,9 +261,31 @@
     display: block;
   }
 
-  .stage-tools {
-    flex-direction: column;
+  /* Two buttons: the sound and "mais", which opens the rest in a row under them. Every one is at least 40 px. */
+  .stage-tools .ui-icon-button[data-size] {
+    width: 40px;
+    min-height: 40px;
+  }
+
+  .tool-wrap.tools-more {
+    display: inline-flex;
+  }
+
+  .tools-extra {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 4;
+    display: none;
     gap: 6px;
+    padding: 4px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    border: 2px solid var(--border);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+  }
+
+  .stage-tools[data-open='true'] .tools-extra {
+    display: flex;
   }
 
   .balance {
@@ -228,9 +310,11 @@
   }
 
   .balance-rates {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 0 var(--space-2);
     font-size: 10px;
+  }
+
+  .balance-rates span {
+    white-space: nowrap;
   }
 }

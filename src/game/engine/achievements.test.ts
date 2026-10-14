@@ -202,7 +202,7 @@ describe('progress', () => {
     g.state.counters.clicks = 10;
     check(g, T0 + 77);
     const view = achievementViews(g.state, g.content).find((v) => v.id === 'a-clicks')!;
-    expect(view).toEqual({ id: 'a-clicks', unlocked: true, unlockedAt: T0 + 77, progress: 1 });
+    expect(view).toMatchObject({ id: 'a-clicks', unlocked: true, unlockedAt: T0 + 77, progress: 1 });
     const locked = achievementViews(g.state, g.content).find((v) => v.id === 'a-diplomas')!;
     expect(locked).toMatchObject({ unlocked: false, unlockedAt: null });
   });

@@ -1,5 +1,6 @@
-/* Mythic skins: a slow glow and pixel sparkles behind the professor. Every layer is hidden until its animation runs,
-   so reduced motion (which cancels animations) shows none of it. */
+/* Mythic skins: a banded halo and pixel sparkles behind the professor and a hard outline on the sprite, the same for
+   every skin. The colours come from mythicEffects.ts as --fx (main) and --fx2 (accent) on the .actor; --u is the size of
+   one art pixel, so everything follows the size of the professor, in the game and in photo mode. */
 
 .mythic-aura {
   position: absolute;
@@ -11,61 +12,59 @@
 .mythic-aura-glow {
   position: absolute;
   inset: 0;
-  opacity: 0;
-  /* Hard colour bands, not a soft blur: the halo reads as pixel art and stays visible on any scenery. */
+  /* Hard colour bands, not a soft blur: the halo reads as pixel art and stays visible on any scenery. A pale core in the accent colour. */
   background: radial-gradient(
     ellipse at 50% 55%,
-    color-mix(in srgb, var(--mythic) 62%, transparent) 0 30%,
-    color-mix(in srgb, var(--mythic) 40%, transparent) 30% 44%,
-    color-mix(in srgb, var(--mythic) 22%, transparent) 44% 56%,
-    color-mix(in srgb, var(--mythic) 10%, transparent) 56% 66%,
+    color-mix(in srgb, var(--fx2) 22%, transparent) 0 14%,
+    color-mix(in srgb, var(--fx) 30%, transparent) 14% 30%,
+    color-mix(in srgb, var(--fx) 18%, transparent) 30% 43%,
+    color-mix(in srgb, var(--fx) 9%, transparent) 43% 55%,
+    color-mix(in srgb, var(--fx) 4%, transparent) 55% 66%,
     transparent 66%
   );
-  animation: mythic-glow 3.2s steps(6) infinite;
+  opacity: 0.6;
+  animation: mythic-glow 3.2s steps(4) infinite;
 }
 
 .mythic-aura i {
+  --arm: calc(var(--s) * var(--u, 3) * 0.9px);
   position: absolute;
   left: var(--x);
   bottom: var(--y);
-  width: calc(var(--s) * 4px);
-  height: calc(var(--s) * 4px);
-  color: var(--mythic);
+  width: var(--arm);
+  height: var(--arm);
   /* A white core with coloured arms and a dark edge, so a sparkle shows on light and dark sceneries alike. */
   background: #fff;
-  outline: 2px solid rgb(20 8 24 / 0.55);
   box-shadow:
-    calc(var(--s) * 4px) 0 currentcolor,
-    calc(var(--s) * -4px) 0 currentcolor,
-    0 calc(var(--s) * 4px) currentcolor,
-    0 calc(var(--s) * -4px) currentcolor;
+    var(--arm) 0 var(--fx),
+    calc(var(--arm) * -1) 0 var(--fx),
+    0 var(--arm) var(--fx),
+    0 calc(var(--arm) * -1) var(--fx);
+  filter: drop-shadow(1px 0 0 rgb(20 8 24 / 0.7)) drop-shadow(-1px 0 0 rgb(20 8 24 / 0.7)) drop-shadow(0 1px 0 rgb(20 8 24 / 0.7))
+    drop-shadow(0 -1px 0 rgb(20 8 24 / 0.7));
   opacity: 0;
   animation: mythic-spark var(--t) steps(8) var(--d) infinite;
 }
 
 .mythic-aura i:nth-of-type(3n) {
-  color: #fff4c2;
-}
-
-.mythic-aura i:nth-of-type(4n + 1) {
-  color: #ffd1e6;
+  box-shadow:
+    var(--arm) 0 var(--fx2),
+    calc(var(--arm) * -1) 0 var(--fx2),
+    0 var(--arm) var(--fx2),
+    0 calc(var(--arm) * -1) var(--fx2);
 }
 
 @keyframes mythic-glow {
   0%,
   100% {
-    opacity: 0.6;
+    opacity: 0.7;
+    transform: scale(0.97);
   }
 
   50% {
     opacity: 1;
+    transform: scale(1.03);
   }
-}
-
-/* A hard two-pixel outline in the mythic colour, hugging the sprite. */
-.actor[data-mythic='true'] .character-squash {
-  filter: drop-shadow(3px 0 0 var(--mythic)) drop-shadow(-3px 0 0 var(--mythic)) drop-shadow(0 3px 0 var(--mythic))
-    drop-shadow(0 -3px 0 var(--mythic)) drop-shadow(0 0 0 #fff);
 }
 
 @keyframes mythic-spark {
@@ -75,38 +74,25 @@
   }
 
   25% {
-    opacity: 1;
-    transform: translateY(-6px) scale(1);
+    opacity: 0.6;
+    transform: translateY(calc(var(--u, 3) * -2px)) scale(1);
   }
 
   70% {
-    opacity: 1;
-    transform: translateY(-16px) scale(0.8);
+    opacity: 0.5;
+    transform: translateY(calc(var(--u, 3) * -5px)) scale(0.8);
   }
 
   100% {
     opacity: 0;
-    transform: translateY(-22px) scale(0.3);
+    transform: translateY(calc(var(--u, 3) * -7px)) scale(0.3);
   }
 }
 
-/* Sceneries without a floor (Galáxia): the professor hovers in slow whole-pixel steps. */
+/* A thin, half-transparent outline in the mythic colour: the sprite reads first, the effect is a soft accent. */
+.actor[data-mythic='true'] .character-squash {
+  --edge: color-mix(in srgb, var(--fx) 55%, transparent);
 
-.actor[data-floating='true'] {
-  bottom: 48px;
-}
-
-.clicker[data-floating='true'] {
-  animation: actor-hover 4.8s steps(8) infinite;
-}
-
-@keyframes actor-hover {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-12px);
-  }
+  filter: drop-shadow(1px 0 0 var(--edge)) drop-shadow(-1px 0 0 var(--edge)) drop-shadow(0 1px 0 var(--edge))
+    drop-shadow(0 -1px 0 var(--edge));
 }

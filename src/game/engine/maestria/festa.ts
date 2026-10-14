@@ -50,6 +50,7 @@ export function startFesta(state: GameState, content: GameContent, now: number, 
   const buff = cfg.buffs[Math.min(cfg.buffs.length, level) - 1];
   if (!buff) return false;
   state.maestria.festa.since = now;
+  state.counters.festas += 1;
   state.buffs = state.buffs.filter((entry) => !entry.id.startsWith(FESTA_BUFF_PREFIX));
   state.buffs.push({
     id: buff.id,

@@ -5,13 +5,6 @@
   right: var(--space-4);
 }
 
-@container stage (max-width: 639px) {
-  .maestria-dock-right {
-    left: auto;
-    right: var(--space-1);
-  }
-}
-
 /* B1: the current version, under the sprint card */
 
 .release-tag {
@@ -34,12 +27,6 @@
 .release-tag small {
   color: var(--text-muted);
   font-size: 10px;
-}
-
-@container stage (max-width: 639px) {
-  .release-tag small {
-    display: none;
-  }
 }
 
 /* Guto: the party. Lights over the stage and a banner; both stay still with reduced motion. */

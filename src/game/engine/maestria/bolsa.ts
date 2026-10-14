@@ -152,6 +152,7 @@ function sellFrom(state: GameState, content: GameContent, holding: BolsaHolding,
 
   let payout = value;
   let capped = false;
+  let paidSeconds = 0;
   if (value.gt(costPart)) {
     const bolsa = state.maestria.bolsa;
     const cps = steadyCoinsPerSecond(state, content);
@@ -159,6 +160,8 @@ function sellFrom(state: GameState, content: GameContent, holding: BolsaHolding,
     const seconds = Math.min(bolsa.liquidity, wanted);
     capped = seconds < wanted;
     bolsa.liquidity -= seconds;
+    // With no production nothing was paid, so no seconds count either.
+    if (cps.gt(0)) paidSeconds = seconds;
     payout = costPart.add(cps.mul(seconds));
   }
   holding.units = whole ? ZERO : holding.units.sub(units);
@@ -169,6 +172,8 @@ function sellFrom(state: GameState, content: GameContent, holding: BolsaHolding,
   // Only the profit is new money: the principal was already counted when it was first earned.
   state.runCoins = state.runCoins.add(profit);
   state.lifetimeCoins = state.lifetimeCoins.add(profit);
+  state.run.extraCoins = state.run.extraCoins.add(profit);
+  state.counters.bolsaProfitSeconds += paidSeconds;
   return { payout, profit, capped };
 }
 

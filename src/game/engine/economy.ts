@@ -117,9 +117,18 @@ export function clickValueWith(
   return value;
 }
 
-/** Credits coins to the wallet, the run and the lifetime total, and to a running earn-seconds sprint. */
-export function gain(state: GameState, amount: Decimal): void {
+/** Where a gain that is not production or a click came from, for the run summary. */
+export type CoinSource = 'events' | 'sprints' | 'offline';
+
+/**
+ * Credits coins to the wallet, the run and the lifetime total, and to a running earn-seconds sprint.
+ * `source` files the coins under their kind in the run stats (untagged coins are the classes and the clicks).
+ */
+export function gain(state: GameState, amount: Decimal, source?: CoinSource): void {
   if (amount.lte(0)) return;
+  if (source === 'events') state.run.eventCoins = state.run.eventCoins.add(amount);
+  else if (source === 'sprints') state.run.sprintCoins = state.run.sprintCoins.add(amount);
+  else if (source === 'offline') state.run.offlineCoins = state.run.offlineCoins.add(amount);
   state.coins = state.coins.add(amount);
   state.runCoins = state.runCoins.add(amount);
   state.lifetimeCoins = state.lifetimeCoins.add(amount);

@@ -43,6 +43,13 @@
       "when": 1791841463947,
       "tag": "0005_player_trusted",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791946769781,
+      "tag": "0006_platinado_tag",
+      "breakpoints": true
     }
   ]
 }

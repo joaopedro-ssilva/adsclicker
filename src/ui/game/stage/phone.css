@@ -1,0 +1,332 @@
+/*
+ * The phone stage (a stage narrower than 640 px, see useStageScale and PhoneDock.tsx).
+ * Nothing floats beside the professor: under him sit a thin combo bar, one row of tools and the one professor row.
+ * The sprint card, the release tag and the buffs fold into one chip, the four Maestrias into one button; both open a
+ * tray over the stage and close again on any tap outside. Every target is at least 40 px.
+ */
+
+.stage-root[data-compact='true'] {
+  /* The one column may not grow with the header: a long balance would push the tools off the screen. */
+  .stage-ui {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .phone-dock {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+
+  /* Combo and golden mode: one thin bar */
+
+  .phone-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 var(--space-2);
+  }
+
+  .phone-status .combo-slot {
+    position: static;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .phone-status .combo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    padding: 3px 8px;
+    box-shadow: 2px 2px 0 var(--shadow-color);
+  }
+
+  .phone-status .combo-multiplier {
+    flex: none;
+    font-size: 14px;
+  }
+
+  .phone-status .combo-cells {
+    flex: 1 1 auto;
+    flex-direction: row;
+    gap: 2px;
+    width: auto;
+    min-width: 0;
+    padding: 2px;
+  }
+
+  .phone-status .combo-cells i {
+    flex: 1 1 0;
+    height: 8px;
+  }
+
+  .phone-status .combo-label {
+    flex: none;
+    white-space: nowrap;
+  }
+
+  .phone-status .golden-slot {
+    position: static;
+    flex: none;
+    width: auto;
+    margin: 0;
+    pointer-events: auto;
+  }
+
+  .phone-status .golden {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 3px 8px;
+    box-shadow: 2px 2px 0 var(--shadow-color);
+  }
+
+  .phone-status .golden-title {
+    display: none;
+  }
+
+  .phone-status .golden-bar {
+    flex: none;
+    width: 36px;
+    padding: 2px;
+  }
+
+  .phone-status .golden-bar b {
+    height: 6px;
+  }
+
+  .phone-status .golden-label {
+    max-width: none;
+    white-space: nowrap;
+  }
+
+  /* The row of tools */
+
+  .phone-tools {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 var(--space-2);
+  }
+
+  .phone-tools > .abilities-slot,
+  .phone-tools > .abilities-slot .abilities {
+    display: flex;
+    gap: 4px;
+  }
+
+  .info-chip,
+  .maestrias-button {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 1px;
+    min-width: 42px;
+    height: 46px;
+    padding: 0 5px;
+    font-family: var(--font-display);
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .info-chip > span,
+  .maestrias-button > span {
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .info-chip b,
+  .maestrias-button b {
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .info-chip {
+    position: relative;
+  }
+
+  .info-chip small {
+    position: absolute;
+    top: 1px;
+    right: 2px;
+    font-size: 8px;
+    line-height: 1;
+  }
+
+  .info-chip[aria-expanded='true'],
+  .maestrias-button[aria-expanded='true'] {
+    border-color: var(--accent);
+  }
+
+  .info-chip[data-alert='true'],
+  .maestrias-button[data-ready='true'] {
+    border-color: var(--accent);
+    animation: ability-ready 1.2s steps(2) infinite;
+  }
+
+  .phone-tools > .abilities-slot .ability {
+    display: grid;
+    flex: 0 1 46px;
+    grid-template-columns: auto;
+    grid-template-areas: 'ring';
+    place-items: center;
+    width: auto;
+    min-width: 40px;
+    height: 46px;
+    padding: 0;
+  }
+
+  .phone-tools > .abilities-slot .ability .ui-meter {
+    --meter-size: 38px;
+  }
+
+  .phone-tools > .abilities-slot .ability-name,
+  .phone-tools > .abilities-slot .ability-key {
+    display: none;
+  }
+
+  /* The time left sits as a small tag over the foot of the ring; a ready button needs none. */
+  .phone-tools > .abilities-slot .ability-caption {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    padding: 0 3px;
+    font-size: 9px;
+    line-height: 12px;
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    transform: translateX(-50%);
+  }
+
+  .phone-tools > .abilities-slot .ability[data-state='ready'] .ability-caption {
+    display: none;
+  }
+
+  /* The trays: over the stage, above the row */
+
+  .phone-tray {
+    position: absolute;
+    bottom: calc(100% + 6px);
+    z-index: 6;
+    display: grid;
+    gap: var(--space-2);
+    max-height: 60dvh;
+    padding: var(--space-2);
+    overflow: auto;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .phone-tray-info {
+    left: var(--space-2);
+    width: min(320px, calc(100cqw - 16px));
+  }
+
+  .phone-tray-info .sprint-offers[data-open='true'] ul {
+    position: static;
+    width: auto;
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .phone-tray-maestrias {
+    right: var(--space-2);
+    width: min(340px, calc(100cqw - 16px));
+  }
+
+  .phone-tray .abilities {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+    justify-items: stretch;
+  }
+
+  .phone-tray .ability {
+    width: auto;
+    min-height: 56px;
+    padding: 4px 6px 4px 4px;
+  }
+
+  .phone-tray .ability .ui-meter {
+    --meter-size: 44px;
+  }
+
+  .phone-tray .ability-name {
+    font-size: 11px;
+  }
+
+  .phone-tray .ability-key {
+    display: none;
+  }
+
+  /* The professor row: eight portraits that fit the width, the next one to hire and no more than two silhouettes after it. */
+
+  .roster {
+    align-items: flex-end;
+    gap: 3px;
+    padding: 4px var(--space-2) 6px;
+  }
+
+  .roster-slot {
+    padding: 3px;
+  }
+
+  .roster-slot:not(.roster-next) {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 40px;
+    max-width: 48px;
+  }
+
+  .roster-face {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  .roster-slot:not(.roster-next) .roster-name {
+    display: none;
+  }
+
+  .roster-slot.roster-next {
+    width: auto;
+    min-width: 0;
+    gap: var(--space-2);
+    padding: 3px 8px 3px 3px;
+  }
+
+  .roster-slot.roster-next .roster-face {
+    width: 38px;
+    height: 38px;
+  }
+
+  .roster-offer {
+    min-width: 96px;
+  }
+
+  .roster-offer .ui-progress,
+  .roster-next .roster-name {
+    display: none;
+  }
+
+  .roster-offer .ui-button {
+    min-height: 40px;
+  }
+
+  .roster-next ~ [data-state='locked'] ~ [data-state='locked'] ~ [data-state='locked'] {
+    display: none;
+  }
+}

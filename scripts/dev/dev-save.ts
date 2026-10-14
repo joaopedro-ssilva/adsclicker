@@ -34,8 +34,8 @@ for (const id of PROFESSOR_IDS) {
 state.maestria.swarm.since = now - 3 * 3600_000; // the Super invasão starts charged
 state.maestria.rollforward.charges = 3;
 state.maestria.festa.since = now - 3600_000; // the Festa de lançamento starts recharged
-state.run.sprintsCompleted = 12; // B1 Releases: a few versions already shipped
-state.maestria.horas = { clicks: 30, invasions: 8, sprints: 10, abilities: 6, levels: 20 }; // Angelo: some bands filled
+state.run.sprintsCompleted = 40; // B1 Releases: version 10 shipped
+state.maestria.horas = { clicks: 20, invasions: 20, sprints: 20, abilities: 20, levels: 20 }; // Angelo: every band filled
 
 // Every Monitor hired at its top level and switched on.
 for (const monitor of content.monitors) state.monitors.units[monitor.id] = { level: monitor.levels.length, on: true, nextAt: 0, done: 0, last: '' };
@@ -62,6 +62,15 @@ Object.assign(state.counters, {
   researchBought: content.research.length,
   graduations: 30,
   playSeconds: 40 * 3600,
+  goldenModes: 150,
+  rollforwards: 80,
+  tripleRollforwards: 5,
+  swarmsWon: 40,
+  swarmsCleared: 12,
+  festas: 40,
+  bolsaProfitSeconds: 7_200,
+  designFreeLevels: 900,
+  cappedGraduations: 6,
 });
 
 writeFileSync('dev-save.txt', exportSave(state));
