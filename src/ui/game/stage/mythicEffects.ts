@@ -16,7 +16,7 @@ export interface MythicEffect {
 
 export const MYTHIC_EFFECTS: Record<string, MythicEffect> = {
   'edecio-primordial': { color: '#ffc83d', accent: '#fff3b0', ink: '#a86b00' },
-  'gladimir-robo': { color: '#38a8f0', accent: '#a8f0ff', ink: '#0b5f94' },
+  'gladimir-robo': { color: '#d62839', accent: '#dfe5ec', ink: '#8f1120' },
   'b2-prisma': { color: '#7fe6f5', accent: '#ffffff', ink: '#0e7490' },
   'wagner-sentinela': { color: '#ef3b3b', accent: '#ffa08a', ink: '#a31212' },
   'guto-tempestade': { color: '#4f86ff', accent: '#d2e2ff', ink: '#1e4cb5' },

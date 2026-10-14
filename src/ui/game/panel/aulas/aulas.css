@@ -12,6 +12,13 @@
   gap: var(--space-2);
 }
 
+/* Stage above panel (the stacked layout): the roster on the stage already picks the professor, so one row is enough. */
+@media (max-width: 1023px) {
+  .professor-strip {
+    display: none;
+  }
+}
+
 .professor-chip {
   --accent-soft: color-mix(in srgb, var(--accent) 16%, var(--surface));
 

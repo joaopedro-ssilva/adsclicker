@@ -15,19 +15,19 @@
   /* Hard colour bands, not a soft blur: the halo reads as pixel art and stays visible on any scenery. A pale core in the accent colour. */
   background: radial-gradient(
     ellipse at 50% 55%,
-    color-mix(in srgb, var(--fx2) 38%, transparent) 0 14%,
-    color-mix(in srgb, var(--fx) 58%, transparent) 14% 30%,
-    color-mix(in srgb, var(--fx) 38%, transparent) 30% 43%,
-    color-mix(in srgb, var(--fx) 22%, transparent) 43% 55%,
-    color-mix(in srgb, var(--fx) 10%, transparent) 55% 66%,
+    color-mix(in srgb, var(--fx2) 22%, transparent) 0 14%,
+    color-mix(in srgb, var(--fx) 30%, transparent) 14% 30%,
+    color-mix(in srgb, var(--fx) 18%, transparent) 30% 43%,
+    color-mix(in srgb, var(--fx) 9%, transparent) 43% 55%,
+    color-mix(in srgb, var(--fx) 4%, transparent) 55% 66%,
     transparent 66%
   );
-  opacity: 0.85;
+  opacity: 0.6;
   animation: mythic-glow 3.2s steps(4) infinite;
 }
 
 .mythic-aura i {
-  --arm: calc(var(--s) * var(--u, 3) * 1.33px);
+  --arm: calc(var(--s) * var(--u, 3) * 0.9px);
   position: absolute;
   left: var(--x);
   bottom: var(--y);
@@ -74,12 +74,12 @@
   }
 
   25% {
-    opacity: 1;
+    opacity: 0.6;
     transform: translateY(calc(var(--u, 3) * -2px)) scale(1);
   }
 
   70% {
-    opacity: 1;
+    opacity: 0.5;
     transform: translateY(calc(var(--u, 3) * -5px)) scale(0.8);
   }
 
@@ -89,10 +89,10 @@
   }
 }
 
-/* A hard one-art-pixel outline in the mythic colour hugging the sprite, with a thin dark edge so it reads on light sceneries. */
+/* A thin, half-transparent outline in the mythic colour: the sprite reads first, the effect is a soft accent. */
 .actor[data-mythic='true'] .character-squash {
-  filter: drop-shadow(calc(var(--u, 3) * 1px) 0 0 var(--fx)) drop-shadow(calc(var(--u, 3) * -1px) 0 0 var(--fx))
-    drop-shadow(0 calc(var(--u, 3) * 1px) 0 var(--fx)) drop-shadow(0 calc(var(--u, 3) * -1px) 0 var(--fx))
-    drop-shadow(1px 0 0 rgb(20 8 24 / 0.6)) drop-shadow(-1px 0 0 rgb(20 8 24 / 0.6)) drop-shadow(0 1px 0 rgb(20 8 24 / 0.6))
-    drop-shadow(0 -1px 0 rgb(20 8 24 / 0.6));
+  --edge: color-mix(in srgb, var(--fx) 55%, transparent);
+
+  filter: drop-shadow(1px 0 0 var(--edge)) drop-shadow(-1px 0 0 var(--edge)) drop-shadow(0 1px 0 var(--edge))
+    drop-shadow(0 -1px 0 var(--edge));
 }

@@ -14,9 +14,9 @@ const floatingSceneries = new Set(content.sceneries.filter((scenery) => scenery.
 
 /**
  * The professor on stage with what lives around them: speech bubble, combo thermometer and the first hint.
- * In photo mode only the professor and the mythic aura remain.
+ * On phones the combo and the golden mode live in the dock instead (PhoneDock.tsx). In photo mode only the professor and the mythic aura remain.
  */
-export function Actor({ scale, photo = false }: { scale: number; photo?: boolean }) {
+export function Actor({ scale, photo = false, compact = false }: { scale: number; photo?: boolean; compact?: boolean }) {
   // The id of the equipped skin when it has an effect of its own (the mythic ones, see mythicEffects.ts).
   const mythic = useGameState((state) => {
     if (!state.settings.sceneryEffects) return null;
@@ -34,8 +34,8 @@ export function Actor({ scale, photo = false }: { scale: number; photo?: boolean
       {mythic ? <MythicAura /> : null}
       {photo ? null : <SpeechBubble />}
       <ClickerButton scale={scale} floating={floating} />
-      {photo ? null : <ComboMeter />}
-      {photo ? null : <GoldenState />}
+      {photo || compact ? null : <ComboMeter />}
+      {photo || compact ? null : <GoldenState />}
       {photo ? null : <FirstNudge />}
     </div>
   );

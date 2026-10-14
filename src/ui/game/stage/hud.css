@@ -236,12 +236,11 @@
 }
 
 /* Narrow stage (phones, and split screens): one row with logo, balance and tools. */
-@container stage (max-width: 639px) {
+.stage-root[data-compact='true'] {
   .stage-head {
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: 'logo balance tools';
-    /* At the top: the tools stack three buttons high, and a balance centred on them would sit on the professor's face. */
-    align-items: start;
+    align-items: center;
     column-gap: var(--space-2);
     padding: var(--space-2) var(--space-2) 0;
   }
@@ -262,9 +261,10 @@
     display: block;
   }
 
-  /* Two buttons tall, as before the stage had five tools: the sound and "mais", which opens the rest in a row to its left. */
-  .stage-tools {
-    flex-direction: column;
+  /* Two buttons: the sound and "mais", which opens the rest in a row under them. Every one is at least 40 px. */
+  .stage-tools .ui-icon-button[data-size] {
+    width: 40px;
+    min-height: 40px;
   }
 
   .tool-wrap.tools-more {
@@ -273,8 +273,8 @@
 
   .tools-extra {
     position: absolute;
-    top: 0;
-    right: calc(100% + 6px);
+    top: calc(100% + 6px);
+    right: 0;
     z-index: 4;
     display: none;
     gap: 6px;
@@ -310,9 +310,11 @@
   }
 
   .balance-rates {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
     gap: 0 var(--space-2);
     font-size: 10px;
+  }
+
+  .balance-rates span {
+    white-space: nowrap;
   }
 }

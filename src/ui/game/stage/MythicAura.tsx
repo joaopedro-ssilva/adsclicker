@@ -31,7 +31,7 @@ export function MythicAura() {
   return (
     <div className="mythic-aura" aria-hidden="true">
       <span className="mythic-aura-glow" />
-      {SPARKLES.map((spark, index) => (
+      {SPARKLES.filter((_, index) => index % 2 === 0).map((spark, index) => (
         <i
           key={index}
           style={cssVariables({

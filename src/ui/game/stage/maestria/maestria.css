@@ -378,64 +378,15 @@
   color: var(--text-muted);
 }
 
-@container stage (max-width: 639px) {
-  /* The combo thermometer takes the side of the professor here, so the state sits over the feet, as a small pill the clicks go through. */
-  .golden-slot {
-    inset-inline: 0;
-    bottom: 0;
-    width: max-content;
-    margin-inline: auto;
-    pointer-events: none;
-  }
-
-  .golden {
-    min-width: 84px;
-    gap: 4px;
-    padding: 5px 6px 4px;
-  }
-
-  .golden-title {
-    display: none;
-  }
-
-  .golden-label {
-    max-width: 96px;
-  }
-
-  /* Side by side (the stage is short): two 54 px buttons fit the 116 px column. */
-  .maestria-dock {
-    left: var(--space-1);
-    bottom: var(--space-1);
-  }
-
-  .maestria-dock .abilities {
-    grid-template-columns: repeat(2, 54px);
-    gap: 4px;
-    justify-items: start;
-  }
-
-  .maestria-dock .ability {
-    width: 54px;
-    padding: 2px;
-  }
-
-  .maestria-dock .ability .ui-meter {
-    --meter-size: 40px;
-  }
-
-  .maestria-pips {
-    top: 2px;
-    right: 2px;
-  }
-
+.stage-root[data-compact='true'] {
   .swarm-layer {
     --zoom: 1;
   }
 
   .swarm-hud {
     top: var(--space-2);
-    width: calc(100cqw - 116px - 64px - 48px);
-    min-width: 132px;
+    width: min(220px, calc(100cqw - 24px));
+    left: 50%;
     padding: var(--space-1) var(--space-2);
   }
 }

@@ -41,12 +41,12 @@ function ActiveSprintView() {
   );
 }
 
-function Offers() {
+function Offers({ defaultOpen }: { defaultOpen: boolean }) {
   const offers = useGameState((state) => state.sprint.offers);
   const accept = useGame((store) => store.acceptSprint);
   const narrow = useMediaQuery('(max-width: 1023px)');
   const [open, setOpen] = useState<boolean | null>(null);
-  const expanded = open ?? !narrow;
+  const expanded = open ?? (defaultOpen || !narrow);
 
   return (
     <div className="sprint-offers" data-open={expanded}>
@@ -97,7 +97,7 @@ function Waiting() {
 }
 
 /** B1's layer: three offers to choose from, the running sprint with its goal and countdown, or the wait for new offers. */
-export function SprintCard() {
+export function SprintCard({ defaultOpen = false }: { defaultOpen?: boolean }) {
   const enabled = useHasFeature('sprints');
   const active = useGameState((state) => state.sprint.active !== null);
   const hasOffers = useGameState((state) => state.sprint.offers.length > 0);
@@ -106,7 +106,7 @@ export function SprintCard() {
   return (
     <LayerReveal layer="sprints" className="sprint-slot">
       <section className="sprint pixel-frame" aria-label="Sprint" data-qa="sprint">
-        {active ? <ActiveSprintView /> : hasOffers ? <Offers /> : <Waiting />}
+        {active ? <ActiveSprintView /> : hasOffers ? <Offers defaultOpen={defaultOpen} /> : <Waiting />}
       </section>
     </LayerReveal>
   );

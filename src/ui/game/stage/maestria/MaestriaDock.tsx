@@ -141,11 +141,23 @@ function BolsaButton({ view }: { view: BolsaView }) {
  * The buttons of the Maestrias that need the player to press them. Gladimir's Rollforward and Wagner's Super invasão
  * sit bottom left; Guto's Festa de lançamento and Pablo's Bolsa sit bottom right, under the abilities.
  */
-export function MaestriaDock() {
+export function MaestriaDock({ tray = false }: { tray?: boolean }) {
   const roll = useRollforwardView();
   const swarm = useSwarmView();
   const festa = useFestaView();
   const bolsa = useBolsaView();
+
+  // Phones: the four buttons in one group, inside the tray the Maestrias button opens.
+  if (tray) {
+    return (
+      <div className="abilities" role="group" aria-label="Maestrias">
+        {roll ? <RollforwardButton view={roll} /> : null}
+        {swarm ? <SwarmButton view={swarm} /> : null}
+        {festa ? <FestaButton view={festa} /> : null}
+        {bolsa ? <BolsaButton view={bolsa} /> : null}
+      </div>
+    );
+  }
 
   return (
     <>

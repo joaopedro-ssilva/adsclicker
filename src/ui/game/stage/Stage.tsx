@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { content, useGameState } from '@/game/store';
 import { Scenery } from '@/ui/art/Scenery';
 import { cssVariables } from '@/ui/theme';
@@ -13,6 +13,7 @@ import { BolsaPanel } from './maestria/bolsa/BolsaPanel';
 import { FestaLayer } from './maestria/FestaLayer';
 import { MaestriaDock } from './maestria/MaestriaDock';
 import { ReleaseTag } from './maestria/ReleaseTag';
+import { PhoneDock, usePhoneDockRows } from './PhoneDock';
 import { PhotoExit } from './PhotoExit';
 import { SwarmLayer } from './maestria/SwarmLayer';
 import { SwarmSummary } from './maestria/SwarmSummary';
@@ -24,9 +25,10 @@ import { useStageScale } from './useStageScale';
 const sceneryById = new Map(content.sceneries.map((scenery) => [scenery.id, scenery]));
 const FALLBACK_SCENERY = content.sceneries.find((scenery) => scenery.default) ?? content.sceneries[0];
 
-/** Height the HUD takes around the professor: header (and balance), speech bubble, roster. */
-function reservedHeight({ width }: { width: number; height: number }): number {
-  return width < 640 ? 176 : 372;
+/** Height the HUD takes around the professor: header (and balance), speech bubble, roster. Phones add the dock rows that have content. */
+function reservedHeight(compact: boolean, tools: boolean, status: boolean): number {
+  if (!compact) return 372;
+  return 190 + (tools ? 52 : 0) + (status ? 30 : 0);
 }
 
 /** The left side of the game screen: scenery, the professor and everything that happens around them. */
@@ -36,7 +38,9 @@ export function Stage() {
   const photo = useUi((store) => store.photo);
   const effects = useGameState((state) => state.settings.sceneryEffects);
   // Photo mode measures like the normal stage, so the professor keeps the size it had.
-  const { ref, scale } = useStageScale(reservedHeight);
+  const { tools, status } = usePhoneDockRows();
+  const reserved = useCallback((box: { compact: boolean }) => reservedHeight(box.compact, tools, status), [tools, status]);
+  const { ref, scale, compact } = useStageScale(reserved);
 
   useEffect(() => {
     registerAnchor('stage', ref.current);
@@ -47,7 +51,7 @@ export function Stage() {
   if (photo) {
     // Photo mode: the scenery, its ambient particles, the professor (and the mythic aura) and the way out. The game runs on.
     return (
-      <section className="stage-root" aria-label="Palco" ref={ref} data-photo="on">
+      <section className="stage-root" aria-label="Palco" ref={ref} data-photo="on" data-compact={compact}>
         <Scenery scenery={scenery} ambient={effects ? undefined : 'none'} focusY={0.65} className="stage-scenery">
           <div className="stage-ui" data-photo="on" style={cssVariables({ '--scale': String(scale) })}>
             {/* The header and the roster stay in the layout, invisible, so the professor keeps the exact place and size he had. */}
@@ -58,7 +62,7 @@ export function Stage() {
               <Actor scale={scale} photo />
             </div>
             <div className="photo-ghost" aria-hidden="true" inert>
-              <Roster />
+              {compact ? <PhoneDock /> : <Roster />}
             </div>
             <PhotoExit />
           </div>
@@ -67,26 +71,30 @@ export function Stage() {
     );
   }
   return (
-    <section className="stage-root" aria-label="Palco" ref={ref}>
+    <section className="stage-root" aria-label="Palco" ref={ref} data-compact={compact}>
       <Scenery scenery={scenery} ambient={effects ? undefined : 'none'} focusY={0.65} className="stage-scenery">
         <div className="stage-ui" style={cssVariables({ '--scale': String(scale) })}>
           <StageHeader />
           <div className="stage-play">
-            <div className="stage-left">
-              <SprintCard />
-              <ReleaseTag />
-              <BuffChips />
-            </div>
-            <div className="stage-right">
-              <Abilities />
-            </div>
-            <MaestriaDock />
-            <Actor scale={scale} />
+            {compact ? null : (
+              <>
+                <div className="stage-left">
+                  <SprintCard />
+                  <ReleaseTag />
+                  <BuffChips />
+                </div>
+                <div className="stage-right">
+                  <Abilities />
+                </div>
+                <MaestriaDock />
+              </>
+            )}
+            <Actor scale={scale} compact={compact} />
             <InvasionLayer />
             <SwarmLayer />
             <FestaLayer />
           </div>
-          <Roster />
+          {compact ? <PhoneDock /> : <Roster />}
         </div>
         <SwarmSummary />
         <BolsaPanel />
