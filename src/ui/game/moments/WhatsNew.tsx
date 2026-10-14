@@ -8,7 +8,7 @@ import { Button, Icon, Modal, RarityBadge } from '@/ui/kit';
 import { unlockHint } from '../panel/album/albumData';
 import { characterSprite } from '../shared/characterProps';
 import { useUi } from '../shared/uiStore';
-import { PATCH } from './whatsNew';
+import { PATCH } from './patchNotes';
 
 const pick = <T extends { id: string }>(items: T[], ids: readonly string[]): T[] =>
   ids.flatMap((id) => items.filter((item) => item.id === id));

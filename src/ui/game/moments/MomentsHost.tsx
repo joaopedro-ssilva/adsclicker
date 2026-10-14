@@ -8,7 +8,7 @@ import { OfflineReport } from './OfflineReport';
 import { UnlockCards } from './UnlockCards';
 import { UnlockCeremony } from './UnlockCeremony';
 import { WhatsNew } from './WhatsNew';
-import { useWhatsNew } from './whatsNew';
+import { useWhatsNew } from './patchNotes';
 
 /**
  * Shows the offline report first, then the queued ceremonies one at a time, then the patch announcement.
