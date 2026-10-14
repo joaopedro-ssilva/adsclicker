@@ -770,7 +770,7 @@
         "edecio-primordial",
         "gladimir-arquivista",
         "b2-prisma",
-        "wagner-sentinela"
+        "_wagner-sentinela"
       ]
     },
     {
@@ -779,7 +779,7 @@
       "keys": [
         "b1-imperatriz",
         "angelo-chanceler",
-        "pablo-singularidade"
+        "_pablo-singularidade"
       ]
     },
     {
@@ -834,7 +834,7 @@
       "kind": "head",
       "keys": [
         "_ref",
-        "wagner-sentinela",
+        "_wagner-sentinela",
         "wagner-ferias"
       ],
       "calibrate": true,
@@ -875,7 +875,7 @@
       "kind": "head",
       "keys": [
         "_ref",
-        "pablo-singularidade",
+        "_pablo-singularidade",
         "pablo-garagem"
       ],
       "calibrate": true,
@@ -1057,28 +1057,28 @@
       "file": "skins-v7-gladimir-neyglad.png",
       "kind": "skin",
       "keys": [
-        "gladimir-neyglad"
+        "_gladimir-neyglad"
       ]
     },
     {
       "file": "skins-v7-gladimir-robo.png",
       "kind": "skin",
       "keys": [
-        "gladimir-robo"
+        "_gladimir-robo"
       ]
     },
     {
       "file": "skins-v7-wagner-sentinela.png",
       "kind": "skin",
       "keys": [
-        "wagner-sentinela"
+        "_wagner-sentinela"
       ]
     },
     {
       "file": "skins-v7-pablo-singularidade.png",
       "kind": "skin",
       "keys": [
-        "pablo-singularidade"
+        "_pablo-singularidade"
       ]
     },
     {
@@ -1097,7 +1097,7 @@
       "keys": [
         "_ref",
         "gladimir-viajante",
-        "gladimir-robo"
+        "_gladimir-robo"
       ],
       "calibrate": true,
       "ref": "gladimir"
@@ -1108,7 +1108,7 @@
       "keys": [
         "_ref",
         "wagner-dedetizador",
-        "wagner-sentinela"
+        "_wagner-sentinela"
       ],
       "calibrate": true,
       "ref": "wagner"
@@ -1138,7 +1138,7 @@
       "kind": "head",
       "keys": [
         "_ref",
-        "pablo-singularidade"
+        "_pablo-singularidade"
       ],
       "calibrate": true,
       "ref": "pablo"
@@ -1191,6 +1191,50 @@
       "keys": [
         "sala-dos-professores"
       ]
+    },
+    {
+      "file": "skins-v8-gladimir-neyglad.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-neyglad"
+      ]
+    },
+    {
+      "file": "skins-v8-gladimir-robo.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-robo"
+      ]
+    },
+    {
+      "file": "heads-skin8-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-robo"
+      ],
+      "calibrate": true,
+      "ref": "gladimir"
+    },
+    {
+      "file": "heads-skin8-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-sentinela"
+      ],
+      "calibrate": true,
+      "ref": "wagner"
+    },
+    {
+      "file": "heads-skin8-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-singularidade"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
     }
   ]
 }

@@ -714,6 +714,51 @@ calls.push(
 );
 V6_SCENERIES.push(...V7_SCENERIES);
 
+// 14) Redrawn after the owner's review. These sheets are the only ones that write these ids (see V8_REDRAWN below).
+const V8_BODIES = [
+  ['gladimir-neyglad', 'a football champion: a bright yellow football jersey with green trim and the number 10, blue shorts, white socks with green stripes and black football boots, a captain armband on one arm; ONE hand holds a golden champions trophy cup up at shoulder height, the OTHER arm hangs relaxed at his side with a normal open hand; exactly two arms and two hands, both the same size; no logos, no crests, no text other than the number'],
+];
+const V8_MYTHIC = [
+  ['gladimir-robo', 'a legendary droid from a classic space-opera film: a sleek humanoid droid body in white armor plates with royal-blue panel lines and stripes, silver mechanical joints at the shoulders, elbows and knees, a round blue and silver chest panel with small blinking red and blue lights, a utility belt of small grey modules, slim mechanical hands and sturdy plated feet; a short blue mechanical neck connector at the top instead of a neck stub; clean, iconic and heroic, not toy-like'],
+];
+const v8Heads = {
+  gladimir: [
+    ['gladimir-robo', 'a DROID HEAD in place of his head, from a classic space-opera film: a polished white and royal-blue dome-shaped droid head with a silver band, one small round radar eye and a few blue panel details on top, and on the front a wide rounded dark screen that shows HIS OWN FACE drawn in glowing light-blue pixels (the same rectangular glasses, eyes and calm smile, simplified as a screen picture); no skin and no hair anywhere, the whole head is a machine'],
+  ],
+  wagner: [
+    ['wagner-sentinela', 'an ornate black open-face battle helmet with layered plates, thin glowing red lines, two swept-back fins and a raised red visor, face fully visible; his two eyes are identical, symmetric and both clearly drawn the same way'],
+  ],
+  pablo: [
+    ['pablo-singularidade', 'the deep hood of a robe made of outer space, black with a purple nebula and tiny stars, with a thin golden rim along its edge, hood up, face fully visible; the top of the hood is smooth and rounded with nothing on it (no star, no ornament)'],
+  ],
+};
+const headSheet8 = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = v8Heads[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    v8: true,
+    file: `heads-skin8-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+const V8_REDRAWN = new Set([...V8_BODIES, ...V8_MYTHIC].map((i) => i[0]).concat(Object.values(v8Heads).flat().map((i) => i[0])));
+calls.push(
+  ...V8_BODIES.map((item) => {
+    const sheet = v4BodySheet(`skins-v8-${item[0]}.png`, [item]);
+    return { label: `skins-v8-${item[0]}`, images: [{ ...sheet, v8: true, text: `${sheet.text} ${ALONE}` }] };
+  }),
+  ...V8_MYTHIC.map((item) => {
+    const sheet = v4BodySheet(`skins-v8-${item[0]}.png`, [item]);
+    return { label: `skins-v8-${item[0]}`, images: [{ ...sheet, v8: true, text: `${sheet.text} ${ALONE} ${RICH}` }] };
+  }),
+  ...Object.keys(v8Heads).map((professor) => ({ label: `heads-skin8-${professor}`, images: [headSheet8(professor)] })),
+);
+
 // Style references for the sceneries above: a shipped scenery, enlarged.
 fs.mkdirSync(RAW_DIR, { recursive: true });
 for (const ref of new Set(V6_SCENERIES.flatMap((image) => image.refs))) {
@@ -736,6 +781,11 @@ for (const professor of Object.keys(HEAD_VARIANTS)) {
     .flatten({ background: '#ff00ff' })
     .png()
     .toFile(path.join(RAW_DIR, `ref-head-${professor}.png`));
+}
+
+// Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
+for (const c of calls) {
+  for (const im of c.images) if (!im.v8) im.keys = im.keys.map((key) => (V8_REDRAWN.has(key) ? `_${key}` : key));
 }
 
 // ---- write --------------------------------------------------------------------------------

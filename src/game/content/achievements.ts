@@ -124,7 +124,7 @@ export const achievements: AchievementDef[] = [
   ach('rollforward-triple', 'production', 'Carga Tripla', '🔋', 'Use o Rollforward com 3 cargas guardadas. Guardou, guardou, e soltou o tempo todo de uma vez.', counter('tripleRollforwards', 1), {
     theme: 'fita-magnetica',
   }),
-  ach('festa-25', 'production', 'Festa de Arromba', '🎉', 'Dê a Festa de lançamento 25 vezes. O servidor reclamou do barulho, mas dançou junto.', counter('festas', 25), { scenery: 'palco' }),
+  ach('festa-25', 'production', 'Festa de Arromba', '🎉', 'Dê a Festa de lançamento 10 vezes. O servidor reclamou do barulho, mas dançou junto.', counter('festas', 10), { scenery: 'palco' }),
   ach('bolsa-hour', 'production', 'Lobo de Wall Street', '🐺', 'Lucre na Bolsa o equivalente a 1 hora de produção. Comprou na baixa, vendeu na alta e manteve a calma.', counter('bolsaProfitSeconds', 3600), {
     scenery: 'wall-street',
   }),
@@ -355,7 +355,7 @@ export const achievements: AchievementDef[] = [
   ach('tree-complete', 'graduation', 'Árvore Centenária', '🌲', 'Complete a árvore de Formatura, com todos os nós no nível máximo. Cada galho com o seu diploma.', { kind: 'prestigeComplete' }, {
     scenery: 'arvore-ancestral',
   }),
-  ach('horas-full', 'graduation', 'Carga Horária Cumprida', '📋', 'Preencha todas as faixas das Horas complementares numa mesma turma. O coordenador carimba sem nem olhar.', { kind: 'horasBands', gte: 6 }, {
+  ach('horas-full', 'graduation', 'Carga Horária Cumprida', '📋', 'Preencha 3 faixas das Horas complementares numa mesma turma. O coordenador carimba sem nem olhar.', { kind: 'horasBands', gte: 3 }, {
     skin: 'angelo-certificado',
   }),
   ach('maestrias-doctorate', 'graduation', 'Doutorado', '📚', 'Leve as 8 Maestrias ao nível 5. A tese tem oito capítulos e nenhuma referência faltando.', { kind: 'maestrias', unlocked: 8, level: 5 }, {

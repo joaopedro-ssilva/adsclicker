@@ -305,6 +305,7 @@ function readSettings(value: unknown, fallback: Settings): Settings {
     clickSound: typeof value.clickSound === 'boolean' ? value.clickSound : fallback.clickSound,
     reducedMotion: motion === 'on' || motion === 'off' || motion === 'system' ? motion : fallback.reducedMotion,
     floatingNumbers: typeof value.floatingNumbers === 'boolean' ? value.floatingNumbers : fallback.floatingNumbers,
+    sceneryEffects: typeof value.sceneryEffects === 'boolean' ? value.sceneryEffects : fallback.sceneryEffects,
     devMultiplier: readNumber(value.devMultiplier, fallback.devMultiplier, MIN_DEV_MULTIPLIER, MAX_DEV_MULTIPLIER),
   };
 }

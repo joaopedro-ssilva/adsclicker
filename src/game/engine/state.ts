@@ -182,6 +182,8 @@ export interface Settings {
   clickSound: boolean;
   reducedMotion: 'system' | 'on' | 'off';
   floatingNumbers: boolean;
+  /** Ambient particles of the sceneries and the glow of mythic skins. The scenery image and the professor stay either way. */
+  sceneryEffects: boolean;
   /**
    * Admin/dev knob: multiplies every source of coins. 1 in normal play.
    * Set from the /admin page for demos and quick progression tests.

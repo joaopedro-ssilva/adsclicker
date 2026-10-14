@@ -34,6 +34,7 @@ export function Stage() {
   const sceneryId = useGameState((state) => state.equippedScenery);
   const scenery = sceneryById.get(sceneryId) ?? FALLBACK_SCENERY;
   const photo = useUi((store) => store.photo);
+  const effects = useGameState((state) => state.settings.sceneryEffects);
   // Photo mode measures like the normal stage, so the professor keeps the size it had.
   const { ref, scale } = useStageScale(reservedHeight);
 
@@ -47,10 +48,17 @@ export function Stage() {
     // Photo mode: the scenery, its ambient particles, the professor (and the mythic aura) and the way out. The game runs on.
     return (
       <section className="stage-root" aria-label="Palco" ref={ref} data-photo="on">
-        <Scenery scenery={scenery} focusY={0.65} className="stage-scenery">
+        <Scenery scenery={scenery} ambient={effects ? undefined : 'none'} focusY={0.65} className="stage-scenery">
           <div className="stage-ui" data-photo="on" style={cssVariables({ '--scale': String(scale) })}>
+            {/* The header and the roster stay in the layout, invisible, so the professor keeps the exact place and size he had. */}
+            <div className="photo-ghost" aria-hidden="true" inert>
+              <StageHeader />
+            </div>
             <div className="stage-play">
               <Actor scale={scale} photo />
+            </div>
+            <div className="photo-ghost" aria-hidden="true" inert>
+              <Roster />
             </div>
             <PhotoExit />
           </div>
@@ -60,7 +68,7 @@ export function Stage() {
   }
   return (
     <section className="stage-root" aria-label="Palco" ref={ref}>
-      <Scenery scenery={scenery} focusY={0.65} className="stage-scenery">
+      <Scenery scenery={scenery} ambient={effects ? undefined : 'none'} focusY={0.65} className="stage-scenery">
         <div className="stage-ui" style={cssVariables({ '--scale': String(scale) })}>
           <StageHeader />
           <div className="stage-play">

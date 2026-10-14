@@ -176,8 +176,8 @@
     "y": 61
   },
   "heads/gladimir-robo": {
-    "x": 27,
-    "y": 57
+    "x": 28,
+    "y": 54
   },
   "heads/gladimir-viajante": {
     "x": 22,
@@ -225,7 +225,7 @@
   },
   "heads/pablo-singularidade": {
     "x": 28,
-    "y": 65
+    "y": 62
   },
   "heads/wagner": {
     "x": 21,
@@ -256,8 +256,8 @@
     "y": 51
   },
   "heads/wagner-sentinela": {
-    "x": 24,
-    "y": 59
+    "x": 26,
+    "y": 52
   },
   "skins/angelo-capitao": {
     "x": 17,
@@ -496,8 +496,8 @@
     "y": 9
   },
   "skins/gladimir-neyglad": {
-    "x": 23,
-    "y": 8
+    "x": 24,
+    "y": 6
   },
   "skins/gladimir-pescador": {
     "x": 16,
@@ -508,7 +508,7 @@
     "y": 3
   },
   "skins/gladimir-robo": {
-    "x": 15,
+    "x": 16,
     "y": 1
   },
   "skins/gladimir-viajante": {

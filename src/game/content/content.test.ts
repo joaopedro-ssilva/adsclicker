@@ -1045,7 +1045,7 @@ describe('content: the collection feats', () => {
 
   it('reads the real caps of the game', () => {
     expect(byId('mastery-all-cap')?.condition).toEqual({ kind: 'mastery', rank: content.balance.mastery.cap });
-    expect(byId('horas-full')?.condition).toEqual({ kind: 'horasBands', gte: Math.max(...content.maestrias.horas.bands) });
+    expect(byId('horas-full')?.condition).toEqual({ kind: 'horasBands', gte: 3 });
     expect(byId('releases-10')?.condition).toEqual({ kind: 'releaseVersions', gte: content.maestrias.releases.maxVersions });
     expect(byId('monitors-all')?.condition).toEqual({ kind: 'monitors', gte: content.monitors.length });
     expect(byId('monitors-max')?.condition).toEqual({ kind: 'monitors', gte: content.monitors.length, maxed: true });

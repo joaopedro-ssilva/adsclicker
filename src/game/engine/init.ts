@@ -76,6 +76,7 @@ export function defaultSettings(): Settings {
     clickSound: true,
     reducedMotion: 'system',
     floatingNumbers: true,
+    sceneryEffects: true,
     devMultiplier: 1,
   };
 }

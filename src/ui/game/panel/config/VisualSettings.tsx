@@ -11,10 +11,11 @@ const MOTION_OPTIONS: { value: Settings['reducedMotion']; label: string }[] = [
   { value: 'on', label: 'Reduzida' },
 ];
 
-/** Reduced motion and floating numbers. */
+/** Reduced motion, floating numbers and scenery effects. */
 export function VisualSettings() {
   const reducedMotion = useGame((store) => store.state.settings.reducedMotion);
   const floatingNumbers = useGame((store) => store.state.settings.floatingNumbers);
+  const sceneryEffects = useGame((store) => store.state.settings.sceneryEffects);
   const updateSettings = useGame((store) => store.updateSettings);
 
   return (
@@ -49,6 +50,13 @@ export function VisualSettings() {
           checked={floatingNumbers}
           testId="setting-floating"
           onChange={(value) => updateSettings({ floatingNumbers: value })}
+        />
+        <ToggleRow
+          label="Efeitos do cenário"
+          hint="Chuva, neve, poeira e estrelas do cenário, e o brilho das skins míticas"
+          checked={sceneryEffects}
+          testId="setting-scenery-effects"
+          onChange={(value) => updateSettings({ sceneryEffects: value })}
         />
       </div>
     </Section>

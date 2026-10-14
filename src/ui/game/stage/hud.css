@@ -156,8 +156,10 @@
   }
 }
 
-.stage-ui[data-photo='on'] {
-  grid-template-rows: minmax(0, 1fr);
+/* Photo mode keeps the three rows of the stage: the hidden header and roster take the room they had. */
+.photo-ghost {
+  display: contents;
+  visibility: hidden;
 }
 
 /* Photo mode: no shade at the top (there is no HUD to read) and a lighter one at the bottom, so the floor keeps its depth. */
