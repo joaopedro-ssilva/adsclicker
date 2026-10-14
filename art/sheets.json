@@ -1003,6 +1003,194 @@
       "keys": [
         "aurora"
       ]
+    },
+    {
+      "file": "skins-v7-edecio-garimpeiro.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-garimpeiro"
+      ]
+    },
+    {
+      "file": "skins-v7-gladimir-viajante.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-viajante"
+      ]
+    },
+    {
+      "file": "skins-v7-wagner-dedetizador.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-dedetizador"
+      ]
+    },
+    {
+      "file": "skins-v7-b1-keynote.png",
+      "kind": "skin",
+      "keys": [
+        "b1-keynote"
+      ]
+    },
+    {
+      "file": "skins-v7-angelo-certificado.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-certificado"
+      ]
+    },
+    {
+      "file": "skins-v7-b2-componentes.png",
+      "kind": "skin",
+      "keys": [
+        "b2-componentes"
+      ]
+    },
+    {
+      "file": "skins-v7-angelo-ninja.png",
+      "kind": "skin",
+      "keys": [
+        "angelo-ninja"
+      ]
+    },
+    {
+      "file": "skins-v7-gladimir-neyglad.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-neyglad"
+      ]
+    },
+    {
+      "file": "skins-v7-gladimir-robo.png",
+      "kind": "skin",
+      "keys": [
+        "gladimir-robo"
+      ]
+    },
+    {
+      "file": "skins-v7-wagner-sentinela.png",
+      "kind": "skin",
+      "keys": [
+        "wagner-sentinela"
+      ]
+    },
+    {
+      "file": "skins-v7-pablo-singularidade.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-singularidade"
+      ]
+    },
+    {
+      "file": "heads-skin7-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-garimpeiro"
+      ],
+      "calibrate": true,
+      "ref": "edecio"
+    },
+    {
+      "file": "heads-skin7-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-viajante",
+        "gladimir-robo"
+      ],
+      "calibrate": true,
+      "ref": "gladimir"
+    },
+    {
+      "file": "heads-skin7-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-dedetizador",
+        "wagner-sentinela"
+      ],
+      "calibrate": true,
+      "ref": "wagner"
+    },
+    {
+      "file": "heads-skin7-b1.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b1-keynote"
+      ],
+      "calibrate": true,
+      "ref": "b1"
+    },
+    {
+      "file": "heads-skin7-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-ninja"
+      ],
+      "calibrate": true,
+      "ref": "angelo"
+    },
+    {
+      "file": "heads-skin7-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-singularidade"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
+    },
+    {
+      "file": "scenery-panteao.png",
+      "kind": "scenery",
+      "keys": [
+        "panteao"
+      ]
+    },
+    {
+      "file": "scenery-arvore-ancestral.png",
+      "kind": "scenery",
+      "keys": [
+        "arvore-ancestral"
+      ]
+    },
+    {
+      "file": "scenery-sala-de-guerra.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-de-guerra"
+      ]
+    },
+    {
+      "file": "scenery-palco.png",
+      "kind": "scenery",
+      "keys": [
+        "palco"
+      ]
+    },
+    {
+      "file": "scenery-wall-street.png",
+      "kind": "scenery",
+      "keys": [
+        "wall-street"
+      ]
+    },
+    {
+      "file": "scenery-sala-dos-monitores.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-dos-monitores"
+      ]
+    },
+    {
+      "file": "scenery-sala-dos-professores.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-dos-professores"
+      ]
     }
   ]
 }

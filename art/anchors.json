@@ -63,6 +63,10 @@
     "x": 22,
     "y": 47
   },
+  "heads/angelo-ninja": {
+    "x": 21,
+    "y": 47
+  },
   "heads/angelo-padel": {
     "x": 20,
     "y": 47
@@ -86,6 +90,10 @@
   "heads/b1-imperatriz": {
     "x": 30,
     "y": 72
+  },
+  "heads/b1-keynote": {
+    "x": 29,
+    "y": 52
   },
   "heads/b1-rainha": {
     "x": 30,
@@ -118,6 +126,10 @@
   "heads/edecio-full-dima": {
     "x": 22,
     "y": 52
+  },
+  "heads/edecio-garimpeiro": {
+    "x": 32,
+    "y": 63
   },
   "heads/edecio-gauchao": {
     "x": 30,
@@ -163,6 +175,14 @@
     "x": 26,
     "y": 61
   },
+  "heads/gladimir-robo": {
+    "x": 27,
+    "y": 57
+  },
+  "heads/gladimir-viajante": {
+    "x": 22,
+    "y": 54
+  },
   "heads/guto": {
     "x": 22,
     "y": 55
@@ -204,8 +224,8 @@
     "y": 55
   },
   "heads/pablo-singularidade": {
-    "x": 26,
-    "y": 57
+    "x": 28,
+    "y": 65
   },
   "heads/wagner": {
     "x": 21,
@@ -223,6 +243,10 @@
     "x": 25,
     "y": 55
   },
+  "heads/wagner-dedetizador": {
+    "x": 23,
+    "y": 51
+  },
   "heads/wagner-detetive": {
     "x": 26,
     "y": 55
@@ -232,11 +256,15 @@
     "y": 51
   },
   "heads/wagner-sentinela": {
-    "x": 23,
-    "y": 53
+    "x": 24,
+    "y": 59
   },
   "skins/angelo-capitao": {
     "x": 17,
+    "y": 2
+  },
+  "skins/angelo-certificado": {
+    "x": 16,
     "y": 2
   },
   "skins/angelo-chanceler": {
@@ -254,6 +282,10 @@
   "skins/angelo-maestro": {
     "x": 19,
     "y": 6
+  },
+  "skins/angelo-ninja": {
+    "x": 18,
+    "y": 3
   },
   "skins/angelo-padel": {
     "x": 23,
@@ -295,6 +327,10 @@
     "x": 20,
     "y": 4
   },
+  "skins/b1-keynote": {
+    "x": 18,
+    "y": 3
+  },
   "skins/b1-lancamento": {
     "x": 21,
     "y": 2
@@ -310,6 +346,10 @@
   "skins/b1-scrum": {
     "x": 20,
     "y": 4
+  },
+  "skins/b2-componentes": {
+    "x": 20,
+    "y": 3
   },
   "skins/b2-curadora": {
     "x": 27,
@@ -383,6 +423,10 @@
     "x": 31,
     "y": 2
   },
+  "skins/edecio-garimpeiro": {
+    "x": 21,
+    "y": 2
+  },
   "skins/edecio-gauchao": {
     "x": 15,
     "y": 3
@@ -451,6 +495,10 @@
     "x": 25,
     "y": 9
   },
+  "skins/gladimir-neyglad": {
+    "x": 23,
+    "y": 8
+  },
   "skins/gladimir-pescador": {
     "x": 16,
     "y": 9
@@ -458,6 +506,14 @@
   "skins/gladimir-piloto": {
     "x": 19,
     "y": 3
+  },
+  "skins/gladimir-robo": {
+    "x": 15,
+    "y": 1
+  },
+  "skins/gladimir-viajante": {
+    "x": 21,
+    "y": 2
   },
   "skins/guto-astronauta": {
     "x": 15,
@@ -528,8 +584,8 @@
     "y": 2
   },
   "skins/pablo-singularidade": {
-    "x": 17,
-    "y": 2
+    "x": 26,
+    "y": 8
   },
   "skins/pablo-trader": {
     "x": 20,
@@ -550,6 +606,10 @@
   "skins/wagner-cripto": {
     "x": 20,
     "y": 2
+  },
+  "skins/wagner-dedetizador": {
+    "x": 25,
+    "y": 3
   },
   "skins/wagner-default": {
     "x": 17,
@@ -576,7 +636,7 @@
     "y": 2
   },
   "skins/wagner-sentinela": {
-    "x": 17,
+    "x": 32,
     "y": 2
   }
 }
