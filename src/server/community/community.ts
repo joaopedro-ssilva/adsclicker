@@ -1,6 +1,7 @@
 import { desc, eq, lt, sql } from 'drizzle-orm';
 import { FEED_KINDS, LOG_RETENTION_DAYS, LOG_RETENTION_MAX_ROWS, ONLINE_WINDOW_MS } from '@/shared/api';
 import type { CommunityResponse, FeedItem } from '@/shared/api';
+import { ONLINE_DISPLAY_BONUS } from '@/shared/onlineBonus';
 import { getEventMultiplier } from '../config/eventMultiplier';
 import type { Db } from '../db/client';
 import { feedEvents, players, rankedCondition } from '../db/schema';
@@ -12,8 +13,6 @@ export const FEED_SIZE = 30;
 /** The game shows 30 events, but the admin "Atividades" view reads the whole table: keep it as long as the server log. */
 const FEED_KEEP_MS = LOG_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 const PRUNE_EVERY_MS = 60 * 60 * 1000;
-/** Added to the "online agora" count shown in the game (the owner's choice). The admin screen reads its own numbers. */
-export const ONLINE_DISPLAY_BONUS = 5;
 
 /** Players that count as people: everyone who is not banned or a test account, flagged ones included (they are still playing). */
 const counted = () => sql`not ${players.banned} and not ${players.testAccount}`;
