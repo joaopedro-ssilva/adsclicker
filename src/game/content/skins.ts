@@ -293,10 +293,10 @@ export const skins: SkinDef[] = [
       id: 'gladimir-robo',
       name: 'Gladbot',
       rarity: 'mythic',
-      description: 'Corpo de robô com o rosto dele na tela. Os quatro monitores fazem tudo sozinhos, e ele só confere se compilou.',
+      description: 'Metade professor, metade máquina. A metade humana corrige a prova; a outra já indexou o banco inteiro.',
       headgear: true,
-      palette: ['#e5e9ef', '#3b82f6', '#14b8a6'],
-      artPrompt: 'friendly robot body, white and light-grey boxy torso with a teal screen on the chest showing a small waveform, bright blue ribbed flexible arms and legs, grey mechanical hands, chunky white feet, blue mechanical neck connector',
+      palette: ['#1f2328', '#c7ccd4', '#e5383b'],
+      artPrompt: 'half-human half-machine cyborg: black leather jacket on one half, exposed chrome machinery with a mechanical arm and leg on the other, cyan joint lights',
     },
   ]),
   ...make('b2', [

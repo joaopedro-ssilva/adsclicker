@@ -18,7 +18,8 @@ const HEAD_SKIN_LIFT = { edecio: { g: 12, b: 36 } };
 /** Professors whose head reads better a little to the right of the measured face centre (owner's call), in pixels. */
 const HEAD_NUDGE_RIGHT = { pablo: 0 };
 /** Heads that the professor's nudge pushes too far (a hood or a visor is already centred): their own value wins. */
-const HEAD_NUDGE_RIGHT_BY_SKIN = { 'pablo-garagem': 0, 'pablo-singularidade': 1 };
+// The cyborg Gladbot is half metal: the skin-based face centre lands on the human half, so it is pulled back to the middle.
+const HEAD_NUDGE_RIGHT_BY_SKIN = { 'pablo-garagem': 0, 'pablo-singularidade': 1, 'gladimir-robo': -8 };
 
 /** Lightens the skin of a head toward the fair tone of the bodies. Shadows are lifted less, so the shading stays. */
 function liftSkin(img, { g, b }) {

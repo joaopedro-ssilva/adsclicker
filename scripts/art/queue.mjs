@@ -719,11 +719,11 @@ const V8_BODIES = [
   ['gladimir-neyglad', 'a football champion: a bright yellow football jersey with green trim and the number 10, blue shorts, white socks with green stripes and black football boots, a captain armband on one arm; ONE hand holds a golden champions trophy cup up at shoulder height, the OTHER arm hangs relaxed at his side with a normal open hand; exactly two arms and two hands, both the same size; no logos, no crests, no text other than the number'],
 ];
 const V8_MYTHIC = [
-  ['gladimir-robo', 'a legendary droid from a classic space-opera film: a sleek humanoid droid body in white armor plates with royal-blue panel lines and stripes, silver mechanical joints at the shoulders, elbows and knees, a round blue and silver chest panel with small blinking red and blue lights, a utility belt of small grey modules, slim mechanical hands and sturdy plated feet; a short blue mechanical neck connector at the top instead of a neck stub; clean, iconic and heroic, not toy-like'],
+  ['gladimir-robo', 'a cyborg, half man and half machine, split down the middle: the left half of the body is human in a black leather jacket over a dark t-shirt, dark trousers and a black boot; the right half is chrome machinery with exposed grey metal plates, pistons and cables, a fully mechanical chrome arm and hand with visible joints, a mechanical leg, small cyan lights in the joints; the jacket is torn along the middle where the metal shows through; serious and cool, not comic'],
 ];
 const v8Heads = {
   gladimir: [
-    ['gladimir-robo', 'a DROID HEAD in place of his head, from a classic space-opera film: a polished white and royal-blue dome-shaped droid head with a silver band, one small round radar eye and a few blue panel details on top, and on the front a wide rounded dark screen that shows HIS OWN FACE drawn in glowing light-blue pixels (the same rectangular glasses, eyes and calm smile, simplified as a screen picture); no skin and no hair anywhere, the whole head is a machine'],
+    ['gladimir-robo', 'a CYBORG HEAD split down the middle: the LEFT half is his own normal face and short grey hair, with the left lens of his black rectangular glasses; the RIGHT half is a chrome metal skull with exposed grey plates, rivets and a few cables, no hair and no skin, and a glowing red eye where his right eye would be, with two small cyan lights on the metal; the split line runs straight from the top of the head to the chin; serious, not comic'],
   ],
   wagner: [
     ['wagner-sentinela', 'an ornate black open-face battle helmet with layered plates, thin glowing red lines, two swept-back fins and a raised red visor, face fully visible; his two eyes are identical, symmetric and both clearly drawn the same way'],
