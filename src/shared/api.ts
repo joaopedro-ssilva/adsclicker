@@ -18,6 +18,9 @@ export const SYNC_INTERVAL_MS = 45_000;
 /** A player counts as online when their last sync is newer than this. */
 export const ONLINE_WINDOW_MS = 120_000;
 
+/** Largest clock skew the sync accepts in its `clock` report (a year); anything beyond is not a report to keep. */
+export const CLOCK_SKEW_MAX_MS = 86_400_000 * 365;
+
 export const NICKNAME_MIN = 3;
 export const NICKNAME_MAX = 16;
 export const PASSWORD_MIN = 6;
@@ -136,6 +139,19 @@ export const syncRequestSchema = z.object({
    * whose epoch is not the account's gets `status: 'reset'` and nothing is written.
    */
   epoch: z.number().int().min(0).optional(),
+  /**
+   * What the browser saw about its own clock (game/clock/trustedClock.ts). Sent only when something is
+   * off, so an honest client never carries it. A forgeable hint: the server's own check of the save
+   * against its clock is the defence; this only makes it quicker and leaves a trail in the logs.
+   */
+  clock: z
+    .object({
+      /** `Date.now`, `performance.now` or `requestAnimationFrame` is no longer the browser's own function. */
+      patched: z.boolean(),
+      /** The page's `Date.now()` minus the browser's real one, in ms (0 when they agree). */
+      skewMs: z.number().int().min(-CLOCK_SKEW_MAX_MS).max(CLOCK_SKEW_MAX_MS),
+    })
+    .optional(),
 });
 export type SyncRequest = z.infer<typeof syncRequestSchema>;
 

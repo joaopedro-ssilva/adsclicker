@@ -78,6 +78,34 @@ O jogo é calculado no navegador, então trapacear o próprio save é sempre pos
 
 Reprovação marca, não apaga nem bloqueia: falso positivo custa ao jogador o ranking, não o progresso. O admin pode limpar a marca.
 
+### Relógio do jogo (anti-speedhack)
+
+Um script colado no console (trocar `Date.now`, `performance.now` e `requestAnimationFrame` por versões aceleradas) faz o jogo achar que passou mais tempo do que passou: produção, buffs, recargas e ganho offline andam mais rápido. O teste de moedas não enxerga isso (a folga de `PRODUCTION_SLACK = 5` esconde um relógio ×2). O que o script não consegue falsificar é o **relógio do servidor**. A defesa de verdade está no servidor (`players/clockCheck.ts`); o cliente só dificulta e deixa rastro.
+
+**Servidor, a cada sync com save anterior.** O save diz quanto tempo de jogo passou (`counters.playSeconds`: o motor soma tick a tick, e nunca soma o tempo "fora", que vira ganho offline); o servidor sabe quanto tempo real passou entre os dois syncs (`agora − last_seen_at`). Jogo honesto reivindica **no máximo** o tempo real (aba dormindo, throttle e notebook suspenso reivindicam menos, nunca mais). O excesso `reivindicado − 1,2 × real − 3 s` entra num balde furado guardado na linha do jogador (`players.clock_excess_seconds`):
+
+| Constante | Valor | Papel |
+| --- | --- | --- |
+| `CLOCK_RATE_LIMIT` | 1,2 | segundos de jogo por segundo real que ainda não contam como excesso |
+| `CLOCK_SLACK_SECONDS` | 3 s | folga por sync (latência, relógio do cliente alguns segundos fora) |
+| `CLOCK_SYNC_EXCESS_CAP_SECONDS` | 30 s | o que um único sync soma ao balde, além do próprio tempo real; um salto único de relógio não enche o balde |
+| `CLOCK_EXCESS_LIMIT_SECONDS` | 300 s | balde cheio: o jogador é **marcado** (`flagged`, motivo "game clock ahead of the server clock…") e o balde zera |
+| `CLOCK_EXCESS_LIMIT_PATCHED_SECONDS` | 90 s | o mesmo limite quando o próprio cliente relatou relógio alterado |
+
+Sync honesto esvazia o balde (nunca abaixo de 0: tempo parado não gera crédito). Na prática, um relógio ×2 enche o balde em cerca de 10 syncs (7 a 8 minutos de jogo), ×1,5 em cerca de 20 minutos, ×1,33 em mais de uma hora, e um sync isolado, por mais absurdo que seja, soma no máximo `tempo real + 30 s` (nunca marca). O que fica escondido é um relógio até ~×1,27 em janelas de 45 s (o piso do limite): ganho sustentável de uns 20% a 25%.
+
+**Por que marcar e não cortar o progresso.** É a regra da seção anterior: o save é um conjunto ligado (moedas, buffs, corrida, contadores); não existe um "devolver o excesso" que não o corrompa, e recusar o sync deixaria o jogo local e a nuvem desencontrados num falso positivo (o jogador perderia progresso, não só o ranking). Marcar tira o trapaceiro do ranking, do feed e dos totais, e o admin enxerga o motivo. O que dá para **limitar** sem tocar no save foi limitado: o ganho offline. Num sync com save anterior, as coletas offline só podem pagar `janela × taxa offline` (não mais um teto cheio de horas por coleta), então empurrar o relógio uma vez por minuto para coletar horas de produção reprova no teste de moedas.
+
+**Isenções.** O primeiro sync, uma volta atrás (rollback) e um overwrite forçado (`force`: o jogador escolheu o save do outro aparelho) não têm uma linha de jogo para comparar; o balde fica como estava e o limite offline generoso continua valendo. `force` não é atalho para o teste de moedas, que continua rodando. Jogador confiável (`trusted`) é julgado e logado (`sync_suspect_trusted`), nunca marcado.
+
+**Cliente (secundário, falsificável).** `src/game/clock/trustedClock.ts`:
+
+- Guarda referências ao `Date.now` e ao `performance.now` do navegador **quando o módulo carrega**, antes de qualquer coisa digitada no console; o laço do jogo (`useGame`) e a nuvem leem esse relógio. Trocar `Date.now` depois da carga não acelera mais o jogo.
+- Detecta relógio alterado: `Date.now`/`performance.now` sem `[native code]` em `Function.prototype.toString` (o `toString` também é capturado na carga), ou a hora que a página enxerga distante da real. Se algo estiver errado, o sync leva `clock: { patched, skewMs }` (ausente quando tudo está normal). O servidor registra `sync_clock_patched` (info, no máximo uma linha por jogador a cada 10 min) e usa o limite de 90 s. O relato sozinho **não marca ninguém**: quem tem extensão de privacidade que troca `Date.now` joga normalmente.
+- Não pega um script que roda antes do jogo (gerenciador de userscripts em `document-start` que também falsifica `toString`): aí as referências já nascem trocadas. Quem faz isso ainda é pego pelo servidor, que não depende do cliente.
+
+**Falsos positivos a ter em mente.** Relógio do aparelho adiantado (mais de alguns minutos de uma vez) soma no máximo um sync de excesso e some nos syncs seguintes. Trocar de aparelho não importa: `playSeconds` é acumulado no save, não no relógio do aparelho. Dois aparelhos com `force` ficam fora da comparação. Migração `drizzle/0007_player_clock_excess.sql` (aditiva: uma coluna `double precision default 0`; o `vercel-build` aplica sozinho).
+
 ## Ranking e comunidade
 
 - Quatro quadros: `coins` (ADScoins produzidos na vida), `diplomas` (diplomas ganhos), `achievements`, `clicks`. Top 100 de cada.
@@ -230,6 +258,7 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Save recusado como inválido | `sync_invalid_save` (warn) | `syncPlayer` |
 | Sync que marca suspeito, com o motivo da plausibilidade | `sync_suspect` (warn) | `syncPlayer` |
 | Sync reprovado de um jogador confiável (não marca) | `sync_suspect_trusted` (info) | `syncPlayer` |
+| Navegador relatou relógio alterado (ver "Relógio do jogo"; não marca sozinho) | `sync_clock_patched` (info) | `syncPlayer` |
 | Convidado criado | `guest_created` (info) | `createGuest` |
 | Apelido escolhido / senha definida ou trocada | `nickname_claimed`, `password_set` (info) | `players/account.ts` |
 | Login ok / falho (apelido tentado e motivo, nunca a senha) | `login_ok` (info), `login_failed` (warn) | `auth/login.ts` |

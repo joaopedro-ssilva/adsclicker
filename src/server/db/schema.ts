@@ -88,6 +88,12 @@ export const players = pgTable(
      * this player (docs/BACKEND.md, "Jogador confiável"). The admin can still flag them by hand.
      */
     trusted: boolean('trusted').notNull().default(false),
+    /**
+     * The leaky bucket of the game-clock check (players/clockCheck.ts): seconds of game time the saves
+     * claimed beyond what the server's clock allowed, still unpaid. Reaching the limit flags the player
+     * and empties it. 0 for anyone who never ran ahead.
+     */
+    clockExcessSeconds: doublePrecision('clock_excess_seconds').notNull().default(0),
 
     // Titles and launch reset ------------------------------------------------------------------
     /**

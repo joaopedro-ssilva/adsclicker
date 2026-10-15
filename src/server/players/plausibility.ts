@@ -112,6 +112,11 @@ export interface JudgeInput {
   next: GameState;
   /** Server clock milliseconds since the previous accepted sync. Ignored without `previous`. */
   elapsedMs: number;
+  /**
+   * The player chose to overwrite the cloud with their save (a conflict between devices): the offline
+   * returns in it may have been earned on the other device's time, so they keep the generous bound.
+   */
+  forced?: boolean;
   content?: GameContent;
 }
 
@@ -125,6 +130,7 @@ function rates(state: GameState, content: GameContent) {
     click: clickValue(state, content),
     autoClicks: stats.autoClicks,
     offlineSeconds: stats.offlineHours * 3600 * stats.offlineRate,
+    offlineRate: stats.offlineRate,
     diplomaGain: stats.diplomaGain,
     lumpFactor: lumpFactor(stats),
     // What a click is worth at best, as a multiple of the base click: full combo and the average crit.
@@ -134,7 +140,7 @@ function rates(state: GameState, content: GameContent) {
 }
 
 
-export function judgeSave({ previous, next, elapsedMs, content = gameContent }: JudgeInput): Verdict {
+export function judgeSave({ previous, next, elapsedMs, forced = false, content = gameContent }: JudgeInput): Verdict {
   let ratio = 0;
   const nextRates = rates(next, content);
   const prevRates = previous ? rates(previous, content) : null;
@@ -182,7 +188,11 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   const clicksAllowed = handClicksDone + autoClicks * window + AUTO_CLICK_BUFF_CLICKS * allowance;
 
   const returns = Math.min(offlineReturns, 1 + window / OFFLINE_RETURN_EVERY_SECONDS);
-  const offlineSeconds = returns * bestNumber((r) => r.offlineSeconds);
+  // Each return pays for the time away, so together they cannot pay for more time than went by: the offline rate
+  // times the real window. Without this bound a clock pushed forward once a minute collects a full cap (hours
+  // of production) per minute. A forced overwrite and a first sync have no real window to hold the returns to.
+  const offlineCap = previous && !forced ? window * bestNumber((r) => r.offlineRate) : Infinity;
+  const offlineSeconds = Math.min(returns * bestNumber((r) => r.offlineSeconds), offlineCap);
   const lumps = REWARD_LUMP_SECONDS * bestNumber((r) => r.lumpFactor) * allowance;
   const maestriaWindow = { clicks: handClicksDone, seconds: window };
   const maestriaSeconds = Math.max(

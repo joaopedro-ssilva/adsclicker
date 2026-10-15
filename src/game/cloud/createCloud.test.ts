@@ -57,7 +57,7 @@ function deferred<T>(): Deferred<T> {
 
 const settle = () => new Promise<void>((resolve) => setImmediate(resolve));
 
-function setup(options: { stored?: string; visible?: boolean } = {}) {
+function setup(options: { stored?: string; visible?: boolean; clock?: () => { patched: boolean; skewMs: number } | null } = {}) {
   let time = T0;
   const timers: { id: number; at: number; fn: () => void }[] = [];
   let nextId = 0;
@@ -151,6 +151,7 @@ function setup(options: { stored?: string; visible?: boolean } = {}) {
     env,
     storage: () => storage,
     now: () => time,
+    ...(options.clock ? { clockReport: options.clock } : {}),
     timers: {
       set: (fn, ms) => {
         nextId += 1;
@@ -216,6 +217,31 @@ describe('cloud store', () => {
     expect(state.me).toEqual(guest);
     expect(state.lastSyncedAt).toBe(T0);
     expect(JSON.parse(t.data.get(CLOUD_KEY) ?? '{}')).toEqual({ rev: 1, force: false });
+  });
+
+  it('sends no clock report while the page clock is fine, and the report when it is not', async () => {
+    const quiet = setup({ clock: () => null });
+    await quiet.start();
+    expect(quiet.syncCalls[0]?.body).not.toHaveProperty('clock');
+
+    const none = setup();
+    await none.start();
+    expect(none.syncCalls[0]?.body).not.toHaveProperty('clock');
+
+    const tampered = setup({ clock: () => ({ patched: true, skewMs: 4_000 }) });
+    await tampered.start();
+    expect(tampered.syncCalls[0]?.body).toMatchObject({ clock: { patched: true, skewMs: 4_000 } });
+  });
+
+  it('a clock report that throws never stops the save from syncing', async () => {
+    const t = setup({
+      clock: () => {
+        throw new Error('patched');
+      },
+    });
+    await t.start();
+    expect(t.syncCalls).toHaveLength(1);
+    expect(t.syncCalls[0]?.body).not.toHaveProperty('clock');
   });
 
   it('start() twice does not double up', async () => {

@@ -1,0 +1,1 @@
+ALTER TABLE "players" ADD COLUMN "clock_excess_seconds" double precision DEFAULT 0 NOT NULL;
