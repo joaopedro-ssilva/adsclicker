@@ -7,6 +7,7 @@ import { createRunStats } from './init';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { masteryRank } from './mastery';
 import { recordGraduationDay } from './session';
+import { GRADUATION_HISTORY_MAX } from './state';
 import type { GameState, RecordKey, RunSummary } from './state';
 import { computeStats, hasFeature } from './stats';
 import type { Stats } from './stats';
@@ -194,6 +195,21 @@ export function graduate(
       ...updateRecords(state),
     },
   };
+  // The Mural line is filed before the honour is replaced and the count moves on: it describes the run that ended.
+  state.graduationHistory = [
+    {
+      number: state.counters.graduations + 1,
+      at: now,
+      diplomas: diplomas + bonus,
+      bonus,
+      seconds: state.run.seconds,
+      capped,
+      honoured: state.honoured,
+      treeReset: state.treeResetGraduation === state.counters.graduations,
+    },
+    ...state.graduationHistory,
+  ].slice(0, GRADUATION_HISTORY_MAX);
+  if (honour === null) state.counters.ungratefulGraduations += 1;
   state.run = createRunStats();
   state.honoured = honour !== null && state.hired[honour] ? honour : null;
   if (state.honoured) state.honouredBefore[state.honoured] = true;
@@ -264,6 +280,7 @@ export function resetPrestigeTree(state: GameState, content: GameContent, emit: 
   state.diplomas += refunded;
   state.prestige = {};
   state.treeResetGraduation = state.counters.graduations;
+  state.counters.treeResets += 1;
   if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
   emit({ type: 'treeReset', refunded });
   return true;

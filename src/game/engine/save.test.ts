@@ -123,6 +123,25 @@ describe('save round trip', () => {
     expect(deserializeState(JSON.stringify(raw), content, T0)!.treeResetGraduation).toBeNull();
   });
 
+  it('keeps the Mural, drops malformed lines and caps it at 10; old saves start empty', () => {
+    const { state, content } = richGame();
+    const line = (n: number) => ({ number: n, at: T0, diplomas: 5, bonus: 1, seconds: 60, capped: false, honoured: null, treeReset: false });
+    state.graduationHistory = [{ ...line(2), honoured: 'gladimir', capped: true, treeReset: true }, line(1)];
+    const raw = JSON.parse(serializeState(state));
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.graduationHistory).toEqual(state.graduationHistory);
+
+    raw.graduationHistory = [line(3), { ...line(2), honoured: 'ghost' }, { ...line(2), seconds: 'x' }, 'junk', null, line(1)];
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.graduationHistory.map((e) => e.number)).toEqual([3, 1]);
+
+    raw.graduationHistory = Array.from({ length: 15 }, (_, i) => line(15 - i));
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.graduationHistory).toHaveLength(10);
+
+    delete raw.graduationHistory;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.graduationHistory).toEqual([]);
+    raw.graduationHistory = 'x';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.graduationHistory).toEqual([]);
+  });
+
   it('writes decimals as strings', () => {
     const { state } = richGame();
     const raw = JSON.parse(serializeState(state));

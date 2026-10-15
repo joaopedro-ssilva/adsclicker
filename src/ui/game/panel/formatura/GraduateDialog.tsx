@@ -1,4 +1,5 @@
 import { content, useGame } from '@/game/store';
+import { prestigeNodeAvailable, prestigeNodeCost } from '@/game/engine/prestige';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { Button, Icon, Modal } from '@/ui/kit';
 import { fmtInt } from '../lib/numbers';
@@ -21,6 +22,17 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
   // Every hired professor can be honoured, so the warning shows whenever someone is hired and nobody is picked.
   const canHonour = PROFESSOR_IDS.some((id) => hired[id]);
   const openSection = useSections((store) => store.setOpen);
+  // Diplomas still in the pocket, and whether some node of the tree could be bought with at least one of them.
+  const unspent = useGame((store) => store.state.diplomas);
+  const canSpend = useGame((store) =>
+    store.state.diplomas > 0 &&
+    content.prestigeNodes.some(
+      (node) =>
+        (store.state.prestige[node.id] ?? 0) < node.maxLevel &&
+        prestigeNodeAvailable(store.state, node) &&
+        prestigeNodeCost(node, store.state.prestige[node.id] ?? 0) <= store.state.diplomas,
+    ),
+  );
 
   /** Closes the dialog, opens the picker's section and brings it into view. */
   const chooseHonour = () => {
@@ -76,6 +88,11 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
               Escolher homenageado
             </Button>
           </div>
+        ) : null}
+        {unspent > 0 && canSpend ? (
+          <p className="graduate-unspent" data-qa="graduate-unspent">
+            Você tem {fmtInt(unspent)} {unspent === 1 ? 'diploma' : 'diplomas'} sem gastar na árvore.
+          </p>
         ) : null}
         <p className="muted">Cada diploma ganho vale um bônus permanente de produção.</p>
       </div>

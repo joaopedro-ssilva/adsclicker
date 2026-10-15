@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { content, useGame, useMaestriasView, useMonitorsView, usePrestigeNodeViews } from '@/game/store';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { Collapsible } from '@/ui/kit';
+import { GraduationMural } from './GraduationMural';
 import { GraduationSummary } from './GraduationSummary';
 import { HonourPicker } from './HonourPicker';
 import { MaestriasSection } from './maestrias/MaestriasSection';
@@ -97,6 +98,15 @@ function TreeFold() {
   );
 }
 
+function MuralFold() {
+  const count = useGame((store) => store.state.graduationHistory.length);
+  return (
+    <Fold id="mural" title="Mural de formaturas" summary={count > 0 ? `${count} ${count === 1 ? 'turma' : 'turmas'}` : 'Nenhuma ainda'}>
+      <GraduationMural />
+    </Fold>
+  );
+}
+
 /** Prestige: the diplomas and the graduate button always show; the rest folds away, closed on a first visit. */
 export function GraduationTab() {
   return (
@@ -109,6 +119,7 @@ export function GraduationTab() {
       </Fold>
       <MonitorsFold />
       <TreeFold />
+      <MuralFold />
     </div>
   );
 }

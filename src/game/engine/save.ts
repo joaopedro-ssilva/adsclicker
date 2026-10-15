@@ -7,6 +7,7 @@ import { isValidFavourite } from './favourites';
 import { createInitialState, createMonitorsState, createRecords, createRunStats } from './init';
 import { readMaestria } from './maestria/save';
 import {
+  GRADUATION_HISTORY_MAX,
   MAX_CARGO_BONUS,
   MAX_DEV_MULTIPLIER,
   MAX_MENTOR_BONUS,
@@ -23,6 +24,7 @@ import type {
   BuyAmount,
   CloudBonus,
   GameState,
+  GraduationRecord,
   LastRun,
   MonitorsState,
   RecordKey,
@@ -318,6 +320,32 @@ function isProfessorId(value: unknown): value is ProfessorId {
   return PROFESSOR_IDS.some((id) => id === value);
 }
 
+/** The Mural: malformed lines are dropped, the rest keep their order (newest first) and stop at the cap. */
+export function readGraduationHistory(value: unknown): GraduationRecord[] {
+  if (!Array.isArray(value)) return [];
+  const list: GraduationRecord[] = [];
+  for (const entry of value) {
+    if (list.length >= GRADUATION_HISTORY_MAX) break;
+    if (!isRecord(entry)) continue;
+    const { number, at, diplomas, bonus, seconds } = entry;
+    const finite = (n: unknown): n is number => typeof n === 'number' && Number.isFinite(n) && n >= 0;
+    if (!finite(number) || !finite(at) || !finite(diplomas) || !finite(bonus) || !finite(seconds)) continue;
+    if (typeof entry.capped !== 'boolean' || typeof entry.treeReset !== 'boolean') continue;
+    if (entry.honoured !== null && !isProfessorId(entry.honoured)) continue;
+    list.push({
+      number: Math.floor(number),
+      at,
+      diplomas: Math.floor(diplomas),
+      bonus: Math.min(Math.floor(bonus), Math.floor(diplomas)),
+      seconds,
+      capped: entry.capped,
+      honoured: entry.honoured,
+      treeReset: entry.treeReset,
+    });
+  }
+  return list;
+}
+
 /**
  * Builds a GameState from parsed save data, merging over a fresh initial state: missing fields
  * keep their defaults, unknown fields and ids that no longer exist in the content are dropped.
@@ -357,6 +385,7 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
     typeof raw.treeResetGraduation === 'number' && Number.isFinite(raw.treeResetGraduation) && raw.treeResetGraduation >= 0
       ? Math.floor(raw.treeResetGraduation)
       : null;
+  state.graduationHistory = readGraduationHistory(raw.graduationHistory);
 
   const triggers = new Set<string>();
   for (const def of content.achievements) if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);

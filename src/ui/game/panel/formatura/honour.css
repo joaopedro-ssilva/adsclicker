@@ -146,3 +146,101 @@
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* Mural de formaturas */
+
+.mural {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mural-empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.mural-row {
+  display: grid;
+  grid-template-columns: auto 44px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.mural-row .panel-portrait,
+.mural-nobody {
+  display: block;
+  width: 44px;
+  height: 44px;
+  background: color-mix(in srgb, var(--accent) 22%, var(--bg));
+}
+
+.mural-nobody {
+  background: repeating-linear-gradient(45deg, var(--border) 0 2px, transparent 2px 6px);
+  opacity: 0.5;
+}
+
+.mural-number {
+  min-width: 52px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.mural-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.mural-text strong {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.mural-text em {
+  margin-left: 6px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.mural-text > span {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.mural-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.mural-tag {
+  padding: 1px 5px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* Diplomas left unspent: lighter than the honour warning */
+
+.graduate-unspent {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}

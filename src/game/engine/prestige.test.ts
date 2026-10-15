@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { buyPrestigeNode, graduate, resetPrestigeTree, setBuyAmount } from './actions';
+import { content as realContent } from '../content';
 import { Decimal } from './decimal';
 import { requirementMet } from './requirements';
 import {
@@ -255,6 +256,83 @@ describe('prestige tree', () => {
     expect(child).toMatchObject({ available: false, affordable: false });
     g.state.prestige['core-power'] = 3;
     expect(prestigeNodeViews(g.state, g.content).find((v) => v.id === 'core-power')).toMatchObject({ maxed: true, affordable: false, cost: 4 });
+  });
+});
+
+describe('Mural de formaturas', () => {
+  function again(g: ReturnType<typeof ready>, honour: 'gladimir' | null = null) {
+    g.state.runCoins = new Decimal(1e6);
+    hire(g.state, 'gladimir', 'b2', 'angelo');
+    return graduate(g.state, g.content, T0 + 5, g.emit, honour);
+  }
+
+  it('files each graduation newest first, with the honour of the run that ended', () => {
+    const g = ready();
+    g.state.run.seconds = 90;
+    expect(again(g, 'gladimir')).toBe(true);
+    expect(g.state.graduationHistory).toHaveLength(1);
+    // Nobody was honoured during the first run.
+    expect(g.state.graduationHistory[0]).toMatchObject({ number: 1, at: T0 + 5, seconds: 90, honoured: null, capped: false, treeReset: false });
+    expect(g.state.graduationHistory[0]!.diplomas).toBe(g.state.diplomasEarned);
+
+    g.state.run.seconds = 30;
+    expect(again(g, null)).toBe(true);
+    expect(g.state.graduationHistory.map((e) => e.number)).toEqual([2, 1]);
+    expect(g.state.graduationHistory[0]).toMatchObject({ honoured: 'gladimir', seconds: 30 });
+  });
+
+  it('marks the run where the tree was reset', () => {
+    const g = ready();
+    g.state.diplomas = 20;
+    buyPrestigeNode(g.state, g.content, 'core-power', T0, g.emit);
+    resetPrestigeTree(g.state, g.content, T0, g.emit);
+    again(g);
+    again(g);
+    expect(g.state.graduationHistory.map((e) => e.treeReset)).toEqual([false, true]);
+  });
+
+  it('keeps only the last 10', () => {
+    const g = ready();
+    for (let i = 0; i < 13; i += 1) again(g);
+    expect(g.state.graduationHistory).toHaveLength(10);
+    expect(g.state.graduationHistory[0]!.number).toBe(13);
+    expect(g.state.graduationHistory[9]!.number).toBe(4);
+  });
+});
+
+describe('graduation achievements', () => {
+  /** The clean fixture has no achievements: bring in just the two real ones under test. */
+  function withAchievements(g: ReturnType<typeof newCleanGame>) {
+    g.content.achievements = realContent.achievements.filter((def) => def.id === 'tree-reset' || def.id === 'grad-ungrateful');
+    expect(g.content.achievements).toHaveLength(2);
+    return g;
+  }
+
+  it('Reforma Curricular unlocks on the first tree reset', () => {
+    const g = withAchievements(newCleanGame());
+    g.state.diplomas = 20;
+    buyPrestigeNode(g.state, g.content, 'core-power', T0, g.emit);
+    expect(g.state.achievements['tree-reset']).toBeUndefined();
+    resetPrestigeTree(g.state, g.content, T0, g.emit);
+    expect(g.state.counters.treeResets).toBe(1);
+    expect(g.state.achievements['tree-reset']).toBeDefined();
+  });
+
+  it('Turma Ingrata needs 3 graduations with nobody honoured', () => {
+    const g = withAchievements(ready());
+    for (let i = 0; i < 3; i += 1) {
+      expect(g.state.achievements['grad-ungrateful']).toBeUndefined();
+      g.state.runCoins = new Decimal(1e6);
+      hire(g.state, 'gladimir', 'b2', 'angelo');
+      graduate(g.state, g.content, T0, g.emit, i === 1 ? 'gladimir' : null);
+    }
+    // The honoured one in the middle does not count: only 2 so far.
+    expect(g.state.counters.ungratefulGraduations).toBe(2);
+    expect(g.state.achievements['grad-ungrateful']).toBeUndefined();
+    g.state.runCoins = new Decimal(1e6);
+    hire(g.state, 'gladimir', 'b2', 'angelo');
+    expect(graduate(g.state, g.content, T0, g.emit, null)).toBe(true);
+    expect(g.state.achievements['grad-ungrateful']).toBeDefined();
   });
 });
 

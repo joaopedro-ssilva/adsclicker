@@ -35,6 +35,8 @@ export function createCounters(): Record<CounterKey, number> {
     bolsaProfitSeconds: 0,
     designFreeLevels: 0,
     cappedGraduations: 0,
+    treeResets: 0,
+    ungratefulGraduations: 0,
   };
 }
 
@@ -113,6 +115,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     prestige: {},
     buyAmount: 1,
     treeResetGraduation: null,
+    graduationHistory: [],
 
     achievements: {},
     secrets: {},
