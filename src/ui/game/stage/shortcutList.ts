@@ -13,6 +13,7 @@ export type ShortcutId =
   | 'swarm'
   | 'festa'
   | 'bolsa'
+  | 'lab'
   | 'panel'
   | 'photo'
   | 'journal'
@@ -50,6 +51,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   { id: 'photo', key: 'C', label: 'Modo foto', group: 'Tela' },
   { id: 'leave-photo', key: 'Esc', label: 'Sair do modo foto', group: 'Tela' },
   { id: 'journal', key: 'J', label: 'Jornal do Campus', group: 'Tela' },
+  { id: 'lab', key: 'L', label: 'Laboratório de Pesquisa', group: 'Tela' },
   { id: 'tab-aulas', key: 'Shift+1', label: 'Aba Aulas', group: 'Painel' },
   { id: 'tab-pesquisas', key: 'Shift+2', label: 'Aba Pesquisas', group: 'Painel' },
   { id: 'tab-album', key: 'Shift+3', label: 'Aba Álbum', group: 'Painel' },

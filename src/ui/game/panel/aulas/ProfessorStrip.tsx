@@ -3,6 +3,7 @@ import { content, useGame } from '@/game/store';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import type { ProfessorId } from '@/game/content/types';
 import { themeVariables } from '@/ui/ThemeProvider';
+import { LabStripChip } from '../../lab/LabEntry';
 import { Portrait } from '../lib/Portrait';
 
 interface ProfessorStripProps {
@@ -34,6 +35,7 @@ export function ProfessorStrip({ selected, onSelect }: ProfessorStripProps) {
           </button>
         );
       })}
+      <LabStripChip />
     </div>
   );
 }

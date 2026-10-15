@@ -8,6 +8,7 @@ import { HackathonScreen } from '@/ui/hackathon/screen/HackathonScreen';
 import { useHackathon } from '@/ui/hackathon/store';
 import { ToastStack } from '@/ui/kit';
 import { CloudRoot } from './cloud/CloudRoot';
+import { LabHost } from './lab/LabOverlay';
 import { MomentsHost } from './moments/MomentsHost';
 import { useUi } from './shared/uiStore';
 import { SidePanel } from './panel/SidePanel';
@@ -46,6 +47,8 @@ function GameScreen() {
       {photo ? null : <FxLayer />}
       {photo ? null : <ToastStack />}
       {hackathon ? null : <ShortcutsHost />}
+      {/* The Laboratório overlay: full screen over the classroom, below the ceremonies, the effects and the toasts. */}
+      {hackathon ? null : <LabHost />}
       <MomentsHost />
       <GameEffects />
       <CloudRoot />
