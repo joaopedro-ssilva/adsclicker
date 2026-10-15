@@ -226,6 +226,22 @@ describe('conditions of the collection feats', () => {
     expect(met(g, { kind: 'monitors', gte: 4, maxed: true }).met).toBe(true);
   });
 
+  it('Mestres da Casa asks for five professors at the Domínio cap, not all eight', () => {
+    const g = game();
+    const def = content.achievements.find((a) => a.id === 'mastery-all-cap')!;
+    const { step, cap } = content.balance.mastery;
+    const maxOut = (professor: (typeof PROFESSOR_IDS)[number]) => {
+      const discipline = content.disciplines.find((d) => d.professor === professor)!;
+      g.state.levels[discipline.id] = step * cap;
+    };
+    PROFESSOR_IDS.slice(0, 4).forEach(maxOut);
+    expect(met(g, def.condition).met).toBe(false);
+    expect(achievementDetail(g.state, content, def, createProbe(g.state, content)).text).toBe(`4 de 5 professores no domínio ${cap}`);
+    maxOut(PROFESSOR_IDS[4]!);
+    expect(met(g, def.condition)).toEqual({ progress: 1, met: true });
+    expect(achievementDetail(g.state, content, def, createProbe(g.state, content)).text).toBe(`5 de 5 professores no domínio ${cap}`);
+  });
+
   it('every new feat explains what is missing', () => {
     const g = game();
     const ids = [

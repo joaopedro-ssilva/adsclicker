@@ -1,5 +1,6 @@
 'use client';
 import { formatNumber } from '@/game/engine/format';
+import { bolsaInvestedLabel } from '@/game/engine/views';
 import type { BolsaAssetView, BolsaView } from '@/game/engine/views';
 import { useBolsaView, useGame } from '@/game/store';
 import { Badge, Button, Modal, ProgressBar } from '@/ui/kit';
@@ -52,7 +53,7 @@ function Holding({ value, cost, held }: { value: BolsaAssetView['value']; cost: 
   const up = profit.gte(0);
   return (
     <p className="bolsa-hold">
-      <b>{coins(value)}</b> Oc
+      <b>{coins(value)}</b> ADScoins
       <span className="bolsa-profit" data-up={up}>
         {up ? '+' : '−'}
         {coins(profit.abs())}
@@ -166,7 +167,7 @@ export function BolsaPanel() {
               label="Investido"
               value={view.limit.gt(0) ? view.invested.div(view.limit).toNumber() : 0}
               max={1}
-              valueLabel={`${coins(view.invested)} / ${coins(view.limit)} Oc (${formatNumber(view.limitMinutes, { integer: true })} min de produção)`}
+              valueLabel={bolsaInvestedLabel(view)}
               segmented
               segments={24}
               size="sm"
