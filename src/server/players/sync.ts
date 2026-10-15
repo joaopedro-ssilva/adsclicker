@@ -21,7 +21,9 @@ import { logEvent, trackSync } from '../logs/log';
 import { RATE_RULES, consume } from '../http/rateLimit';
 import { diffFeed } from './feed';
 import { effectiveMultiplier } from './multiplier';
+import { judgeClock } from './clockCheck';
 import { isRollback, judgeSave } from './plausibility';
+import type { Verdict } from './plausibility';
 import { coinsOutOfRange, projectState } from './projection';
 import { isRanked, toCloudSave, toMe } from './summary';
 import { getTagCatalog, grantTagSql } from './tags';
@@ -43,6 +45,10 @@ export interface SyncResult {
 }
 
 const FLAG_REASON_MAX = 200;
+/** A client that reports its page clock this far from the browser's real one (ms) is worth a log line. */
+const CLOCK_SKEW_LOG_MS = 5_000;
+/** One `sync_clock_patched` line per player this often, however many syncs carry the report. */
+const CLOCK_REPORT_LOG_THROTTLE_MS = 10 * 60_000;
 
 /**
  * POST /api/sync (docs/BACKEND.md): the lean path every open game takes every 45 s. Queries on a
@@ -125,7 +131,28 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   // so `force` is not a way around the elapsed-time check.
   const stored = player.save !== null ? deserializeState(player.save, content, now) : null;
   const previous = stored && !(request.force && isRollback(stored, parsed)) ? stored : null;
-  const verdict = judgeSave({ previous, next: parsed, elapsedMs: now - player.lastSeenAt.getTime() });
+  const elapsedMs = now - player.lastSeenAt.getTime();
+  const coinVerdict = judgeSave({ previous, next: parsed, elapsedMs, forced: request.force });
+  // Game time against the server's clock (a speedhack makes the first run ahead of the second). The bucket is
+  // stored whatever the verdict, so the excess keeps counting across syncs.
+  const patched = request.clock?.patched === true;
+  const clock = judgeClock({ previous, next: parsed, elapsedMs, excessSeconds: player.clockExcessSeconds, patched, forced: request.force });
+  const verdict: Verdict = coinVerdict.ok && clock.suspect ? { ok: false, reason: clock.reason } : coinVerdict;
+  if (patched || Math.abs(request.clock?.skewMs ?? 0) >= CLOCK_SKEW_LOG_MS) {
+    logEvent(
+      db,
+      {
+        level: 'info',
+        kind: 'sync_clock_patched',
+        message: 'O navegador relatou um relógio alterado.',
+        playerId: player.id,
+        nickname: player.nickname,
+        route: '/api/sync',
+        detail: { patched, skewMs: request.clock?.skewMs ?? 0, excessSeconds: Math.round(clock.excessSeconds) },
+      },
+      { throttleMs: CLOCK_REPORT_LOG_THROTTLE_MS, throttleKey: player.id },
+    );
+  }
 
   // A trusted player (cleared for good by the admin) is still judged and logged, but never flagged.
   const suspect = !verdict.ok && !player.trusted;
@@ -154,6 +181,7 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
     lastSeenAt: new Date(now),
     flagged,
     flagReason,
+    clockExcessSeconds: clock.excessSeconds,
     ...(platinado ? { titles: grantTagSql(PLATINADO_TAG) } : {}),
     ...projectState(parsed),
   };
