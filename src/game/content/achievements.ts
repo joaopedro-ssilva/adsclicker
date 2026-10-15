@@ -255,7 +255,7 @@ export const achievements: AchievementDef[] = [
     gte: 500,
   }, { scenery: 'servidor-antigo' }),
   ach('mastery-all-10', 'professor', 'Corpo Docente', '🧑‍🏫', 'Deixe os 8 professores com Domínio 10 ou mais ao mesmo tempo.', { kind: 'mastery', rank: 10 }, { scenery: 'castelo' }),
-  ach('mastery-all-cap', 'professor', 'Mestres da Casa', '🏫', 'Deixe os 8 professores com o Domínio no máximo (40) ao mesmo tempo. Cada um já tem cadeira cativa na sala.', { kind: 'mastery', rank: 40 }, {
+  ach('mastery-all-cap', 'professor', 'Mestres da Casa', '🏫', 'Deixe 5 professores com o Domínio no máximo (40) ao mesmo tempo. Metade da sala já tem cadeira cativa.', { kind: 'mastery', rank: 40, count: 5 }, {
     scenery: 'sala-dos-professores',
   }),
   ach('design-500', 'professor', 'Sistema que se Desenha', '🧩', 'Receba 500 níveis de graça do Design System. A Bruna B2 reaproveita componente, e você reaproveita nível.', counter('designFreeLevels', 500), {

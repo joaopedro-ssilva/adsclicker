@@ -147,8 +147,8 @@ export type Condition =
   | { kind: 'runCounter'; counter: RunCounterKey; gte: number }
   /** Sum of the levels of one professor's disciplines. */
   | { kind: 'professorLevels'; professor: ProfessorId; gte: number }
-  /** Domínio rank of one professor, or of every professor when none is named. */
-  | { kind: 'mastery'; rank: number; professor?: ProfessorId }
+  /** Domínio rank of one professor, or of every professor when none is named (or of `count` of them, when given). */
+  | { kind: 'mastery'; rank: number; professor?: ProfessorId; count?: number }
   /** Every discipline of some professor sits at exactly the same level, this one or higher. */
   | { kind: 'alignedLevels'; level: number }
   /** Every ability of the game was used at least once. */

@@ -152,11 +152,12 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
       const short = professors.filter((id) => masteryRank(state, content, id) < condition.rank);
       const reached = professors.length - short.length;
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
       return {
         text: condition.professor
           ? `domínio ${n(Math.min(masteryRank(state, content, condition.professor), condition.rank))} / ${n(condition.rank)}`
-          : `${n(reached)} de ${n(professors.length)} professores no domínio ${n(condition.rank)}`,
-        note: !condition.professor && short.length > 0 ? `Ainda abaixo: ${nameList(short.map((id) => professorName(id)))}.` : null,
+          : `${n(Math.min(reached, needed))} de ${n(needed)} professores no domínio ${n(condition.rank)}`,
+        note: !condition.professor && reached < needed ? `Ainda abaixo: ${nameList(short.map((id) => professorName(id)))}.` : null,
       };
     }
     case 'alignedLevels': {

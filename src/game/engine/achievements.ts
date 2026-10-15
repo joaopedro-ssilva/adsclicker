@@ -126,14 +126,14 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       return measureAtLeast(masteryLevels(state, content, condition.professor), condition.gte);
     case 'mastery': {
       const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
-      let reached = 0;
-      let met = true;
-      for (const id of professors) {
-        const rank = masteryRank(state, content, id);
-        reached += Math.min(rank, condition.rank);
-        if (rank < condition.rank) met = false;
-      }
-      return { progress: fraction(reached, condition.rank * professors.length), met };
+      // `count` asks for only some of the professors: the best-ranked ones are the ones that count.
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      const ranks = professors
+        .map((id) => Math.min(masteryRank(state, content, id), condition.rank))
+        .sort((a, b) => b - a)
+        .slice(0, needed);
+      const reached = ranks.reduce((sum, rank) => sum + rank, 0);
+      return { progress: fraction(reached, condition.rank * needed), met: ranks.every((rank) => rank >= condition.rank) };
     }
     case 'alignedLevels': {
       let best = 0;
