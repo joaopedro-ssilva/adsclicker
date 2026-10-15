@@ -324,7 +324,8 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     });
   });
 
-  describe('game clock (speedhack)', () => {
+  // Each case plays dozens of syncs through the real engine: about 2 s alone, past the 5 s default when the whole suite runs in parallel.
+  describe('game clock (speedhack)', { timeout: 30_000 }, () => {
     /**
      * A player whose game runs `speed` times faster than the server's clock: each sync is 45 s of server time
      * and carries `45 x speed` seconds of simulated play. Returns the saves, in order.
