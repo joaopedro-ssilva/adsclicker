@@ -307,7 +307,7 @@ export interface LabBenchView {
   effects: LabLine[];
   /** Run buffs picked, with how many times. */
   buffs: { id: string; name: string; emoji: string; description: string; count: number }[];
-  /** An item waiting for the player to equip or recycle it, with the one it would replace. */
+  /** An item waiting for the player to equip or recycle it, with the one it would replace and the Commits each recycle pays. */
   pending: { item: LabItemView; replaces: LabItemView | null; recycleNew: number; recycleOld: number | null } | null;
 }
 
@@ -350,11 +350,13 @@ export function labBenchView(state: GameState, content: GameContent): LabBenchVi
     const slot = view?.slot;
     const current = slot ? lab.turma.equipped[slot] : undefined;
     if (view) {
+      // What recycling pays is the rarity's value with the Commits bonus of the tree and the items, as the engine pays it.
+      const bonus = 1 + Math.max(0, totals.lab.commits);
       pending = {
         item: view,
         replaces: current ? labItemView(state, content, current, true) : null,
-        recycleNew: recycleValue(content, run.pending),
-        recycleOld: current ? recycleValue(content, current) : null,
+        recycleNew: Math.floor(recycleValue(content, run.pending) * bonus),
+        recycleOld: current ? Math.floor(recycleValue(content, current) * bonus) : null,
       };
     }
   }

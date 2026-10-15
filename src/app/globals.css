@@ -30,6 +30,7 @@
 @import '../ui/game/stage/stage.css';
 @import '../ui/game/moments/moments.css';
 @import '../ui/game/panel/panel.css';
+@import '../ui/game/lab/lab.css';
 
 /* Hackathon mode: each file is an index owned by one engineer */
 @import '../ui/hackathon/arena/arena.css';

@@ -337,7 +337,7 @@ export const lab: LabConfig = {
   },
   labels: {
     stats: {
-      clickPower: 'Poder do clique',
+      clickPower: 'ADScoins por clique',
       comboMax: 'Combo máximo',
       comboDecay: 'Queda do combo',
       abilityDuration: 'Duração das habilidades',
