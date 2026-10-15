@@ -27,21 +27,24 @@ function OfferCard({ offer }: { offer: LabOfferView }) {
 
   return (
     <article className="lab-offer" data-kind={offer.kind} data-rarity={offer.item?.rarity} aria-label={`${KIND_LABEL[offer.kind]}: ${offer.title}`}>
-      <p className="lab-offer-kind">{KIND_LABEL[offer.kind]}</p>
       {offer.item ? (
-        <ItemBody item={offer.item} art={72}>
-          {compare ? <p className="lab-offer-compare">{compare}</p> : <p className="lab-offer-compare">Slot livre: equipa na hora.</p>}
-          {action}
+        <ItemBody item={offer.item} variant="row" art={64}>
+          <div className="lab-offer-foot">
+            <p className="lab-offer-compare">{compare ?? 'Slot livre: equipa na hora.'}</p>
+            {action}
+          </div>
         </ItemBody>
       ) : (
         <div className="lab-offer-plain">
           <span className="lab-offer-emoji" aria-hidden="true">
             {offer.emoji}
           </span>
-          <p className="lab-item-name">{offer.title}</p>
-          {offer.lines.length > 0 ? <LineList lines={offer.lines} /> : null}
-          <p className="lab-offer-text">{offer.description}</p>
-          {action}
+          <div className="lab-offer-main">
+            <p className="lab-item-name">{offer.title}</p>
+            {offer.lines.length > 0 ? <LineList lines={offer.lines} /> : null}
+            <p className="lab-offer-text">{offer.description}</p>
+            <div className="lab-offer-foot">{action}</div>
+          </div>
         </div>
       )}
     </article>
@@ -86,22 +89,22 @@ export function Compare({ pending }: { pending: NonNullable<LabBenchView['pendin
           <p className="lab-compare-tag" data-tone="new">
             Novo
           </p>
-          <ItemBody item={item} art={72} />
+          <ItemBody item={item} variant="row" art={64} />
         </div>
         {replaces ? (
           <div>
             <p className="lab-compare-tag">Atual</p>
-            <ItemBody item={replaces} art={72} />
+            <ItemBody item={replaces} variant="row" art={64} />
           </div>
         ) : null}
-      </div>
-      <div className="lab-compare-actions">
-        <Button onClick={() => void equip()} data-qa="lab-equip">
-          Equipar (recicla o atual{pending.recycleOld !== null ? `, +${formatNumber(pending.recycleOld, { integer: true })} Commits` : ''})
-        </Button>
-        <Button variant="secondary" onClick={() => void recycle()} data-qa="lab-recycle">
-          Reciclar o novo (+{formatNumber(pending.recycleNew, { integer: true })} Commits)
-        </Button>
+        <div className="lab-compare-actions">
+          <Button onClick={() => void equip()} data-qa="lab-equip">
+            Equipar (recicla o atual{pending.recycleOld !== null ? `, +${formatNumber(pending.recycleOld, { integer: true })} Commits` : ''})
+          </Button>
+          <Button variant="secondary" onClick={() => void recycle()} data-qa="lab-recycle">
+            Reciclar o novo (+{formatNumber(pending.recycleNew, { integer: true })} Commits)
+          </Button>
+        </div>
       </div>
     </section>
   );

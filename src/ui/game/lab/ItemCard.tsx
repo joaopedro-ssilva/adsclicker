@@ -27,8 +27,12 @@ export function LineList({ lines }: { lines: readonly LabLine[] }) {
 
 interface ItemBodyProps {
   item: LabItemView;
+  /** "card" stacks art and name over the affixes (the equipment grid); "row" puts the art beside everything else (rewards, compare). */
+  variant?: 'card' | 'row';
   /** Art side in px. */
   art?: number;
+  /** A line above the item inside its frame (the slot name of the equipment cards). */
+  label?: ReactNode;
   /** Adds a control to the end of each affix row (the "Sortear" button of the bench). */
   affixAction?: (affix: LabAffixView) => ReactNode;
   /** Shown under the affixes (the level up button, the compare buttons). */
@@ -36,26 +40,25 @@ interface ItemBodyProps {
 }
 
 /** An item as the bench, the rewards and the compare view show it: art, name, rarity, level, power and every affix written out. */
-export function ItemBody({ item, art = 72, affixAction, children }: ItemBodyProps) {
-  return (
-    <div className="lab-item" data-rarity={item.rarity} data-qa={`lab-item-${item.base}`}>
-      <div className="lab-item-head">
-        <ItemArt asset={item.asset} name={item.name} size={art} />
-        <div className="lab-item-id">
-          <p className="lab-item-name">{item.name}</p>
-          <p className="lab-item-meta">
-            <b className="lab-rarity">{item.rarityName}</b>
-            <span>
-              Nv {item.level}/{item.maxLevel}
-            </span>
-          </p>
-          <p className="lab-item-power">
-            Poder <b>{formatNumber(item.power)}</b>
-            {item.nextPower !== null ? <small> (próximo nível: {formatNumber(item.nextPower)})</small> : <small> (nível máximo)</small>}
-          </p>
-        </div>
-      </div>
+export function ItemBody({ item, variant = 'card', art = 56, label, affixAction, children }: ItemBodyProps) {
+  const id = (
+    <div className="lab-item-id">
+      <p className="lab-item-name">{item.name}</p>
+      <p className="lab-item-meta">
+        <b className="lab-rarity">{item.rarityName}</b>
+        <span>
+          Nv {item.level}/{item.maxLevel}
+        </span>
+      </p>
+      <p className="lab-item-power">
+        Poder <b>{formatNumber(item.power)}</b>
+        {item.nextPower !== null ? <small> (próximo nível: {formatNumber(item.nextPower)})</small> : <small> (nível máximo)</small>}
+      </p>
+    </div>
+  );
 
+  const rest = (
+    <>
       {item.affixes.length > 0 ? (
         <ul className="lab-affixes">
           {item.affixes.map((affix) => (
@@ -80,6 +83,29 @@ export function ItemBody({ item, art = 72, affixAction, children }: ItemBodyProp
         </p>
       ) : null}
       {children}
+    </>
+  );
+
+  return (
+    <div className="lab-item" data-variant={variant} data-rarity={item.rarity} data-qa={`lab-item-${item.base}`}>
+      {label}
+      {variant === 'row' ? (
+        <div className="lab-item-row">
+          <ItemArt asset={item.asset} name={item.name} size={art} />
+          <div className="lab-item-main">
+            {id}
+            {rest}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="lab-item-head">
+            <ItemArt asset={item.asset} name={item.name} size={art} />
+            {id}
+          </div>
+          {rest}
+        </>
+      )}
     </div>
   );
 }

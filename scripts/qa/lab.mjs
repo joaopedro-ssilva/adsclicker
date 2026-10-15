@@ -1,5 +1,6 @@
 // Screenshots of the Laboratório de Pesquisa on a running dev server, from a save made by scripts/dev/lab-saves.ts.
-// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--roster] [--tab=arvore|registro] [--wait=ms] [--clicks=N] [--scroll=px]
+// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=arvore|registro] [--wait=ms] [--clicks=N] [--scroll=px]
+//   --size    viewport, e.g. 1920x1080 (default 1440x900; --mobile is 390x844)
 //   --scroll  scrolls the body of the overlay before the shot (and reports any horizontal scroll)
 //   --roster  shoots the classroom with the 9th slot instead of opening the overlay (opens nothing)
 //   --clicks  clicks the monitor N times before the shot
@@ -10,9 +11,14 @@ const [saveFile, out = 'lab.png', ...flags] = process.argv.slice(2);
 const flag = (name) => flags.find((f) => f.startsWith(`--${name}=`))?.slice(name.length + 3);
 const has = (name) => flags.some((f) => f === `--${name}` || f.startsWith(`--${name}=`));
 
+const viewport = () => {
+  if (has('mobile')) return { width: 390, height: 844 };
+  const [width, height] = (flag('size') ?? '1440x900').split('x').map(Number);
+  return { width, height };
+};
 const base = process.env.QA_BASE ?? 'http://localhost:3000';
 const browser = await chromium.launch();
-const context = await browser.newContext({ viewport: has('mobile') ? { width: 390, height: 844 } : { width: 1440, height: 900 }, hasTouch: has('mobile') });
+const context = await browser.newContext({ viewport: viewport(), hasTouch: has('mobile') });
 const page = await context.newPage();
 
 const errors = [];

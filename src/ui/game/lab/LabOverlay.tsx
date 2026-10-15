@@ -5,7 +5,7 @@ import { useCoins, useGame, useGameEvents, useGameState, useLabBenchView, useLab
 import { IconButton, Keycap } from '@/ui/kit';
 import { useUi } from '../shared/uiStore';
 import { shortcutKey } from '../stage/shortcutList';
-import { Bench } from './Bench';
+import { Equipment, Summary } from './Bench';
 import { Compare, FightNote, Rewards } from './Decision';
 import { LabUnlockDialog } from './LabEntry';
 import { useLabOverlay } from './labOverlayStore';
@@ -56,17 +56,28 @@ function Research() {
   const rewards = useLabRewardsView();
   const feed = useLabFeed();
 
+  const compare = monitor.status === 'equip' && bench.pending ? <Compare pending={bench.pending} /> : null;
+  const decision = rewards.open || compare !== null;
+
+  // Desktop: summary | equipment | monitor, and the decision strip across the bottom when there is one. Narrow screens
+  // stack them in the order monitor, decision, summary, equipment (see the areas in lab.css).
   return (
-    <div className="lab-grid">
-      <div className="lab-main">
+    <div className="lab-grid" data-decision={decision}>
+      <Summary view={bench} />
+      <Equipment view={bench} />
+      <section className="lab-area-monitor lab-panel" aria-label="Pesquisa em andamento">
+        <header className="lab-section-head">
+          <h3>Pesquisa em andamento</h3>
+        </header>
         <Monitor view={monitor} feed={feed} />
-        {rewards.open ? <Rewards view={rewards} /> : null}
-        {monitor.status === 'equip' && bench.pending ? <Compare pending={bench.pending} /> : null}
         {monitor.status === 'fighting' ? <FightNote view={monitor} /> : null}
-      </div>
-      <aside className="lab-side">
-        <Bench view={bench} />
-      </aside>
+      </section>
+      {decision ? (
+        <div className="lab-area-decision">
+          {rewards.open ? <Rewards view={rewards} /> : null}
+          {compare}
+        </div>
+      ) : null}
     </div>
   );
 }

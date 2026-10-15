@@ -226,24 +226,69 @@ button.lab-slot {
   overflow: hidden;
 }
 
+/* Desktop: three columns (summary | equipment | monitor), and the decision strip across the bottom while there is one. */
 .lab-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(380px, 460px);
-  gap: var(--space-4);
+  grid-template-columns: minmax(220px, 250px) minmax(0, 1fr) minmax(320px, 380px);
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: 'summary equipment monitor';
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 1600px;
   height: 100%;
-  padding: var(--space-4);
+  margin-inline: auto;
+  padding: var(--space-3);
 }
 
-.lab-main,
-.lab-side {
+.lab-grid[data-decision='true'] {
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'summary equipment monitor'
+    'decision decision decision';
+}
+
+.lab-area-summary {
+  grid-area: summary;
+}
+
+.lab-area-equipment {
+  grid-area: equipment;
+}
+
+.lab-area-monitor {
+  grid-area: monitor;
+}
+
+.lab-area-decision {
   display: grid;
-  align-content: start;
-  gap: var(--space-4);
+  grid-area: decision;
+  gap: var(--space-3);
   min-width: 0;
-  min-height: 0;
+  max-height: 44dvh;
+  padding: 0 4px 4px 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
+}
+
+/* A column of the research screen: it scrolls by itself when the screen is short. */
+.lab-panel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  border: 2px solid var(--border);
+}
+
+.lab-panel > .lab-section-head {
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--border);
 }
 
 .lab-tree,
@@ -299,12 +344,9 @@ button.lab-slot {
   display: grid;
   justify-items: center;
   justify-self: center;
-  width: min(100%, clamp(360px, calc((100dvh - 380px) * 1.35), 620px));
-}
-
-/* Rewards and the compare view need the room: the monitor gives some of its height back while one is up. */
-.lab-main:has(.lab-decision:not(.lab-fight-note)) .lab-monitor {
-  width: min(100%, clamp(340px, calc((100dvh - 560px) * 1.35), 620px));
+  width: 100%;
+  max-width: 520px;
+  padding-right: 6px;
 }
 
 /* The game's effects canvas (coin bursts, floating numbers) sits above everything: under the lab it is only noise. */
@@ -315,7 +357,7 @@ body:has(.lab) .fx-canvas {
 .lab-bezel {
   position: relative;
   width: 100%;
-  padding: 14px 14px 8px;
+  padding: 10px 10px 6px;
   background:
     linear-gradient(145deg, #3a3f50, #232632 55%, #1a1c26);
   border: 3px solid #0a0b10;
@@ -331,7 +373,7 @@ body:has(.lab) .fx-canvas {
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: var(--space-2);
   aspect-ratio: 4 / 3;
-  min-height: 280px;
+  min-height: 250px;
   padding: var(--space-3);
   overflow: hidden;
   color: #8dffcf;
@@ -565,7 +607,7 @@ body:has(.lab) .fx-canvas {
 /* Mobs */
 
 .lab-arena {
-  --zoom: 1;
+  --zoom: 0.78;
 
   position: relative;
   z-index: 2;
@@ -887,20 +929,40 @@ body:has(.lab) .fx-canvas {
   --rarity: var(--border);
 
   display: grid;
-  gap: var(--space-2);
-  padding: var(--space-3);
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 10px;
   background: color-mix(in srgb, var(--rarity) 7%, var(--surface));
   border: 2px solid var(--rarity);
   box-shadow: 3px 3px 0 var(--shadow-color);
 }
 
-.lab-item-head {
+/* The equipment cards: art and name on top, affixes in the middle, the level up button always at the bottom. */
+.lab-item[data-variant='card'] {
   display: flex;
-  align-items: center;
-  gap: var(--space-3);
+  flex-direction: column;
 }
 
-.lab-item-head .lab-art {
+.lab-item-head,
+.lab-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lab-item-row {
+  align-items: flex-start;
+}
+
+.lab-item-main {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lab-item-head .lab-art,
+.lab-item-row .lab-art {
   padding: 4px;
   background-color: color-mix(in srgb, var(--rarity) 14%, #0a0c12);
   background-origin: content-box;
@@ -921,7 +983,7 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-item-name {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 900;
   line-height: 1.2;
 }
@@ -929,8 +991,8 @@ body:has(.lab) .fx-canvas {
 .lab-item-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px var(--space-3);
-  font-size: 12px;
+  gap: 0 var(--space-2);
+  font-size: 11px;
   color: var(--text-muted);
 }
 
@@ -941,23 +1003,23 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-item-power {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
 }
 
 .lab-item-power b {
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text);
 }
 
 .lab-item-power small {
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .lab-affixes {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -965,21 +1027,25 @@ body:has(.lab) .fx-canvas {
 
 .lab-affix {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 6px var(--space-3);
-  padding: 6px 8px;
+  gap: var(--space-2);
+  padding: 4px 6px;
   background: rgb(0 0 0 / 0.25);
   border-left: 3px solid var(--rarity);
+}
+
+.lab-affix .ui-button {
+  flex-shrink: 0;
 }
 
 .lab-lines {
   display: grid;
   gap: 2px;
   min-width: 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .lab-line[data-scope='clicker'] {
@@ -1032,15 +1098,16 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-item-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
+  display: grid;
+  margin-top: auto;
+  padding-top: 2px;
 }
 
-.lab-item-hint {
-  font-size: 10px;
-  color: var(--text-muted);
+.lab .lab-item-actions .ui-button {
+  gap: 6px;
+  width: 100%;
+  min-height: 30px;
+  padding-block: 4px;
 }
 
 .lab .ui-button small {
@@ -1051,38 +1118,40 @@ body:has(.lab) .fx-canvas {
   font-variant-numeric: tabular-nums;
 }
 
-.lab-reroll {
-  min-height: 30px;
-  padding: 3px 10px;
+.lab .ui-button.lab-reroll {
+  gap: 4px;
+  min-height: 26px;
+  padding: 2px 8px;
   font-size: 11px;
+  box-shadow: none;
 }
 
 /* ---------- Bench ---------- */
 
-.lab-bench {
-  display: grid;
-  gap: var(--space-3);
+.lab-summary-totals {
+  font-size: 13px;
+  color: var(--text-muted);
 }
 
-.lab-summary {
+.lab-summary-totals b {
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--text);
+}
+
+.lab-summary-block {
   display: grid;
-  gap: 6px;
-  padding: var(--space-3);
-  background: var(--surface);
-  border: 2px solid var(--border);
+  gap: 4px;
+  padding-top: var(--space-2);
+  border-top: 2px solid var(--border);
 }
 
 .lab-summary-title {
-  margin-top: 4px;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-muted);
-}
-
-.lab-summary-title:first-child {
-  margin-top: 0;
 }
 
 .lab-buffs {
@@ -1095,15 +1164,17 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-buffs li {
-  padding: 3px 8px;
-  font-size: 12px;
+  padding: 2px 6px;
+  font-size: 11px;
   font-weight: 700;
   background: var(--surface-raised);
   border: 2px solid var(--border);
 }
 
+/* The four slots: 2x2 on desktop, as many as fit per row on narrower screens. */
 .lab-slots {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
   margin: 0;
   padding: 0;
@@ -1112,45 +1183,63 @@ body:has(.lab) .fx-canvas {
 
 .lab-slot-card {
   display: grid;
-  gap: 6px;
+  min-width: 0;
+}
+
+.lab-slot-card > * {
+  height: 100%;
 }
 
 .lab-slot-title {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 2px var(--space-3);
+  gap: var(--space-2);
+  min-width: 0;
 }
 
 .lab-slot-title b {
+  flex-shrink: 0;
   font-family: var(--font-display);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--lab);
+  color: var(--rarity, var(--lab));
 }
 
 .lab-slot-title span {
-  font-size: 11px;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text-muted);
 }
 
 .lab-slot-empty {
-  padding: var(--space-4) var(--space-3);
-  text-align: center;
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-height: 150px;
+  padding: 8px 10px;
   background: rgb(0 0 0 / 0.2);
   border: 2px dashed var(--border);
+}
+
+.lab-slot-empty > p:last-child {
+  align-self: center;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text-muted);
 }
 
 /* ---------- Rewards and compare ---------- */
 
 .lab-decision {
   display: grid;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
   border: 2px solid var(--lab);
-  box-shadow: 4px 4px 0 var(--shadow-color);
 }
 
 .lab-fight-note .lab-center-fine {
@@ -1159,10 +1248,15 @@ body:has(.lab) .fx-canvas {
 
 .lab-fight-note {
   gap: 4px;
+  padding: var(--space-2);
   border-color: var(--border);
-  box-shadow: none;
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1.4;
   color: var(--text-muted);
+}
+
+.lab-fight-note .lab-center-fine {
+  font-size: 10px;
 }
 
 .lab-fight-note b {
@@ -1171,14 +1265,12 @@ body:has(.lab) .fx-canvas {
 
 .lab-offers {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: var(--space-3);
 }
 
 .lab-offer {
   display: grid;
-  align-content: start;
-  gap: var(--space-2);
   min-width: 0;
 }
 
@@ -1186,29 +1278,44 @@ body:has(.lab) .fx-canvas {
   height: 100%;
 }
 
-.lab-offer-kind {
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-muted);
+.lab-offer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .lab-offer-compare {
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 11px;
   color: var(--text-muted);
 }
 
+.lab-offer-foot .ui-button {
+  flex-shrink: 0;
+}
+
 .lab-offer-plain {
-  display: grid;
-  align-content: start;
-  justify-items: start;
-  gap: var(--space-2);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
   height: 100%;
-  padding: var(--space-3);
+  padding: 8px 10px;
   background: var(--surface);
   border: 2px solid var(--border);
   box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.lab-offer-main {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lab-offer-main .lab-offer-foot {
+  justify-content: flex-end;
 }
 
 .lab-offer[data-kind='buff'] .lab-offer-plain {
@@ -1224,8 +1331,11 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-offer-emoji {
-  font-size: 38px;
-  line-height: 1;
+  flex-shrink: 0;
+  width: 64px;
+  font-size: 36px;
+  line-height: 64px;
+  text-align: center;
 }
 
 .lab-offer-text {
@@ -1233,14 +1343,14 @@ body:has(.lab) .fx-canvas {
   color: var(--text-muted);
 }
 
-.lab-offer .ui-button,
 .lab-item .ui-button {
   justify-self: start;
 }
 
+/* New item | current item | the two buttons. */
 .lab-compare-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(200px, 280px);
   gap: var(--space-3);
 }
 
@@ -1258,9 +1368,9 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-compare-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  display: grid;
+  align-content: center;
+  gap: var(--space-2);
 }
 
 /* ---------- Tree ---------- */
@@ -1431,28 +1541,73 @@ body:has(.lab) .fx-canvas {
 
 /* ---------- Narrow screens: one column, the whole body scrolls ---------- */
 
-@media (max-width: 1023px) {
+/* Tablet: the monitor on top, then the decision, then the summary beside the equipment. The body scrolls. */
+@media (max-width: 1199px) {
   .lab-body {
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .lab-grid {
-    display: flex;
-    flex-direction: column;
+  .lab-grid,
+  .lab-grid[data-decision='true'] {
+    grid-template-columns: minmax(200px, 250px) minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-template-areas:
+      'monitor monitor'
+      'summary equipment';
     height: auto;
   }
 
-  .lab-main,
-  .lab-side {
+  .lab-grid[data-decision='true'] {
+    grid-template-areas:
+      'monitor monitor'
+      'decision decision'
+      'summary equipment';
+  }
+
+  .lab-panel {
     overflow: visible;
   }
 
-  .lab-monitor {
-    width: 100%;
-    max-width: 620px;
+  .lab-area-decision {
+    max-height: none;
+    overflow: visible;
   }
 
+  .lab-slots {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .lab-compare-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  }
+}
+
+/* Phones (and a portrait tablet): one column. */
+@media (max-width: 768px) {
+  .lab-grid,
+  .lab-grid[data-decision='true'] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'monitor'
+      'summary'
+      'equipment';
+  }
+
+  .lab-grid[data-decision='true'] {
+    grid-template-areas:
+      'monitor'
+      'decision'
+      'summary'
+      'equipment';
+  }
+
+  .lab-offers {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 1023px) {
   .lab-tree,
   .lab-records {
     height: auto;
