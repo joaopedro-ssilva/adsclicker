@@ -534,7 +534,8 @@
       "target": {
         "axis": "max",
         "size": 28
-      }
+      },
+      "hires": true
     },
     {
       "file": "hk-items-2.png",
@@ -561,7 +562,8 @@
       "target": {
         "axis": "max",
         "size": 28
-      }
+      },
+      "hires": true
     },
     {
       "file": "hk-arena.png",

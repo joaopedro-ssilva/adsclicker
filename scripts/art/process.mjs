@@ -715,7 +715,18 @@ async function processSheet(sheet, anchors) {
     const key = sheet.keys[k];
     if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
-    const tall = typicalH > 0 && item.h > typicalH * 1.12;
+    // sheet.hires: the item keeps the resolution it was drawn at (cut out of the magenta, no pixel-art sampling).
+    if (sheet.hires) {
+      removeFringe(item);
+      removeIsolated(item);
+      const sprite = trim(item);
+      const rel = `${folder}/${key}`;
+      await savePng(sprite, path.join(ASSETS_DIR, `${rel}.png`));
+      delete anchors[rel];
+      console.log(`  ${rel}  ${sprite.w}x${sprite.h}  (hires)`);
+      continue;
+    }
+    const tall =typicalH > 0 && item.h > typicalH * 1.12;
     const itemTarget = sheet.sizes?.[key] ? { ...target, size: sheet.sizes[key] } : target;
     const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, itemTarget, key, tall ? typicalH : undefined);
     let sprite = blockSample(item, b, px, py);

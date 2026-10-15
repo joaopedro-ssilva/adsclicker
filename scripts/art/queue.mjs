@@ -327,7 +327,8 @@ const hkItemSheet = (file, items, note) => ({
   kind: 'icon',
   keys: items.map((i) => i[0]),
   refs: ['icons.png'],
-  sheet: { folder: 'hackathon/items', layout: [6, 6], target: { axis: 'max', size: 28 } },
+  // The Laboratório shows the items at the resolution they were drawn at, not as pixel art.
+  sheet: { folder: 'hackathon/items', layout: [6, 6], target: { axis: 'max', size: 28 }, hires: true },
   text: `${HK_BASE}. ${HK_STYLE} It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
 });
 
