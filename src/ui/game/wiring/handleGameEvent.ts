@@ -243,6 +243,24 @@ export function handleGameEvent(event: GameEvent): void {
         duration: 4000,
       });
       break;
+    // Laboratório de Pesquisa: only the moments that matter get a toast; the screen itself reads the state.
+    case 'labUnlocked':
+      audio.play('unlock');
+      toast({ title: '🔬 Laboratório de Pesquisa liberado', description: 'A porta fica na sala do Pablo.', tone: 'good', duration: 6000 });
+      break;
+    case 'labBossBeaten':
+      audio.play('sprintDone');
+      toast({ title: `🔥 Chefão derrotado na fase ${event.phase}`, tone: 'good', duration: 3500 });
+      break;
+    case 'labBroken':
+      audio.play('sprintFailed');
+      toast({
+        title: '💥 O monitor quebrou',
+        description: `${event.reason === 'timer' ? 'O prazo do chefão acabou' : 'A integridade zerou'} na fase ${event.phase}. +${event.commits} Commits.`,
+        tone: 'bad',
+        duration: 6000,
+      });
+      break;
     case 'reset':
       fx.clear();
       forgetLayers();

@@ -269,6 +269,29 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         });
       },
 
+      unlockLab: () => run((state, emit) => engine.unlockLab(state, content, now(), emit), true),
+      setLabOpen(open) {
+        run((state) => {
+          if (state.lab.open === open) return false;
+          engine.setLabOpen(state, open);
+          return true;
+        });
+      },
+      startLabRun() {
+        // The seed is drawn here, outside the engine: the run is replayable from it.
+        const seed = Math.floor(rng() * 4294967296) >>> 0;
+        return run((state, emit) => engine.startLabRun(state, content, seed, now(), emit), true);
+      },
+      labClick() {
+        run((state, emit) => engine.labClick(state, content, now(), emit));
+      },
+      chooseLabReward: (index) => run((state, emit) => engine.chooseLabReward(state, content, index, now(), emit), true),
+      equipLabPending: () => run((state, emit) => engine.equipLabPending(state, content, now(), emit), true),
+      recycleLabPending: () => run((state, emit) => engine.recycleLabPending(state, content, now(), emit), true),
+      levelUpLabItem: (slot) => run((state, emit) => engine.levelUpLabItem(state, content, slot, now(), emit), true),
+      rerollLabAffix: (slot, affix) => run((state, emit) => engine.rerollLabAffix(state, content, slot, affix, now(), emit), true),
+      buyLabNode: (id) => run((state, emit) => engine.buyLabNode(state, content, id, now(), emit), true),
+
       triggerSecret(trigger) {
         run((state, emit) => engine.triggerSecret(state, content, trigger, now(), emit), true);
       },

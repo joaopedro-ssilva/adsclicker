@@ -2,6 +2,7 @@ import { PROFESSOR_IDS } from '../content/types';
 import type { Effect, Feature, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import type { Decimal } from './decimal';
+import { labClickerEffects } from './lab/effects';
 import { releaseMultiplier } from './maestria/releases';
 import { masteryRank } from './mastery';
 import type { GameState } from './state';
@@ -144,6 +145,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     if (def && levels > 0) acc.push(def.effects, levels);
   }
   for (const buff of state.buffs) acc.push(buff.effects);
+  // The Laboratório: equipped items and run buffs of this turma, capped and scaled by the lab tree.
+  if (state.lab.unlocked) acc.push(labClickerEffects(state, content));
 
   // Domínio and the honoured professor. They only count while the professor is hired.
   for (const id of PROFESSOR_IDS) {

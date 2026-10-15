@@ -1,5 +1,5 @@
 import type Decimal from 'break_infinity.js';
-import type { MonitorId, ProfessorId, Rarity } from '../content/types';
+import type { LabSlot, MonitorId, ProfessorId, Rarity } from '../content/types';
 import type { BuyAmount, CloudBonus, GameState, MonitorsState, Settings } from '../engine/state';
 
 // ---------------------------------------------------------------------------
@@ -49,6 +49,18 @@ export type GameEvent =
   | { type: 'graduate'; diplomas: number; bonus?: number }
   /** The tree of diplomas was reset; `refunded` diplomas came back. */
   | { type: 'treeReset'; refunded: number }
+  /** Laboratório de Pesquisa. */
+  | { type: 'labUnlocked' }
+  | { type: 'labRunStarted'; seed: number }
+  | { type: 'labPhaseCleared'; phase: number; boss: boolean }
+  | { type: 'labBossBeaten'; phase: number }
+  /** The monitor broke (the boss timer ran out or the integrity hit 0); `commits` were paid. */
+  | { type: 'labBroken'; phase: number; reason: 'timer' | 'integrity'; commits: number }
+  /** An item was taken from the rewards; `equipped` is false when it waits for a decision (the slot is taken). */
+  | { type: 'labItemGained'; item: string; rarity: string; equipped: boolean }
+  | { type: 'labItemRecycled'; item: string; rarity: string }
+  | { type: 'labItemChanged'; action: 'levelUp' | 'reroll'; item: string; level: number }
+  | { type: 'labNodeBought'; id: string; level: number }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -277,6 +289,27 @@ export interface GameActions {
   sellBolsaAsset(id: string, fraction: number): boolean;
   depositBolsaFund(fraction: number): boolean;
   withdrawBolsaFund(fraction: number): boolean;
+
+  /** Laboratório de Pesquisa (see docs/LABORATORIO.md). Spends 100 diplomas once, after Pablo is hired. */
+  unlockLab(): boolean;
+  /** The lab screen is open (the run advances) or closed (the run is paused). */
+  setLabOpen(open: boolean): void;
+  /** Starts the run of this turma, with a seed drawn now. Only when every aula is at level 1 or more, once per turma. */
+  startLabRun(): boolean;
+  /** A click on the monitor. Past 5 clicks in a second it counts for nothing. */
+  labClick(): void;
+  /** Picks one of the options after a phase. */
+  chooseLabReward(index: number): boolean;
+  /** The item waiting for a decision takes its slot (the one in it is recycled into Commits). */
+  equipLabPending(): boolean;
+  /** The item waiting for a decision is recycled into Commits. */
+  recycleLabPending(): boolean;
+  /** Raises the item in the slot one level with ADScoins. */
+  levelUpLabItem(slot: LabSlot): boolean;
+  /** Rolls one affix of the item in the slot again with ADScoins. */
+  rerollLabAffix(slot: LabSlot, affix: number): boolean;
+  /** One level of a node of the lab tree, with Commits. */
+  buyLabNode(id: string): boolean;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;

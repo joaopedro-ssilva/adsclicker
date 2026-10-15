@@ -2,6 +2,7 @@ import { MONITOR_IDS, PROFESSOR_IDS } from '../content/types';
 import type { CounterKey, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import { ZERO } from './decimal';
+import { createLabState } from './lab/state';
 import { createMaestriaState } from './maestria/slots';
 import { SAVE_VERSION } from './state';
 import type { GameState, MonitorsState, Records, RunStats, Settings } from './state';
@@ -146,6 +147,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     abilitiesTried: {},
     maestria: createMaestriaState(),
     monitors: createMonitorsState(),
+    lab: createLabState(),
     session: { seconds: 0, activeAt: now },
     calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 

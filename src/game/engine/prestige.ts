@@ -4,6 +4,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
+import { resetLabForGraduation } from './lab/run';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { masteryRank } from './mastery';
 import { recordGraduationDay } from './session';
@@ -235,6 +236,8 @@ export function graduate(
   state.combo = { steps: 0, lastClickAt: 0 };
   state.autoClickCarry = 0;
   resetMaestriasForGraduation(state);
+  // The run, the equipped items and the run buffs of the Laboratório do not carry over (Commits and the tree do).
+  resetLabForGraduation(state, content);
   if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
 
   emit(bonus > 0 ? { type: 'graduate', diplomas: diplomas + bonus, bonus } : { type: 'graduate', diplomas });

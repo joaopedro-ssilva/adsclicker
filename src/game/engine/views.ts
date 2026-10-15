@@ -34,6 +34,8 @@ import { diplomaCap, diplomasFor, diplomasForRun, prestigeNodeAvailable, prestig
 export { diplomaBonus } from './stats';
 import { horasBandsFilled } from './maestria/horas';
 export * from './maestria/views';
+export * from './lab/views';
+export { labRunAvailable } from './lab/access';
 import { effectiveBuyAmount, quoteLevels } from './purchases';
 import { hireLock, isAbilityUnlocked, levelledLock, researchLock } from './requirements';
 import type { GameState } from './state';

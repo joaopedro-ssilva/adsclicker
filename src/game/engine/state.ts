@@ -1,5 +1,6 @@
 import type Decimal from 'break_infinity.js';
 import type { CounterKey, Effect, MonitorId, ProfessorId } from '../content/types';
+import type { LabState } from './lab/types';
 import type { MaestriaState } from './maestria/types';
 
 /** Bump when the saved shape changes and add a migration in save.ts. */
@@ -311,6 +312,9 @@ export interface GameState {
 
   /** Monitores (automation hired with diplomas). Survives graduation. */
   monitors: MonitorsState;
+
+  /** O Laboratório de Pesquisa: unlock, Commits and tree last; the run and the items last until graduation (see engine/lab). */
+  lab: LabState;
 
   /** The current sitting: seconds played and when the player last acted. Restarted at every boot. */
   session: { seconds: number; activeAt: number };

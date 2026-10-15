@@ -119,6 +119,19 @@ export {
 
 export { buyCafe, cafeCost } from './cafe';
 
+export {
+  buyLabNode,
+  chooseLabReward,
+  equipLabPending,
+  labClick,
+  levelUpLabItem,
+  recycleLabPending,
+  rerollLabAffix,
+  setLabOpen,
+  startLabRun,
+  unlockLab,
+} from './lab/actions';
+
 /** Easter eggs: remembers the trigger so achievements with { kind: 'secret', trigger } unlock. */
 export function triggerSecret(state: GameState, content: GameContent, trigger: string, now: number, emit: Emit): void {
   if (state.secrets[trigger]) return;
