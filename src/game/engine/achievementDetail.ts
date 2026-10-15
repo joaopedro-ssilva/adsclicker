@@ -50,6 +50,8 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   bolsaProfitSeconds: 'de lucro na Bolsa',
   designFreeLevels: 'níveis de graça',
   cappedGraduations: 'formaturas no teto de diplomas',
+  treeResets: 'resets da árvore',
+  ungratefulGraduations: 'formaturas sem homenagem',
 };
 
 const n = (value: number) => formatNumber(Math.floor(value));

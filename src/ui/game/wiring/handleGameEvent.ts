@@ -234,6 +234,15 @@ export function handleGameEvent(event: GameEvent): void {
       audio.play('graduate');
       useMoments.getState().push({ kind: 'graduate', diplomas: event.diplomas });
       break;
+    case 'treeReset':
+      audio.play('uiTap');
+      toast({
+        title: '🌳 Árvore resetada',
+        description: `${event.refunded} ${event.refunded === 1 ? 'diploma voltou' : 'diplomas voltaram'} para você.`,
+        tone: 'good',
+        duration: 4000,
+      });
+      break;
     case 'reset':
       fx.clear();
       forgetLayers();

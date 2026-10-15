@@ -93,7 +93,8 @@ export const players = pgTable(
     /**
      * Ids of the tags this player holds (catalogue in `player_tags`). A column and not a join
      * table: the boards and the feed read it with the row they already read, and nothing queries
-     * "who holds X" often enough to need an index.     */
+     * "who holds X" often enough to need an index.
+     */
     titles: text('titles').array().notNull().default(sql`'{}'::text[]`),
     /**
      * The progress epoch this account is at (see server/config/progressEpoch.ts). A sync from a

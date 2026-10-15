@@ -3,12 +3,14 @@ import { useShallow } from 'zustand/react/shallow';
 import { content, useGame, useMaestriasView, useMonitorsView, usePrestigeNodeViews } from '@/game/store';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { Collapsible } from '@/ui/kit';
+import { GraduationMural } from './GraduationMural';
 import { GraduationSummary } from './GraduationSummary';
 import { HonourPicker } from './HonourPicker';
 import { MaestriasSection } from './maestrias/MaestriasSection';
 import { MonitorsSection } from './monitors/MonitorsSection';
 import { PrestigeTree } from './PrestigeTree';
 import { ResetInfo } from './ResetInfo';
+import { TreeReset } from './TreeReset';
 import { useSections, type SectionId } from './sectionsStore';
 import { useHonourPick } from './honourPick';
 
@@ -91,6 +93,16 @@ function TreeFold() {
     >
       <p className="formatura-hint">Toque num nó</p>
       <PrestigeTree />
+      <TreeReset />
+    </Fold>
+  );
+}
+
+function MuralFold() {
+  const count = useGame((store) => store.state.graduationHistory.length);
+  return (
+    <Fold id="mural" title="Mural de formaturas" summary={count > 0 ? `${count} ${count === 1 ? 'turma' : 'turmas'}` : 'Nenhuma ainda'}>
+      <GraduationMural />
     </Fold>
   );
 }
@@ -107,6 +119,7 @@ export function GraduationTab() {
       </Fold>
       <MonitorsFold />
       <TreeFold />
+      <MuralFold />
     </div>
   );
 }

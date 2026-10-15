@@ -27,8 +27,8 @@ export function HonourPicker() {
     <Section title="Professor homenageado" note={chosen ? '1 escolhido' : 'Opcional'}>
       <div className="honour" data-qa="honour-picker">
         <p className="honour-intro">
-          Escolha quem a turma vai homenagear: a mecânica dele fica mais forte na próxima turma.
-          {current && now ? ` Agora: ${content.professors[current].name}, ${now.toLowerCase()}.` : ''}
+          <strong>Vale a partir da próxima turma:</strong> o professor escolhido tem a mecânica mais forte depois de você formar.
+          {current && now ? ` Nesta turma: ${content.professors[current].name}, ${now.toLowerCase()}.` : ''}
         </p>
         <div className="honour-list" role="radiogroup" aria-label="Professor homenageado">
           {options.map(({ id, rank }) => {
@@ -54,6 +54,11 @@ export function HonourPicker() {
                     {def.name} <em>{honour.name}</em>
                   </strong>
                   <span>{honour.description}</span>
+                  {selected ? (
+                    <b className="honour-tag" data-qa="honour-next-tag">
+                      Na próxima turma
+                    </b>
+                  ) : null}
                 </span>
                 <span className="honour-rank" title="Domínio atual">
                   {rank}

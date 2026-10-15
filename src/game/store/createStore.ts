@@ -236,6 +236,7 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         return done;
       },
       buyPrestigeNode: (id) => run((state, emit) => engine.buyPrestigeNode(state, content, id, now(), emit), true),
+      resetPrestigeTree: () => run((state, emit) => engine.resetPrestigeTree(state, content, now(), emit), true),
 
       buyMonitor: (id) => run((state, emit) => engine.buyMonitor(state, content, id, now(), emit), true),
       setMonitorOn(id, on) {

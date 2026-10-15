@@ -28,6 +28,20 @@ export interface Patch {
 /** Newest first. The first one is "the latest patch": the one announced by itself and tracked as unread. */
 export const PATCHES: readonly Patch[] = [
   {
+    id: '2026-10-formatura-planejada',
+    date: '2026-10-16',
+    title: 'Formatura planejada',
+    summary: 'Resete a árvore uma vez por turma, veja suas últimas formaturas no Mural e ganhe avisos mais claros na hora de formar.',
+    notes: [
+      'Resetar a árvore de diplomas: uma vez por turma você pode devolver todos os nós e receber os diplomas de volta para montar outra estratégia.',
+      'A homenagem ficou mais clara, e a confirmação da Formatura avisa quando você ia formar sem homenagear ninguém.',
+      'Mural de formaturas na aba Formatura: as últimas 10 turmas, com diplomas, duração, o professor homenageado de cada uma e as marcas de Teto e de árvore resetada.',
+      'Um lembrete novo: a confirmação avisa quando você tem diplomas sem gastar na árvore.',
+      'Atalhos novos: Ctrl+1 a Ctrl+4 compram as três aulas do professor em cena e o upgrade de clique, na ordem da aba Aulas e com a quantidade escolhida. Segurando, continua comprando.',
+      'Duas conquistas novas: Reforma Curricular (resetar a árvore pela primeira vez) e Turma Ingrata (formar 3 turmas sem homenagear ninguém).',
+    ],
+  },
+  {
     id: '2026-10-pontas-soltas',
     date: '2026-10-15',
     title: 'Pontas soltas e feitos lendários',

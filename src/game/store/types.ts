@@ -47,6 +47,8 @@ export type GameEvent =
   | { type: 'bolsa'; side: 'buy' | 'sell'; asset: string; coins: Decimal; profit: Decimal; capped: boolean }
   /** `diplomas` is the whole payment; `bonus` is the part from Horas complementares. */
   | { type: 'graduate'; diplomas: number; bonus?: number }
+  /** The tree of diplomas was reset; `refunded` diplomas came back. */
+  | { type: 'treeReset'; refunded: number }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -248,6 +250,8 @@ export interface GameActions {
   /** `honour`: the hired professor honoured for the next run (optional). */
   graduate(honour?: ProfessorId | null): boolean;
   buyPrestigeNode(id: string): boolean;
+  /** Refunds the diplomas spent on the tree and empties it. Once per turma. */
+  resetPrestigeTree(): boolean;
 
   /** Hires a Monitor, or raises it one level, with diplomas. */
   buyMonitor(id: MonitorId): boolean;

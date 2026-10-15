@@ -1,7 +1,10 @@
 import { content, useGame } from '@/game/store';
+import { prestigeNodeAvailable, prestigeNodeCost } from '@/game/engine/prestige';
+import { PROFESSOR_IDS } from '@/game/content/types';
 import { Button, Icon, Modal } from '@/ui/kit';
 import { fmtInt } from '../lib/numbers';
 import { useHonourPick } from './honourPick';
+import { useSections } from './sectionsStore';
 
 interface GraduateDialogProps {
   open: boolean;
@@ -16,6 +19,29 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
   const picked = useHonourPick((store) => store.pick);
   const setPick = useHonourPick((store) => store.setPick);
   const honour = picked && hired[picked] ? picked : null;
+  // Every hired professor can be honoured, so the warning shows whenever someone is hired and nobody is picked.
+  const canHonour = PROFESSOR_IDS.some((id) => hired[id]);
+  const openSection = useSections((store) => store.setOpen);
+  // Diplomas still in the pocket, and whether some node of the tree could be bought with at least one of them.
+  const unspent = useGame((store) => store.state.diplomas);
+  const canSpend = useGame((store) =>
+    store.state.diplomas > 0 &&
+    content.prestigeNodes.some(
+      (node) =>
+        (store.state.prestige[node.id] ?? 0) < node.maxLevel &&
+        prestigeNodeAvailable(store.state, node) &&
+        prestigeNodeCost(node, store.state.prestige[node.id] ?? 0) <= store.state.diplomas,
+    ),
+  );
+
+  /** Closes the dialog, opens the picker's section and brings it into view. */
+  const chooseHonour = () => {
+    onClose();
+    openSection('honour', true);
+    window.setTimeout(() => {
+      document.querySelector('[data-qa="honour-picker"]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  };
 
   return (
     <Modal
@@ -37,7 +63,8 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
             }}
           >
             <Icon name="diploma" size={12} />
-            Formar e ganhar {fmtInt(diplomas)} {diplomas === 1 ? 'diploma' : 'diplomas'}
+            {canHonour && !honour ? 'Formar sem homenagear' : 'Formar'} e ganhar {fmtInt(diplomas)}{' '}
+            {diplomas === 1 ? 'diploma' : 'diplomas'}
           </Button>
         </>
       }
@@ -49,7 +76,22 @@ export function GraduateDialog({ open, diplomas, onClose }: GraduateDialogProps)
         </p>
         {honour ? (
           <p className="graduate-honour" data-qa="graduate-honour">
-            Homenageado: <strong>{content.professors[honour].name}</strong>, {content.mastery[honour].honour.name.toLowerCase()}.
+            Homenageado: <strong>{content.professors[honour].name}</strong>, {content.mastery[honour].honour.name.toLowerCase()} (vale
+            na próxima turma).
+          </p>
+        ) : canHonour ? (
+          <div className="graduate-warning" role="alert" data-qa="graduate-no-honour">
+            <p>
+              Você não escolheu um professor homenageado. A homenagem deixa a mecânica de um professor mais forte na próxima turma.
+            </p>
+            <Button variant="secondary" size="sm" onClick={chooseHonour} data-qa="graduate-choose-honour">
+              Escolher homenageado
+            </Button>
+          </div>
+        ) : null}
+        {unspent > 0 && canSpend ? (
+          <p className="graduate-unspent" data-qa="graduate-unspent">
+            Você tem {fmtInt(unspent)} {unspent === 1 ? 'diploma' : 'diplomas'} sem gastar na árvore.
           </p>
         ) : null}
         <p className="muted">Cada diploma ganho vale um bônus permanente de produção.</p>

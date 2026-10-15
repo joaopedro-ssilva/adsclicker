@@ -28,7 +28,7 @@ const ach = (
 });
 
 /**
- * 151 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
+ * 153 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
  * Every non-default cosmetic is granted by exactly one achievement, and harder ones give rarer skins:
  * common = hire / early clicks, rare = discipline level 25, epic = all research, legendary = level 100
  * or a long-haul challenge; mythic (one per professor) is reserved for the hardest feat of each family
@@ -366,6 +366,8 @@ export const achievements: AchievementDef[] = [
     skin: 'gladimir-robo',
   }),
   ach('cap-reached', 'graduation', 'Teto de Vidro', '🪟', 'Forme uma turma que valia o teto de diplomas. O resto do lucro bateu no vidro e ficou olhando.', counter('cappedGraduations', 1), { theme: 'vidro' }),
+  ach('tree-reset', 'graduation', 'Reforma Curricular', '🔧', 'Resete a árvore de diplomas pela primeira vez. O currículo mudou, a ementa nova ninguém leu.', counter('treeResets', 1)),
+  ach('grad-ungrateful', 'graduation', 'Turma Ingrata', '😶', 'Forme 3 turmas sem homenagear ninguém. O professor ficou esperando o discurso até o fim da cerimônia.', counter('ungratefulGraduations', 3)),
 
   // ------------------------------------------------------------------ collection (11)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),

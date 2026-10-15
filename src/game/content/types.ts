@@ -113,7 +113,11 @@ export type CounterKey =
   /** Free levels the Design System gave to other classes. */
   | 'designFreeLevels'
   /** Graduations whose run was worth the diploma cap or more. */
-  | 'cappedGraduations';
+  | 'cappedGraduations'
+  /** Times the diploma tree was reset. */
+  | 'treeResets'
+  /** Graduations made without honouring anyone. */
+  | 'ungratefulGraduations';
 
 /** Counters of the current run only: they start again at every graduation (GameState.run). */
 export type RunCounterKey = 'levelsBought';

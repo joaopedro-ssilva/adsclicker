@@ -53,6 +53,20 @@ describe('judgeSave: honest play passes', () => {
   }, 60_000);
 });
 
+describe('judgeSave: the tree reset', () => {
+  it('a save whose tree was reset (diplomas back, diplomasEarned untouched) is not suspicious', () => {
+    const { previous, next, elapsedMs } = lastWindow({ clicksPerSecond: 4, graduate: true, graduateMinDiplomas: 1, windows: 10, seed: 1 });
+    // 40 diplomas earned, all sitting in the tree before the reset and all in hand after it.
+    for (const state of [previous, next]) state.diplomasEarned = 40;
+    previous.diplomas = 0;
+    previous.prestige = { 'core-power': 2 };
+    next.prestige = {};
+    next.diplomas = 40;
+    next.treeResetGraduation = next.counters.graduations;
+    expect(judgeSave({ previous, next: roundTrip(next), elapsedMs })).toMatchObject({ ok: true });
+  });
+});
+
 describe('judgeSave: tampering fails', () => {
   const base = () => lastWindow({ clicksPerSecond: 4, windows: 10, seed: 1 });
 

@@ -4,7 +4,7 @@ import { create } from 'zustand';
  * Which sections of the Formatura tab are open. Interface-only: kept on this device in localStorage, never in
  * the save and never read by the engine. Every section starts closed on a first visit.
  */
-export type SectionId = 'maestrias' | 'honour' | 'monitors' | 'reset' | 'tree';
+export type SectionId = 'maestrias' | 'honour' | 'monitors' | 'reset' | 'tree' | 'mural';
 
 const KEY = 'adsclicker.formatura.sections';
 

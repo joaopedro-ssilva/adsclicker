@@ -155,6 +155,28 @@ export interface RunSummary {
   recordsStarted: RecordKey[];
 }
 
+/** One line of the Mural de formaturas: numbers and ids only, so the last ten stay small in the save. */
+export interface GraduationRecord {
+  /** Which turma this was (counters.graduations after it). */
+  number: number;
+  /** Epoch ms of the graduation. */
+  at: number;
+  /** Diplomas paid, Horas complementares included. */
+  diplomas: number;
+  /** Of those, the ones paid by Horas complementares. */
+  bonus: number;
+  /** Seconds the run lasted. */
+  seconds: number;
+  capped: boolean;
+  /** The professor honoured DURING the run that ended (what that honour "rendeu"). */
+  honoured: ProfessorId | null;
+  /** The tree was reset during that run. */
+  treeReset: boolean;
+}
+
+/** Graduations the Mural keeps. */
+export const GRADUATION_HISTORY_MAX = 10;
+
 /** What the run closed by the latest graduation looked like, for the achievements that judge a whole run. */
 export interface LastRun {
   seconds: number;
@@ -221,6 +243,13 @@ export interface GameState {
   /** Levels of prestige nodes, by id. Survives graduation. */
   prestige: Record<string, number>;
   buyAmount: BuyAmount;
+  /**
+   * The graduation count (counters.graduations) when the tree was last reset, or null if it never was. The reset is
+   * allowed once per turma: it is open again as soon as the count moves on.
+   */
+  treeResetGraduation: number | null;
+  /** The last graduations, newest first, at most GRADUATION_HISTORY_MAX. */
+  graduationHistory: GraduationRecord[];
 
   // Collection (survives graduation)
   /** Achievement id -> unlock timestamp. */

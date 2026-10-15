@@ -7,6 +7,7 @@ import { createRunStats } from './init';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { masteryRank } from './mastery';
 import { recordGraduationDay } from './session';
+import { GRADUATION_HISTORY_MAX } from './state';
 import type { GameState, RecordKey, RunSummary } from './state';
 import { computeStats, hasFeature } from './stats';
 import type { Stats } from './stats';
@@ -194,6 +195,21 @@ export function graduate(
       ...updateRecords(state),
     },
   };
+  // The Mural line is filed before the honour is replaced and the count moves on: it describes the run that ended.
+  state.graduationHistory = [
+    {
+      number: state.counters.graduations + 1,
+      at: now,
+      diplomas: diplomas + bonus,
+      bonus,
+      seconds: state.run.seconds,
+      capped,
+      honoured: state.honoured,
+      treeReset: state.treeResetGraduation === state.counters.graduations,
+    },
+    ...state.graduationHistory,
+  ].slice(0, GRADUATION_HISTORY_MAX);
+  if (honour === null) state.counters.ungratefulGraduations += 1;
   state.run = createRunStats();
   state.honoured = honour !== null && state.hired[honour] ? honour : null;
   if (state.honoured) state.honouredBefore[state.honoured] = true;
@@ -232,6 +248,42 @@ export function prestigeNodeCost(def: PrestigeNodeDef, level: number): number {
 
 export function prestigeNodeAvailable(state: GameState, def: PrestigeNodeDef): boolean {
   return def.requires.every((id) => (state.prestige[id] ?? 0) > 0);
+}
+
+/** Diplomas spent on the tree so far: what a reset would give back. Unknown nodes are ignored. */
+export function prestigeTreeSpent(state: GameState, content: GameContent): number {
+  const index = getIndex(content);
+  let spent = 0;
+  for (const id in state.prestige) {
+    const def = index.prestigeNodes.get(id);
+    if (!def) continue;
+    const level = Math.min(def.maxLevel, state.prestige[id] ?? 0);
+    for (let at = 0; at < level; at += 1) spent += prestigeNodeCost(def, at);
+  }
+  return spent;
+}
+
+/** The tree can be reset once per turma, and only when something is bought. */
+export function canResetPrestigeTree(state: GameState, content: GameContent): boolean {
+  return state.treeResetGraduation !== state.counters.graduations && prestigeTreeSpent(state, content) > 0;
+}
+
+/**
+ * Takes the tree back and refunds every diploma spent on it (the monitors are not part of the tree and keep what
+ * they cost). The refund goes to `diplomas` only: diplomasEarned, and with it the diploma bonus, does not change.
+ * Professors the tree kept hired stay hired for this run; they only go at the next graduation if the tree no
+ * longer keeps them. No feature depends on the nodes (features come from the professors), so nothing else is undone.
+ */
+export function resetPrestigeTree(state: GameState, content: GameContent, emit: Emit): boolean {
+  if (!canResetPrestigeTree(state, content)) return false;
+  const refunded = prestigeTreeSpent(state, content);
+  state.diplomas += refunded;
+  state.prestige = {};
+  state.treeResetGraduation = state.counters.graduations;
+  state.counters.treeResets += 1;
+  if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
+  emit({ type: 'treeReset', refunded });
+  return true;
 }
 
 export function buyPrestigeNode(state: GameState, content: GameContent, id: string, emit: Emit): boolean {
