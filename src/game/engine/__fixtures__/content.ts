@@ -2,6 +2,7 @@
  * A small, valid GameContent for tests. Cheap numbers and one professor per feature, so every
  * engine rule can be exercised without depending on the real content.
  */
+import { lab } from '../../content/lab';
 import { maestrias } from '../../content/maestrias';
 import { monitors } from '../../content/monitors';
 import { PROFESSOR_IDS } from '../../content/types';
@@ -332,6 +333,7 @@ export function createFixtureContent(): GameContent {
     mastery: neutralMastery(),
     monitors: monitors.map((def) => ({ ...def, levels: [...def.levels] })),
     maestrias: structuredClone(maestrias),
+    lab: structuredClone(lab),
     balance: { ...fixtureBalance, graduation: { ...fixtureBalance.graduation } },
   };
 }

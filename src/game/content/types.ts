@@ -6,6 +6,8 @@
  * and parsed by the engine with break_infinity.js.
  */
 
+import type { LabConfig } from './labTypes';
+
 export type DecimalString = string;
 
 export const PROFESSOR_IDS = [
@@ -721,6 +723,8 @@ export interface BalanceConfig {
   };
 }
 
+export * from './labTypes';
+
 export interface GameContent {
   professors: Record<ProfessorId, ProfessorDef>;
   disciplines: DisciplineDef[];
@@ -737,5 +741,7 @@ export interface GameContent {
   mastery: Record<ProfessorId, MasteryDef>;
   monitors: MonitorDef[];
   maestrias: MaestriasConfig;
+  /** The Laboratório de Pesquisa (see content/lab.ts). */
+  lab: LabConfig;
   balance: BalanceConfig;
 }
