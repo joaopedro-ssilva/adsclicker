@@ -716,10 +716,18 @@ async function processSheet(sheet, anchors) {
     if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
     // sheet.hires: the item keeps the resolution it was drawn at (cut out of the magenta, no pixel-art sampling).
+    // A number caps its longest side, scaled down smoothly (an item drawn alone comes out much bigger than a grid's).
     if (sheet.hires) {
       removeFringe(item);
       removeIsolated(item);
-      const sprite = trim(item);
+      let sprite = trim(item);
+      if (typeof sheet.hires === 'number' && Math.max(sprite.w, sprite.h) > sheet.hires) {
+        const { data, info } = await sharp(Buffer.from(sprite.data.buffer), { raw: { width: sprite.w, height: sprite.h, channels: 4 } })
+          .resize(sheet.hires, sheet.hires, { fit: 'inside', kernel: 'lanczos3' })
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+        sprite = { data: new Uint8ClampedArray(data), w: info.width, h: info.height };
+      }
       const rel = `${folder}/${key}`;
       await savePng(sprite, path.join(ASSETS_DIR, `${rel}.png`));
       delete anchors[rel];

@@ -1237,6 +1237,19 @@
       ],
       "calibrate": true,
       "ref": "pablo"
+    },
+    {
+      "file": "lab-mouse-quebrado.png",
+      "kind": "icon",
+      "keys": [
+        "mouse-quebrado"
+      ],
+      "folder": "hackathon/items",
+      "target": {
+        "axis": "max",
+        "size": 28
+      },
+      "hires": 210
     }
   ]
 }

@@ -332,6 +332,16 @@ const hkItemSheet = (file, items, note) => ({
   text: `${HK_BASE}. ${HK_STYLE} It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
 });
 
+// The Laboratório's starting item, drawn against the first item sheet so it matches the other 24.
+const labMouseSheet = {
+  file: 'lab-mouse-quebrado.png',
+  kind: 'icon',
+  keys: ['mouse-quebrado'],
+  refs: ['hk-items-1.png'],
+  sheet: { folder: 'hackathon/items', target: { axis: 'max', size: 28 }, hires: 210 },
+  text: `${HK_BASE}. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. It shows ONE single game item icon, alone, centered, drawn at the same size as one icon of the reference, bold simple readable shape with a thick dark outline: a cheap old broken computer mouse, dull beige-grey plastic, a big crack across the shell, the left button chipped off, a strip of grey duct tape holding it together, a frayed cable with exposed copper wires curling out. It must read clearly as "the worst mouse", but still cute.`,
+};
+
 const hkArena = {
   file: 'hk-arena.png',
   kind: 'scenery',
@@ -783,6 +793,9 @@ for (const professor of Object.keys(HEAD_VARIANTS)) {
     .png()
     .toFile(path.join(RAW_DIR, `ref-head-${professor}.png`));
 }
+
+// 15) The Laboratório's starting item (queued last so the numbered prompt files above keep their names).
+calls.push({ label: 'lab-mouse-quebrado', images: [labMouseSheet] });
 
 // Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
 for (const c of calls) {

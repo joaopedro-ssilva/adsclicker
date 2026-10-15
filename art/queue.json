@@ -1490,6 +1490,17 @@
       "refs": [
         "ref-head-pablo.png"
       ]
+    },
+    {
+      "file": "lab-mouse-quebrado.png",
+      "kind": "icon",
+      "keys": [
+        "mouse-quebrado"
+      ],
+      "prompt": "a pixel-art sprite sheet, 16-bit SNES style, crisp chunky pixels, limited palette, dark 1px outline, flat solid pure magenta (#FF00FF) background with nothing else on it, no text, no labels, no frames, no drop shadows. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. It shows ONE single game item icon, alone, centered, drawn at the same size as one icon of the reference, bold simple readable shape with a thick dark outline: a cheap old broken computer mouse, dull beige-grey plastic, a big crack across the shell, the left button chipped off, a strip of grey duct tape holding it together, a frayed cable with exposed copper wires curling out. It must read clearly as \"the worst mouse\", but still cute.",
+      "refs": [
+        "hk-items-1.png"
+      ]
     }
   ]
 }
