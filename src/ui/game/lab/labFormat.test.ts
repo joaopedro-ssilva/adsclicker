@@ -11,7 +11,9 @@ import {
   itemArtSrc,
   mobZoom,
   perSecond,
-  recordRows,
+  nodeForest,
+  nodeState,
+  recordSections,
   seconds,
   splitLines,
 } from './labFormat';
@@ -104,10 +106,35 @@ describe('the 9th slot', () => {
 describe('records and feed', () => {
   it('lists the counters', () => {
     const counters = { ...createLabCounters(), phasesCleared: 1234, bossesBeaten: 3 };
-    const rows = recordRows(counters, 14, 200);
-    expect(rows[0]).toEqual({ label: 'Fase mais alta', value: '14' });
+    const records = recordSections(counters, 14, 200);
+    expect(records.tiles[0]).toEqual({ label: 'Fase mais alta', value: '14' });
+    const rows = records.sections.flatMap((section) => section.rows);
     expect(rows.find((row) => row.label === 'Fases vencidas')?.value).toBe('1.234');
-    expect(recordRows(createLabCounters(), 0, 0)[0]?.value).toBe('-');
+    expect(rows.find((row) => row.label === 'Commits gastos na árvore')?.value).toBe('200');
+    expect(recordSections(createLabCounters(), 0, 0).tiles[0]?.value).toBe('-');
+  });
+
+  it('hangs the nodes of a branch under their requirements', () => {
+    const at = (id: string, requires: string[], row: number) => ({ id, requires, position: { row } });
+    const forest = nodeForest([at('c', ['a'], 3), at('a', [], 0), at('b', ['a'], 2), at('d', ['b'], 4), at('x', ['elsewhere'], 5)]);
+    expect(forest.map((entry) => entry.node.id)).toEqual(['a', 'x']);
+    expect(forest[0]?.children.map((entry) => entry.node.id)).toEqual(['b', 'c']);
+    expect(forest[0]?.children[0]?.children.map((entry) => entry.node.id)).toEqual(['d']);
+  });
+
+  it('covers every node of the real tree and keeps the branches apart', () => {
+    for (const branch of ['codigo', 'infra', 'produto'] as const) {
+      const nodes = content.lab.tree.filter((node) => node.branch === branch);
+      const count = (list: ReturnType<typeof nodeForest<(typeof nodes)[number]>>): number => list.reduce((sum, entry) => sum + 1 + count(entry.children), 0);
+      expect(count(nodeForest(nodes))).toBe(nodes.length);
+    }
+  });
+
+  it('names where a node stands', () => {
+    expect(nodeState({ maxed: true, available: true, affordable: false })).toBe('max');
+    expect(nodeState({ maxed: false, available: false, affordable: true })).toBe('locked');
+    expect(nodeState({ maxed: false, available: true, affordable: true })).toBe('ready');
+    expect(nodeState({ maxed: false, available: true, affordable: false })).toBe('short');
   });
 
   it('flashes a line for the events of the run and ignores the rest', () => {

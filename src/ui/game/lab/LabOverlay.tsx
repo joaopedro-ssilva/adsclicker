@@ -11,13 +11,12 @@ import { LabUnlockDialog } from './LabEntry';
 import { useLabOverlay } from './labOverlayStore';
 import type { LabTab } from './labOverlayStore';
 import { Monitor } from './Monitor';
-import { Records, Tree } from './Tree';
+import { Progression } from './Tree';
 import { useLabFeed } from './useLabFeed';
 
 const TABS: { id: LabTab; label: string }[] = [
   { id: 'pesquisa', label: 'Pesquisa' },
-  { id: 'arvore', label: 'Árvore' },
-  { id: 'registro', label: 'Registro' },
+  { id: 'progressao', label: 'Progressão' },
 ];
 
 const FOCUSABLE = 'button:not(:disabled), a[href], [tabindex="0"]';
@@ -187,8 +186,7 @@ export function LabOverlay() {
       <TopBar tab={tab} />
       <div className="lab-body">
         {tab === 'pesquisa' ? <Research /> : null}
-        {tab === 'arvore' ? <Tree view={tree} /> : null}
-        {tab === 'registro' ? <Records /> : null}
+        {tab === 'progressao' ? <Progression view={tree} /> : null}
       </div>
       <p className="lab-foot" aria-hidden="true">
         <Keycap>{shortcutKey('lab')}</Keycap> abre · <Keycap>Esc</Keycap> fecha

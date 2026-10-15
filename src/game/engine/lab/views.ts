@@ -480,6 +480,8 @@ export interface LabNodeView {
   maxed: boolean;
   requires: string[];
   position: { col: number; row: number };
+  /** What the node changes, as it stands now and after the next level ('+0%' -> '+10%'). Empty when maxed. */
+  effects: { label: string; now: string; next: string }[];
 }
 
 export interface LabTreeView {
@@ -487,6 +489,19 @@ export interface LabTreeView {
   commits: number;
   spent: number;
   nodes: LabNodeView[];
+}
+
+/** The effects of a node written as the change one more level makes. */
+function nodeEffects(content: GameContent, def: LabNodeDef, level: number): LabNodeView['effects'] {
+  if (level >= def.maxLevel) return [];
+  const lines: LabNodeView['effects'] = [];
+  for (const key of LAB_EFFECT_KEYS) {
+    const per = def.effects[key];
+    if (per === undefined) continue;
+    const text = (owned: number) => (key === 'startSetup' || key === 'secondWind' ? (owned > 0 ? 'sim' : 'não') : labEffectText(key, per * owned));
+    lines.push({ label: content.lab.labels.effects[key], now: text(level), next: text(level + 1) });
+  }
+  return lines;
 }
 
 export function labTreeView(state: GameState, content: GameContent): LabTreeView {
@@ -508,6 +523,7 @@ export function labTreeView(state: GameState, content: GameContent): LabTreeView
       maxed,
       requires: def.requires,
       position: def.position,
+      effects: nodeEffects(content, def, level),
     };
   });
   return { unlocked: state.lab.unlocked, commits: state.lab.commits, spent: labTreeSpent(state, content), nodes };

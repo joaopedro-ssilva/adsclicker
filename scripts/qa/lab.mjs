@@ -1,5 +1,5 @@
 // Screenshots of the Laboratório de Pesquisa on a running dev server, from a save made by scripts/dev/lab-saves.ts.
-// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=arvore|registro] [--wait=ms] [--clicks=N] [--scroll=px]
+// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=progressao] [--wait=ms] [--clicks=N] [--scroll=px]
 //   --size    viewport, e.g. 1920x1080 (default 1440x900; --mobile is 390x844)
 //   --scroll  scrolls the body of the overlay before the shot (and reports any horizontal scroll)
 //   --roster  shoots the classroom with the 9th slot instead of opening the overlay (opens nothing)

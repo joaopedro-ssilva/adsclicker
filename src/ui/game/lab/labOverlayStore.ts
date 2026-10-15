@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type LabTab = 'pesquisa' | 'arvore' | 'registro';
+export type LabTab = 'pesquisa' | 'progressao';
 
 /**
  * Interface-only state of the Laboratório: whether its full-screen overlay is up, the tab it shows, and the

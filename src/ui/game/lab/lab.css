@@ -291,14 +291,6 @@ button.lab-slot {
   border-bottom: 2px solid var(--border);
 }
 
-.lab-tree,
-.lab-records {
-  height: 100%;
-  padding: var(--space-4);
-  overflow-y: auto;
-  scrollbar-width: thin;
-}
-
 .lab-section-head {
   display: flex;
   flex-wrap: wrap;
@@ -1373,28 +1365,108 @@ body:has(.lab) .fx-canvas {
   gap: var(--space-2);
 }
 
-/* ---------- Tree ---------- */
+/* ---------- Progressão: the tree and the records ---------- */
+
+.lab-prog {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 290px);
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 1600px;
+  height: 100%;
+  margin-inline: auto;
+  padding: var(--space-3);
+}
 
 .lab-tree {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lab-tree-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--border);
+}
+
+.lab-tree-head h3 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lab-tree-head p {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.lab-tree-wallet {
+  display: flex;
+  align-items: baseline;
   gap: var(--space-3);
+  color: var(--text);
+}
+
+.lab-tree-wallet b {
+  font-family: var(--font-display);
+  font-size: 18px;
+}
+
+.lab-tree-wallet span {
+  padding-left: var(--space-3);
+  font-size: 12px;
+  color: var(--text-muted);
+  border-left: 2px solid var(--border);
 }
 
 .lab-branches {
   display: grid;
+  flex: 1 1 auto;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--space-4);
+  align-content: start;
+  gap: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.lab-branch {
+  --branch: var(--lab);
+  --line: color-mix(in srgb, var(--branch) 60%, var(--border));
+
+  min-width: 0;
+  padding: 0 var(--space-2) var(--space-3);
+}
+
+.lab-branch + .lab-branch {
+  border-left: 2px solid var(--border);
+}
+
+.lab-branch[data-branch='infra'] {
+  --branch: #5aa9ff;
+}
+
+.lab-branch[data-branch='produto'] {
+  --branch: #b07cff;
 }
 
 .lab-branch h4 {
   display: grid;
   margin: 0 0 var(--space-3);
+  padding: var(--space-2) 0;
   font-family: var(--font-display);
   font-size: 14px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--lab);
+  color: var(--branch);
+  border-bottom: 2px solid var(--branch);
 }
 
 .lab-branch h4 small {
@@ -1405,140 +1477,335 @@ body:has(.lab) .fx-canvas {
   color: var(--text-muted);
 }
 
-.lab-branch ul {
-  position: relative;
-  display: grid;
-  gap: var(--space-3);
+/* The tree itself: nested lists, joined by plain lines from each parent to its children. */
+.lab-forest ul {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   margin: 0;
-  padding: 0 0 0 14px;
+  padding: 0;
   list-style: none;
 }
 
-/* The rail that ties a branch together. */
-.lab-branch ul::before {
+.lab-forest li {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 210px;
+  padding: 10px 3px 0;
+}
+
+.lab-forest > ul > li {
+  max-width: none;
+  padding-top: 0;
+}
+
+/* The root keeps a card's width while its children spread under it. */
+.lab-forest > ul > li > .lab-node {
+  align-self: center;
+  width: min(100%, 240px);
+}
+
+.lab-forest li > ul {
+  position: relative;
+  padding-top: 10px;
+}
+
+.lab-forest li > ul::before {
   content: '';
   position: absolute;
-  inset: 8px auto 8px 4px;
-  width: 4px;
-  background: var(--border);
+  top: 0;
+  left: 50%;
+  height: 10px;
+  border-left: 2px solid var(--line);
+}
+
+.lab-forest li::before,
+.lab-forest li::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 50%;
+  width: 50%;
+  height: 10px;
+  border-top: 2px solid var(--line);
+}
+
+.lab-forest li::after {
+  right: auto;
+  left: 50%;
+  border-left: 2px solid var(--line);
+}
+
+.lab-forest li::before {
+  border-right: 2px solid var(--line);
+}
+
+.lab-forest li:first-child::before,
+.lab-forest li:last-child::after {
+  border: 0;
+}
+
+.lab-forest li:only-child::before {
+  display: none;
+}
+
+.lab-forest li:only-child::after {
+  width: 0;
+  border-top: 0;
+}
+
+.lab-forest > ul > li::before,
+.lab-forest > ul > li::after {
+  display: none;
 }
 
 .lab-node {
-  position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-2) var(--space-3);
-  padding: var(--space-3);
+  flex: 1 1 auto;
+  align-content: start;
+  gap: 4px;
+  padding: 6px 8px;
+  font: inherit;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
   background: var(--surface);
   border: 2px solid var(--border);
-  box-shadow: 3px 3px 0 var(--shadow-color);
 }
 
-.lab-node::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: -14px;
-  width: 12px;
-  height: 4px;
-  background: var(--border);
+.lab-node:hover {
+  background: var(--surface-raised);
 }
 
-.lab-node[data-locked='true'] {
-  opacity: 0.6;
-  border-style: dashed;
+.lab-node:focus-visible,
+.lab-node[aria-pressed='true'] {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
 }
 
-.lab-node[data-maxed='true'] {
-  border-color: var(--lab);
-}
-
-.lab-node[data-affordable='true'] {
+.lab-node[data-state='ready'] {
   border-color: var(--warn);
 }
 
-.lab-node-emoji {
-  font-size: 26px;
-  line-height: 1;
+.lab-node[data-state='max'] {
+  border-color: var(--good);
 }
 
-.lab-node-name {
+.lab-node[data-state='locked'] {
+  color: var(--text-muted);
+  border-style: dashed;
+}
+
+.lab-node-top {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px var(--space-2);
-  font-weight: 900;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: 12px;
 }
 
-.lab-node-text {
-  font-size: 12px;
+.lab-node-top span {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
 
-.lab-node-lock {
+.lab-node-text {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-muted);
+}
+
+.lab-node-need {
   font-size: 11px;
   color: var(--warn);
 }
 
-.lab-node .ui-button {
-  grid-column: 1 / -1;
-  justify-self: start;
-}
-
-.lab-pips {
-  display: inline-flex;
+.lab-node-foot {
+  display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0 var(--space-2);
+  margin-top: auto;
+  font-size: 11px;
+  font-weight: 800;
 }
 
-.lab-pips i {
-  width: 7px;
-  height: 7px;
-  background: var(--border);
+.lab-node-state {
+  color: var(--text-muted);
 }
 
-.lab-pips i[data-on='true'] {
-  background: var(--lab);
+.lab-node[data-state='ready'] .lab-node-state {
+  color: var(--warn);
 }
 
-/* ---------- Records ---------- */
+.lab-node[data-state='max'] .lab-node-state {
+  color: var(--good);
+}
 
-.lab-records {
+/* The selected skill, under the branches. */
+.lab-selected {
   display: grid;
-  align-content: start;
-  gap: var(--space-3);
-}
-
-.lab-record-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-3);
-  margin: 0;
-}
-
-.lab-record-list div {
-  display: grid;
-  gap: 2px;
+  grid-template-columns: minmax(0, 1.4fr) minmax(200px, 280px) auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
   padding: var(--space-3);
-  background: var(--surface);
+  background: var(--bg);
   border: 2px solid var(--border);
 }
 
-.lab-record-list dt {
+.lab-kicker-small {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-selected h4 {
+  font-size: 15px;
+}
+
+.lab-selected-level {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.lab-selected-effects {
+  display: grid;
+  gap: 2px;
+  margin: 2px 0 0;
+  padding: 0;
+  font-size: 12px;
+  list-style: none;
+  color: var(--good);
+}
+
+.lab-selected-effects b {
+  color: var(--text);
+}
+
+.lab-selected-buy {
+  display: grid;
+  gap: 4px;
+  justify-items: stretch;
+  text-align: center;
+}
+
+.lab-selected-balance {
   font-size: 11px;
+  color: var(--text-muted);
+}
+
+.lab-legend {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  font-size: 11px;
+  list-style: none;
+  color: var(--text-muted);
+}
+
+.lab-legend li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lab-legend li::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--border);
+}
+
+.lab-legend [data-state='ready']::before {
+  border-color: var(--warn);
+}
+
+.lab-legend [data-state='max']::before {
+  border-color: var(--good);
+}
+
+.lab-legend [data-state='locked']::before {
+  border-style: dashed;
+}
+
+.lab-legend [data-selected]::before {
+  border-color: var(--text);
+}
+
+.lab-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.lab-tiles div {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg);
+  border: 2px solid var(--border);
+}
+
+.lab-tiles dt {
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-.lab-record-list dd {
+.lab-tiles dd {
   margin: 0;
   font-family: var(--font-display);
   font-size: 20px;
   font-variant-numeric: tabular-nums;
 }
 
+.lab-record-section h4 {
+  margin-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lab);
+}
+
+.lab-record-list {
+  display: grid;
+  margin: 0;
+}
+
+.lab-record-list div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 5px 0;
+  border-bottom: 2px solid var(--border);
+}
+
+.lab-record-list dt {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.lab-record-list dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
 /* ---------- Narrow screens: one column, the whole body scrolls ---------- */
 
 /* Tablet: the monitor on top, then the decision, then the summary beside the equipment. The body scrolls. */
@@ -1607,14 +1874,39 @@ body:has(.lab) .fx-canvas {
   }
 }
 
-@media (max-width: 1023px) {
-  .lab-tree,
-  .lab-records {
+/* Progressão: the records go under the tree, which scrolls with the page. */
+@media (max-width: 1199px) {
+  .lab-prog {
+    grid-template-columns: minmax(0, 1fr);
     height: auto;
+  }
+
+  .lab-tree {
     overflow: visible;
   }
 
   .lab-branches {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 1023px) {
+  .lab-branches {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lab-branch {
+    padding-inline: 0;
+  }
+
+  .lab-branch + .lab-branch {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 2px solid var(--border);
+    border-left: 0;
+  }
+
+  .lab-selected {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -1655,8 +1947,7 @@ body:has(.lab) .fx-canvas {
   }
 
   .lab-grid,
-  .lab-tree,
-  .lab-records {
+  .lab-prog {
     padding: var(--space-3);
   }
 

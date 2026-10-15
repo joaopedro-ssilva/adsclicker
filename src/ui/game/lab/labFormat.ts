@@ -137,23 +137,81 @@ export interface RecordRow {
   value: string;
 }
 
-export function recordRows(counters: LabCounters, bestPhase: number, treeSpent: number): RecordRow[] {
-  return [
-    { label: 'Fase mais alta', value: bestPhase > 0 ? fmtInt(bestPhase) : '-' },
-    { label: 'Pesquisas iniciadas', value: fmtInt(counters.runs) },
-    { label: 'Monitores quebrados', value: fmtInt(counters.broken) },
-    { label: 'Fases vencidas', value: fmtInt(counters.phasesCleared) },
-    { label: 'Chefões derrotados', value: fmtInt(counters.bossesBeaten) },
-    { label: 'Itens encontrados', value: fmtInt(counters.itemsFound) },
-    { label: 'Itens reciclados', value: fmtInt(counters.itemsRecycled) },
-    { label: 'Níveis de item comprados', value: fmtInt(counters.itemLevelUps) },
-    { label: 'Atributos sorteados', value: fmtInt(counters.affixRerolls) },
-    { label: 'Cliques no monitor', value: fmtInt(counters.clicks) },
-    { label: 'Commits ganhos', value: fmtInt(counters.commitsEarned) },
-    { label: 'Commits gastos na árvore', value: fmtInt(treeSpent) },
-  ];
+export interface RecordSection {
+  title: string;
+  rows: RecordRow[];
 }
 
+export interface Records {
+  /** The two numbers on top. */
+  tiles: RecordRow[];
+  sections: RecordSection[];
+}
+
+export function recordSections(counters: LabCounters, bestPhase: number, treeSpent: number): Records {
+  return {
+    tiles: [
+      { label: 'Fase mais alta', value: bestPhase > 0 ? fmtInt(bestPhase) : '-' },
+      { label: 'Commits ganhos', value: fmtInt(counters.commitsEarned) },
+    ],
+    sections: [
+      {
+        title: 'Pesquisa',
+        rows: [
+          { label: 'Pesquisas iniciadas', value: fmtInt(counters.runs) },
+          { label: 'Fases vencidas', value: fmtInt(counters.phasesCleared) },
+          { label: 'Chefões derrotados', value: fmtInt(counters.bossesBeaten) },
+          { label: 'Monitores quebrados', value: fmtInt(counters.broken) },
+          { label: 'Cliques no monitor', value: fmtInt(counters.clicks) },
+        ],
+      },
+      {
+        title: 'Equipamentos',
+        rows: [
+          { label: 'Itens encontrados', value: fmtInt(counters.itemsFound) },
+          { label: 'Itens reciclados', value: fmtInt(counters.itemsRecycled) },
+          { label: 'Níveis de item comprados', value: fmtInt(counters.itemLevelUps) },
+          { label: 'Atributos sorteados', value: fmtInt(counters.affixRerolls) },
+        ],
+      },
+      { title: 'Investimento', rows: [{ label: 'Commits gastos na árvore', value: fmtInt(treeSpent) }] },
+    ],
+  };
+}
+
+// ---------------------------------------------------------------------------
+// The tree
+// ---------------------------------------------------------------------------
+
+export interface ForestNode<T> {
+  node: T;
+  children: ForestNode<T>[];
+}
+
+/**
+ * The nodes of one branch as nested parents and children, following `requires` (a node hangs under the first requirement it
+ * has inside the branch; the ones without any are roots). Siblings keep the order of their rows.
+ */
+export function nodeForest<T extends { id: string; requires: string[]; position: { row: number } }>(nodes: readonly T[]): ForestNode<T>[] {
+  const ids = new Set(nodes.map((node) => node.id));
+  const sorted = [...nodes].sort((a, b) => a.position.row - b.position.row);
+  const build = (parent: string | null): ForestNode<T>[] =>
+    sorted
+      .filter((node) => (node.requires.find((id) => ids.has(id)) ?? null) === parent)
+      .map((node) => ({ node, children: build(node.id) }));
+  return build(null);
+}
+
+export type NodeState = 'max' | 'locked' | 'ready' | 'short';
+
+export const NODE_STATE_LABEL: Record<NodeState, string> = { max: 'Máximo', locked: 'Bloqueado', ready: 'Disponível', short: 'Sem Commits' };
+
+/** Where a node stands for the player: owned to the top, waiting for a parent, buyable now, or buyable once there are Commits. */
+export function nodeState(node: { maxed: boolean; available: boolean; affordable: boolean }): NodeState {
+  if (node.maxed) return 'max';
+  if (!node.available) return 'locked';
+  return node.affordable ? 'ready' : 'short';
+}
 // ---------------------------------------------------------------------------
 // The little feed on the monitor
 // ---------------------------------------------------------------------------
