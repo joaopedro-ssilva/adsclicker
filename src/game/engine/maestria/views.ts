@@ -388,6 +388,15 @@ export interface BolsaView {
   totalValue: Decimal;
 }
 
+/**
+ * "invested / limit ADScoins (N min de produção)" for the Bolsa progress bar. Each amount carries its own suffix, and the
+ * unit is spelled out: a bare "Oc" read as the 1e27 suffix even when the numbers were 0.
+ */
+export function bolsaInvestedLabel(view: Pick<BolsaView, 'invested' | 'limit' | 'limitMinutes'>): string {
+  const coins = (value: Decimal) => formatNumber(value, { integer: true });
+  return `${coins(view.invested)} / ${coins(view.limit)} ADScoins (${whole(view.limitMinutes)} min de produção)`;
+}
+
 export function bolsaView(state: GameState, content: GameContent): BolsaView | null {
   const level = bolsaLevel(state);
   if (level <= 0) return null;
