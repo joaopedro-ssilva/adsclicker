@@ -93,10 +93,56 @@
   opacity: 0.6;
 }
 
+.honour-tag {
+  justify-self: start;
+  padding: 1px 6px;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--accent);
+}
+
 .graduate-honour {
   margin: 0;
   padding: var(--space-2) var(--space-3);
   font-size: 12px;
   border-left: 3px solid var(--legendary);
   background: color-mix(in srgb, var(--legendary) 10%, var(--surface));
+}
+
+.graduate-warning {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: 12px;
+  line-height: 1.4;
+  border: 2px solid var(--warn, var(--legendary));
+  background: color-mix(in srgb, var(--warn, var(--legendary)) 12%, var(--surface));
+}
+
+.graduate-warning p {
+  margin: 0;
+}
+
+.graduate-warning .btn,
+.graduate-warning button {
+  justify-self: start;
+}
+
+/* Reset of the tree of diplomas */
+
+.tree-reset {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  margin-top: var(--space-3);
+}
+
+.tree-reset-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
 }

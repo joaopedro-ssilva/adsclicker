@@ -112,6 +112,17 @@ describe('save round trip', () => {
     expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.sceneryEffects).toBe(true);
   });
 
+  it('keeps the tree reset mark, and loads a save from before it as never used', () => {
+    const { state, content } = richGame();
+    state.treeResetGraduation = 4;
+    const raw = JSON.parse(serializeState(state));
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.treeResetGraduation).toBe(4);
+    delete raw.treeResetGraduation;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.treeResetGraduation).toBeNull();
+    raw.treeResetGraduation = 'x';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.treeResetGraduation).toBeNull();
+  });
+
   it('writes decimals as strings', () => {
     const { state } = richGame();
     const raw = JSON.parse(serializeState(state));

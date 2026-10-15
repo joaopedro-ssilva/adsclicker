@@ -352,6 +352,11 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
     if (level > 0) state.prestige[id] = level;
   }
   state.buyAmount = readBuyAmount(raw.buyAmount);
+  // Absent in older saves: the reset was never used.
+  state.treeResetGraduation =
+    typeof raw.treeResetGraduation === 'number' && Number.isFinite(raw.treeResetGraduation) && raw.treeResetGraduation >= 0
+      ? Math.floor(raw.treeResetGraduation)
+      : null;
 
   const triggers = new Set<string>();
   for (const def of content.achievements) if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);

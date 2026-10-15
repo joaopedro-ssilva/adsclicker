@@ -112,6 +112,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     research: {},
     prestige: {},
     buyAmount: 1,
+    treeResetGraduation: null,
 
     achievements: {},
     secrets: {},

@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { buyPrestigeNode, graduate, setBuyAmount } from './actions';
+import { buyPrestigeNode, graduate, resetPrestigeTree, setBuyAmount } from './actions';
 import { Decimal } from './decimal';
 import { requirementMet } from './requirements';
-import { capBase, diplomaCap, diplomasFor, prestigeNodeCost, runCoinsFor } from './prestige';
+import {
+  canResetPrestigeTree,
+  capBase,
+  diplomaCap,
+  diplomasFor,
+  prestigeNodeCost,
+  prestigeTreeSpent,
+  runCoinsFor,
+} from './prestige';
 import { computeStats } from './stats';
 import { graduationPreview, prestigeNodeViews } from './views';
 import { eventsOf, hire, newCleanGame, num, T0 } from './__fixtures__/helpers';
@@ -247,6 +255,63 @@ describe('prestige tree', () => {
     expect(child).toMatchObject({ available: false, affordable: false });
     g.state.prestige['core-power'] = 3;
     expect(prestigeNodeViews(g.state, g.content).find((v) => v.id === 'core-power')).toMatchObject({ maxed: true, affordable: false, cost: 4 });
+  });
+});
+
+describe('tree reset', () => {
+  function withTree() {
+    const g = newCleanGame();
+    g.state.diplomas = 20;
+    g.state.diplomasEarned = 20;
+    for (let i = 0; i < 3; i += 1) buyPrestigeNode(g.state, g.content, 'core-power', T0, g.emit); // 1 + 2 + 4
+    buyPrestigeNode(g.state, g.content, 'click-power', T0, g.emit); // 1
+    return g;
+  }
+
+  it('refunds every diploma spent on the nodes and empties the tree', () => {
+    const g = withTree();
+    expect(g.state.diplomas).toBe(20 - 8);
+    expect(prestigeTreeSpent(g.state, g.content)).toBe(8);
+    expect(resetPrestigeTree(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.diplomas).toBe(20);
+    expect(g.state.diplomasEarned).toBe(20);
+    expect(g.state.prestige).toEqual({});
+    expect(eventsOf(g.events, 'treeReset')).toEqual([{ type: 'treeReset', refunded: 8 }]);
+    // Only the diploma bonus (20 earned) is left: the 1.5x of the tree is gone.
+    expect(computeStats(g.state, g.content).globalPower).toBeCloseTo(1 + 20 * g.content.balance.graduation.bonusPerDiploma);
+  });
+
+  it('does nothing when nothing is bought', () => {
+    const g = newCleanGame();
+    expect(resetPrestigeTree(g.state, g.content, T0, g.emit)).toBe(false);
+    expect(g.state.treeResetGraduation).toBeNull();
+  });
+
+  it('is allowed once per turma, and again after the next graduation', () => {
+    const g = withTree();
+    hire(g.state, 'gladimir', 'b2', 'angelo');
+    expect(resetPrestigeTree(g.state, g.content, T0, g.emit)).toBe(true);
+    buyPrestigeNode(g.state, g.content, 'core-power', T0, g.emit);
+    expect(canResetPrestigeTree(g.state, g.content)).toBe(false);
+    expect(resetPrestigeTree(g.state, g.content, T0, g.emit)).toBe(false);
+    expect(g.state.prestige['core-power']).toBe(1);
+
+    g.state.runCoins = new Decimal(1e6);
+    expect(graduate(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(canResetPrestigeTree(g.state, g.content)).toBe(true);
+    expect(resetPrestigeTree(g.state, g.content, T0, g.emit)).toBe(true);
+  });
+
+  it('keeps the professors the tree kept for this run, and no longer keeps them at the next graduation', () => {
+    const g = withTree();
+    g.state.diplomas = 20;
+    buyPrestigeNode(g.state, g.content, 'core-keep', T0, g.emit);
+    hire(g.state, 'gladimir', 'b2', 'angelo');
+    resetPrestigeTree(g.state, g.content, T0, g.emit);
+    expect(g.state.hired.gladimir).toBe(true);
+    g.state.runCoins = new Decimal(1e6);
+    expect(graduate(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.hired.gladimir).toBe(false);
   });
 });
 

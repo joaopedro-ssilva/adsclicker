@@ -221,6 +221,11 @@ export interface GameState {
   /** Levels of prestige nodes, by id. Survives graduation. */
   prestige: Record<string, number>;
   buyAmount: BuyAmount;
+  /**
+   * The graduation count (counters.graduations) when the tree was last reset, or null if it never was. The reset is
+   * allowed once per turma: it is open again as soon as the count moves on.
+   */
+  treeResetGraduation: number | null;
 
   // Collection (survives graduation)
   /** Achievement id -> unlock timestamp. */

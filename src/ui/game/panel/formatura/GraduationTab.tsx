@@ -9,6 +9,7 @@ import { MaestriasSection } from './maestrias/MaestriasSection';
 import { MonitorsSection } from './monitors/MonitorsSection';
 import { PrestigeTree } from './PrestigeTree';
 import { ResetInfo } from './ResetInfo';
+import { TreeReset } from './TreeReset';
 import { useSections, type SectionId } from './sectionsStore';
 import { useHonourPick } from './honourPick';
 
@@ -91,6 +92,7 @@ function TreeFold() {
     >
       <p className="formatura-hint">Toque num nó</p>
       <PrestigeTree />
+      <TreeReset />
     </Fold>
   );
 }

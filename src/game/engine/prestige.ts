@@ -234,6 +234,41 @@ export function prestigeNodeAvailable(state: GameState, def: PrestigeNodeDef): b
   return def.requires.every((id) => (state.prestige[id] ?? 0) > 0);
 }
 
+/** Diplomas spent on the tree so far: what a reset would give back. Unknown nodes are ignored. */
+export function prestigeTreeSpent(state: GameState, content: GameContent): number {
+  const index = getIndex(content);
+  let spent = 0;
+  for (const id in state.prestige) {
+    const def = index.prestigeNodes.get(id);
+    if (!def) continue;
+    const level = Math.min(def.maxLevel, state.prestige[id] ?? 0);
+    for (let at = 0; at < level; at += 1) spent += prestigeNodeCost(def, at);
+  }
+  return spent;
+}
+
+/** The tree can be reset once per turma, and only when something is bought. */
+export function canResetPrestigeTree(state: GameState, content: GameContent): boolean {
+  return state.treeResetGraduation !== state.counters.graduations && prestigeTreeSpent(state, content) > 0;
+}
+
+/**
+ * Takes the tree back and refunds every diploma spent on it (the monitors are not part of the tree and keep what
+ * they cost). The refund goes to `diplomas` only: diplomasEarned, and with it the diploma bonus, does not change.
+ * Professors the tree kept hired stay hired for this run; they only go at the next graduation if the tree no
+ * longer keeps them. No feature depends on the nodes (features come from the professors), so nothing else is undone.
+ */
+export function resetPrestigeTree(state: GameState, content: GameContent, emit: Emit): boolean {
+  if (!canResetPrestigeTree(state, content)) return false;
+  const refunded = prestigeTreeSpent(state, content);
+  state.diplomas += refunded;
+  state.prestige = {};
+  state.treeResetGraduation = state.counters.graduations;
+  if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
+  emit({ type: 'treeReset', refunded });
+  return true;
+}
+
 export function buyPrestigeNode(state: GameState, content: GameContent, id: string, emit: Emit): boolean {
   const def = getIndex(content).prestigeNodes.get(id);
   if (!def) return false;

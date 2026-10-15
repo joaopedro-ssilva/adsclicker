@@ -9,7 +9,11 @@ import { activateAbility as activateAbilityRaw } from './buffs';
 import { getIndex } from './contentIndex';
 import { afterAction } from './lifecycle';
 import { buyMonitor as buyMonitorRaw } from './monitors';
-import { buyPrestigeNode as buyPrestigeNodeRaw, graduate as graduateRaw } from './prestige';
+import {
+  buyPrestigeNode as buyPrestigeNodeRaw,
+  graduate as graduateRaw,
+  resetPrestigeTree as resetPrestigeTreeRaw,
+} from './prestige';
 import { buyLevelled } from './purchases';
 import { hitInvasion as hitInvasionRaw } from './invasions';
 import { acceptSprint as acceptSprintRaw } from './sprints';
@@ -84,6 +88,12 @@ export function buyPrestigeNode(state: GameState, content: GameContent, id: stri
   const bought = buyPrestigeNodeRaw(state, content, id, emit);
   if (bought) afterAction(state, content, now, emit);
   return bought;
+}
+
+export function resetPrestigeTree(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
+  const done = resetPrestigeTreeRaw(state, content, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
 }
 
 export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
