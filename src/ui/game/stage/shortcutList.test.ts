@@ -24,6 +24,13 @@ describe('shortcuts', () => {
     expect(press('1', { code: 'Digit1' })?.id).toBe('ability-1');
   });
 
+  it('reads Ctrl+digit as a purchase and nothing else while Ctrl is held', () => {
+    expect(matchShortcut({ key: '1', code: 'Digit1', shiftKey: false, ctrlKey: true })?.id).toBe('buy-1');
+    expect(matchShortcut({ key: '4', code: 'Digit4', shiftKey: false, ctrlKey: true })?.id).toBe('buy-4');
+    expect(matchShortcut({ key: '5', code: 'Digit5', shiftKey: false, ctrlKey: true })).toBeNull();
+    expect(matchShortcut({ key: 'r', code: 'KeyR', shiftKey: false, ctrlKey: true })).toBeNull();
+  });
+
   it('ignores keys with no shortcut', () => {
     expect(press('x')).toBeNull();
     expect(press(' ')).toBeNull();

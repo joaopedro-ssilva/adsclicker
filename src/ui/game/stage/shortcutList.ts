@@ -5,6 +5,10 @@ export type ShortcutId =
   | 'ability-2'
   | 'ability-3'
   | 'ability-4'
+  | 'buy-1'
+  | 'buy-2'
+  | 'buy-3'
+  | 'buy-4'
   | 'rollforward'
   | 'swarm'
   | 'festa'
@@ -17,22 +21,27 @@ export type ShortcutId =
 
 export interface Shortcut {
   id: ShortcutId;
-  /** What the player presses, as the keycap shows it: a letter, a digit, "Shift+1" or "Esc". */
+  /** What the player presses, as the keycap shows it: a letter, a digit, "Shift+1", "Ctrl+1" or "Esc". */
   key: string;
   /** What it does, in Portuguese. */
   label: string;
-  group: 'Habilidades' | 'Maestrias' | 'Tela' | 'Painel';
+  group: 'Habilidades' | 'Compras' | 'Maestrias' | 'Tela' | 'Painel';
 }
 
 /**
  * Keyboard shortcuts of the classroom (desktop). One list for everything: the host that listens, the keycaps on
- * the buttons and, later, the Config tab. They never fire while typing, with a window open or with Ctrl, Alt or Meta held.
+ * the buttons and, later, the Config tab. They never fire while typing, with a window open or with Alt or Meta held;
+ * Ctrl is only for the Ctrl+digit purchases.
  */
 export const SHORTCUTS: readonly Shortcut[] = [
   { id: 'ability-1', key: '1', label: 'Primeira habilidade', group: 'Habilidades' },
   { id: 'ability-2', key: '2', label: 'Segunda habilidade', group: 'Habilidades' },
   { id: 'ability-3', key: '3', label: 'Terceira habilidade', group: 'Habilidades' },
   { id: 'ability-4', key: '4', label: 'Quarta habilidade', group: 'Habilidades' },
+  { id: 'buy-1', key: 'Ctrl+1', label: 'Comprar a primeira aula do professor', group: 'Compras' },
+  { id: 'buy-2', key: 'Ctrl+2', label: 'Comprar a segunda aula do professor', group: 'Compras' },
+  { id: 'buy-3', key: 'Ctrl+3', label: 'Comprar a terceira aula do professor', group: 'Compras' },
+  { id: 'buy-4', key: 'Ctrl+4', label: 'Comprar o upgrade de clique do professor', group: 'Compras' },
   { id: 'rollforward', key: 'R', label: 'Rollforward', group: 'Maestrias' },
   { id: 'swarm', key: 'I', label: 'Super invasão', group: 'Maestrias' },
   { id: 'festa', key: 'F', label: 'Festa de lançamento', group: 'Maestrias' },
@@ -56,11 +65,17 @@ export function shortcutKey(id: ShortcutId): string {
   return byId.get(id)?.key ?? '';
 }
 
-/** The shortcut an event presses, or null. Letters ignore case and keyboard layout state; Shift+digit uses the physical key. */
-export function matchShortcut(event: Pick<KeyboardEvent, 'key' | 'code' | 'shiftKey'>): Shortcut | null {
+/**
+ * The shortcut an event presses, or null. Letters ignore case and keyboard layout state; Shift+digit and Ctrl+digit
+ * use the physical key. With Ctrl held only the Ctrl shortcuts match.
+ */
+export function matchShortcut(event: Pick<KeyboardEvent, 'key' | 'code' | 'shiftKey'> & { ctrlKey?: boolean }): Shortcut | null {
+  const ctrl = event.ctrlKey ?? false;
   for (const shortcut of SHORTCUTS) {
     const [first, second] = shortcut.key.split('+');
+    if (ctrl !== (first === 'Ctrl' && second !== undefined)) continue;
     if (second !== undefined) {
+      if (first === 'Ctrl' && !event.shiftKey && event.code === `Digit${second}`) return shortcut;
       if (first === 'Shift' && event.shiftKey && event.code === `Digit${second}`) return shortcut;
     } else if (shortcut.key === 'Esc') {
       if (event.key === 'Escape') return shortcut;

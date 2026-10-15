@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { abilityViews, bolsaView, festaView, hasFeature, rollforwardView, swarmView } from '@/game/engine/views';
 import { content, useGame } from '@/game/store';
 import { useJournal } from '../moments/journalStore';
+import { playLimited } from '../panel/lib/feedback';
 import { useUi } from '../shared/uiStore';
 import type { PanelTab } from '../shared/uiStore';
 import { useBolsaPanel } from './maestria/bolsa/bolsaPanelStore';
@@ -18,12 +19,31 @@ function windowOpen(): boolean {
   return document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]') !== null || useBolsaPanel.getState().open;
 }
 
-function press(id: ShortcutId): void {
+/** The cards of the Aulas tab for a professor, in the order it shows them: the disciplines by tier, then the click upgrade. */
+function lessonCards(professor: string): { id: string; kind: 'discipline' | 'clickUpgrade' }[] {
+  return [
+    ...content.disciplines
+      .filter((entry) => entry.professor === professor)
+      .sort((a, b) => a.tier - b.tier)
+      .map((entry) => ({ id: entry.id, kind: 'discipline' as const })),
+    ...content.clickUpgrades.filter((entry) => entry.professor === professor).map((entry) => ({ id: entry.id, kind: 'clickUpgrade' as const })),
+  ];
+}
+
+function press(id: ShortcutId, repeat: boolean): void {
   const game = useGame.getState();
   const { state } = game;
   const now = Date.now();
   const ui = useUi.getState();
 
+  if (id.startsWith('buy-')) {
+    // The active professor is the one the Aulas tab and the stage show; the amount is the chosen x1/x10/... .
+    const card = lessonCards(state.activeProfessor)[Number(id.slice('buy-'.length)) - 1];
+    if (!card) return;
+    const bought = card.kind === 'discipline' ? game.buyDiscipline(card.id) : game.buyClickUpgrade(card.id);
+    if (!bought && !repeat) playLimited('cantAfford');
+    return;
+  }
   if (id.startsWith('ability-')) {
     const slot = Number(id.slice('ability-'.length));
     // The live state: the listener is attached once, not on every tick.
@@ -70,13 +90,17 @@ function press(id: ShortcutId): void {
 export function ShortcutsHost() {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || isEditable(event.target) || windowOpen()) return;
+      if (event.metaKey || event.altKey || isEditable(event.target) || windowOpen()) return;
       const shortcut = matchShortcut(event);
       if (!shortcut) return;
+      // Holding Ctrl+digit keeps buying, like holding the buy button; every other shortcut fires once per press.
+      const buying = shortcut.id.startsWith('buy-');
+      if (event.repeat && !buying) return;
       // Esc only means something in photo mode; elsewhere it stays free for whatever else wants it.
       if (shortcut.id === 'leave-photo' && !useUi.getState().photo) return;
+      // Ctrl+digit switches browser tabs: keep it in the game (browsers that reserve it never send it here).
       event.preventDefault();
-      press(shortcut.id);
+      press(shortcut.id, event.repeat);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
