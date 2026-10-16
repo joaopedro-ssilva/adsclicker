@@ -58,10 +58,21 @@ describe('formatNumber', () => {
     expect(formatNumber(new Decimal('9.999e32'))).toBe('1 Dc');
   });
 
-  it('switches to scientific notation after Dc', () => {
-    expect(formatNumber(new Decimal('1.234e36'))).toBe('1,23e36');
-    expect(formatNumber(new Decimal('1e100'))).toBe('1e100');
-    expect(formatNumber(new Decimal('9.999e40'))).toBe('1e41');
+  it('keeps abbreviating past Dc with the real names, three letters at most', () => {
+    expect(formatNumber(new Decimal('1.234e36'))).toBe('1,23 Ud');
+    expect(formatNumber(new Decimal('1.86e36'))).toBe('1,86 Ud');
+    expect(formatNumber(new Decimal('1e45'))).toBe('1 Qad');
+    expect(formatNumber(new Decimal('9.999e40'))).toBe('100 Dd');
+    expect(formatNumber(new Decimal('9.999e41'))).toBe('1 Td');
+    expect(formatNumber(new Decimal('2e63'))).toBe('2 Vg');
+    expect(formatNumber(new Decimal('1e93'))).toBe('1 Tg');
+    expect(formatNumber(new Decimal('1e123'))).toBe('1 Qag');
+  });
+
+  it('switches to scientific notation after Qag (1e123)', () => {
+    expect(formatNumber(new Decimal('1e126'))).toBe('1e126');
+    expect(formatNumber(new Decimal('1.234e200'))).toBe('1,23e200');
+    expect(formatNumber(new Decimal('9.999e125'))).toBe('1e126');
   });
 
   it('handles negatives, huge values and bad input', () => {

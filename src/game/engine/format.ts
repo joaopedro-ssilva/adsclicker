@@ -1,8 +1,18 @@
 import { toDecimal } from './decimal';
 import type { DecimalSource } from './decimal';
 
-/** Short-scale suffixes by thousands group: 1e3 K, 1e6 M ... 1e33 Dc. Past that: scientific. */
-const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'] as const;
+/**
+ * Short-scale suffixes by thousands group, at most three letters: 1e3 K, 1e6 M ... 1e33 Dc, then the real names
+ * abbreviated (undecilhão Ud, duodecilhão Dd ... vigintilhão Vg ... trigintilhão Tg ... quadragintilhão Qag, 1e123).
+ * Past that: scientific.
+ */
+const SUFFIXES = [
+  '', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No',
+  'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod',
+  'Vg', 'Uv', 'Dv', 'Tv', 'Qav', 'Qiv', 'Sxv', 'Spv', 'Ocv', 'Nov',
+  'Tg', 'Ut', 'Dt', 'Tt', 'Qat', 'Qit', 'Sxt', 'Spt', 'Oct', 'Not',
+  'Qag',
+] as const;
 
 /** Below this the number is shown whole with thousands separators: 1.234. */
 const PLAIN_LIMIT_EXPONENT = 4;
