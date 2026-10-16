@@ -254,7 +254,7 @@ const tree: LabNodeDef[] = [
     id: 'revisao-de-pr',
     branch: 'produto',
     name: 'Revisão de PR',
-    emoji: '🧐',
+    emoji: '🔍',
     description: 'A primeira recompensa da corrida mostra 4 opções.',
     cost: 20,
     costGrowth: 1,

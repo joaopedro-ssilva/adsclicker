@@ -33,7 +33,9 @@ function NodeCard({ node, names, selected, onSelect }: { node: LabNodeView; name
       onClick={onSelect}
     >
       <span className="lab-node-top">
-        <b>{node.name}</b>
+        <b>
+          <span aria-hidden="true">{node.emoji}</span> {node.name}
+        </b>
         <span>
           {node.level}/{node.maxLevel}
         </span>
@@ -70,7 +72,9 @@ function Selected({ node, balance, names }: { node: LabNodeView; balance: number
     <section className="lab-selected" aria-label="Habilidade selecionada" data-qa="lab-selected">
       <div className="lab-selected-info">
         <p className="lab-kicker-small">Habilidade selecionada</p>
-        <h4>{node.name}</h4>
+        <h4>
+          <span aria-hidden="true">{node.emoji}</span> {node.name}
+        </h4>
         <p className="lab-selected-level">
           {node.maxed ? `Nível máximo (${node.level})` : `Nível ${node.level} → ${node.level + 1}`}
         </p>
