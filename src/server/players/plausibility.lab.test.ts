@@ -34,7 +34,7 @@ function maxedLab(state: GameState): void {
     seed: 1, status: 'broken', phase: 40, t: 900, phaseTime: 0, carry: 0, integrity: 0, maxIntegrity: 300, mobs: [], mobSeq: 0, waveHp: 0,
     bossLeft: null, nextCharge: 0, offers: [], pending: null,
     buffs: Object.fromEntries(content.lab.buffs.map((buff) => [buff.id, 6])),
-    clickTimes: [], windUsed: 0, cleared: 39, bosses: 7, clearLog: [], brokenBy: 'timer', paid: 0, shield: 0, rerolled: 0,
+    clicks: 0, clickTimes: [], windUsed: 0, cleared: 39, bosses: 7, clearLog: [], brokenBy: 'timer', paid: 0, shield: 0, rerolled: 0,
   };
   state.lab.turma.nextUid = uid;
   // The run above got to phase 40: the counters say so too (the judge ties the record to the phases cleared).

@@ -7,6 +7,7 @@
  * coin sink in the Oc..Qad range (1e27..1e45). A `null` price means "not sold": a default, or an achievement reward that a
  * later change grants with `grantLabCosmetic`.
  */
+import { achievements } from './achievements';
 import type { LabCosmeticDef, LabEffects } from './labTypes';
 
 export interface LabCosmeticArt {
@@ -55,7 +56,12 @@ export const labStartItems: LabCosmeticArt[] = [
 // Prices: fixed ADScoins, by tier (Oc = 1e27 ... Qad = 1e45). Edit them here and nowhere else.
 // ---------------------------------------------------------------------------
 
-const CONQUISTA = 'Conquista (em breve)';
+/** What a cosmetic that is not for sale says: the achievement that hands it out (a secret one keeps its name hidden). */
+function conquista(id: string): string {
+  const def = achievements.find((entry) => entry.reward?.labCosmetic === id);
+  if (!def) return 'Conquista';
+  return def.secret ? 'Conquista secreta: ???' : `Conquista: ${def.name}`;
+}
 
 /** Decorations: 1e27 .. 1e33. */
 const DECOR_PRICE: Record<string, string | null> = {
@@ -188,7 +194,7 @@ const item = (kind: LabCosmeticDef['kind'], base: Omit<LabCosmeticDef, 'kind' | 
   ...base,
   kind,
   price: price ?? null,
-  ...(price === null || price === undefined ? (base.free ? {} : { hint: CONQUISTA }) : {}),
+  ...(price === null || price === undefined ? (base.free ? {} : { hint: conquista(base.id) }) : {}),
 });
 
 /** The Mouse quebrado: what a run starts with until another starting item is equipped. Not a shop item. */

@@ -28,8 +28,8 @@ const make = (seed: SceneSeed): SceneryDef => ({
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 42 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
-export const sceneries: SceneryDef[] = [
+/** The original 42 sceneries (GAME_DESIGN section 6). The late collections below join them in `sceneries`. */
+const mainSceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
     name: 'Sala de Aula',
@@ -371,8 +371,8 @@ export const sceneries: SceneryDef[] = [
 ];
 
 /**
- * The Laboratório collection sceneries. Kept OUT of `sceneries` on purpose (the design test wants the 42 sceneries
- * to be achievement rewards, one each); `source` says where each comes from. Merge into `sceneries` when the unlocks are wired.
+ * The late sceneries: four of the Laboratório, the Pós-doc defence hall and the Centro Comunitário. `source` marks the
+ * collection of each; every one is the reward of exactly one achievement.
  */
 export const labSceneries: SceneryDef[] = [
   make({
@@ -430,3 +430,6 @@ export const labSceneries: SceneryDef[] = [
     scene: 'lively campus community centre hall with colorful bunting, a wooden donors plaque with small gold nameplates on the back wall, a long table with food and drink donations, boxes and a mural painted by students, big windows with sunlight',
   }),
 ];
+
+/** The closed list of 48 sceneries: the original 42 and the 6 late ones. Each non-default one is the reward of exactly one achievement. */
+export const sceneries: SceneryDef[] = [...mainSceneries, ...labSceneries];

@@ -5,6 +5,7 @@ import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
 import { isValidFavourite } from './favourites';
 import { createInitialState, createMonitorsState, createRecords, createRunStats } from './init';
+import { grantLabCosmetic } from './lab/cosmetics';
 import { readLab, settleLabAfterLoad } from './lab/save';
 import { readMaestria } from './maestria/save';
 import { readPostdoc } from './postdoc';
@@ -393,7 +394,10 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.graduationHistory = readGraduationHistory(raw.graduationHistory);
 
   const triggers = new Set<string>();
-  for (const def of content.achievements) if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);
+  for (const def of content.achievements) {
+    if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);
+    else if (def.condition.kind === 'flag') triggers.add(def.condition.flag);
+  }
   state.achievements = readNumbers(raw.achievements, (id) => index.achievements.has(id), 0);
   state.secrets = readBooleans(raw.secrets, (trigger) => triggers.has(trigger));
 
@@ -444,6 +448,11 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.postdoc = readPostdoc(raw.postdoc, content);
   // Absent in older saves: a locked, empty lab.
   state.lab = readLab(raw.lab, content);
+  // The lab was just read, so the achievement rewards for it (granted above to a blank lab) are handed out again.
+  for (const id in state.achievements) {
+    const labCosmetic = index.achievements.get(id)?.reward?.labCosmetic;
+    if (labCosmetic) grantLabCosmetic(state, content, labCosmetic);
+  }
   settleLabAfterLoad(state, content);
   if (isRecord(raw.session)) {
     state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };

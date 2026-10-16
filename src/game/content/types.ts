@@ -6,7 +6,7 @@
  * and parsed by the engine with break_infinity.js.
  */
 
-import type { LabConfig } from './labTypes';
+import type { LabConfig, LabRarity } from './labTypes';
 
 export type DecimalString = string;
 
@@ -195,6 +195,21 @@ export type Condition =
   | { kind: 'bolsaPortfolio' }
   /** At least `gte` Monitores are hired, or at their top level when `maxed`. */
   | { kind: 'monitors'; gte: number; maxed?: boolean }
+  /** ADScoins given to the campus in total (GameState.donated) reach `gte`. */
+  | { kind: 'donated'; gte: DecimalString }
+  /**
+   * A yes/no fact the engine noted by name in GameState.secrets when it happened (a single big donation, a lab boss
+   * beaten...). Unlike `secret` it is not an easter egg: the achievement can be public.
+   */
+  | { kind: 'flag'; flag: string }
+  /** A Laboratório number: the lab unlocked (1), the best phase, or one of the lifetime counters. */
+  | { kind: 'labStat'; stat: 'unlocked' | 'bestPhase' | 'broken' | 'itemsRecycled'; gte: number }
+  /** At least `gte` equipped lab items of this rarity right now. */
+  | { kind: 'labEquipped'; rarity: LabRarity; gte: number }
+  /** At least `pieces` equipped pieces of this lab item set. */
+  | { kind: 'labSet'; set: string; pieces: number }
+  /** Every node of the lab tree at its top level: of any one branch, or of the whole tree. */
+  | { kind: 'labTree'; scope: 'branch' | 'all' }
   /** Fired by name from the UI or engine (easter eggs): useGame.getState().triggerSecret(id). */
   | { kind: 'secret'; trigger: string };
 
@@ -585,6 +600,12 @@ export type AchievementFamily =
   | 'sprints'
   | 'graduation'
   | 'collection'
+  /** Laboratório de Pesquisa. */
+  | 'laboratorio'
+  /** Centro Comunitário (donations). */
+  | 'comunidade'
+  /** Pós-doc stars. */
+  | 'posdoc'
   | 'secret';
 
 export interface AchievementDef {
@@ -601,6 +622,8 @@ export interface AchievementDef {
     skin?: string;
     scenery?: string;
     theme?: string;
+    /** A Laboratório cosmetic that only an achievement hands out (content/labCosmetics.ts); granted with grantLabCosmetic. */
+    labCosmetic?: string;
   };
 }
 
@@ -633,8 +656,9 @@ export interface SkinDef {
     accent: string;
   };
   /**
-   * Where the skin comes from when it is not an achievement reward (the Laboratório collection: 'lab' drops,
-   * 'posdoc' and 'donation' from the Centro Comunitário). Unwired for now: the unlock rules come later.
+   * Which collection the skin belongs to when it is part of the late content (the Laboratório: 'lab', 'posdoc' gowns and
+   * 'donation' skins of the Centro Comunitário). Each one is still the reward of exactly one achievement; the
+   * rarity collection feats (Colecionador de Lendárias, Panteão...) only count skins without a `source`.
    */
   source?: 'lab' | 'posdoc' | 'donation';
   /** Short prompt fragment for the art pipeline describing the outfit. */
@@ -660,7 +684,7 @@ export interface SceneryDef {
     horizon: string;
     floor: string;
   };
-  /** Laboratório collection scenery that is not an achievement reward (unlock rules come later). */
+  /** Which late collection the scenery belongs to (Laboratório, Pós-doc, Centro Comunitário); still an achievement reward. */
   source?: 'lab' | 'posdoc' | 'donation';
   artPrompt: string;
 }

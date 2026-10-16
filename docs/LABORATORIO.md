@@ -220,3 +220,9 @@ Ações: `buyLabCosmetic(id)`, `equipLabCosmetic(id, on)` (decoração: `on = fa
 ## Perfil público do Laboratório
 
 `GET /api/lab/profile?nickname=` (`server/community/labProfile.ts`): lê a coluna `players.lab_profile` (jsonb, migração `0010_lab_profile`), derivada do save na projeção (`engine/lab/profile.ts`: cosméticos vestidos e números da vida do laboratório), mais as builds dos dois recordes. Passa pelo conteúdo na leitura (ids desconhecidos voltam ao padrão), mesmas regras de exclusão dos rankings (sinalizado, banido, conta de teste, sem apelido) e 404 para quem nunca liberou o laboratório. A interface (`ui/game/lab/LabProfile.tsx`) abre pelo clique no Ranking do Laboratório; o cartão da Turma fica no link "Ver perfil na Turma".
+
+## Conquistas e recompensas
+
+36 conquistas novas (famílias `laboratorio` 14, `comunidade` 7 e `posdoc` 13, mais 2 secretas do lab na família `secret`). As 18 skins e os 6 cenários da coleção entraram nas listas principais (113 skins, 48 cenários), cada um recompensa de **uma** conquista. Os cosméticos só de conquista (Gato dormindo, Troféu de hackathon, Mousepad gamer RGB, tema Grimório) saem de `reward.labCosmetic` (`grantLabCosmetic`); a aba Cosméticos mostra "Conquista: <nome>", ou "Conquista secreta: ???". Quatro temas novos do jogo: Mármore do Campus, Ouro do Doutorado, Céu Estrelado e BSOD. As conquistas de raridade (Colecionador de Lendárias, Panteão...) ignoram as skins com `source`.
+
+Condições novas: `donated`, `flag` (um fato anotado em `state.secrets`: a doação de tudo de uma vez, o chefão do lab por id, Minimalista, Mouse de Estimação, Sem as Mãos; os nomes ficam em `content/labFlags.ts`), `labStat`, `labEquipped`, `labSet` e `labTree`. A corrida guarda `run.clicks` (cliques no monitor naquela corrida).

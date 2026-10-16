@@ -29,8 +29,8 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 95 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
-export const skins: SkinDef[] = [
+/** The original 95 skins (GAME_DESIGN section 6). The late collections below join them in `skins`. */
+const mainSkins: SkinDef[] = [
   ...make('edecio', [
     {
       id: 'edecio-default',
@@ -874,10 +874,9 @@ const posdoc = (id: string, desc: string): SkinSeed => ({
 });
 
 /**
- * The Laboratório collection (RPG meets tech), Pós-doc gowns and the Centro Comunitário donation skins.
- * Kept OUT of `skins` on purpose: the achievement design test demands 95 skins, each the reward of exactly one
- * achievement, and these are unlocked by other means. `source` marks where each comes from ('lab' drops, 'posdoc',
- * 'donation'); whoever wires the unlocks merges this list into `skins` (and updates those tests) when ready.
+ * The Laboratório collection (RPG meets tech), Pós-doc gowns and the Centro Comunitário donation skins: 18 skins that
+ * are merged into `skins` below. `source` marks the collection of each ('lab', 'posdoc', 'donation'); every one is the
+ * reward of exactly one achievement, like the rest.
  */
 export const labSkins: SkinDef[] = [
   ...make('edecio', [
@@ -1005,3 +1004,17 @@ export const labSkins: SkinDef[] = [
     },
   ]),
 ];
+
+const RARITY_RANK: Record<Rarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4 };
+
+/**
+ * The closed list of 113 skins: the original 95 and the 18 late ones. Each non-default skin is the reward of exactly one
+ * achievement. A professor's skins stay ordered from common to mythic, the late ones slotted in by rarity.
+ */
+export const skins: SkinDef[] = (() => {
+  const all = [...mainSkins, ...labSkins];
+  const order = [...new Set(all.map((skin) => skin.professor))];
+  return order.flatMap((professor) =>
+    all.filter((skin) => skin.professor === professor).sort((a, b) => RARITY_RANK[a.rarity] - RARITY_RANK[b.rarity]),
+  );
+})();

@@ -12,7 +12,10 @@ describe('content: Laboratório collection art', () => {
   it('has 18 skins with unique ids, a source marker and art on disk', () => {
     expect(labSkins).toHaveLength(18);
     const ids = labSkins.map((s) => s.id);
-    expect(new Set([...ids, ...skins.map((s) => s.id)]).size).toBe(ids.length + skins.length);
+    // They are part of the main list now (113 = 95 + 18), each once.
+    expect(skins).toHaveLength(113);
+    expect(new Set(skins.map((s) => s.id)).size).toBe(skins.length);
+    for (const id of ids) expect(skins.some((s) => s.id === id), id).toBe(true);
     for (const skin of labSkins) {
       expect(skin.id.startsWith(`${skin.professor}-`), skin.id).toBe(true);
       expect(skin.source, skin.id).toBeDefined();
@@ -25,8 +28,11 @@ describe('content: Laboratório collection art', () => {
 
   it('has 6 sceneries with unique ids and art on disk', () => {
     expect(labSceneries).toHaveLength(6);
-    const ids = [...labSceneries, ...sceneries].map((s) => s.id);
+    // Part of the main list now (48 = 42 + 6), each once.
+    expect(sceneries).toHaveLength(48);
+    const ids = sceneries.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
+    for (const scenery of labSceneries) expect(ids).toContain(scenery.id);
     for (const scenery of labSceneries) expect(asset(scenery.asset), scenery.id).toBe(true);
   });
 

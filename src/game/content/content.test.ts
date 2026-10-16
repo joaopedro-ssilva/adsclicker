@@ -1,5 +1,6 @@
 import Decimal from 'break_infinity.js';
 import { describe, expect, it } from 'vitest';
+import { donationTitles } from './donations';
 import { content, PROFESSOR_IDS } from './index';
 import type { Condition, Effect, Requirement, Reward } from './index';
 
@@ -111,6 +112,28 @@ const EXPECTED_SKIN_IDS = [
   'pablo-singularidade',
 ];
 
+/** The 18 late skins (Laboratório, Pós-doc gowns, donations), merged into the main list after the original 95. */
+const LATE_SKIN_RARITY: Record<string, string> = {
+  'edecio-sir-edecio': 'epic',
+  'edecio-posdoc': 'legendary',
+  'gladimir-darth-glad': 'legendary',
+  'gladimir-posdoc': 'legendary',
+  'b2-pintora-arco-iris': 'epic',
+  'b2-posdoc': 'legendary',
+  'wagner-paladino-firewall': 'epic',
+  'wagner-posdoc': 'legendary',
+  'guto-churrasqueiro-sagrado': 'epic',
+  'guto-posdoc': 'legendary',
+  'b1-product-owner': 'epic',
+  'b1-posdoc': 'legendary',
+  'angelo-reitor-mor': 'legendary',
+  'angelo-posdoc': 'legendary',
+  'angelo-nome-no-predio': 'mythic',
+  'pablo-mago-grafos': 'legendary',
+  'pablo-posdoc': 'legendary',
+  'pablo-mecenas': 'mythic',
+};
+
 const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'edecio-default': 'common',
   'edecio-cafe': 'common',
@@ -208,6 +231,7 @@ const EXPECTED_SKIN_RARITY: Record<string, string> = {
   'pablo-sensei': 'legendary',
   'pablo-singularidade': 'mythic',
 };
+Object.assign(EXPECTED_SKIN_RARITY, LATE_SKIN_RARITY);
 
 const SKINS_WITH_HEADGEAR = [
   'edecio-cria',
@@ -300,6 +324,16 @@ const EXPECTED_SCENERY_IDS = [
   'sala-dos-professores',
 ];
 
+/** The 6 late sceneries, in order, after the original 42. */
+const LATE_SCENERY_AMBIENT: Record<string, string> = {
+  'datacenter-em-chamas': 'embers',
+  'sala-do-tesouro': 'dust',
+  'fortaleza-do-wagner': 'leaves',
+  'taverna-da-guilda': 'dust',
+  'salao-da-defesa': 'dust',
+  'centro-comunitario': 'confetti',
+};
+
 const EXPECTED_AMBIENT: Record<string, string> = {
   'sala-de-aula': 'dust',
   laboratorio: 'code',
@@ -344,6 +378,7 @@ const EXPECTED_AMBIENT: Record<string, string> = {
   'sala-dos-monitores': 'code',
   'sala-dos-professores': 'dust',
 };
+Object.assign(EXPECTED_AMBIENT, LATE_SCENERY_AMBIENT);
 
 const ORIGINAL_UPGRADE_NAMES = [
   'Café Quentinho',
@@ -742,8 +777,11 @@ describe('content: professors, disciplines and numbers', () => {
 });
 
 describe('content: skins, sceneries and themes', () => {
-  it('has exactly the 95 skins of the design, with their rarities', () => {
-    expect(skinIds).toEqual(EXPECTED_SKIN_IDS);
+  it('has exactly the 113 skins of the design (95 original and 18 late), with their rarities', () => {
+    // The late skins sit inside their professor's list by rarity, so the order is only pinned for the original ones.
+    expect(skinIds.filter((id) => !(id in LATE_SKIN_RARITY))).toEqual(EXPECTED_SKIN_IDS);
+    expect([...skinIds].sort()).toEqual([...EXPECTED_SKIN_IDS, ...Object.keys(LATE_SKIN_RARITY)].sort());
+    expect(content.skins.filter((skin) => skin.source)).toHaveLength(18);
     for (const skin of content.skins) {
       expect(skin.rarity, `${skin.id} rarity`).toBe(EXPECTED_SKIN_RARITY[skin.id]);
       expect(skin.id.startsWith(`${skin.professor}-`), `${skin.id} prefix`).toBe(true);
@@ -761,7 +799,7 @@ describe('content: skins, sceneries and themes', () => {
   it('builds body and head asset keys from the skin id, with its own head only where the design lists headgear', () => {
     for (const skin of content.skins) {
       expect(skin.body).toBe(`skins/${skin.id}`);
-      if (SKINS_WITH_HEADGEAR.includes(skin.id)) expect(skin.head).toBe(`heads/${skin.id}`);
+      if (SKINS_WITH_HEADGEAR.includes(skin.id) || skin.id in LATE_SKIN_RARITY) expect(skin.head).toBe(`heads/${skin.id}`);
       else expect(skin.head).toBeUndefined();
       for (const colour of Object.values(skin.palette)) expect(colour).toMatch(/^#[0-9a-f]{6}$/i);
       expect(skin.artPrompt.length).toBeGreaterThan(10);
@@ -769,8 +807,10 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has exactly the 42 sceneries of the design with one default, and only the Galáxia floats', () => {
-    expect(sceneryIds).toEqual(EXPECTED_SCENERY_IDS);
+  it('has exactly the 48 sceneries of the design (42 original and 6 late) with one default, and only the Galáxia floats', () => {
+    expect(sceneryIds.slice(0, EXPECTED_SCENERY_IDS.length)).toEqual(EXPECTED_SCENERY_IDS);
+    expect(sceneryIds.slice(EXPECTED_SCENERY_IDS.length)).toEqual(Object.keys(LATE_SCENERY_AMBIENT));
+    expect(content.sceneries.filter((scenery) => scenery.source)).toHaveLength(6);
     expect(content.sceneries.filter((scenery) => scenery.default === true).map((scenery) => scenery.id)).toEqual([
       'sala-de-aula',
     ]);
@@ -785,8 +825,11 @@ describe('content: skins, sceneries and themes', () => {
     }
   });
 
-  it('has the 17 HUD themes with one default and legible contrast', () => {
-    expect(themeIds).toEqual(['escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro', 'prata', 'platina', 'holografico', 'grego', 'arco-iris', 'fita-magnetica', 'pregao', 'vidro']);
+  it('has the 21 HUD themes with one default and legible contrast', () => {
+    expect(themeIds).toEqual([
+      'escuro', 'claro', 'alto-contraste', 'terminal', 'pastel', 'floresta', 'roxo', 'vermelho', 'ouro', 'prata', 'platina', 'holografico', 'grego', 'arco-iris', 'fita-magnetica', 'pregao', 'vidro',
+      'marmore-do-campus', 'ouro-do-doutorado', 'ceu-estrelado', 'bsod',
+    ]);
     expect(content.themes.filter((theme) => theme.default === true).map((theme) => theme.id)).toEqual(['escuro']);
     const luminance = (hex: string): number => {
       const channels = [1, 3, 5].map((start) => {
@@ -814,9 +857,13 @@ describe('content: skins, sceneries and themes', () => {
 });
 
 describe('content: achievements', () => {
-  it('has about 150 achievements spread over the families of the design', () => {
-    expect(content.achievements.length).toBeGreaterThanOrEqual(145);
-    expect(content.achievements.length).toBeLessThanOrEqual(160);
+  it('has about 190 achievements spread over the families of the design', () => {
+    expect(content.achievements.length).toBeGreaterThanOrEqual(185);
+    expect(content.achievements.length).toBeLessThanOrEqual(195);
+    const count36 = (family: string) => content.achievements.filter((a) => a.family === family).length;
+    expect(count36('laboratorio')).toBe(14);
+    expect(count36('comunidade')).toBe(7);
+    expect(count36('posdoc')).toBe(13);
     const count = (family: string) => content.achievements.filter((a) => a.family === family).length;
     expect(count('click')).toBeGreaterThanOrEqual(10);
     expect(count('production')).toBeGreaterThanOrEqual(12);
@@ -825,7 +872,8 @@ describe('content: achievements', () => {
     expect(count('sprints')).toBeGreaterThanOrEqual(5);
     expect(count('graduation')).toBeGreaterThanOrEqual(6);
     expect(count('collection')).toBeGreaterThanOrEqual(5);
-    expect(count('secret')).toBe(12);
+    // 12 original secrets and the two secret feats of the Laboratório.
+    expect(count('secret')).toBe(14);
   });
 
   it('covers every secret trigger of the design and hides only the secret family', () => {
@@ -847,6 +895,11 @@ describe('content: achievements', () => {
     const nonDefault = <T extends { id: string; default?: boolean }>(items: T[]) =>
       items.filter((item) => item.default !== true).map((item) => item.id);
     expect([...rewarded.skin].sort()).toEqual(nonDefault(content.skins).sort());
+    // The Laboratório cosmetics that only an achievement hands out: each one exists, is not for sale, and has one source.
+    const labRewarded = content.achievements.flatMap((a) => (a.reward?.labCosmetic ? [a.reward.labCosmetic] : []));
+    const notSold = content.lab.cosmetics.items.filter((item) => item.price === null && !item.free).map((item) => item.id);
+    expect([...labRewarded].sort()).toEqual([...notSold].sort());
+    expect(duplicates(labRewarded)).toEqual([]);
     expect([...rewarded.scenery].sort()).toEqual(nonDefault(content.sceneries).sort());
     expect([...rewarded.theme].sort()).toEqual(nonDefault(content.themes).sort());
     expect(duplicates(rewarded.skin)).toEqual([]);
@@ -860,7 +913,8 @@ describe('content: achievements', () => {
     // Legendary skins come from the level 100 ladder or from a long-haul challenge; never from hiring or early counters.
     for (const achievement of byRarity('legendary')) expect(achievement.id).not.toMatch(/^hire-|^click-(100|500|1k|5k)$/);
     for (const achievement of byRarity('mythic')) expect(achievement.id).not.toMatch(/^hire-|^lvl|^research-/);
-    expect(byRarity('mythic')).toHaveLength(8);
+    // One per professor, plus the two donation skins (Mecenas and Nome no Prédio).
+    expect(byRarity('mythic')).toHaveLength(10);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });
@@ -983,9 +1037,9 @@ describe('content: the collection feats', () => {
   const byId = (id: string) => content.achievements.find((a) => a.id === id);
   const rewardOf = (kind: 'skin' | 'scenery' | 'theme', id: string) => content.achievements.find((a) => a.reward?.[kind] === id);
 
-  it('keeps exactly one mythic skin per professor, with the two Gladimir feats in place', () => {
+  it('keeps exactly one mythic skin per professor in the original collection, with the two Gladimir feats in place', () => {
     for (const id of PROFESSOR_IDS) {
-      expect(content.skins.filter((skin) => skin.professor === id && skin.rarity === 'mythic'), id).toHaveLength(1);
+      expect(content.skins.filter((skin) => skin.professor === id && skin.rarity === 'mythic' && !skin.source), id).toHaveLength(1);
     }
     expect(rewardOf('skin', 'gladimir-robo')?.id).toBe('monitors-max');
     expect(rewardOf('skin', 'gladimir-arquivista')?.id).toBe('mastery-gladimir');
@@ -994,6 +1048,7 @@ describe('content: the collection feats', () => {
 
   it('hands out the approved rewards', () => {
     const rewards: Record<string, { skin?: string; scenery?: string; theme?: string } | undefined> = {
+      'skins-all': { theme: 'holografico' },
       'mythics-all': { scenery: 'panteao' },
       'sceneries-all': { theme: 'grego' },
       'themes-all': { theme: 'arco-iris' },
@@ -1041,6 +1096,75 @@ describe('content: the collection feats', () => {
     // Nothing is rewarded by Platina, and the 100 achievements can be met without it.
     expect(platina?.reward).toBeUndefined();
     expect(content.achievements.length - 1).toBeGreaterThan(100);
+  });
+
+  it('hands out the late collections: Laboratório, Centro Comunitário and Pós-doc', () => {
+    const rewards: Record<string, { skin?: string; scenery?: string; theme?: string; labCosmetic?: string } | undefined> = {
+      'lab-unlock': undefined,
+      'lab-boss-friday': { labCosmetic: 'trofeu-de-hackathon', skin: 'guto-churrasqueiro-sagrado' },
+      'lab-boss-where': { skin: 'wagner-paladino-firewall' },
+      'lab-boss-ai': { skin: 'angelo-reitor-mor' },
+      'lab-broken-10': { theme: 'bsod' },
+      'lab-minimalist': { scenery: 'fortaleza-do-wagner' },
+      'lab-legendary-4': { skin: 'b2-pintora-arco-iris', scenery: 'sala-do-tesouro' },
+      'lab-set-guilda': { skin: 'edecio-sir-edecio', scenery: 'taverna-da-guilda' },
+      'lab-set-plantao': { skin: 'b1-product-owner' },
+      'lab-phase-25': { skin: 'gladimir-darth-glad' },
+      'lab-phase-40': { scenery: 'datacenter-em-chamas' },
+      'lab-branch': { labCosmetic: 'tema-grimorio' },
+      'lab-tree': { skin: 'pablo-mago-grafos' },
+      'lab-recycle-100': { labCosmetic: 'gato-dormindo-no-monitor' },
+      'secret-lab-mouse': undefined,
+      'secret-lab-hands': { labCosmetic: 'mousepad-gamer-rgb' },
+      'donate-patrocinador': { scenery: 'centro-comunitario' },
+      'donate-mecenas': { skin: 'pablo-mecenas' },
+      'donate-benfeitor': { theme: 'marmore-do-campus' },
+      'donate-nome': { skin: 'angelo-nome-no-predio' },
+      'postdoc-all': { scenery: 'salao-da-defesa' },
+      'postdoc-20': { theme: 'ouro-do-doutorado' },
+      'postdoc-40': { theme: 'ceu-estrelado' },
+    };
+    for (const [id, reward] of Object.entries(rewards)) expect(byId(id)?.reward, id).toEqual(reward);
+    for (const professor of PROFESSOR_IDS) {
+      expect(byId(`postdoc-${professor}`)?.condition, professor).toEqual({ kind: 'postdoc', stars: 3, professor });
+      expect(byId(`postdoc-${professor}`)?.reward, professor).toEqual({ skin: `${professor}-posdoc` });
+    }
+  });
+
+  it('reads the real lab content in the lab conditions', () => {
+    const conditions = content.achievements.map((a) => a.condition);
+    const flags = conditions.flatMap((c) => (c.kind === 'flag' ? [c.flag] : []));
+    expect(duplicates(flags)).toEqual([]);
+    for (const boss of ['deploy-de-sexta', 'select-em-producao', 'ia-que-apagou-o-banco']) {
+      expect(content.lab.run.bossCycle).toContain(boss);
+      expect(flags).toContain(`lab-boss:${boss}`);
+    }
+    for (const condition of conditions) {
+      if (condition.kind === 'labSet') expect(content.lab.sets.map((set) => set.id)).toContain(condition.set);
+      if (condition.kind === 'labEquipped') expect(content.lab.rarities.map((rarity) => rarity.id)).toContain(condition.rarity);
+    }
+    // 4 pieces is the top bonus of both sets.
+    expect(byId('lab-set-guilda')?.condition).toEqual({ kind: 'labSet', set: 'guilda-dos-professores', pieces: 4 });
+    expect(byId('lab-set-plantao')?.condition).toEqual({ kind: 'labSet', set: 'kit-plantao', pieces: 4 });
+    // Each title achievement asks for exactly the threshold of its title.
+    const titles = ['voluntario', 'apoiador', 'patrocinador', 'mecenas', 'benfeitor', 'nome-no-predio'];
+    for (const title of titles) {
+      const def = donationTitles.find((entry) => entry.id === title)!;
+      expect(content.achievements.some((a) => a.condition.kind === 'donated' && a.condition.gte === def.threshold), title).toBe(true);
+    }
+    // Galáxia Docente is every star of every professor.
+    expect(byId('postdoc-40')?.condition).toEqual({ kind: 'postdocTotal', gte: PROFESSOR_IDS.length * content.balance.postdoc.maxStars });
+    expect(byId('postdoc-5')?.condition).toEqual({ kind: 'postdoc', stars: content.balance.postdoc.maxStars, count: 1 });
+  });
+
+  it('keeps the late collections out of the rarity feats and shows the lab cosmetics where they come from', () => {
+    for (const skin of content.skins.filter((s) => s.source)) expect(skin.rarity === 'common', skin.id).toBe(false);
+    const hint = (id: string) => content.lab.cosmetics.items.find((item) => item.id === id)?.hint;
+    expect(hint('trofeu-de-hackathon')).toBe('Conquista: Sobreviveu à Sexta');
+    expect(hint('tema-grimorio')).toBe('Conquista: Arquiteto');
+    expect(hint('gato-dormindo-no-monitor')).toBe('Conquista: Reciclador');
+    // A secret feat keeps its name hidden.
+    expect(hint('mousepad-gamer-rgb')).toBe('Conquista secreta: ???');
   });
 
   it('reads the real caps of the game', () => {

@@ -1,11 +1,24 @@
 import { PROFESSOR_IDS } from '../content/types';
 import type { AchievementDef, Condition, CounterKey, GameContent } from '../content/types';
-import { achievementsDone, bolsaHeld, cleanRunSteps, lastRunValue, measureCondition, monitorsReached, ownedCount, prestigeProgress } from './achievements';
+import {
+  achievementsDone,
+  bolsaHeld,
+  cleanRunSteps,
+  labStatValue,
+  labTreeProgress,
+  lastRunValue,
+  measureCondition,
+  monitorsReached,
+  ownedCount,
+  prestigeProgress,
+  rarityCollection,
+} from './achievements';
 import type { Probe } from './achievements';
 import { getIndex } from './contentIndex';
 import { parseDecimal } from './decimal';
 import { levelOf } from './economy';
 import { formatDuration, formatNumber, formatPercent } from './format';
+import { setPieces } from './lab/effects';
 import { horasBandsFilled } from './maestria/horas';
 import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
@@ -56,6 +69,8 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   ungratefulGraduations: 'formaturas sem homenagem',
   donations: 'doações ao campus',
 };
+
+const LAB_STAT_UNIT = { bestPhase: 'fases', broken: 'monitores quebrados', itemsRecycled: 'itens reciclados' } as const;
 
 const n = (value: number) => formatNumber(Math.floor(value));
 const pair = (value: number, target: number, unit: string) => `${n(Math.min(value, target))} / ${n(target)} ${unit}`;
@@ -204,7 +219,7 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       return { text: `${n(content.research.length - missing.length)} de ${n(content.research.length)} pesquisas`, note: 'Todas as pesquisas compradas na mesma turma.' };
     }
     case 'rarityOwned': {
-      const list = content.skins.filter((skin) => skin.rarity === condition.rarity);
+      const list = rarityCollection(content, condition.rarity);
       const owned = list.filter((skin) => state.skins[skin.id]).length;
       return { text: `${n(owned)} de ${n(list.length)} skins`, note: null };
     }
@@ -278,12 +293,35 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
         text: pair(monitorsReached(state, content, condition.maxed === true), condition.gte, condition.maxed ? 'monitores no nível máximo' : 'monitores contratados'),
         note: null,
       };
+    case 'donated':
+      return { text: `${formatNumber(state.donated)} / ${formatNumber(parseDecimal(condition.gte))} moedas doadas`, note: null };
+    case 'flag':
+      return { text: 'ainda não aconteceu', note: null };
+    case 'labStat': {
+      if (condition.stat === 'unlocked') return { text: state.lab.unlocked ? 'desbloqueado' : 'trancado', note: null };
+      const unit = LAB_STAT_UNIT[condition.stat];
+      return { text: pair(labStatValue(state, condition.stat), condition.gte, unit), note: null };
+    }
+    case 'labEquipped': {
+      const have = Object.values(state.lab.turma.equipped).filter((item) => item.rarity === condition.rarity).length;
+      const rarityName = content.lab.rarities.find((rarity) => rarity.id === condition.rarity)?.name.toLowerCase() ?? condition.rarity;
+      return { text: pair(have, condition.gte, `itens ${rarityName}s equipados`), note: 'Todos equipados ao mesmo tempo, na mesma turma.' };
+    }
+    case 'labSet': {
+      const name = content.lab.sets.find((set) => set.id === condition.set)?.name ?? 'o conjunto';
+      return { text: pair(setPieces(state, content).get(condition.set) ?? 0, condition.pieces, `peças de ${name}`), note: 'Equipadas ao mesmo tempo, na mesma turma.' };
+    }
+    case 'labTree': {
+      const { branches, whole } = labTreeProgress(state, content);
+      const best = condition.scope === 'all' ? whole : branches.reduce((top, entry) => (entry.ratio > top.ratio ? entry : top), { ratio: 0, done: false });
+      return { text: `${formatPercent(best.ratio)} ${condition.scope === 'all' ? 'da árvore' : 'do ramo mais adiantado'}`, note: null };
+    }
   }
 }
 
 /** Progress and the "o que falta" text of one achievement. Locked secrets reveal nothing. */
 export function achievementDetail(state: GameState, content: GameContent, def: AchievementDef, probe: Probe): ProgressDetail {
-  if (def.condition.kind === 'secret') return { progress: null, text: null, note: null };
+  if (def.condition.kind === 'secret' || def.secret) return { progress: null, text: null, note: null };
   if (state.achievements[def.id] !== undefined) return { progress: 1, text: null, note: null };
   const measure = measureCondition(state, content, def.condition, probe);
   const described = describe(state, content, def.condition, probe);

@@ -25,4 +25,9 @@ export const donationTitles: readonly DonationTitleDef[] = [
   { id: 'nome-no-predio', name: 'Nome no Prédio', emoji: '🪧', threshold: '1e93', description: 'Doou 1 Tg de ADScoins: seu nome vai na fachada.' },
 ];
 
+/** Donating every ADScoin in hand at once counts as generous from this sum (1 Sp, the Apoiador threshold). */
+export const GENEROUS_DONATION_MIN: DecimalString = '1e24';
+/** The `flag` condition (GameState.secrets) the generous donation sets: read by the Doação Generosa achievement. */
+export const GENEROUS_DONATION_FLAG = 'donate-all';
+
 export const donationTitleById = new Map(donationTitles.map((title) => [title.id, title]));

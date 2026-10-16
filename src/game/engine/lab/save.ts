@@ -128,6 +128,7 @@ function readRun(value: unknown, content: GameContent): LabRun | null {
       if (count > 0 && index.buffs.has(id)) run.buffs[id] = count;
     }
   }
+  run.clicks = int(value.clicks, 0, 0, 1e9);
   if (Array.isArray(value.clickTimes)) {
     run.clickTimes = value.clickTimes
       .filter((at): at is number => typeof at === 'number' && Number.isFinite(at) && at >= 0)

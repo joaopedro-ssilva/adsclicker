@@ -1,4 +1,5 @@
 import type { Stream } from '../../../hackathon/engine/rng';
+import { LAB_FEAT_PHASE, LAB_FLAGS, labBossFlag } from '../../content/labFlags';
 import type { LabEnemyDef, LabItemBase, LabRarity } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
@@ -104,6 +105,12 @@ function phaseCleared(state: GameState, content: GameContent, totals: LabTotals,
   const fast = !boss && run.phaseTime < content.lab.run.fastClearSeconds;
   const share = totals.lab.repairPhase + (boss ? totals.lab.repairBoss : 0) + (fast ? totals.lab.fastClearRepair : 0);
   if (share > 0) run.integrity = Math.min(run.maxIntegrity, run.integrity + run.maxIntegrity * share);
+  // Facts the lab achievements read (GameState.secrets): which boss fell, with how little, and the starting mouse still in hand.
+  if (boss) {
+    state.secrets[labBossFlag(bossFor(content, run.phase))] = true;
+    if (run.bosses === 0 && Object.keys(lab.turma.equipped).length <= 1) state.secrets[LAB_FLAGS.minimalist] = true;
+  }
+  if (run.phase >= LAB_FEAT_PHASE && lab.turma.equipped.ferramenta?.base === content.lab.starter) state.secrets[LAB_FLAGS.starterMouse] = true;
   if (boss) {
     run.bosses += 1;
     lab.counters.bossesBeaten += 1;
@@ -194,6 +201,7 @@ export function labClick(state: GameState, content: GameContent, now: number, em
   const { lab } = state;
   const run = lab.turma.run;
   if (!lab.unlocked || !lab.open || !run || run.status !== 'fighting') return false;
+  run.clicks += 1;
   const { perWindow, windowMs } = content.lab.run.click;
   const from = now - windowMs;
   run.clickTimes = run.clickTimes.filter((at) => at > from && at <= now);

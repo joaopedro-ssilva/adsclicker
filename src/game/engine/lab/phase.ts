@@ -1,3 +1,4 @@
+import { LAB_FEAT_PHASE, LAB_FLAGS } from '../../content/labFlags';
 import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
@@ -112,6 +113,7 @@ export function enterNextPhase(state: GameState, content: GameContent): void {
   if (!run) return;
   run.phase += 1;
   noteBestPhase(lab, run.phase);
+  if (run.phase >= LAB_FEAT_PHASE && run.clicks === 0) state.secrets[LAB_FLAGS.noHands] = true;
   run.offers = [];
   run.rerolled = 0;
   const totals = labTotals(state, content);

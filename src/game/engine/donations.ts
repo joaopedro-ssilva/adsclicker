@@ -3,7 +3,7 @@
  * (`state.donated`) decides a title (content/donations.ts) and a place on the donors board.
  */
 import type { GameContent } from '../content/types';
-import { donationTitles } from '../content/donations';
+import { GENEROUS_DONATION_FLAG, GENEROUS_DONATION_MIN, donationTitles } from '../content/donations';
 import type { DonationTitleDef } from '../content/donations';
 import type { Emit } from '../store/types';
 import { afterAction } from './lifecycle';
@@ -52,6 +52,8 @@ export function donateToCampus(state: GameState, content: GameContent, amount: D
   if (!Number.isFinite(amount.m) || !Number.isFinite(amount.e)) return false;
   if (amount.lt(MIN_DONATION) || amount.gt(state.coins)) return false;
   const before = donationTitleFor(state.donated);
+  // Everything in the pocket at once, and a real sum: the Doação Generosa achievement reads this fact.
+  if (amount.gte(state.coins) && amount.gte(parseDecimal(GENEROUS_DONATION_MIN))) state.secrets[GENEROUS_DONATION_FLAG] = true;
   spend(state, amount);
   state.donated = state.donated.add(amount);
   state.counters.donations += 1;

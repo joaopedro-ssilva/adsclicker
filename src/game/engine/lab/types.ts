@@ -67,6 +67,8 @@ export interface LabRun {
   pending: LabItem | null;
   /** Run buff id -> times picked. */
   buffs: Record<string, number>;
+  /** Clicks on the monitor in this run (the "Sem as Mãos" achievement wants none). */
+  clicks: number;
   /** Epoch ms of the last clicks that counted, for the clicks-per-second limit. */
   clickTimes: number[];
   /** Second winds used in this phase. */

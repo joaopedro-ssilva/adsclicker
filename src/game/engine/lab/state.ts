@@ -65,6 +65,7 @@ export function createLabRun(seed: number, integrity: number): LabRun {
     offers: [],
     pending: null,
     buffs: {},
+    clicks: 0,
     clickTimes: [],
     windUsed: 0,
     shield: 0,
