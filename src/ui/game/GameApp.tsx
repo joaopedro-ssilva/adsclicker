@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { setNumberNotation } from '@/game/engine';
 import { useGame } from '@/game/store';
 import { FxLayer } from '@/ui/fx';
 import { HackathonInviteWatcher } from '@/ui/hackathon/arena/HackathonInviteWatcher';
@@ -24,11 +25,16 @@ function GameScreen() {
   const hackathon = useHackathon((store) => store.mode === 'hackathon');
   const photo = useUi((store) => store.photo) && !hackathon;
   const panelOpen = useUi((store) => store.panelOpen) && !photo;
+  const notation = useGame((store) => store.state.settings.numberNotation);
+  // Set while rendering so every formatNumber below already follows it; the key on <main> re-renders all the
+  // numbers at once when the player changes the setting (selectors that return the same value would not).
+  setNumberNotation(notation);
   return (
     <>
       {photo ? null : <MobileNotice />}
       {/* The Hackathon takes the whole screen; the classroom splits it between stage and panel. */}
       <main
+        key={notation}
         className="game"
         data-mode={hackathon ? 'hackathon' : 'classroom'}
         data-panel={panelOpen ? 'open' : 'closed'}

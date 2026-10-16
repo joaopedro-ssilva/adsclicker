@@ -17,7 +17,29 @@ const SUFFIXES = [
 /** Below this the number is shown whole with thousands separators: 1.234. */
 const PLAIN_LIMIT_EXPONENT = 4;
 
+/**
+ * How numbers from the decilhão (1e33, Dc) up are written: "names" keeps the suffixes ("1,86 Ud"), "scientific"
+ * writes "1,86e36". Below 1e33 the suffixes (K, M, B ... No) are always used.
+ */
+export type NumberNotation = 'names' | 'scientific';
+
+/** First exponent written in scientific form under the "scientific" notation (the decilhão). */
+const SCIENTIFIC_FROM_EXPONENT = 33;
+
+let defaultNotation: NumberNotation = 'names';
+
+/** The notation every formatNumber call without an explicit one follows. The UI sets it from the player setting. */
+export function setNumberNotation(notation: NumberNotation): void {
+  defaultNotation = notation;
+}
+
+export function getNumberNotation(): NumberNotation {
+  return defaultNotation;
+}
+
 export interface FormatNumberOptions {
+  /** Overrides the module default for this call. Server-side texts pass nothing and keep "names". */
+  notation?: NumberNotation;
   /** Drop fractions below 10.000 (coin counters): 15,7 becomes 15. */
   integer?: boolean;
   /** Significant digits of the abbreviated form. Default 3: "12,5 K", "3,21 M". */
@@ -57,6 +79,8 @@ export function formatNumber(value: DecimalSource, opts: FormatNumberOptions = {
   }
 
   const exponent = abs.e;
+  const scientificFromDecilhao = (opts.notation ?? defaultNotation) === 'scientific';
+  if (scientificFromDecilhao && exponent >= SCIENTIFIC_FROM_EXPONENT) return sign + scientific(abs.m, exponent, digits);
   let group3 = Math.floor(exponent / 3);
   if (group3 >= SUFFIXES.length) return sign + scientific(abs.m, exponent, digits);
 
@@ -65,7 +89,9 @@ export function formatNumber(value: DecimalSource, opts: FormatNumberOptions = {
   if (mantissa >= 1000) {
     mantissa /= 1000;
     group3 += 1;
-    if (group3 >= SUFFIXES.length) return sign + scientific(mantissa, group3 * 3, digits);
+    if (group3 >= SUFFIXES.length || (scientificFromDecilhao && group3 * 3 >= SCIENTIFIC_FROM_EXPONENT)) {
+      return sign + scientific(mantissa, group3 * 3, digits);
+    }
   }
   return `${sign}${fixed(mantissa, fractionDigitsFor(mantissa, digits))} ${SUFFIXES[group3]}`;
 }

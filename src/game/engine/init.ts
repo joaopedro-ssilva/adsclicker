@@ -88,6 +88,7 @@ export function defaultSettings(): Settings {
     reducedMotion: 'system',
     floatingNumbers: true,
     sceneryEffects: true,
+    numberNotation: 'names',
     devMultiplier: 1,
   };
 }

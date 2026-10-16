@@ -218,6 +218,8 @@ export interface Settings {
   floatingNumbers: boolean;
   /** Ambient particles of the sceneries and the glow of mythic skins. The scenery image and the professor stay either way. */
   sceneryEffects: boolean;
+  /** Numbers from the decilhão (1e33) up as names ("1,86 Ud") or scientific ("1,86e36"). Below that the names always show. */
+  numberNotation: 'names' | 'scientific';
   /**
    * Admin/dev knob: multiplies every source of coins. 1 in normal play.
    * Set from the /admin page for demos and quick progression tests.
