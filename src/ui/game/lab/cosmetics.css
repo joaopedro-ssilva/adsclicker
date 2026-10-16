@@ -1048,22 +1048,24 @@
 
 /* Cosméticos: both panels share one row as tall as the body; the list scrolls inside. */
 @media (min-width: 1024px) {
+  /* The block is as tall as the left panel (the preview), centred like the other tabs; the list takes that height and scrolls. */
   .lab-cosm {
-    flex: 1 1 0;
+    flex: 0 0 auto;
     align-items: stretch;
-    min-height: 0;
-    margin: 0 auto;
+    margin: auto;
   }
 
-  .lab-cosm-stage,
-  .lab-cosm-catalog {
+  .lab-cosm-stage {
     position: static;
+  }
+
+  .lab-cosm-catalog {
     min-height: 0;
     overflow-y: auto;
+    contain: size;
     scrollbar-width: thin;
   }
 }
-
 .lab-cosm-fold {
   align-items: center;
 }
