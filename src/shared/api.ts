@@ -321,6 +321,43 @@ export const labLeaderboardResponseSchema = z.object({
 export type LabLeaderboardResponse = z.infer<typeof labLeaderboardResponseSchema>;
 
 // ---------------------------------------------------------------------------
+// GET /api/lab/profile?nickname= — the public Laboratório profile of a ranked player
+// ---------------------------------------------------------------------------
+
+export const labProfileSchema = z.object({
+  nickname: z.string(),
+  /** For the avatar, as on the boards. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  tags: z.array(publicTagSchema).optional(),
+  /** What they wear in the lab: monitor skin, theme, decorations on display (ids of the content), and the starting item. */
+  monitor: z.string(),
+  theme: z.string(),
+  decor: z.array(z.string()),
+  startItem: z.string(),
+  /** The best phase and the items equipped when they reached it (empty = unknown). */
+  bestPhase: z.number().int(),
+  phaseBuild: z.array(labBuildItemSchema),
+  /** The best turma (ADScoins as a decimal string, "0" when none) and its items. */
+  bestRunCoins: z.string(),
+  runBuild: z.array(labBuildItemSchema),
+  stats: z.object({
+    commitsEarned: z.number(),
+    runs: z.number(),
+    broken: z.number(),
+    phasesCleared: z.number(),
+    bossesBeaten: z.number(),
+    itemsFound: z.number(),
+    itemsRecycled: z.number(),
+    itemLevelUps: z.number(),
+    affixRerolls: z.number(),
+    clicks: z.number(),
+    cosmeticsOwned: z.number(),
+  }),
+});
+export type LabProfile = z.infer<typeof labProfileSchema>;
+
+// ---------------------------------------------------------------------------
 // GET /api/community/donors — the Centro Comunitário board
 // ---------------------------------------------------------------------------
 

@@ -13,6 +13,7 @@ import { POST as logout } from './auth/logout/route';
 import { GET as community } from './community/route';
 import { GET as donors } from './community/donors/route';
 import { GET as labLeaderboard } from './lab/leaderboard/route';
+import { GET as labProfile } from './lab/profile/route';
 import { GET as leaderboard } from './leaderboard/route';
 import { GET as me } from './me/route';
 import { GET as ranks } from './me/ranks/route';
@@ -45,6 +46,7 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
     ['leaderboard', () => leaderboard(get('/api/leaderboard?board=coins'))],
     ['donors', () => donors(get('/api/community/donors'))],
     ['lab leaderboard', () => labLeaderboard(get('/api/lab/leaderboard?board=phase'))],
+    ['lab profile', () => labProfile(get('/api/lab/profile?nickname=maria'))],
     ['community', () => community()],
     ['hackathon profile', () => hackathonProfile(get('/api/hackathon/profile'))],
     ['hackathon create', () => hackathonCreate(post('/api/hackathon/profile', { head: 'h1' }))],

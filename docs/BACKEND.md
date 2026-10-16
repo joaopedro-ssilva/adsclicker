@@ -292,3 +292,7 @@ A marca de suspeito só é limpa pelo admin (`admin_unflag`); o sync nunca a lim
 ### Atividades (`feed_events`)
 
 Todas as linhas da tabela do mural (o jogo mostra só as 30 mais recentes), com apelido, o texto igual ao do mural público (`feedAction`) e a hora; filtro por tipo e busca por apelido. O mural público e o cache de 10 s não mudaram. A retenção do mural era de 14 dias e sem limite de linhas; agora é a mesma dos logs (30 dias, 100 000 linhas), podada na carga da comunidade (no máximo de hora em hora por instância) e ao abrir a visão. A poda é a única coisa que remove linhas desta tabela: só as mais velhas que o prazo ou acima do limite; contas e saves nunca são tocados.
+
+### Perfil do Laboratório
+
+`GET /api/lab/profile?nickname=` (público, 60/min por IP, cache de 30 s): coluna `players.lab_profile` (jsonb, migração 0010) preenchida pela projeção a cada sync com os cosméticos vestidos e os contadores do laboratório; as builds vêm de `lab_best_phase_build` e `best_run_build`. 404 para quem não está no ranking ou nunca liberou o laboratório.

@@ -21,6 +21,7 @@ import {
   communityResponseSchema,
   donorsResponseSchema,
   labLeaderboardResponseSchema,
+  labProfileSchema,
   leaderboardResponseSchema,
   loginResponseSchema,
   playerProfileSchema,
@@ -103,6 +104,8 @@ export const api = {
     call('GET', `/api/leaderboard?board=${board}`, leaderboardResponseSchema, { signal }),
   labLeaderboard: (board: LabBoard, signal?: AbortSignal) =>
     call('GET', `/api/lab/leaderboard?board=${board}`, labLeaderboardResponseSchema, { signal }),
+  labProfile: (nickname: string, signal?: AbortSignal) =>
+    call('GET', `/api/lab/profile?nickname=${encodeURIComponent(nickname)}`, labProfileSchema, { signal }),
   donors: (signal?: AbortSignal) => call('GET', '/api/community/donors', donorsResponseSchema, { signal }),
   community: (signal?: AbortSignal) => call('GET', '/api/community', communityResponseSchema, { signal }),
   profile: (nickname: string, signal?: AbortSignal) =>

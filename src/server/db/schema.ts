@@ -16,6 +16,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import type { LabProfileData } from '@/game/engine/lab/profile';
 import type { LabBuild } from '@/game/engine/lab/types';
 import { flaggedAreRanked } from '../players/ranking';
 
@@ -121,6 +122,8 @@ export const players = pgTable(
     bestRunCoinsLog: doublePrecision('best_run_coins_log').notNull().default(0),
     /** The items of that turma. */
     bestRunBuild: jsonb('best_run_build').$type<LabBuild>(),
+    /** The public lab profile (GET /api/lab/profile): what the player wears in the lab and their lifetime lab numbers. Null = lab never unlocked. */
+    labProfile: jsonb('lab_profile').$type<LabProfileData>(),
 
     // Centro Comunitário (docs/BACKEND.md, "Centro Comunitário") --------------------------------
     /** ADScoins given to the campus, ever (`state.donated` of the save): exact text and log10, as lifetime coins. */
