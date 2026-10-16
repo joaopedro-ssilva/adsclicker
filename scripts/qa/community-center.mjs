@@ -43,10 +43,10 @@ await page.screenshot({ path: join(outDir, `cc-tab-${tag}.png`) });
 await page.locator('[data-qa="community-center-open"]').click({ timeout: 3000 }).catch(() => errors.push('could not open the window'));
 await page.waitForTimeout(900);
 await page.screenshot({ path: join(outDir, `cc-panel-${tag}.png`) });
-await page.locator('.ui-modal-content').evaluate((node) => node.scrollTo(0, node.scrollHeight)).catch(() => {});
+await page.locator('dialog[open] .ui-modal-content').evaluate((node) => node.scrollTo(0, node.scrollHeight)).catch(() => {});
 await page.waitForTimeout(300);
 await page.screenshot({ path: join(outDir, `cc-panel-bottom-${tag}.png`) });
-await page.locator('.ui-modal-content').evaluate((node) => node.scrollTo(0, 0)).catch(() => {});
+await page.locator('dialog[open] .ui-modal-content').evaluate((node) => node.scrollTo(0, 0)).catch(() => {});
 
 const overflow = await page.evaluate(() => {
   const content = document.querySelector('.ui-modal-content');
