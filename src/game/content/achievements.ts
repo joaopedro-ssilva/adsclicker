@@ -383,28 +383,29 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (11)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }, { scenery: 'camarim' }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 113 skins, as do Laboratório, dos Pós-docs e do Centro Comunitário também.', { kind: 'skinsOwned', gte: 113 }, { theme: 'holografico' }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha 95 skins, quaisquer que sejam. O Álbum enche, a mochila nem tanto.', { kind: 'skinsOwned', gte: 95 }, { theme: 'holografico' }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }, { theme: 'prata' }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }, { theme: 'platina' }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),
   ach('days-7', 'collection', 'Sequência de Sete', '🗓️', 'Jogue 7 dias seguidos. Frequência de 100%.', counter('bestDayStreak', 7), { scenery: 'por-do-sol' }),
-  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha todas as skins raras.', { kind: 'rarityOwned', rarity: 'rare' }, {
+  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha 26 skins raras.', { kind: 'rarityOwned', rarity: 'rare', gte: 26 }, {
     skin: 'b2-curadora',
   }),
-  ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha todas as skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic' }, {
+  ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha 26 skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic', gte: 26 }, {
     skin: 'b2-prisma',
   }),
-  ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha todas as skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary' }, {
+  ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha 16 skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary', gte: 16 }, {
     scenery: 'galaxia',
   }),
-  ach('mythics-all', 'collection', 'Panteão', '🏛️', 'Tenha as 8 skins míticas, uma de cada professor. Cada pedestal com o seu nome gravado.', { kind: 'rarityOwned', rarity: 'mythic' }, {
+  ach('mythics-all', 'collection', 'Panteão', '🏛️', 'Tenha 8 skins míticas. Cada pedestal com um nome gravado.', { kind: 'rarityOwned', rarity: 'mythic', gte: 8 }, {
     scenery: 'panteao',
   }),
-  ach('sceneries-all', 'collection', 'Volta ao Mundo', '🗺️', 'Tenha todos os cenários do jogo. Da sala de aula ao Panteão, sem pular o Nether.', { kind: 'everyOwned', of: 'sceneries' }, { theme: 'grego' }),
-  ach('themes-all', 'collection', 'Paleta Infinita', '🖌️', 'Tenha todos os temas do jogo (o Arco-íris é o prêmio e não entra na conta). Combina com tudo, até com o erro de compilação.', {
+  ach('sceneries-all', 'collection', 'Volta ao Mundo', '🗺️', 'Tenha 42 cenários. Da sala de aula ao Panteão, sem pular o Nether.', { kind: 'everyOwned', of: 'sceneries', gte: 42 }, { theme: 'grego' }),
+  ach('themes-all', 'collection', 'Paleta Infinita', '🖌️', 'Tenha 16 temas (o Arco-íris é o prêmio e não entra na conta). Combina com tudo, até com o erro de compilação.', {
     kind: 'everyOwned',
     of: 'themes',
     except: ['arco-iris'],
+    gte: 16,
   }, { theme: 'arco-iris' }),
   ach('achievements-100', 'collection', 'Cem por Cento', '🎯', 'Conquiste 100 conquistas. São +100% de produção global, redondinho.', { kind: 'achievements', gte: 100 }, {
     skin: 'gladimir-neyglad',

@@ -984,7 +984,8 @@ export const labSkins: SkinDef[] = [
     {
       id: 'pablo-mago-grafos',
       name: 'Mago Pablo',
-      rarity: 'legendary',
+      // Mythic: the whole Laboratório tree, about fifty runs at one a turma, is the longest chase among the late skins.
+      rarity: 'mythic',
       description: 'Manto azul com padrão de grafos e um cajado de nós conectados. Todo caminho mínimo é um feitiço.',
       headgear: true,
       source: 'lab',

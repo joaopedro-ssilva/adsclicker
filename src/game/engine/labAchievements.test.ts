@@ -351,12 +351,14 @@ describe('rewards of the late collections', () => {
     expect(g.state.skins['angelo-nome-no-predio']).toBeUndefined();
   });
 
-  it('the late skins stay out of the rarity feats', () => {
+  it('the collection feats ask for as many as before the patch, and any skin of the rarity counts', () => {
     const g = game();
-    const mythics = content.skins.filter((skin) => skin.rarity === 'mythic' && !skin.source);
-    for (const skin of mythics) g.state.skins[skin.id] = true;
-    expect(met(g, { kind: 'rarityOwned', rarity: 'mythic' }).met).toBe(true);
-    // The Panteão asks for the 8 original mythics only, never for the donation skins.
+    // Seven original mythics plus a late one fill the Panteão: the goal stays at 8 whatever is added later.
+    const original = content.skins.filter((skin) => skin.rarity === 'mythic' && !skin.source).slice(0, 7);
+    for (const skin of original) g.state.skins[skin.id] = true;
+    expect(detail(g, 'mythics-all').text).toBe('7 de 8 skins');
+    g.state.skins['pablo-mecenas'] = true;
+    expect(met(g, { kind: 'rarityOwned', rarity: 'mythic', gte: 8 }).met).toBe(true);
     expect(detail(g, 'mythics-all').text).toBe('8 de 8 skins');
   });
 });

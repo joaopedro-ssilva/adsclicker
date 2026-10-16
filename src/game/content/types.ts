@@ -168,7 +168,8 @@ export type Condition =
   /** Every research of the game is bought in the current run. */
   | { kind: 'everyResearch' }
   /** Every skin of that rarity is owned. */
-  | { kind: 'rarityOwned'; rarity: Rarity }
+  /** Skins of a rarity: every one of the original set, or (with `gte`) that many of any of them. */
+  | { kind: 'rarityOwned'; rarity: Rarity; gte?: number }
   /** Different professors honoured at a graduation, ever. */
   | { kind: 'honoured'; gte: number }
   /** Graduations made on the same calendar day (the day of the last one). */
@@ -182,7 +183,8 @@ export type Condition =
   /** At least `unlocked` Maestrias are unlocked, each at level `level` or more (default 1). */
   | { kind: 'maestrias'; unlocked: number; level?: number }
   /** Every scenery (or theme) of the game is owned, except the ones named: the rewards of the achievement itself. */
-  | { kind: 'everyOwned'; of: 'sceneries' | 'themes'; except?: string[] }
+  /** Sceneries or themes: all of them, or (with `gte`) that many, leaving out `except`. */
+  | { kind: 'everyOwned'; of: 'sceneries' | 'themes'; except?: string[]; gte?: number }
   /** Every achievement of the game is unlocked, except the ones named (the achievement itself). */
   | { kind: 'everyAchievement'; except?: string[] }
   /** Every node of the Formatura tree is at its maximum level. */

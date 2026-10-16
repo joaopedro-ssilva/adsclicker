@@ -180,6 +180,11 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       return { progress: total === 0 ? 0 : bought / total, met: total > 0 && bought === total };
     }
     case 'rarityOwned': {
+      // A count: any skin of the rarity counts, the late ones included, so new skins never move the goal.
+      if (condition.gte !== undefined) {
+        const owned = content.skins.filter((skin) => skin.rarity === condition.rarity && state.skins[skin.id]).length;
+        return measureAtLeast(owned, condition.gte);
+      }
       const list = rarityCollection(content, condition.rarity);
       const owned = list.filter((skin) => state.skins[skin.id]).length;
       return { progress: list.length === 0 ? 0 : owned / list.length, met: list.length > 0 && owned === list.length };
@@ -213,6 +218,7 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'everyOwned': {
       const { owned, total } = ownedCount(state, content, condition.of, condition.except);
+      if (condition.gte !== undefined) return measureAtLeast(owned, condition.gte);
       return { progress: total === 0 ? 0 : owned / total, met: total > 0 && owned === total };
     }
     case 'everyAchievement': {

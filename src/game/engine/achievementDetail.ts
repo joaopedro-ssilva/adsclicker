@@ -219,6 +219,10 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       return { text: `${n(content.research.length - missing.length)} de ${n(content.research.length)} pesquisas`, note: 'Todas as pesquisas compradas na mesma turma.' };
     }
     case 'rarityOwned': {
+      if (condition.gte !== undefined) {
+        const owned = content.skins.filter((skin) => skin.rarity === condition.rarity && state.skins[skin.id]).length;
+        return { text: `${n(owned)} de ${n(condition.gte)} skins`, note: null };
+      }
       const list = rarityCollection(content, condition.rarity);
       const owned = list.filter((skin) => state.skins[skin.id]).length;
       return { text: `${n(owned)} de ${n(list.length)} skins`, note: null };
@@ -269,6 +273,8 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       const list = (condition.of === 'sceneries' ? content.sceneries : content.themes).filter((item) => !(condition.except ?? []).includes(item.id));
       const have = condition.of === 'sceneries' ? state.sceneries : state.themes;
       const missing = list.filter((item) => !have[item.id]);
+      // A count leaves the choice open, so naming what is missing would only mislead.
+      if (condition.gte !== undefined) return { text: pair(owned, condition.gte, unit), note: null };
       return { text: pair(owned, total, unit), note: missing.length > 0 ? `Ainda falta: ${nameList(missing.map((item) => item.name))}.` : null };
     }
     case 'everyAchievement': {

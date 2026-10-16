@@ -129,7 +129,7 @@ const LATE_SKIN_RARITY: Record<string, string> = {
   'angelo-reitor-mor': 'legendary',
   'angelo-posdoc': 'legendary',
   'angelo-nome-no-predio': 'mythic',
-  'pablo-mago-grafos': 'legendary',
+  'pablo-mago-grafos': 'mythic',
   'pablo-posdoc': 'legendary',
   'pablo-mecenas': 'mythic',
 };
@@ -913,8 +913,8 @@ describe('content: achievements', () => {
     // Legendary skins come from the level 100 ladder or from a long-haul challenge; never from hiring or early counters.
     for (const achievement of byRarity('legendary')) expect(achievement.id).not.toMatch(/^hire-|^click-(100|500|1k|5k)$/);
     for (const achievement of byRarity('mythic')) expect(achievement.id).not.toMatch(/^hire-|^lvl|^research-/);
-    // One per professor, plus the two donation skins (Mecenas and Nome no Prédio).
-    expect(byRarity('mythic')).toHaveLength(10);
+    // One per professor, the two donation skins (Mecenas and Nome no Prédio) and the Mago Pablo of the whole lab tree.
+    expect(byRarity('mythic')).toHaveLength(11);
     for (const achievement of byRarity('rare')) expect(achievement.id).not.toMatch(/^hire-/);
     for (const achievement of byRarity('common')) expect(achievement.id).not.toMatch(/^lvl100-|^research-/);
   });
@@ -1017,10 +1017,14 @@ describe('content: Domínio, milestones and the new skins', () => {
     expect(cap?.condition).toEqual({ kind: 'mastery', professor: 'gladimir', rank: content.balance.mastery.cap });
   });
 
-  it('counts every skin in the album achievement', () => {
-    const all = content.achievements.find((a) => a.id === 'skins-all');
-    expect(all?.condition).toEqual({ kind: 'skinsOwned', gte: content.skins.length });
-    expect(all?.description).toContain(String(content.skins.length));
+  it('keeps the collection feats at the counts they had before the late skins (95 skins, 26/26/16/8 by rarity)', () => {
+    const condition = (id: string) => content.achievements.find((a) => a.id === id)?.condition;
+    expect(condition('skins-all')).toEqual({ kind: 'skinsOwned', gte: 95 });
+    expect(condition('rares-all')).toEqual({ kind: 'rarityOwned', rarity: 'rare', gte: 26 });
+    expect(condition('epics-all')).toEqual({ kind: 'rarityOwned', rarity: 'epic', gte: 26 });
+    expect(condition('legendaries-all')).toEqual({ kind: 'rarityOwned', rarity: 'legendary', gte: 16 });
+    expect(condition('mythics-all')).toEqual({ kind: 'rarityOwned', rarity: 'mythic', gte: 8 });
+    expect(content.achievements.find((a) => a.id === 'skins-all')?.description).toContain('95');
   });
 
   it('only names professors, disciplines and rarities that exist in the new conditions', () => {
@@ -1080,8 +1084,9 @@ describe('content: the collection feats', () => {
     const paleta = byId('themes-all');
     const platina = byId('platinum');
     // A feat never asks for its own reward.
-    expect(volta?.condition).toEqual({ kind: 'everyOwned', of: 'sceneries' });
-    expect(paleta?.condition).toEqual({ kind: 'everyOwned', of: 'themes', except: ['arco-iris'] });
+    // Counts frozen at the totals before the Laboratório patch (42 sceneries, 16 themes besides the Arco-íris).
+    expect(volta?.condition).toEqual({ kind: 'everyOwned', of: 'sceneries', gte: 42 });
+    expect(paleta?.condition).toEqual({ kind: 'everyOwned', of: 'themes', except: ['arco-iris'], gte: 16 });
     expect(platina?.condition).toEqual({ kind: 'everyAchievement', except: ['platinum'] });
     const collectionWide = new Set(['sceneries-all', 'themes-all', 'platinum']);
     // Every scenery comes from a feat that is not one of the collection-wide ones.

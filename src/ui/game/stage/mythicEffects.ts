@@ -26,6 +26,8 @@ export const MYTHIC_EFFECTS: Record<string, MythicEffect> = {
   // The two donation skins of the Centro Comunitário: a gold statue and a gala tuxedo with a coin brooch.
   'angelo-nome-no-predio': { color: '#e6b422', accent: '#fff0a8', ink: '#7a5600' },
   'pablo-mecenas': { color: '#f2c94c', accent: '#f2f2f2', ink: '#14141c' },
+  // Mago Pablo, the reward of the whole Laboratório tree: graph-blue robe, teal nodes, a gold staff tip.
+  'pablo-mago-grafos': { color: '#3b82f6', accent: '#2dd4bf', ink: '#1e3a8a' },
 };
 
 /** The effect of a skin, or undefined when the skin has none (it is not mythic). */
