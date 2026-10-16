@@ -129,3 +129,29 @@ const treeIdle = ready();
 treeIdle.lab.commits = 90;
 treeIdle.lab.tree = { ...tree.lab.tree };
 save('tree-idle', treeIdle);
+
+// 9. The wardrobe: everything worn, to look at the skins, the themes and the decoration (names of the ids: content/labCosmetics.ts).
+function dressed(monitor: string, theme: string, decor: string[], startItem = 'mouse-quebrado'): GameState {
+  const state = fighting(7, 0.62, 0.8);
+  const cosmetics = state.lab.cosmetics;
+  for (const entry of content.lab.cosmetics.items) if (!entry.free) cosmetics.owned[entry.id] = true;
+  cosmetics.monitor = monitor;
+  cosmetics.theme = theme;
+  cosmetics.decor = decor;
+  cosmetics.startItem = startItem;
+  return state;
+}
+
+save('dressed', dressed('monitor-gamer-rgb', 'tema-madrugada', ['luminaria', 'gato-dormindo-no-monitor', 'cacto']));
+for (const skin of ['crt-bege', 'gamer-rgb', 'ultrawide', 'tela-azul', 'tubo-adesivado']) {
+  save(`skin-${skin}`, dressed(`monitor-${skin}`, 'tema-fosforo', ['trofeu-de-hackathon', 'caneca-do-plantao', 'pilha-de-livros-de-algoritmos', 'luz-neon-codigo']));
+}
+for (const theme of ['fosforo', 'tela-azul', 'madrugada', 'masmorra', 'grimorio']) {
+  save(`theme-${theme}`, dressed('monitor-crt-bege', `tema-${theme}`, ['luminaria', 'mini-servidor']));
+}
+const wardrobe = ready();
+wardrobe.lab.cosmetics.owned = { cacto: true, 'monitor-gamer-rgb': true, 'tema-madrugada': true, trackball: true };
+wardrobe.lab.cosmetics.monitor = 'monitor-gamer-rgb';
+wardrobe.lab.cosmetics.decor = ['cacto'];
+wardrobe.lab.cosmetics.startItem = 'trackball';
+save('wardrobe', wardrobe);

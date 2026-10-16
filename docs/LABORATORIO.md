@@ -201,3 +201,22 @@ Medido com o jogador simulado de `engine/__fixtures__/labBot.ts` (escolhe o melh
 | Campanha inteira | 40 a 80 corridas | 52 |
 
 Números: HP 0,178 x 1,14^(fase-1); chefão 0,54 do HP base, x 2,6 a partir do 2º chefão (uma vez); dreno 0,05 x 1,12^(fase-1); itens como antes. A meia árvore não fica em 12 a 16 porque metade dos Commits já compra quase todo o poder (o resto são capstones e utilidades): a mediana de 12 a 16 é de **um quarto** da árvore. A partir da fase 15 as mortes se concentram nos chefões (fases 15, 25, 30), pelo prazo; a corrida nunca é infinita (máx. 44 no simulador, teste exige menos de 80).
+
+## Cosméticos e Loja do Laboratório
+
+Tudo em `content/labCosmetics.ts` (preços em um lugar só, em degraus fixos de ADScoins; é um ralo de moedas). Estado permanente em `lab.cosmetics` = `{ owned: {id: true}, monitor, theme, decor[], startItem }` (sobrevive à formatura; os padrões CRT Bege 1998, Fósforo Verde e Mouse quebrado são grátis e não entram em `owned`). Leitor tolerante em `engine/lab/save.ts` (`readLabCosmetics`): ids desconhecidos somem, o que se veste precisa ser seu e do tipo certo, decorações únicas e limitadas a 4.
+
+| Tipo | Faixa de preço | Itens |
+| --- | --- | --- |
+| Skins do monitor (CSS) | 1e33..1e42 | CRT Bege (grátis), Gamer RGB 1 Dc, Ultrawide Curvo 1 Td, Tela Azul 1 Dd, Tubo Adesivado 1 Td* |
+| Temas (variáveis CSS) | 1e34..1e40 | Fósforo Verde (grátis), Tela Azul 10 Dc, Madrugada 1 Ud(…), Masmorra 10 Dd, Grimório (conquista) |
+| Decoração (até 4) | 1e27..1e33 | 12 objetos; Gato dormindo e Troféu de hackathon são só por conquista |
+| Item inicial | 1e36..1e45 | ver abaixo; Mousepad gamer RGB é só por conquista |
+
+(Valores exatos: `DECOR_PRICE`, `MONITOR_PRICE`, `THEME_PRICE` e `START_PRICE` no arquivo.) O item inicial é uma base de ferramenta (poder igual ao do Mouse quebrado, sem afixos, não cai) com `effects` pequenos: Mouse dourado +10% Commits, Mouse com fita +10 integridade, Mouse de bolinha +5 sorte, Trackball +6% dano automático, Teclado de membrana +1 s no 1º chefão, Mousepad gamer RGB +10% dano do clique (efeito novo `clickDamage`). `startLabRun` usa `labStarterId` (o equipado, se for seu). O simulador de ritmo com cada item mantém chefão 5 em 35 a 55% e chefão 10 abaixo de 3% (`cosmetics.test.ts`).
+
+Ações: `buyLabCosmetic(id)`, `equipLabCosmetic(id, on)` (decoração: `on = false` tira). **Para conquistas:** `grantLabCosmetic(state, content, id, emit?)` (em `engine/lab/cosmetics.ts`, exportada de `engine/actions`): dá o cosmético sem cobrar, idempotente, emite `labCosmeticGained { how: 'grant' }`. Na aba Cosméticos o que ainda não é seu aparece como "???" (só mostra como liberar: Loja com preço, ou Conquista).
+
+## Perfil público do Laboratório
+
+`GET /api/lab/profile?nickname=` (`server/community/labProfile.ts`): lê a coluna `players.lab_profile` (jsonb, migração `0010_lab_profile`), derivada do save na projeção (`engine/lab/profile.ts`: cosméticos vestidos e números da vida do laboratório), mais as builds dos dois recordes. Passa pelo conteúdo na leitura (ids desconhecidos voltam ao padrão), mesmas regras de exclusão dos rankings (sinalizado, banido, conta de teste, sem apelido) e 404 para quem nunca liberou o laboratório. A interface (`ui/game/lab/LabProfile.tsx`) abre pelo clique no Ranking do Laboratório; o cartão da Turma fica no link "Ver perfil na Turma".

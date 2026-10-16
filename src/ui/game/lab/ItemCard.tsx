@@ -68,6 +68,11 @@ export function ItemBody({ item, variant = 'card', art = 56, label, affixAction,
             </li>
           ))}
         </ul>
+      ) : item.bonus.length > 0 ? (
+        <div className="lab-item-bonus">
+          <LineList lines={item.bonus} />
+          <p className="lab-item-note">Item inicial: o efeito vale enquanto ele estiver equipado.</p>
+        </div>
       ) : (
         <p className="lab-item-note">Sem atributos: só dano automático na pesquisa.</p>
       )}

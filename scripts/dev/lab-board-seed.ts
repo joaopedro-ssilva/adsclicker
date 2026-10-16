@@ -7,6 +7,7 @@ import { content } from '@/game/content';
 import { LAB_SLOTS } from '@/game/content/labTypes';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { createInitialState, serializeState } from '@/game/engine';
+import type { LabProfileData } from '@/game/engine/lab/profile';
 import type { LabBuild } from '@/game/engine/lab/types';
 import { createGuest } from '@/server/auth/guest';
 import { createDb } from '@/server/db/client';
@@ -29,6 +30,36 @@ function build(rarities: string[], levels: number[], offset = 0): LabBuild {
   });
 }
 
+
+/** What a seeded player wears in the lab: a different monitor, theme and decoration each, so the lab profile has something to show. */
+const LOOKS: Pick<LabProfileData, 'monitor' | 'theme' | 'decor' | 'startItem'>[] = [
+  { monitor: 'monitor-tubo-adesivado', theme: 'tema-madrugada', decor: ['luminaria', 'gato-dormindo-no-monitor', 'cacto'], startItem: 'mouse-dourado' },
+  { monitor: 'monitor-gamer-rgb', theme: 'tema-tela-azul', decor: ['luz-neon-codigo', 'mini-servidor', 'caneca-do-plantao', 'trofeu-de-hackathon'], startItem: 'trackball' },
+  { monitor: 'monitor-ultrawide', theme: 'tema-masmorra', decor: ['pilha-de-livros-de-algoritmos', 'lixeira-reciclagem'], startItem: 'mouse-de-bolinha' },
+  { monitor: 'monitor-tela-azul', theme: 'tema-grimorio', decor: ['poster-funciona-na-minha-maquina'], startItem: 'teclado-de-membrana-velho' },
+  { monitor: 'monitor-crt-bege', theme: 'tema-fosforo', decor: [], startItem: 'mouse-quebrado' },
+];
+
+function labProfile(index: number, phase: number): LabProfileData {
+  const look = LOOKS[index % LOOKS.length]!;
+  return {
+    ...look,
+    stats: {
+      bestPhase: phase,
+      commitsEarned: phase * 41,
+      runs: Math.ceil(phase / 3),
+      broken: Math.ceil(phase / 3),
+      phasesCleared: phase * 3,
+      bossesBeaten: Math.floor(phase / 5),
+      itemsFound: phase * 2,
+      itemsRecycled: phase,
+      itemLevelUps: phase,
+      affixRerolls: Math.floor(phase / 2),
+      clicks: phase * 310,
+      cosmeticsOwned: 3 + look.decor.length + 2,
+    },
+  };
+}
 const ROWS: { name: string; phase: number; coins: number; rarities: string[]; levels: number[] }[] = [
   { name: 'Ana Luz', phase: 31, coins: 38.2, rarities: ['lendario', 'lendario', 'epico', 'lendario'], levels: [12, 11, 9, 10] },
   { name: 'Bruno_ADS', phase: 27, coins: 41.6, rarities: ['epico', 'lendario', 'epico', 'raro'], levels: [9, 12, 8, 6] },
@@ -42,7 +73,7 @@ const ROWS: { name: string; phase: number; coins: number; rarities: string[]; le
 
 async function main(): Promise<void> {
   // Start over: the seeded players are found by their nickname keys (the profile card looks players up by them).
-  const keys = [...ROWS.map((row) => nicknameKey(row.name)), ...[0, 1, 2].map((i) => nicknameKey(`Escondido `)), nicknameKey(viewer)];
+  const keys = [...ROWS.map((row) => nicknameKey(row.name)), ...[0, 1, 2].map((i) => nicknameKey(`Escondido ${i}`)), nicknameKey(viewer)];
   await db.delete(players).where(inArray(players.nicknameKey, keys));
   const base = Date.now() - 3 * 86_400_000;
   for (const [i, row] of ROWS.entries()) {
@@ -63,6 +94,7 @@ async function main(): Promise<void> {
       bestRunCoinsText: `${row.coins}e+30`,
       bestRunCoinsLog: 30 + Math.log10(row.coins),
       bestRunBuild: runBuild,
+      labProfile: labProfile(i, row.phase),
     });
   }
   // Rows that must NOT show: flagged, banned, test account, no nickname.
@@ -94,6 +126,7 @@ async function main(): Promise<void> {
       bestRunCoinsText: '24.1e+30',
       bestRunCoinsLog: 30 + Math.log10(24.1),
       bestRunBuild: build(['raro', 'epico', 'incomum', 'raro'], [4, 6, 3, 5], 5),
+      labProfile: labProfile(2, 17),
     })
     .where(eq(players.id, guest.player.id));
   console.log(guest.token);

@@ -31,6 +31,7 @@
 @import '../ui/game/moments/moments.css';
 @import '../ui/game/panel/panel.css';
 @import '../ui/game/lab/lab.css';
+@import '../ui/game/lab/cosmetics.css';
 
 /* Hackathon mode: each file is an index owned by one engineer */
 @import '../ui/hackathon/arena/arena.css';

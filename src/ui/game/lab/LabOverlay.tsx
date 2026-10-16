@@ -7,6 +7,7 @@ import { IconButton, Keycap } from '@/ui/kit';
 import { useUi } from '../shared/uiStore';
 import { shortcutKey } from '../stage/shortcutList';
 import { Equipment, Summary } from './Bench';
+import { Cosmetics } from './Cosmetics';
 import { FightNote } from './Decision';
 import { LabUnlockDialog } from './LabEntry';
 import { useLabOverlay } from './labOverlayStore';
@@ -21,6 +22,7 @@ const TABS: { id: LabTab; label: string; icon: string }[] = [
   { id: 'pesquisa', label: 'Pesquisa', icon: '🔬' },
   { id: 'progressao', label: 'Progressão', icon: '🌳' },
   { id: 'ranking', label: 'Ranking', icon: '🏆' },
+  { id: 'cosmeticos', label: 'Cosméticos', icon: '🎨' },
 ];
 
 /** The room the screens may grow to, and the least they shrink to before the body scrolls instead. */
@@ -201,6 +203,7 @@ export function LabOverlay() {
   const tab = useLabOverlay((store) => store.tab);
   const hide = useLabOverlay((store) => store.hide);
   const tree = useLabTreeView();
+  const theme = useGameState((state) => state.lab.cosmetics.theme);
   useLabOpenContract();
   useFitScale(bodyRef, tab);
   // The graduation scene takes the screen: the lab (its run, its items) is reset under it.
@@ -243,12 +246,13 @@ export function LabOverlay() {
   }, [hide]);
 
   return (
-    <div ref={root} className="lab" role="dialog" aria-modal="true" aria-label="Laboratório de Pesquisa" tabIndex={-1} data-qa="lab-overlay">
+    <div ref={root} className="lab" role="dialog" aria-modal="true" aria-label="Laboratório de Pesquisa" tabIndex={-1} data-lab-theme={theme} data-qa="lab-overlay">
       <TopBar tab={tab} />
       <div ref={bodyRef} className="lab-body">
         {tab === 'pesquisa' ? <Research /> : null}
         {tab === 'progressao' ? <Progression view={tree} /> : null}
         {tab === 'ranking' ? <Ranking /> : null}
+        {tab === 'cosmeticos' ? <Cosmetics /> : null}
       </div>
       <Shop />
       <p className="lab-foot" aria-hidden="true">

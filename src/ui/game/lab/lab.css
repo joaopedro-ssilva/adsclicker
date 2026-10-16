@@ -61,8 +61,15 @@ button.lab-slot {
 /* ---------- The overlay ---------- */
 
 .lab {
-  --lab: #4fe3a9;
+  --lab: var(--lab);
   --lab-dim: #1f5f49;
+  /* The phosphor of the monitor (ink, bright ink, glow centre, and the ink as r g b for alphas): a theme changes these. */
+  --ph: #8dffcf;
+  --ph-hi: #d4ffee;
+  --ph-deep: #123a2c;
+  --ph-rgb: 79 227 169;
+  --lab-bg-1: #12261f;
+  --lab-bg-2: #090b11;
   --accent: var(--lab);
   --on-accent: #04130d;
   --bg: #0a0c12;
@@ -90,7 +97,7 @@ button.lab-slot {
   color-scheme: dark;
   background:
     conic-gradient(rgb(0 0 0 / 0.25) 25%, transparent 0 50%, rgb(0 0 0 / 0.25) 0 75%, transparent 0) 0 0 / 4px 4px,
-    radial-gradient(circle at 40% 30%, #12261f, #090b11 70%);
+    radial-gradient(circle at 40% 30%, var(--lab-bg-1), var(--lab-bg-2) 70%);
   animation: lab-in 220ms steps(5) both;
 }
 
@@ -260,60 +267,6 @@ button.lab-slot {
   color: var(--lab);
 }
 
-/* The shop (a placeholder): a small panel over the lab. */
-.lab-shop-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 5;
-  display: grid;
-  place-items: center;
-  padding: var(--space-4);
-  background: rgb(0 0 0 / 0.62);
-}
-
-.lab-shop {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-2);
-  width: min(420px, 100%);
-  padding: var(--space-5) var(--space-4);
-  text-align: center;
-  background: var(--surface);
-  border: 3px solid var(--warn);
-  box-shadow: 6px 6px 0 var(--shadow-color);
-}
-
-.lab-shop h3 {
-  font-family: var(--font-display);
-  font-size: 15px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.lab-shop p {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.lab-shop .lab-shop-soon {
-  padding: 2px 10px;
-  font-family: var(--font-display);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #1a1204;
-  background: var(--warn);
-}
-
-.lab-shop-emoji {
-  font-size: 40px;
-  line-height: 1;
-}
-
-.lab-shop .ui-button {
-  margin-top: var(--space-2);
-}
-
 .lab-foot {
   display: flex;
   align-items: center;
@@ -463,15 +416,15 @@ body:has(.lab) .fx-canvas {
   min-height: 300px;
   padding: var(--space-3);
   overflow: hidden;
-  color: #8dffcf;
+  color: var(--ph);
   user-select: none;
   touch-action: manipulation;
   background:
-    radial-gradient(ellipse at 50% 45%, #123a2c 0%, var(--screen-bg) 75%);
+    radial-gradient(ellipse at 50% 45%, var(--ph-deep) 0%, var(--screen-bg) 75%);
   border: 3px solid #05070a;
   box-shadow:
     inset 0 0 40px rgb(0 0 0 / 0.65),
-    inset 0 0 0 2px rgb(79 227 169 / 0.12);
+    inset 0 0 0 2px rgb(var(--ph-rgb) / 0.12);
 }
 
 .lab-monitor[data-state='fighting'] .lab-screen {
@@ -624,8 +577,8 @@ body:has(.lab) .fx-canvas {
 .lab-phase b {
   margin-left: 6px;
   font-size: 22px;
-  color: #d4ffee;
-  text-shadow: 0 0 8px rgb(79 227 169 / 0.6);
+  color: var(--ph-hi);
+  text-shadow: 0 0 8px rgb(var(--ph-rgb) / 0.6);
 }
 
 .lab-phase em {
@@ -647,14 +600,14 @@ body:has(.lab) .fx-canvas {
 .lab-timer-bar {
   display: block;
   height: 6px;
-  background: rgb(79 227 169 / 0.14);
+  background: rgb(var(--ph-rgb) / 0.14);
 }
 
 .lab-wave i,
 .lab-timer-bar i {
   display: block;
   height: 100%;
-  background: #4fe3a9;
+  background: var(--lab);
   transition: width 120ms steps(3);
 }
 
@@ -770,7 +723,7 @@ body:has(.lab) .fx-canvas {
   width: 22px;
   height: 22px;
   pointer-events: none;
-  border: 2px solid #d4ffee;
+  border: 2px solid var(--ph-hi);
   translate: -50% -50%;
   rotate: 45deg;
   animation: lab-hit 380ms steps(4) both;
@@ -848,7 +801,7 @@ body:has(.lab) .fx-canvas {
   font-weight: 800;
   text-align: center;
   color: #04130d;
-  background: #8dffcf;
+  background: var(--ph);
   box-shadow: 3px 3px 0 rgb(0 0 0 / 0.5);
   translate: -50% 0;
   animation: lab-feed 2600ms steps(8) both;
@@ -956,14 +909,14 @@ body:has(.lab) .fx-canvas {
   padding: var(--space-2) var(--space-3);
   text-align: left;
   background: rgb(0 0 0 / 0.4);
-  border: 2px solid rgb(79 227 169 / 0.4);
+  border: 2px solid rgb(var(--ph-rgb) / 0.4);
 }
 
 .lab-paused-phase {
   font-family: var(--font-display);
   font-size: 30px;
-  color: #d4ffee;
-  text-shadow: 0 0 10px rgb(79 227 169 / 0.6);
+  color: var(--ph-hi);
+  text-shadow: 0 0 10px rgb(var(--ph-rgb) / 0.6);
 }
 
 /* The cracks run behind the verdict: it sits on a dark plate to stay readable. */
@@ -1436,7 +1389,7 @@ body:has(.lab) .fx-canvas {
   gap: var(--space-2);
   min-height: 0;
   padding: 0 2px;
-  color: #8dffcf;
+  color: var(--ph);
 }
 
 .lab-pick-head-line {
@@ -1452,8 +1405,8 @@ body:has(.lab) .fx-canvas {
   font-size: 13px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #d4ffee;
-  text-shadow: 0 0 8px rgb(79 227 169 / 0.6);
+  color: var(--ph-hi);
+  text-shadow: 0 0 8px rgb(var(--ph-rgb) / 0.6);
 }
 
 .lab-pick-head-line p {
@@ -1473,7 +1426,7 @@ body:has(.lab) .fx-canvas {
   overflow: auto;
   padding: 2px 2px 6px;
   scrollbar-width: thin;
-  scrollbar-color: rgb(79 227 169 / 0.5) transparent;
+  scrollbar-color: rgb(var(--ph-rgb) / 0.5) transparent;
 }
 
 .lab-pick-grid[data-count='4'],
@@ -1482,7 +1435,7 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-pick {
-  --rarity: rgb(79 227 169 / 0.55);
+  --rarity: rgb(var(--ph-rgb) / 0.55);
 
   display: grid;
   grid-template-rows: 1fr auto auto;
@@ -1579,7 +1532,7 @@ body:has(.lab) .fx-canvas {
 .lab-pick-power b {
   font-family: var(--font-display);
   font-size: 12px;
-  color: #d4ffee;
+  color: var(--ph-hi);
 }
 
 .lab-pick-lines {
@@ -1600,7 +1553,7 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-pick-lines li[data-scope='clicker'] {
-  color: #8dffcf;
+  color: var(--ph);
 }
 
 .lab-pick-lines li[data-scope='lab'] {
@@ -2349,7 +2302,7 @@ body:has(.lab) .fx-canvas {
   gap: 2px;
   padding: 8px 10px 6px;
   background: #07120e;
-  border: 2px solid rgb(79 227 169 / 0.4);
+  border: 2px solid rgb(var(--ph-rgb) / 0.4);
   box-shadow: inset 0 0 18px rgb(0 0 0 / 0.55);
 }
 
@@ -2368,8 +2321,8 @@ body:has(.lab) .fx-canvas {
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
   text-align: center;
-  color: #d4ffee;
-  text-shadow: 0 0 10px rgb(79 227 169 / 0.6);
+  color: var(--ph-hi);
+  text-shadow: 0 0 10px rgb(var(--ph-rgb) / 0.6);
   white-space: nowrap;
 }
 

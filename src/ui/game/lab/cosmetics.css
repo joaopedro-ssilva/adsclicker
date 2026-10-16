@@ -1,0 +1,1164 @@
+/* Laboratório: the wardrobe (Cosméticos tab), the shop, the lab themes, the monitor skins, the decoration and the lab profile. */
+
+/* ---------- Lab themes: a palette for the overlay (and for a profile that shows another player's) ----------
+   Every theme sets the whole palette, so it works on any element carrying data-lab-theme: the overlay root, the
+   preview and the profile stage. The phosphor (--ph*) is what the monitor's glass is written in. */
+
+[data-lab-theme='tema-fosforo'] {
+  --lab: #4fe3a9;
+  --lab-dim: #1f5f49;
+  --on-accent: #04130d;
+  --bg: #0a0c12;
+  --surface: #131722;
+  --surface-raised: #1c2130;
+  --border: #363d52;
+  --text: #eef0f6;
+  --text-muted: #9ba3b8;
+  --ink: #fff;
+  --ph: #8dffcf;
+  --ph-hi: #d4ffee;
+  --ph-deep: #123a2c;
+  --ph-rgb: 79 227 169;
+  --lab-bg-1: #12261f;
+  --lab-bg-2: #090b11;
+  --lab-screen: #07120e;
+}
+
+[data-lab-theme='tema-tela-azul'] {
+  --lab: #ffffff;
+  --lab-dim: #8f94ff;
+  --on-accent: #0000aa;
+  --bg: #00006a;
+  --surface: #0000a4;
+  --surface-raised: #1717c6;
+  --border: #8f94ff;
+  --text: #ffffff;
+  --text-muted: #c6c9ff;
+  --ink: #fff;
+  --ph: #ffffff;
+  --ph-hi: #ffffff;
+  --ph-deep: #1b1bd8;
+  --ph-rgb: 255 255 255;
+  --lab-bg-1: #0c0cbc;
+  --lab-bg-2: #00005a;
+  --lab-screen: #00007e;
+}
+
+[data-lab-theme='tema-madrugada'] {
+  --lab: #a98bff;
+  --lab-dim: #4a3a8a;
+  --on-accent: #0d0724;
+  --bg: #0a061d;
+  --surface: #15103a;
+  --surface-raised: #1f1850;
+  --border: #3c3480;
+  --text: #ece8ff;
+  --text-muted: #a9a1d8;
+  --ink: #fff;
+  --ph: #cdbcff;
+  --ph-hi: #f0eaff;
+  --ph-deep: #2b1a60;
+  --ph-rgb: 169 139 255;
+  --lab-bg-1: #1d1348;
+  --lab-bg-2: #060414;
+  --lab-screen: #0b0722;
+}
+
+[data-lab-theme='tema-masmorra'] {
+  --lab: #e3b341;
+  --lab-dim: #6d5518;
+  --on-accent: #1a1204;
+  --bg: #12100d;
+  --surface: #211e19;
+  --surface-raised: #2e2a23;
+  --border: #5d5546;
+  --text: #f1e8d3;
+  --text-muted: #aca18a;
+  --ink: #fff;
+  --ph: #ffd77a;
+  --ph-hi: #fff1c4;
+  --ph-deep: #3b2d10;
+  --ph-rgb: 227 179 65;
+  --lab-bg-1: #2a251b;
+  --lab-bg-2: #0c0b09;
+  --lab-screen: #120e06;
+}
+
+[data-lab-theme='tema-grimorio'] {
+  --lab: #dba35f;
+  --lab-dim: #6b4a24;
+  --on-accent: #1f1306;
+  --bg: #1a120a;
+  --surface: #2a1d11;
+  --surface-raised: #38281a;
+  --border: #6e5231;
+  --text: #f4e7c9;
+  --text-muted: #bba47e;
+  --ink: #fff;
+  --ph: #f3dfb0;
+  --ph-hi: #fff4d6;
+  --ph-deep: #3f2b15;
+  --ph-rgb: 243 223 176;
+  --lab-bg-1: #3b2916;
+  --lab-bg-2: #120c06;
+  --lab-screen: #1c130a;
+}
+/* Masmorra: the wall is stone blocks. */
+.lab[data-lab-theme='tema-masmorra'] {
+  background:
+    linear-gradient(rgb(0 0 0 / 0.35) 2px, transparent 2px) 0 0 / 100% 56px,
+    linear-gradient(90deg, rgb(0 0 0 / 0.3) 2px, transparent 2px) 0 0 / 112px 56px,
+    radial-gradient(circle at 40% 30%, var(--lab-bg-1), var(--lab-bg-2) 70%);
+}
+
+/* Grimório: an old book, ruled pages behind the panels. */
+.lab[data-lab-theme='tema-grimorio'] {
+  background:
+    repeating-linear-gradient(0deg, rgb(243 223 176 / 0.045) 0 1px, transparent 1px 30px),
+    radial-gradient(circle at 40% 30%, var(--lab-bg-1), var(--lab-bg-2) 75%);
+}
+/* The glass takes its colour from the theme. */
+.lab-monitor {
+  --screen-bg: var(--lab-screen, #07120e);
+}
+
+/* ---------- Monitor skins: the frame and the glow around the glass (CSS only) ---------- */
+
+/* CRT Bege 1998: yellowed plastic, a thick bezel, a bulging glass. The theme's phosphor shows through. */
+.lab-monitor[data-skin='monitor-crt-bege'] .lab-bezel {
+  padding: 16px 16px 8px;
+  background: linear-gradient(145deg, #ddd4b8, #c9bfa4 55%, #aea48a);
+  border: 3px solid #6c654d;
+  border-radius: 10px;
+  box-shadow:
+    inset 3px 3px 0 rgb(255 255 255 / 0.35),
+    inset -3px -3px 0 rgb(0 0 0 / 0.22),
+    0 6px 0 rgb(0 0 0 / 0.5);
+}
+
+.lab-monitor[data-skin='monitor-crt-bege'] .lab-screen {
+  border: 4px solid #2c281d;
+  border-radius: 22px / 18px;
+  box-shadow:
+    inset 0 0 46px rgb(0 0 0 / 0.7),
+    inset 0 0 0 2px rgb(var(--ph-rgb) / 0.14),
+    0 0 0 3px #8f876f,
+    0 0 26px rgb(var(--ph-rgb) / 0.16);
+}
+
+.lab-monitor[data-skin='monitor-crt-bege'] .lab-brand {
+  color: #6c654d;
+}
+
+.lab-monitor[data-skin='monitor-crt-bege'] .lab-stand {
+  background: linear-gradient(90deg, #aea48a, #d7cdb1 50%, #aea48a);
+  border-inline-color: #6c654d;
+}
+
+.lab-monitor[data-skin='monitor-crt-bege'] .lab-stand::after {
+  background: linear-gradient(#cfc5a9, #aea48a);
+  border-color: #6c654d;
+}
+
+/* Gamer RGB: a black frame with a rainbow that runs around it. */
+@property --lab-rgb-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes lab-rgb-spin {
+  to {
+    --lab-rgb-angle: 360deg;
+  }
+}
+
+.lab-monitor[data-skin='monitor-gamer-rgb'] .lab-bezel {
+  padding: 8px 8px 6px;
+  background:
+    linear-gradient(#0f1118, #0f1118) padding-box,
+    conic-gradient(from var(--lab-rgb-angle), #ff2d55, #ffb300, #7dff3a, #00e5ff, #7a5cff, #ff2de1, #ff2d55) border-box;
+  border: 5px solid transparent;
+  box-shadow:
+    0 0 18px rgb(122 92 255 / 0.55),
+    0 6px 0 rgb(0 0 0 / 0.5);
+  animation: lab-rgb-spin 5s linear infinite;
+}
+
+.lab-monitor[data-skin='monitor-gamer-rgb'] .lab-screen {
+  border-color: #000;
+  border-radius: 3px;
+}
+
+.lab-monitor[data-skin='monitor-gamer-rgb'] .lab-brand {
+  color: #b9a8ff;
+  letter-spacing: 0.3em;
+}
+
+.lab-monitor[data-skin='monitor-gamer-rgb'] .lab-stand {
+  background: linear-gradient(90deg, #0b0c12, #232634 50%, #0b0c12);
+}
+
+.lab-monitor[data-skin='monitor-gamer-rgb'] .lab-stand::after {
+  background: linear-gradient(#232634, #0b0c12);
+  border-color: #000;
+  box-shadow: 0 4px 12px rgb(122 92 255 / 0.55);
+}
+
+/* Ultrawide Curvo: a thin bezel and a glass that curves at the sides. */
+.lab-monitor[data-skin='monitor-ultrawide'] .lab-bezel {
+  padding: 4px 4px 3px;
+  background: linear-gradient(#171921, #0e0f15);
+  border: 2px solid #05060a;
+  border-radius: 8px;
+}
+
+.lab-monitor[data-skin='monitor-ultrawide'] .lab-screen {
+  min-height: 250px;
+  border-width: 2px;
+  border-radius: 64px / 14px;
+  box-shadow:
+    inset 0 0 50px rgb(0 0 0 / 0.6),
+    inset 0 0 0 2px rgb(var(--ph-rgb) / 0.16);
+}
+
+.lab-monitor[data-skin='monitor-ultrawide'] .lab-bezel-bar {
+  padding: 3px 28px 0;
+}
+
+.lab-monitor[data-skin='monitor-ultrawide'] .lab-stand {
+  width: 7%;
+  height: 28px;
+  background: linear-gradient(90deg, #171921, #2b2e3a 50%, #171921);
+}
+
+.lab-monitor[data-skin='monitor-ultrawide'] .lab-stand::after {
+  width: 520%;
+  height: 6px;
+  margin: 28px 0 0 -210%;
+  border-radius: 3px;
+  background: linear-gradient(#2b2e3a, #171921);
+}
+
+/* Tela Azul: a grey frame around a blue screen of death. The glass is blue whatever the theme. */
+.lab-monitor[data-skin='monitor-tela-azul'] {
+  --screen-bg: #00007c;
+  --ph: #ffffff;
+  --ph-hi: #ffffff;
+  --ph-deep: #1b1bd8;
+  --ph-rgb: 255 255 255;
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-bezel {
+  background: linear-gradient(145deg, #d0d3dd, #b4b8c6 55%, #9a9eae);
+  border-color: #4d5160;
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-screen {
+  border-color: #1b1d27;
+  box-shadow:
+    inset 0 0 40px rgb(0 0 40 / 0.6),
+    inset 0 0 0 2px rgb(255 255 255 / 0.16);
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-screen::before {
+  content: ':(';
+  position: absolute;
+  top: 2px;
+  right: 14px;
+  font-family: var(--font-display);
+  font-size: 70px;
+  color: #fff;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-brand {
+  color: #4d5160;
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-stand {
+  background: linear-gradient(90deg, #9a9eae, #cfd2dc 50%, #9a9eae);
+  border-inline-color: #4d5160;
+}
+
+.lab-monitor[data-skin='monitor-tela-azul'] .lab-stand::after {
+  background: linear-gradient(#c4c8d4, #9a9eae);
+  border-color: #4d5160;
+}
+
+/* Tubo Adesivado: a huge tube in thick plastic, covered in stickers. */
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-bezel {
+  padding: 34px 34px 14px;
+  background: radial-gradient(circle at 20% 15%, rgb(255 255 255 / 0.22), transparent 40%), linear-gradient(145deg, #cfc3a2, #b3a780 55%, #968b68);
+  border: 3px solid #5d5640;
+  border-radius: 16px;
+  box-shadow:
+    inset 3px 3px 0 rgb(255 255 255 / 0.3),
+    inset -4px -4px 0 rgb(0 0 0 / 0.25),
+    0 7px 0 rgb(0 0 0 / 0.5);
+}
+
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-screen {
+  border: 5px solid #26231a;
+  border-radius: 64px / 54px;
+  box-shadow:
+    inset 0 0 64px rgb(0 0 0 / 0.78),
+    inset 0 0 0 2px rgb(var(--ph-rgb) / 0.14),
+    0 0 0 4px #7e7557;
+}
+
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-bezel-bar {
+  padding-top: 12px;
+}
+
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-brand {
+  color: #5d5640;
+}
+
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-stand {
+  width: 38%;
+  height: 26px;
+  background: linear-gradient(90deg, #968b68, #c4b891 50%, #968b68);
+  border-inline-color: #5d5640;
+}
+
+.lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-stand::after {
+  width: 130%;
+  margin: 26px 0 0 -15%;
+  background: linear-gradient(#bfb38d, #968b68);
+  border-color: #5d5640;
+}
+
+.lab-stickers {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.lab-stickers i {
+  position: absolute;
+  font-size: 27px;
+  font-style: normal;
+  line-height: 1;
+  text-shadow:
+    -1.5px 0 #fff,
+    1.5px 0 #fff,
+    0 -1.5px #fff,
+    0 1.5px #fff,
+    1.5px 1.5px #fff,
+    -1.5px -1.5px #fff,
+    1.5px -1.5px #fff,
+    -1.5px 1.5px #fff,
+    2px 3px 0 rgb(0 0 0 / 0.35);
+}
+
+.lab-stickers i[data-n='0'] {
+  top: 4px;
+  left: 6px;
+  rotate: -14deg;
+}
+
+.lab-stickers i[data-n='1'] {
+  top: 3px;
+  left: 31%;
+  rotate: 9deg;
+}
+
+.lab-stickers i[data-n='2'] {
+  top: 5px;
+  right: 8px;
+  rotate: 16deg;
+}
+
+.lab-stickers i[data-n='3'] {
+  top: 34%;
+  right: 3px;
+  rotate: -10deg;
+}
+
+.lab-stickers i[data-n='4'] {
+  bottom: 30px;
+  right: 5px;
+  rotate: 12deg;
+}
+
+.lab-stickers i[data-n='5'] {
+  top: 30%;
+  left: 3px;
+  rotate: 8deg;
+}
+
+.lab-stickers i[data-n='6'] {
+  bottom: 28px;
+  left: 5px;
+  rotate: -18deg;
+}
+
+.lab-stickers i[data-n='7'] {
+  bottom: 2px;
+  left: 38%;
+  rotate: 7deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-monitor[data-skin='monitor-gamer-rgb'] .lab-bezel {
+    animation: none;
+  }
+}
+
+/* ---------- The stage: the monitor and the decoration around it ---------- */
+
+.lab-stage {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-self: center;
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.lab-stage[data-top] {
+  padding-top: 58px;
+}
+
+.lab-stage[data-desk] {
+  padding-bottom: 34px;
+}
+
+.lab-decor {
+  position: absolute;
+  z-index: 4;
+  width: auto;
+  max-width: 24%;
+  height: 64px;
+  object-fit: contain;
+  image-rendering: auto;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(2px 3px 0 rgb(0 0 0 / 0.38));
+}
+
+/* On top of the monitor: standing on the upper edge of the bezel (a few px of overlap, never on the glass). */
+.lab-decor[data-slot='top-left'] {
+  top: 0;
+  left: 7%;
+}
+
+.lab-decor[data-slot='top-right'] {
+  top: 0;
+  right: 7%;
+}
+
+/* On the desk, at each side of the stand. */
+.lab-decor[data-slot='desk-left'] {
+  bottom: 0;
+  left: 4%;
+  height: 70px;
+}
+
+.lab-decor[data-slot='desk-right'] {
+  right: 4%;
+  bottom: 0;
+  height: 70px;
+}
+
+/* ---------- Cosméticos tab ---------- */
+
+.lab-cosm {
+  display: grid;
+  grid-template-columns: minmax(360px, 0.95fr) minmax(0, 1.05fr);
+  align-items: start;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 1500px;
+  margin: auto;
+  padding: var(--space-3);
+}
+
+.lab-cosm-stage {
+  position: sticky;
+  top: var(--space-3);
+}
+
+.lab-preview {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  color: var(--text);
+  background: radial-gradient(circle at 40% 30%, var(--lab-bg-1), var(--lab-bg-2) 75%);
+  border: 2px solid var(--border);
+}
+
+.lab-preview .lab-screen {
+  min-height: 220px;
+}
+
+.lab-cosm-caption {
+  display: grid;
+  gap: 2px;
+  min-height: 68px;
+  padding: var(--space-2) var(--space-3);
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 2px dashed var(--border);
+}
+
+.lab-cosm-caption-name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  color: var(--text);
+}
+
+.lab-cosm-caption-state {
+  color: var(--lab);
+  font-weight: 800;
+}
+
+.lab-cosm-catalog {
+  gap: var(--space-4);
+}
+
+.lab-cosm-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.lab-cosm-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lab-cosm-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: 6px 8px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.lab-cosm-card[data-owned] {
+  background: color-mix(in srgb, var(--lab) 7%, var(--surface));
+}
+
+.lab-cosm-card[data-equipped] {
+  border-color: var(--lab);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--lab) 40%, transparent);
+}
+
+.lab-cosm-card[data-selected]:not([data-equipped]) {
+  border-color: color-mix(in srgb, var(--lab) 60%, var(--border));
+}
+
+.lab-cosm-card:not([data-owned]) .lab-cosm-pick {
+  opacity: 0.7;
+}
+
+.lab-cosm-pick {
+  display: grid;
+  place-items: center;
+  min-width: 72px;
+  min-height: 62px;
+  padding: 2px;
+  background: color-mix(in srgb, var(--bg) 60%, var(--surface));
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+
+.lab-cosm-pick:hover,
+.lab-cosm-pick:focus-visible {
+  border-color: var(--lab);
+}
+
+.lab-cosm-body {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.lab-cosm-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.lab-cosm-note {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.lab-cosm-state {
+  font-size: 11px;
+}
+
+.lab-cosm-badge {
+  display: inline-block;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.lab-cosm-badge[data-tone='on'] {
+  color: var(--on-accent);
+  background: var(--lab);
+  border-color: var(--lab);
+}
+
+.lab-cosm-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 800;
+  color: var(--warn);
+}
+
+.lab-shop-price[data-poor] {
+  color: var(--bad);
+}
+
+/* The thumbnails. */
+.lab-thumb {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.lab-thumb-monitor {
+  background: linear-gradient(145deg, #ddd4b8, #aea48a);
+  border: 2px solid #6c654d;
+  border-radius: 4px;
+}
+
+.lab-thumb-monitor i {
+  position: absolute;
+  inset: 14%;
+  background: radial-gradient(ellipse at 50% 45%, #123a2c, #07120e 75%);
+  border-radius: 8px / 6px;
+}
+
+.lab-thumb-monitor[data-skin='monitor-gamer-rgb'] {
+  background:
+    linear-gradient(#0f1118, #0f1118) padding-box,
+    conic-gradient(#ff2d55, #ffb300, #7dff3a, #00e5ff, #7a5cff, #ff2de1, #ff2d55) border-box;
+  border: 3px solid transparent;
+}
+
+.lab-thumb-monitor[data-skin='monitor-gamer-rgb'] i {
+  inset: 10%;
+  border-radius: 1px;
+}
+
+.lab-thumb-monitor[data-skin='monitor-ultrawide'] {
+  background: #14161d;
+  border-color: #05060a;
+}
+
+.lab-thumb-monitor[data-skin='monitor-ultrawide'] i {
+  inset: 22% 6%;
+  border-radius: 18px / 6px;
+}
+
+.lab-thumb-monitor[data-skin='monitor-tela-azul'] {
+  background: linear-gradient(145deg, #d0d3dd, #9a9eae);
+  border-color: #4d5160;
+}
+
+.lab-thumb-monitor[data-skin='monitor-tela-azul'] i {
+  background: #00007c;
+}
+
+.lab-thumb-monitor[data-skin='monitor-tubo-adesivado'] {
+  background: linear-gradient(145deg, #cfc3a2, #968b68);
+  border-color: #5d5640;
+}
+
+.lab-thumb-monitor[data-skin='monitor-tubo-adesivado'] i {
+  inset: 24%;
+  border-radius: 14px / 12px;
+}
+
+.lab-thumb-monitor[data-skin='monitor-tubo-adesivado']::after {
+  content: '⭐🐞';
+  position: absolute;
+  top: 0;
+  left: 1px;
+  font-size: 10px;
+  line-height: 1;
+}
+
+.lab-thumb-theme {
+  background: radial-gradient(circle at 35% 30%, var(--lab-bg-1), var(--lab-bg-2) 80%);
+  border: 2px solid var(--border);
+}
+
+.lab-thumb-theme i {
+  position: absolute;
+  inset: 22% 40% 22% 12%;
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+}
+
+.lab-thumb-theme b {
+  position: absolute;
+  inset: 34% 10% 34% 66%;
+  background: var(--lab);
+}
+
+/* A cosmetic not owned yet: a dark silhouette, nothing that gives it away. */
+.lab-thumb-locked {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 56px;
+  color: var(--text-muted);
+  background: repeating-linear-gradient(45deg, #0b0c10 0 6px, #14161d 6px 12px);
+  border: 2px solid var(--border);
+}
+
+/* The effect line of a starting item (on the ready screen and in the equipment). */
+.lab-start-bonus,
+.lab-item-bonus .lab-item-note {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ph-hi);
+}
+
+.lab-item-bonus {
+  display: grid;
+  gap: 4px;
+}
+
+/* ---------- The shop ---------- */
+
+.lab-shop-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-3);
+  background: rgb(0 0 0 / 0.66);
+}
+
+.lab-shop {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  width: min(1100px, 92vw);
+  height: min(720px, 86vh);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  background: var(--surface);
+  border: 3px solid var(--warn);
+  box-shadow: 6px 6px 0 var(--shadow-color);
+}
+
+.lab-shop-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.lab-shop h3 {
+  margin-right: auto;
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--warn);
+}
+
+.lab-shop h4 {
+  padding-bottom: 4px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+
+.lab-shop-wallet {
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: color-mix(in srgb, var(--bg) 55%, var(--surface));
+  border: 2px solid var(--border);
+}
+
+.lab-shop-wallet b {
+  margin-left: 6px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  color: var(--lab);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.lab-shop-lead {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.lab-shop-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lab-shop-filters button {
+  min-height: 34px;
+  padding: 4px 12px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 2px solid var(--border);
+  cursor: pointer;
+}
+
+.lab-shop-filters button[aria-selected='true'] {
+  color: #1a1204;
+  background: var(--warn);
+  border-color: var(--warn);
+}
+
+.lab-shop-body {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 0;
+  padding-right: 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.lab-shop-group {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.lab-shop-foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- The lab profile (opened from the Ranking) ---------- */
+
+.lab-profile {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.lab-profile-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.lab-profile-who {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.lab-profile-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 15px;
+}
+
+.lab-profile-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.lab-profile-stage {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  color: var(--text);
+  background: radial-gradient(circle at 40% 30%, var(--lab-bg-1), var(--lab-bg-2) 75%);
+  border: 2px solid var(--border);
+}
+
+.lab-profile-stage .lab-screen {
+  min-height: 190px;
+}
+
+.lab-profile-screen {
+  gap: 4px;
+}
+
+.lab-profile-phase {
+  font-family: var(--font-display);
+  font-size: 56px;
+  line-height: 1;
+  color: var(--ph-hi);
+  text-shadow: 0 0 14px rgb(var(--ph-rgb) / 0.6);
+}
+
+.lab-profile-start {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.lab-profile-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.lab-profile-stat {
+  display: grid;
+  gap: 0;
+  padding: 6px 10px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+}
+
+.lab-profile-stat dt {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.lab-profile-stat dd {
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lab-profile-builds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-5);
+}
+
+.lab-profile-build-title {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 1023px) {
+  .lab-cosm {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lab-cosm-stage {
+    position: static;
+  }
+
+  .lab-cosm-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 719px) {
+  .lab-stage[data-top] {
+    padding-top: 44px;
+  }
+
+  .lab-stage[data-desk] {
+    padding-bottom: 28px;
+  }
+
+  .lab-decor {
+    height: 48px;
+  }
+
+  .lab-decor[data-slot^='desk'] {
+    height: 54px;
+  }
+
+  .lab-shop {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .lab-cosm-card {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .lab-cosm-actions {
+    grid-column: 1 / -1;
+  }
+
+  .lab-monitor[data-skin='monitor-tubo-adesivado'] .lab-bezel {
+    padding: 22px 22px 10px;
+  }
+}
+
+/* The monitor's glass layers stay inside the monitor: nothing of it can draw over a dialog. */
+.lab-monitor {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Cosméticos: both panels share one row as tall as the body; the list scrolls inside. */
+@media (min-width: 1024px) {
+  .lab-cosm {
+    flex: 1 1 0;
+    align-items: stretch;
+    min-height: 0;
+    margin: 0 auto;
+  }
+
+  .lab-cosm-stage,
+  .lab-cosm-catalog {
+    position: static;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+.lab-cosm-fold {
+  align-items: center;
+}
+
+.lab-cosm-fold button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 4px;
+  color: var(--text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.lab-cosm-fold button:hover h3 {
+  color: var(--lab);
+}
+
+.lab-cosm-fold button:focus-visible {
+  outline: 2px solid var(--lab);
+}
+
+.lab-cosm-list[hidden] {
+  display: none;
+}
+
+/* The lab profile fits a 1590x820 window without scrolling. */
+.lab-profile {
+  gap: var(--space-2);
+}
+
+.lab-profile-stage {
+  padding: var(--space-2) var(--space-3) 6px;
+}
+
+.lab-profile-stage .lab-stage {
+  max-width: 430px;
+}
+
+.lab-profile-stage .lab-screen {
+  min-height: 100px;
+}
+
+.lab-profile-phase {
+  font-size: 38px;
+}
+
+.lab-profile-stats {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.lab-profile-stat {
+  padding: 3px 8px;
+}
+
+.lab-profile-stat dt {
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.lab-profile-stat dd {
+  overflow: visible;
+  font-size: 13px;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.lab-profile-builds {
+  flex-wrap: nowrap;
+  gap: var(--space-4);
+}
+
+.lab-profile-builds > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lab-profile-build-title {
+  margin: 0;
+}
+
+@media (max-width: 719px) {
+  .lab-profile-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lab-profile-builds {
+    flex-wrap: wrap;
+  }
+
+  .lab-shop {
+    width: 94vw;
+    height: 90vh;
+  }
+}

@@ -11,6 +11,7 @@ import { cssVariables } from '@/ui/theme';
 import { playLimited } from '../panel/lib/feedback';
 import { ScreenDecision } from './Decision';
 import { ItemArt } from './ItemArt';
+import { LabStage, Stickers, skinBrand } from './LabStage';
 import { crackLevel, integrityTone, mobZoom, perSecond, seconds } from './labFormat';
 
 const HIT_LIFE_MS = 380;
@@ -48,7 +49,13 @@ function Mob({ mob }: { mob: LabMobView }) {
         className="lab-mob-sprite"
         role="img"
         aria-label={mob.name}
-        style={{ ...cssVariables({ '--w': String(meta?.w ?? 40), '--h': String(meta?.h ?? 46) }), backgroundImage: `url(/assets/${mob.asset}.png)` }}
+        style={{
+          ...cssVariables({
+            '--w': String(meta?.w ?? 40),
+            '--h': String(meta?.h ?? 46),
+          }),
+          backgroundImage: `url(/assets/${mob.asset}.png)`,
+        }}
       />
     </div>
   );
@@ -70,11 +77,22 @@ function Hud({ view }: { view: LabMonitorView }) {
           <div className="lab-timer" data-danger={danger} role="timer" aria-label={`Prazo do chefão: ${seconds(view.bossLeft)}`}>
             <span className="lab-timer-text">{seconds(view.bossLeft)}</span>
             <span className="lab-timer-bar">
-              <i style={{ width: `${Math.max(0, Math.min(1, view.bossLeft / view.bossTotal)) * 100}%` }} />
+              <i
+                style={{
+                  width: `${Math.max(0, Math.min(1, view.bossLeft / view.bossTotal)) * 100}%`,
+                }}
+              />
             </span>
           </div>
         ) : (
-          <div className="lab-wave" role="progressbar" aria-label="Progresso da onda" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(view.waveProgress * 100)}>
+          <div
+            className="lab-wave"
+            role="progressbar"
+            aria-label="Progresso da onda"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(view.waveProgress * 100)}
+          >
             <i style={{ width: `${view.waveProgress * 100}%` }} />
           </div>
         )
@@ -112,7 +130,10 @@ function Integrity({ view }: { view: LabMonitorView }) {
 
 function ReadyScreen({ view }: { view: LabMonitorView }) {
   const start = useGame((store) => store.startLabRun);
-  const starter = content.lab.bases.find((base) => base.id === content.lab.starter);
+  // The starting item the player wears (a shop cosmetic) or, by default, the Mouse quebrado.
+  const startId = useGame((store) => store.state.lab.cosmetics.startItem);
+  const starter = content.lab.bases.find((base) => base.id === startId) ?? content.lab.bases.find((base) => base.id === content.lab.starter);
+  const bonus = starter?.effects ? (content.lab.cosmetics.items.find((entry) => entry.id === starter.id)?.description ?? null) : null;
   const power = content.lab.items.power.base * (content.lab.items.power.rarity.comum ?? 1);
   const setupAtHome = useGame((store) => (store.state.lab.tree['setup-de-casa'] ?? 0) > 0);
   return (
@@ -132,18 +153,22 @@ function ReadyScreen({ view }: { view: LabMonitorView }) {
             <p className="lab-item-power">
               Poder <b>{formatNumber(power)}</b>
             </p>
+            {bonus ? <p className="lab-start-bonus">{bonus}</p> : null}
           </div>
         </div>
       ) : null}
       <p className="lab-center-text">
         Você começa com {starter?.name.toLowerCase() ?? 'um item'}
-        {setupAtHome ? ' e um item comum no Setup' : ''}, {content.lab.run.startIntegrity} de integridade e nenhum atributo.
-        Derrote as ondas, escolha uma recompensa a cada fase e não deixe o monitor quebrar.
+        {setupAtHome ? ' e um item comum no Setup' : ''}, {content.lab.run.startIntegrity} de integridade e nenhum atributo. Derrote as ondas, escolha
+        uma recompensa a cada fase e não deixe o monitor quebrar.
       </p>
       <Button size="lg" onClick={() => void start()} data-qa="lab-start">
         Iniciar pesquisa
       </Button>
-      <p className="lab-center-fine">Uma pesquisa por turma.{view.bestPhase > 0 ? ` Recorde: fase ${view.bestPhase}.` : ''}</p>
+      <p className="lab-center-fine">
+        Uma pesquisa por turma.
+        {view.bestPhase > 0 ? ` Recorde: fase ${view.bestPhase}.` : ''}
+      </p>
     </div>
   );
 }
@@ -207,6 +232,7 @@ interface Hit {
  */
 export function Monitor({ view, feed }: MonitorProps) {
   const click = useGame((store) => store.labClick);
+  const cosmetics = useGame((store) => store.state.lab.cosmetics);
   const [hits, setHits] = useState<Hit[]>([]);
   const nextHit = useRef(1);
   const timers = useRef(new Set<number>());
@@ -256,53 +282,63 @@ export function Monitor({ view, feed }: MonitorProps) {
   const zoom = mobZoom(view.mobs.length);
 
   return (
-    <div className="lab-monitor" data-state={state} data-crack={cracks} data-boss={view.boss || undefined} data-qa="lab-monitor">
-      <div className="lab-bezel">
-        <div
-          className="lab-screen"
-          data-hit={hits.length > 0}
-          role={fighting ? 'button' : undefined}
-          tabIndex={fighting ? 0 : undefined}
-          aria-label={fighting ? 'Monitor da pesquisa. Clique para causar dano extra.' : undefined}
-          onPointerDown={onPointerDown}
-          onKeyDown={onKeyDown}
-          data-qa="lab-screen"
-        >
-          {fighting || view.status === 'reward' || view.status === 'equip' ? <Hud view={view} /> : null}
+    <LabStage decor={cosmetics.decor}>
+      <div
+        className="lab-monitor"
+        data-state={state}
+        data-crack={cracks}
+        data-boss={view.boss || undefined}
+        data-skin={cosmetics.monitor}
+        data-qa="lab-monitor"
+      >
+        <div className="lab-bezel">
+          <div
+            className="lab-screen"
+            data-hit={hits.length > 0}
+            role={fighting ? 'button' : undefined}
+            tabIndex={fighting ? 0 : undefined}
+            aria-label={fighting ? 'Monitor da pesquisa. Clique para causar dano extra.' : undefined}
+            onPointerDown={onPointerDown}
+            onKeyDown={onKeyDown}
+            data-qa="lab-screen"
+          >
+            {fighting || view.status === 'reward' || view.status === 'equip' ? <Hud view={view} /> : null}
 
-          {fighting ? (
-            <div className="lab-arena" style={cssVariables({ '--z': String(zoom) })} data-count={view.mobs.length}>
-              {view.mobs.map((mob) => (
-                <Mob key={mob.uid} mob={mob} />
-              ))}
-            </div>
-          ) : null}
+            {fighting ? (
+              <div className="lab-arena" style={cssVariables({ '--z': String(zoom) })} data-count={view.mobs.length}>
+                {view.mobs.map((mob) => (
+                  <Mob key={mob.uid} mob={mob} />
+                ))}
+              </div>
+            ) : null}
 
-          {ready ? <ReadyScreen view={view} /> : null}
-          {dead ? <OffScreen view={view} /> : null}
-          {view.status === 'reward' || view.status === 'equip' ? <ScreenDecision status={view.status} /> : null}
-          {broken ? <BrokenScreen view={view} /> : null}
+            {ready ? <ReadyScreen view={view} /> : null}
+            {dead ? <OffScreen view={view} /> : null}
+            {view.status === 'reward' || view.status === 'equip' ? <ScreenDecision status={view.status} /> : null}
+            {broken ? <BrokenScreen view={view} /> : null}
 
-          {view.hasRun && !broken ? <Integrity view={view} /> : null}
+            {view.hasRun && !broken ? <Integrity view={view} /> : null}
 
-          <CrackLayer level={cracks} />
-          <span className="lab-glare" aria-hidden="true" />
-          <span className="lab-scan" aria-hidden="true" />
-          {hits.map((hit) => (
-            <span key={hit.id} className="lab-hit" style={{ left: `${hit.x}%`, top: `${hit.y}%` }} aria-hidden="true" />
-          ))}
-          {feed ? (
-            <p key={feed.id} className="lab-feed" role="status">
-              {feed.text}
-            </p>
-          ) : null}
+            <CrackLayer level={cracks} />
+            <span className="lab-glare" aria-hidden="true" />
+            <span className="lab-scan" aria-hidden="true" />
+            {hits.map((hit) => (
+              <span key={hit.id} className="lab-hit" style={{ left: `${hit.x}%`, top: `${hit.y}%` }} aria-hidden="true" />
+            ))}
+            {feed ? (
+              <p key={feed.id} className="lab-feed" role="status">
+                {feed.text}
+              </p>
+            ) : null}
+          </div>
+          <div className="lab-bezel-bar">
+            <span className="lab-led" aria-hidden="true" />
+            <span className="lab-brand">{skinBrand(cosmetics.monitor)}</span>
+          </div>
+          {cosmetics.monitor === 'monitor-tubo-adesivado' ? <Stickers /> : null}
         </div>
-        <div className="lab-bezel-bar">
-          <span className="lab-led" aria-hidden="true" />
-          <span className="lab-brand">ADS-CRT 2000</span>
-        </div>
+        <div className="lab-stand" aria-hidden="true" />
       </div>
-      <div className="lab-stand" aria-hidden="true" />
-    </div>
+    </LabStage>
   );
 }

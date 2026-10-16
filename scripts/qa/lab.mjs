@@ -58,13 +58,13 @@ if (!has('roster')) {
   if (tab === 'ranking' && flag('board')) await page.locator(`[data-qa="lab-board-tab-${flag('board')}"]`).click({ timeout: 1000 }).catch(() => {});
   if (has('profile')) {
     await page.locator('[data-qa="lab-rank-open-profile"]').nth(Number(flag('profile') || 0)).click({ timeout: 3000 }).catch(() => errors.push('profile button not found'));
-    await page.waitForSelector('[data-qa="player-profile"]', { timeout: 4000 }).catch(() => errors.push('profile did not open'));
+    await page.waitForSelector('[data-qa="lab-profile"], [data-qa="lab-profile-class"]', { timeout: 4000 }).catch(() => errors.push('profile did not open'));
   }
   if (has('escape')) {
     // Esc closes the thing on top first: the profile, then the lab.
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
-    const afterFirst = await page.evaluate(() => ({ profile: Boolean(document.querySelector('[data-qa="player-profile"]')), lab: Boolean(document.querySelector('[data-qa="lab-overlay"]')) }));
+    const afterFirst = await page.evaluate(() => ({ profile: Boolean(document.querySelector('[data-qa="lab-profile"], [data-qa="player-profile"]')), lab: Boolean(document.querySelector('[data-qa="lab-overlay"]')) }));
     await page.keyboard.press('Escape');
     await page.waitForTimeout(300);
     const afterSecond = await page.evaluate(() => Boolean(document.querySelector('[data-qa="lab-overlay"]')));
