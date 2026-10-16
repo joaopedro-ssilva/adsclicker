@@ -24,6 +24,7 @@ Além do que vem do Hackathon, o Laboratório tem **24 bases de item** (6 por es
 lab: {
   unlocked, open,                 // open nunca é lido como true de um save
   commits, tree: {id: nível},     // permanentes
+  treeVersion,                    // versão da árvore em que os níveis foram comprados (ver Commits e árvore)
   bestPhase,                      // fase mais alta alcançada (quebrar na 7 conta 7)
   bestPhaseBuild, bestRunBuild,   // itens equipados no recorde de fase e na melhor turma (ver "Recordes e builds")
   counters: { runs, broken, phasesCleared, bossesBeaten, itemsFound, itemsRecycled,
@@ -35,6 +36,7 @@ lab: {
       integrity, maxIntegrity,
       mobs[], mobSeq, waveHp, bossLeft, nextCharge,
       offers[], pending,          // recompensa em tela / item esperando decisão
+      shield, rerolled,           // escudo da fase / sorteios de recompensa já usados (árvore)
       buffs: {id: vezes}, clickTimes[], windUsed,
       cleared, bosses, clearLog[],// clearLog = t (s) em que cada fase foi vencida
       brokenBy, paid
@@ -60,16 +62,16 @@ Passo fixo de 0,1 s, independente da frequência do tick (o resultado é o mesmo
 | Poder do item | `5 x raridade[1; 1,7; 3; 5,4; 10] x 1,15^(nível-1)` |
 | Clique no monitor | 4% do dano automático por clique; no máximo **5 cliques contam por segundo** (janela móvel) = no máximo +20% |
 | Onda | 2..6 monstros: 2 + 1 a cada 3 fases, +0 ou +1 pela semente. Tipos liberados por fase (bug 1, loop 2, merge 3, vazamento 4, legado 6) |
-| HP | HP do Hackathon x 0,1 x 1,18^(fase-1). Chefão: x 0,4 |
+| HP | HP do Hackathon x 0,178 x 1,14^(fase-1). Chefão: x 0,54 x 2,6 no 2º chefão em diante (`bossHpGrowth`, 1 só vez: `bossGrowthTurns`) |
 | Dreno | dano x ataques/s do inimigo x 0,05 x 1,12^(fase-1) por segundo, com `ramp` (vazamento, chefão) e carga do chefão (golpe a cada 9 s). `armor` vira redução de dano (8% por ponto, máx. 50%); `split` do Conflito de merge vale |
-| Chefão | toda 5ª fase, **30 s** de prazo (+ árvore). Prazo zerado ou integridade 0 = monitor quebra |
+| Chefão | toda 5ª fase, **30 s** de prazo (+ árvore; Hotfix só no primeiro). Prazo zerado ou integridade 0 = monitor quebra |
 | Segundo fôlego | uma vez por fase (por carga), a queda fatal deixa 15% da integridade |
 
 Ordem de um passo: dano, fase vencida?, dreno, golpe do chefão, integridade, prazo.
 
 ### Recompensas
 
-Ao vencer uma fase: **3 opções** (4 na primeira com a árvore; +1 pela chance de "opção extra" dos itens, até 5). A primeira é sempre item; as demais sorteiam por peso item 3, buff 3, Commits 1,5, reparo 1,5 (reparo x2,5 com o monitor abaixo de 50%). Chefão: duas opções de item, a primeira **raro ou melhor** e a segunda **incomum ou melhor**.
+Ao vencer uma fase: **3 opções** (4 na primeira com a árvore; +1 pela chance de "opção extra" dos itens, até 5). A primeira é sempre item; as demais sorteiam por peso item 3, buff 3, Commits 1,5, reparo 1,5 (reparo x2,5 com o monitor abaixo de 50%). Mentoria: +1 opção no chefão. Retrospectiva: sorteia de novo as opções (`rerollLabOffers`, uma vez por nível por recompensa, mesma semente, fluxo seguinte). Chefão: duas opções de item, a primeira **raro ou melhor** e a segunda **incomum ou melhor**.
 
 - **Item:** base sorteada (espaços vazios pesam 2), raridade pelos pesos do Hackathon deslocados pela qualidade de loot `sorte + 1,5 x (fase-1)` (cada ponto multiplica o peso de rank i por `1 + q/100 x i`, teto 400), nível `1 + floor((fase-1)/3)` (+1 em chefão). Vaga livre equipa na hora; vaga ocupada deixa o item **pendente**: `equipLabPending` (o antigo é reciclado em Commits) ou `recycleLabPending` (recicla o novo).
 - **Buff da corrida:** um dos 12 (10 dos buffs de onda do Hackathon, adaptados, mais Prazo estendido e CI verde). Vale até a formatura, empilha, e também age no clicker.
@@ -111,20 +113,68 @@ Números fixos (strings decimais), um degrau acima do Pablo (1,52e21), não minu
 ## Commits e árvore
 
 - **Quebrar o monitor** paga `(fases vencidas x 3 + chefões x 25) x bônus`; **reciclar** paga `5 / 12 / 30 / 80 / 250` por raridade, +10% por nível acima de 1.
-- **Árvore permanente** (`lab.tree`, 12 nós, 3 ramos, comprados com Commits, `custo x crescimento^nível`):
-  - Código: Algoritmos eficientes (+10% dano, 10 níveis), Estudo de chefão (+10% dano em chefões, 5), Setup de casa (começa com item comum no Setup).
-  - Infra: Monitor reforçado (+10 integridade, 10), Backup noturno (+5% de reparo após chefão, 5), Prazo folgado (+5 s no chefão, 4), Rede segura (-4% dreno, 5), Nobreak do laboratório (segundo fôlego).
-  - Produto: Revisão de PR (4 opções na primeira recompensa), Código limpo (+5 sorte, 6), Documentação (+10% nos buffs do clicker, 5), Portfólio (+20% Commits, 3).
-  Total da árvore: cerca de 2.200 Commits.
+- **Árvore permanente** (`lab.tree`, 34 nós, 3 ramos, 5 camadas, comprados com Commits, `custo x crescimento^nível`; `content/labTree.ts`, todos os preços passam por `TREE_PRICE`). Cada nó pede um nó da camada anterior; três capstones pedem também um nó de outro ramo (Deploy contínuo <- Rede segura, Datacenter próprio <- Portfólio, Unicórnio <- TDD).
 
+| Ramo | Nó | Níveis | Custo | Total | Efeito | Requer |
+| --- | --- | --- | --- | --- | --- | --- |
+| Código | 🧠 Algoritmos eficientes | 10 | 12 x 1.45^nível | 1074 | +6% de dano automático por nível. | - |
+| Código | 📖 Estudo de chefão | 6 | 25 x 1.5^nível | 522 | +12% de dano em chefões por nível. | Algoritmos eficientes |
+| Código | 🪑 Setup de casa | 1 | 60 | 60 | Toda corrida começa com um item comum no Setup, além do mouse quebrado. | Algoritmos eficientes |
+| Código | ✂️ Minimalismo | 3 | 40 x 1.8^nível | 242 | +10% de dano automático por espaço vazio, por nível. Quem tem pouco ainda ataca. | Algoritmos eficientes |
+| Código | ⚡ Hotfix | 3 | 90 x 1.7^nível | 504 | +6 segundos no prazo do primeiro chefão de cada corrida, por nível. | Estudo de chefão |
+| Código | 🧪 TDD | 4 | 80 x 1.6^nível | 741 | Cada chefão derrotado paga +15 Commits na hora, por nível. | Estudo de chefão |
+| Código | 🏃 Speedrun | 4 | 70 x 1.6^nível | 649 | Vencer uma fase comum em menos de 10 s repara 2% da integridade, por nível. | Minimalismo |
+| Código | 🎒 Estagiário dedicado | 2 | 260 x 3^nível | 1040 | A corrida começa com +1 item incomum sorteado num espaço vazio, por nível. | Setup de casa |
+| Código | 🧬 Herança de código | 3 | 420 x 2.2^nível | 3377 | O item novo herda 30% do nível do que ele substitui, por nível. | Estagiário dedicado |
+| Código | 🏆 Código lendário | 3 | 500 x 2^nível | 3500 | +50% de dano automático por item lendário equipado, por nível. | Hotfix |
+| Código | 🚀 Deploy contínuo | 1 | 4200 | 4200 | +80% de dano automático e +60% em chefões. Pede Código lendário e Rede segura. | Código lendário + Rede segura |
+| Infra | 🖥️ Monitor reforçado | 10 | 10 x 1.38^nível | 639 | +8 de integridade máxima por nível. | - |
+| Infra | 💾 Backup noturno | 5 | 25 x 1.55^nível | 364 | Repara 5% da integridade depois de cada chefão, por nível. | Monitor reforçado |
+| Infra | ⏱️ Prazo folgado | 5 | 30 x 1.6^nível | 475 | +4 segundos no prazo dos chefões por nível. | Monitor reforçado |
+| Infra | ❄️ Cooler turbinado | 5 | 20 x 1.5^nível | 265 | Repara 1% da integridade depois de cada fase, por nível. | Monitor reforçado |
+| Infra | 🔒 Rede segura | 6 | 40 x 1.55^nível | 937 | Os mobs drenam 3% menos integridade por nível. | Backup noturno |
+| Infra | 🔋 Nobreak do laboratório | 1 | 450 | 450 | Uma vez por fase, uma queda fatal deixa o monitor com 15% de integridade. | Prazo folgado |
+| Infra | 🧱 Firewall do lab | 4 | 55 x 1.7^nível | 579 | Toda fase começa com um escudo de 6% da integridade máxima, por nível. | Cooler turbinado |
+| Infra | 📺 Monitor ultrawide | 5 | 70 x 1.6^nível | 1108 | +4% de integridade máxima por nível. | Firewall do lab |
+| Infra | 🛡️ Zero trust | 4 | 220 x 1.9^nível | 2942 | Mais 4% de redução do dreno por nível, somando com a Rede segura. | Rede segura |
+| Infra | 🔌 Gerador de emergência | 1 | 1800 | 1800 | Mais uma carga de segundo fôlego por fase. | Nobreak do laboratório |
+| Infra | 🏢 Datacenter próprio | 1 | 3600 | 3600 | +25% de integridade máxima, +3% de reparo por fase e +10% após chefões. Pede Zero trust e Portfólio. | Zero trust + Portfólio |
+| Produto | 🔍 Revisão de PR | 1 | 30 | 30 | A primeira recompensa da corrida mostra 4 opções. | - |
+| Produto | ✨ Código limpo | 8 | 15 x 1.5^nível | 741 | +4 de sorte por nível: mais chance de itens raros e lendários. | Revisão de PR |
+| Produto | 📚 Documentação | 5 | 20 x 1.55^nível | 291 | Os buffs do Laboratório valem 8% mais no clicker, por nível. | Revisão de PR |
+| Produto | 🔁 Retrospectiva | 2 | 300 x 3.5^nível | 1350 | Sorteia de novo as opções de cada recompensa, uma vez por nível. | Revisão de PR |
+| Produto | 📁 Portfólio | 5 | 40 x 1.7^nível | 756 | +12% de Commits por nível. | Código limpo |
+| Produto | ♻️ Reciclagem | 5 | 45 x 1.6^nível | 713 | Itens reciclados pagam 20% mais Commits, por nível. | Código limpo |
+| Produto | 🖱️ Mouse gamer | 5 | 25 x 1.5^nível | 332 | +4% de ADScoins por clique no clicker, por nível. | Documentação |
+| Produto | ☕ Cafeína | 5 | 35 x 1.55^nível | 509 | Habilidades dos professores recarregam 2% mais rápido, por nível. | Documentação |
+| Produto | 🏷️ Licenças educacionais | 5 | 60 x 1.65^nível | 1038 | Subir o nível de itens com ADScoins custa 8% menos, por nível. | Documentação |
+| Produto | 🎯 Mira afiada | 4 | 45 x 1.6^nível | 418 | +1,5 ponto de chance de crítico no clicker, por nível. | Mouse gamer |
+| Produto | 🎓 Mentoria | 1 | 700 | 700 | A recompensa de um chefão mostra uma opção a mais. | Retrospectiva |
+| Produto | 🦄 Unicórnio | 1 | 4800 | 4800 | +15 de sorte, +30% de Commits e +10% de chance de opção extra. Pede Portfólio e TDD. | Portfólio + TDD |
+
+Total: 40746 Commits (34 nós)
+
+Novos efeitos do motor (`LAB_EFFECT_KEYS`): `startItem`, `firstBossTime`, `offerRerolls`, `fastClearRepair` (limite `run.fastClearSeconds` = 10 s), `bossOptions`, `levelKeep` (teto 90%), `phaseShield`, `bossCommits`, `emptySlotDamage`, `legendaryDamage`, `levelCost` (teto de 90% de desconto) e `recycleBonus`; nós também podem dar bônus pequenos ao clicker (`clicker` por nível), sempre sob os tetos de `caps`. Cada um tem teste em `lab.test.ts`.
+
+### Resetar a árvore
+
+`resetLabTree` devolve **todos** os Commits gastos na árvore e zera os níveis. É de graça e sem limite de vezes, mas **só fora de uma corrida**: sem corrida (antes de começar, ou depois da formatura) ou com o monitor quebrado. Em luta, escolhendo recompensa ou decidindo um item, não (`labTreeResetCheck` devolve o motivo em pt-BR). A regra é mais estrita que "só fora da luta" de propósito: resetar entre uma fase e outra deixaria o jogador regastar os mesmos Commits no que a próxima fase pede (prazo antes do chefão, dano depois). Evento `labTreeReset { refunded }`; ação da store `resetLabTree`. A interface (Progressão) mostra o botão com um modal que diz quantos Commits voltam.
+
+### Saves antigos
+
+`lab.treeVersion` marca a árvore em que os níveis foram comprados (`LAB_TREE_VERSION`, hoje 1). Ao ler um save com versão diferente (ou sem, a árvore de 12 nós) a árvore **não é lida**: cada Commit gasto volta para a carteira, calculado pelos preços antigos (`legacyTree`), e a árvore começa vazia. Ids removidos ou renomeados dentro da versão atual somem sem reembolso (não acontece sem mudar a versão). Uma versão futura desconhecida zera a árvore sem reembolso.
+
+### Renda de Commits (simulador)
+
+Quebrar o monitor paga `(fases x 3 + chefões x 25)` mais os bônus; somando reciclagem, ofertas de Commits, TDD e Portfólio, a mediana de Commits por corrida medida: **fase 5: 20 a 30**, **fase 10: 70 a 115**, **fase 15: 210 (árvore pequena) a 800 (um quarto da árvore)**, **fase 20: cerca de 800 a 1.500**, **fase 30: cerca de 4.300** (árvore cheia). Um jogador simulado que gasta tudo no mais barato disponível, com prioridade para dano e sobrevivência, compra os 40.746 Commits da árvore em **52 corridas**.
 ## Pontos de integração
 
 - `engine/stats.ts`: `computeStats` soma `labClickerEffects` depois dos buffs ativos.
 - `engine/tick.ts`: `advance` chama `advanceLab` com o tempo real do tick.
 - `engine/prestige.ts`: `graduate` chama `resetLabForGraduation`.
 - `engine/save.ts`: `readLab` + `settleLabAfterLoad`; `engine/init.ts`: `createLabState`.
-- Eventos (`store/types.ts`): `labUnlocked`, `labRunStarted`, `labPhaseCleared`, `labBossBeaten`, `labBroken`, `labItemGained`, `labItemRecycled`, `labItemChanged`, `labNodeBought`. A interface trata `labUnlocked`, `labBossBeaten` e `labBroken` em `handleGameEvent.ts`.
-- Store (`GameActions`): `unlockLab`, `setLabOpen`, `startLabRun`, `labClick`, `chooseLabReward`, `equipLabPending`, `recycleLabPending`, `levelUpLabItem`, `rerollLabAffix`, `buyLabNode`.
+- Eventos (`store/types.ts`): `labUnlocked`, `labRunStarted`, `labPhaseCleared`, `labBossBeaten`, `labBroken`, `labItemGained`, `labItemRecycled`, `labItemChanged`, `labNodeBought`, `labTreeReset`, `labOffersRerolled`. A interface trata `labUnlocked`, `labBossBeaten` e `labBroken` em `handleGameEvent.ts`.
+- Store (`GameActions`): `unlockLab`, `setLabOpen`, `startLabRun`, `labClick`, `chooseLabReward`, `equipLabPending`, `recycleLabPending`, `levelUpLabItem`, `rerollLabAffix`, `buyLabNode`, `resetLabTree`, `rerollLabOffers`.
 - Views (`engine/lab/views.ts`, hooks em `store/labHooks.ts`): `labSlotView` (o 9º slot), `labMonitorView`, `labBenchView`, `labRewardsView`, `labTreeView`.
 
 ## Servidor
@@ -137,4 +187,17 @@ O servidor lê o save com o mesmo `deserializeState` e julga com `computeStats`,
 
 ## Balanceamento
 
-Um jogador simulado (`pacing` em `lab.test.ts`) que escolhe o melhor item, buff de dano e reparo quando machucado, sem gastar ADScoins: sem árvore chega à fase 14 (mediana; p10 12, p90 17) em cerca de 2 min e meio de luta; com a árvore média, 20; com a cheia, 27 (p90 32).
+Medido com o jogador simulado de `engine/__fixtures__/labBot.ts` (escolhe o melhor item, buff de dano e reparo quando machucado, 5 cliques por segundo, usa o sorteio de recompensa quando a melhor opção é fraca) e fixado em `engine/lab/pacing.test.ts` (sementes fixas, 400 corridas sem árvore). `LAB_SIM=1 LAB_RUNS=300 npx vitest run src/game/engine/lab/pacing.test.ts` imprime a planilha em `LAB_OUT`; `LAB_TUNE='{"run.hpScale":0.2}'` testa um número sem editar o conteúdo.
+
+| Cenário | Meta | Medido |
+| --- | --- | --- |
+| Sem árvore, vencer o chefão da fase 5 | 35 a 55% | 46% |
+| Sem árvore, vencer o chefão da fase 10 | menos de 3%, só com épico/lendário | 1%, todas as corridas com item épico ou melhor |
+| Sem árvore, mediana de fase | 5 a 6 | 5 (p90 10) |
+| Sem árvore + 1e26 ADScoins em níveis | mais fácil, ainda raro passar da 10 | chefão 5: 71%, chefão 10: 2% |
+| Um quarto da árvore (`custo/4`, o mais barato primeiro) | mediana 12 a 22 | 15 (p10 15, p90 25) |
+| Metade da árvore | - | 28 |
+| Árvore cheia | mediana 25 a 35, p90 acima de 33 | 30 (p10 25, p90 38, máx. 44) |
+| Campanha inteira | 40 a 80 corridas | 52 |
+
+Números: HP 0,178 x 1,14^(fase-1); chefão 0,54 do HP base, x 2,6 a partir do 2º chefão (uma vez); dreno 0,05 x 1,12^(fase-1); itens como antes. A meia árvore não fica em 12 a 16 porque metade dos Commits já compra quase todo o poder (o resto são capstones e utilidades): a mediana de 12 a 16 é de **um quarto** da árvore. A partir da fase 15 as mortes se concentram nos chefões (fases 15, 25, 30), pelo prazo; a corrida nunca é infinita (máx. 44 no simulador, teste exige menos de 80).
