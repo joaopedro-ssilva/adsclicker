@@ -28,6 +28,7 @@ function NodeCard({ node, names, selected, onSelect }: { node: LabNodeView; name
       className="lab-node"
       data-state={state}
       aria-pressed={selected}
+      title={node.name}
       data-qa={`lab-node-${node.id}`}
       aria-label={`${node.name}, nível ${node.level} de ${node.maxLevel}. ${NODE_STATE_LABEL[state]}.`}
       onClick={onSelect}
@@ -41,7 +42,9 @@ function NodeCard({ node, names, selected, onSelect }: { node: LabNodeView; name
         </span>
       </span>
       <span className="lab-node-text">{node.description}</span>
-      {state === 'locked' ? <span className="lab-node-need">Requer: {requirement(node, names)}</span> : null}
+      <span className="lab-node-need" data-locked={state === 'locked'}>
+        {state === 'locked' ? `Requer: ${requirement(node, names)}` : node.requires.length > 0 ? 'Requisito cumprido' : 'Sem requisitos'}
+      </span>
       <span className="lab-node-foot">
         <span className="lab-node-cost">{node.cost !== null ? commits(node.cost) : null}</span>
         <span className="lab-node-state">{NODE_STATE_LABEL[state]}</span>

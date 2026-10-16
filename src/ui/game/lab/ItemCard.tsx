@@ -62,7 +62,7 @@ export function ItemBody({ item, variant = 'card', art = 56, label, affixAction,
       {item.affixes.length > 0 ? (
         <ul className="lab-affixes">
           {item.affixes.map((affix) => (
-            <li key={affix.index} className="lab-affix">
+            <li key={affix.index} className="lab-affix" title={affix.lines.map(affixText).join('; ')}>
               <LineList lines={affix.lines} />
               {affixAction ? affixAction(affix) : null}
             </li>

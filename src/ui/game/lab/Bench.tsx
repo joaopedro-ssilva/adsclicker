@@ -76,9 +76,16 @@ export function Summary({ view }: { view: LabBenchView }) {
       <header className="lab-section-head">
         <h3>Bancada</h3>
       </header>
-      <p className="lab-summary-totals">
-        Poder <b>{formatNumber(view.power)}</b> · Dano <b>{perSecond(view.autoDps)}</b>/s
-      </p>
+      <dl className="lab-summary-totals">
+        <div>
+          <dt>Poder</dt>
+          <dd>{formatNumber(view.power)}</dd>
+        </div>
+        <div>
+          <dt>Dano</dt>
+          <dd>{perSecond(view.autoDps)}/s</dd>
+        </div>
+      </dl>
 
       {!enabled ? (
         <p className="lab-note" data-tone="warn">

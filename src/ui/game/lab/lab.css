@@ -233,7 +233,7 @@ button.lab-slot {
 /* Desktop: three columns (summary | equipment | monitor), and the decision strip across the bottom while there is one. */
 .lab-grid {
   display: grid;
-  grid-template-columns: minmax(170px, 200px) minmax(0, 1fr) minmax(500px, 580px);
+  grid-template-columns: 190px minmax(0, 1fr) 560px;
   grid-template-areas: 'summary monitor equipment';
   align-items: stretch;
   gap: var(--space-3);
@@ -978,6 +978,9 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-item-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 14px;
   font-weight: 900;
   line-height: 1.2;
@@ -998,6 +1001,9 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-item-power {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 11px;
   color: var(--text-muted);
 }
@@ -1022,7 +1028,7 @@ body:has(.lab) .fx-canvas {
 
 .lab-affix {
   display: flex;
-  flex-wrap: wrap;
+  min-height: 46px;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
@@ -1037,6 +1043,17 @@ body:has(.lab) .fx-canvas {
 
 .lab-affix .lab-lines {
   flex: 1 1 90px;
+}
+
+.lab-affix .lab-line {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.lab-slot-card .lab-item {
+  min-height: 280px;
 }
 
 .lab-lines {
@@ -1119,7 +1136,9 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab .ui-button.lab-reroll {
+  justify-content: space-between;
   gap: 4px;
+  width: 108px;
   min-height: 26px;
   padding: 2px 8px;
   font-size: 11px;
@@ -1129,14 +1148,30 @@ body:has(.lab) .fx-canvas {
 /* ---------- Bench ---------- */
 
 .lab-summary-totals {
-  font-size: 13px;
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.lab-summary-totals div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+.lab-summary-totals dt {
+  font-size: 12px;
   color: var(--text-muted);
 }
 
-.lab-summary-totals b {
+.lab-summary-totals dd {
+  min-width: 9ch;
+  margin: 0;
   font-family: var(--font-display);
   font-size: 14px;
-  color: var(--text);
+  text-align: right;
 }
 
 .lab-summary-block {
@@ -1377,7 +1412,7 @@ body:has(.lab) .fx-canvas {
 
 .lab-prog {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 290px);
+  grid-template-columns: minmax(0, 1fr) 290px;
   gap: var(--space-3);
   width: 100%;
   max-width: 1600px;
@@ -1611,7 +1646,17 @@ body:has(.lab) .fx-canvas {
   font-size: 12px;
 }
 
+.lab-node-top b {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .lab-node-top span {
+  flex-shrink: 0;
+  min-width: 5ch;
+  text-align: right;
   font-size: 11px;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
@@ -1624,22 +1669,37 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-node-need {
+  min-height: 1.35em;
+  overflow: hidden;
   font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+.lab-node-need[data-locked='true'] {
   color: var(--warn);
 }
 
 .lab-node-foot {
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 0 var(--space-2);
+  white-space: nowrap;
   margin-top: auto;
   font-size: 11px;
   font-weight: 800;
 }
 
+.lab-node-cost {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .lab-node-state {
+  flex-shrink: 0;
   color: var(--text-muted);
 }
 
@@ -1654,7 +1714,7 @@ body:has(.lab) .fx-canvas {
 /* The selected skill, under the branches. */
 .lab-selected {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(200px, 280px) auto;
+  grid-template-columns: minmax(0, 1fr) 260px 130px;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2) var(--space-4);
@@ -1693,6 +1753,10 @@ body:has(.lab) .fx-canvas {
 
 .lab-selected-effects b {
   color: var(--text);
+}
+
+.lab-selected-info {
+  min-height: 7.5em;
 }
 
 .lab-selected-buy {
@@ -1805,7 +1869,9 @@ body:has(.lab) .fx-canvas {
 }
 
 .lab-record-list dd {
+  min-width: 8ch;
   margin: 0;
+  text-align: right;
   font-family: var(--font-display);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -1974,4 +2040,23 @@ body:has(.lab) .fx-canvas {
   .lab-foot {
     display: none;
   }
+}
+
+/* Desktop: the research and progression screens are drawn 15% larger (the monitor, cards, text and tree together). */
+@media (min-width: 1200px) {
+  .lab-grid,
+  .lab-prog {
+    zoom: 1.15;
+  }
+}
+
+@media (min-width: 720px) {
+  .lab-stats dd {
+    min-width: 7ch;
+  }
+}
+
+/* Always there, so the monitor does not grow when the fight note goes away. */
+.lab-note-slot {
+  min-height: 74px;
 }

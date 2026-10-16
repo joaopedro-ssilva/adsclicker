@@ -69,7 +69,7 @@ function Research() {
           <h3>Pesquisa em andamento</h3>
         </header>
         <Monitor view={monitor} feed={feed} />
-        {monitor.status === 'fighting' ? <FightNote view={monitor} /> : null}
+        <div className="lab-note-slot">{monitor.status === 'fighting' ? <FightNote view={monitor} /> : null}</div>
       </section>
       {decision ? (
         <div className="lab-area-decision">
