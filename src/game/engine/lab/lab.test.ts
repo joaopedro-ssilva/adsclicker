@@ -500,7 +500,8 @@ describe('phases', () => {
   });
 });
 
-describe('advanced content', () => {
+// Rolls hundreds of phases: about 2 s alone, past the 5 s default when the whole suite runs in parallel.
+describe('advanced content', { timeout: 30_000 }, () => {
   const lab = realContent.lab;
   const advanced = lab.bases.filter((base) => base.fromPhase !== undefined);
   const newRegulars = Object.keys(labEnemyFrom);
