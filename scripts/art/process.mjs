@@ -39,6 +39,8 @@ function liftSkin(img, { g, b }) {
 const BODY_NECK_DROP = { 'b2-paleta': 4 };
 /** Heads whose hood or collar should hang over the neck: rows the head is lowered onto the body. */
 const HEAD_DROP = { 'gladimir-mestre': 4, 'pablo-galactico': 3 };
+/** Bodies sized by their neck even when a tall prop made the first pass shrink them far below the usual measure. */
+const FORCE_NECK_SCALE = new Set(['gladimir-darth-glad', 'b2-pintora-arco-iris']);
 /** Rows from the neck anchor to the feet that every professor body ends up with. */
 const BODY_BELOW_NECK = 46;
 /** Icons: their longest side. */
@@ -748,7 +750,7 @@ async function processSheet(sheet, anchors) {
       // sized by the whole sprite, a raised staff or a cape shrinks the body and the professor looks smaller.
       const below = sprite.h - (anchor.top ?? anchor.y);
       // A neck found in the wrong place gives an absurd measure: leave such a body as it is.
-      const sane = below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3;
+      const sane = FORCE_NECK_SCALE.has(key) || (below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3);
       if (!sheet.target && sane && Math.abs(below - BODY_BELOW_NECK) >= 1) {
         sprite = blockSample(item, (b * below) / BODY_BELOW_NECK, 0, 0);
         removeFringe(sprite);

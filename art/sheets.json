@@ -1342,6 +1342,255 @@
         "select-em-producao": 84,
         "ia-que-apagou-o-banco": 88
       }
+    },
+    {
+      "file": "skins-lab-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-sir-edecio",
+        "gladimir-darth-glad",
+        "b2-pintora-arco-iris",
+        "wagner-paladino-firewall"
+      ]
+    },
+    {
+      "file": "skins-lab-2.png",
+      "kind": "skin",
+      "keys": [
+        "b1-product-owner",
+        "angelo-reitor-mor",
+        "pablo-mago-grafos"
+      ]
+    },
+    {
+      "file": "skins-lab-guto.png",
+      "kind": "skin",
+      "keys": [
+        "guto-churrasqueiro-sagrado",
+        "guto-posdoc"
+      ],
+      "darkSkin": true
+    },
+    {
+      "file": "skins-posdoc-1.png",
+      "kind": "skin",
+      "keys": [
+        "edecio-posdoc",
+        "gladimir-posdoc",
+        "b2-posdoc",
+        "wagner-posdoc"
+      ]
+    },
+    {
+      "file": "skins-posdoc-2.png",
+      "kind": "skin",
+      "keys": [
+        "b1-posdoc",
+        "angelo-posdoc",
+        "pablo-posdoc"
+      ]
+    },
+    {
+      "file": "skins-lab-donation.png",
+      "kind": "skin",
+      "keys": [
+        "pablo-mecenas",
+        "angelo-nome-no-predio"
+      ]
+    },
+    {
+      "file": "heads-lab-edecio.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "edecio-sir-edecio",
+        "edecio-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "edecio"
+    },
+    {
+      "file": "heads-lab-gladimir.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "gladimir-darth-glad",
+        "gladimir-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "gladimir"
+    },
+    {
+      "file": "heads-lab-b2.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b2-pintora-arco-iris",
+        "b2-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "b2"
+    },
+    {
+      "file": "heads-lab-wagner.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "wagner-paladino-firewall",
+        "wagner-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "wagner"
+    },
+    {
+      "file": "heads-lab-guto.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "guto-churrasqueiro-sagrado",
+        "guto-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "guto"
+    },
+    {
+      "file": "heads-lab-b1.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "b1-product-owner",
+        "b1-posdoc"
+      ],
+      "calibrate": true,
+      "ref": "b1"
+    },
+    {
+      "file": "heads-lab-angelo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "angelo-reitor-mor",
+        "angelo-posdoc",
+        "angelo-nome-no-predio"
+      ],
+      "calibrate": true,
+      "ref": "angelo"
+    },
+    {
+      "file": "heads-lab-pablo.png",
+      "kind": "head",
+      "keys": [
+        "_ref",
+        "pablo-mago-grafos",
+        "pablo-posdoc",
+        "pablo-mecenas"
+      ],
+      "calibrate": true,
+      "ref": "pablo"
+    },
+    {
+      "file": "scenery-datacenter-em-chamas.png",
+      "kind": "scenery",
+      "keys": [
+        "datacenter-em-chamas"
+      ]
+    },
+    {
+      "file": "scenery-sala-do-tesouro.png",
+      "kind": "scenery",
+      "keys": [
+        "sala-do-tesouro"
+      ]
+    },
+    {
+      "file": "scenery-fortaleza-do-wagner.png",
+      "kind": "scenery",
+      "keys": [
+        "fortaleza-do-wagner"
+      ]
+    },
+    {
+      "file": "scenery-taverna-da-guilda.png",
+      "kind": "scenery",
+      "keys": [
+        "taverna-da-guilda"
+      ]
+    },
+    {
+      "file": "scenery-salao-da-defesa.png",
+      "kind": "scenery",
+      "keys": [
+        "salao-da-defesa"
+      ]
+    },
+    {
+      "file": "scenery-centro-comunitario.png",
+      "kind": "scenery",
+      "keys": [
+        "centro-comunitario"
+      ]
+    },
+    {
+      "file": "lab-decor.png",
+      "kind": "icon",
+      "keys": [
+        "poster-funciona-na-minha-maquina",
+        "caneca-do-plantao",
+        "luz-neon-codigo",
+        "lixeira-reciclagem",
+        "gato-dormindo-no-monitor",
+        "luminaria",
+        "quadro-branco-diagrama",
+        "pilha-de-livros-de-algoritmos",
+        "trofeu-de-hackathon",
+        "cacto",
+        "fones-pendurados",
+        "mini-servidor"
+      ],
+      "folder": "lab/decor",
+      "layout": [
+        6,
+        6
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      },
+      "hires": 210
+    },
+    {
+      "file": "lab-start.png",
+      "kind": "icon",
+      "keys": [
+        "mouse-dourado",
+        "mouse-com-fita-colorida",
+        "mouse-de-bolinha",
+        "trackball",
+        "teclado-de-membrana-velho",
+        "mousepad-gamer-rgb"
+      ],
+      "folder": "lab/start",
+      "layout": [
+        3,
+        3
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      },
+      "hires": 210
+    },
+    {
+      "file": "community-center.png",
+      "kind": "icon",
+      "keys": [
+        "community-center"
+      ],
+      "target": {
+        "axis": "max",
+        "size": 32
+      },
+      "hires": 112
     }
   ]
 }
