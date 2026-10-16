@@ -1250,6 +1250,98 @@
         "size": 28
       },
       "hires": 210
+    },
+    {
+      "file": "lab-items-1.png",
+      "kind": "icon",
+      "keys": [
+        "espada-do-sir-edecio",
+        "sabre-de-luz-do-glad",
+        "martelo-teclado-de-guerra",
+        "cajado-do-mago-pablo",
+        "pincel-arco-iris-da-b2",
+        "espeto-sagrado-do-guto",
+        "trono-do-reitor",
+        "servidor-fortaleza",
+        "armadura-full-stack",
+        "mesa-redonda-scrum",
+        "sofa-do-plantao",
+        "forja-de-silicio"
+      ],
+      "folder": "lab/items",
+      "layout": [
+        6,
+        6
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      },
+      "hires": 210
+    },
+    {
+      "file": "lab-items-2.png",
+      "kind": "icon",
+      "keys": [
+        "escudo-firewall-do-wagner",
+        "botas-de-entrega-continua",
+        "capa-do-sudo-invisivel",
+        "manoplas-do-product-owner",
+        "anel-de-um-so-build",
+        "raquete-escudo-do-padel",
+        "cristal-de-gpu",
+        "grimorio-de-algoritmos",
+        "olho-da-ia",
+        "pe-de-coelho-de-producao",
+        "fenix-do-rollback",
+        "dado-de-vinte-lados"
+      ],
+      "folder": "lab/items",
+      "layout": [
+        6,
+        6
+      ],
+      "target": {
+        "axis": "max",
+        "size": 28
+      },
+      "hires": 210
+    },
+    {
+      "file": "lab-enemies-1.png",
+      "kind": "skin",
+      "keys": [
+        "bug-de-vibecoder",
+        "select-sem-where",
+        "alucinacao-de-ia",
+        "prompt-injection",
+        "agente-em-loop"
+      ],
+      "folder": "lab/enemies",
+      "noAnchor": true,
+      "target": {
+        "axis": "h",
+        "size": 44
+      },
+      "sizes": {}
+    },
+    {
+      "file": "lab-enemies-2.png",
+      "kind": "skin",
+      "keys": [
+        "select-em-producao",
+        "ia-que-apagou-o-banco"
+      ],
+      "folder": "lab/enemies",
+      "noAnchor": true,
+      "target": {
+        "axis": "h",
+        "size": 44
+      },
+      "sizes": {
+        "select-em-producao": 84,
+        "ia-que-apagou-o-banco": 88
+      }
     }
   ]
 }

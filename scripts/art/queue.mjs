@@ -797,6 +797,66 @@ for (const professor of Object.keys(HEAD_VARIANTS)) {
 // 15) The Laboratório's starting item (queued last so the numbered prompt files above keep their names).
 calls.push({ label: 'lab-mouse-quebrado', images: [labMouseSheet] });
 
+// 16) The Laboratório's own items and enemies (src/game/content/labItems.ts, labEnemies.ts): RPG-meets-tech gear and
+//     "serious but funny" enemies. Appended at the very end so the numbered prompt files above keep their names.
+const LAB_ITEMS_A = [
+  ['espada-do-sir-edecio', 'a knightly steel broadsword standing upright, a thin glowing cyan circuit trace running along the blade, a golden crossguard and a red pen-nib shaped gem on the pommel'],
+  ['sabre-de-luz-do-glad', 'a futuristic energy sword standing upright: a glowing crimson-red blade of pure light and a black metal hilt with tiny buttons and a small blue LED'],
+  ['martelo-teclado-de-guerra', 'a big medieval war hammer whose hammer head is a block of a mechanical keyboard with colourful keycaps, a wooden handle wrapped in a coiled USB cable'],
+  ['cajado-do-mago-pablo', 'a gnarled wooden wizard staff topped with a small tree of connected glowing blue orbs, like a binary tree diagram'],
+  ['pincel-arco-iris-da-b2', 'a giant artist paintbrush with a wooden handle and rainbow-coloured bristles dripping bright paint'],
+  ['espeto-sagrado-do-guto', 'a long metal barbecue skewer with grilled meat chunks and pepper pieces, a small golden holy halo glowing above it'],
+  ['trono-do-reitor', 'a grand ornate throne-like office chair with a red velvet cushion, golden armrests and a tall carved back topped with a tiny graduation cap'],
+  ['servidor-fortaleza', 'a server rack built like a small stone castle fortress with battlements, a tiny drawbridge and blinking green LEDs in the arrow-slit windows'],
+  ['armadura-full-stack', 'a suit of plate armor on a stand, made of layered plates in blue, green and orange, with thin glowing circuit lines'],
+  ['mesa-redonda-scrum', 'a round oak table seen slightly from above, covered with colourful sticky notes in columns like a kanban board, a small banner flag standing in the middle'],
+  ['sofa-do-plantao', 'a comfy worn-out sofa with a rumpled blanket, a pillow and a steaming coffee mug on the armrest'],
+  ['forja-de-silicio', 'a blacksmith anvil with a glowing red-hot microchip on top, a soldering iron resting beside it and a few orange sparks'],
+];
+const LAB_ITEMS_B = [
+  ['escudo-firewall-do-wagner', 'a knight heater shield painted like a red brick wall with orange flames licking the top, a steel padlock emblem in the middle'],
+  ['botas-de-entrega-continua', 'a pair of leather adventurer boots with a glowing green circular two-arrow loop emblem on the side and glowing soles'],
+  ['capa-do-sudo-invisivel', 'a dark violet hooded cloak with a faint translucent shimmer along its edges, held by a small round clasp'],
+  ['manoplas-do-product-owner', 'a pair of armored gauntlets in purple with gold trim, a tiny yellow sticky note stuck on one finger'],
+  ['anel-de-um-so-build', 'a gold ring with a thin band of tiny engraved binary dots and a glowing green hexagonal gem'],
+  ['raquete-escudo-do-padel', 'a padel racket (a solid round-headed paddle with round holes, no strings) built like a round shield with a golden rim, a small yellow ball beside it'],
+  ['cristal-de-gpu', 'a glowing teal crystal shaped like a computer chip, held in a metal ring mount on a chain, thin circuit lines on its facets'],
+  ['grimorio-de-algoritmos', 'an ancient thick spellbook with a leather cover, metal corners, a chain clasp and a glowing flowchart sigil on the cover'],
+  ['olho-da-ia', 'a golden amulet on a chain with a big glowing blue eye in the middle, the iris drawn as a tiny circuit pattern'],
+  ['pe-de-coelho-de-producao', 'a lucky white rabbit foot charm on a short silver chain with a tiny round green status light'],
+  ['fenix-do-rollback', 'a small phoenix bird amulet made of orange and gold flames, a circular rewind arrow on its spread wings'],
+  ['dado-de-vinte-lados', 'a twenty-sided die (d20) in translucent purple with gold engraved dots instead of numbers, glinting'],
+];
+const labItemSheet = (file, items, note) => ({
+  ...hkItemSheet(file, items, note),
+  refs: ['hk-items-1.png'],
+  sheet: { folder: 'lab/items', layout: [6, 6], target: { axis: 'max', size: 28 }, hires: 210 },
+  text: `${HK_BASE}. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. It shows 12 separate fantasy-RPG-meets-tech game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size as one icon of the reference, bold simple readable shapes with a thick dark outline, no text and no letters. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
+});
+
+const LAB_ENEMIES_A = [
+  ['bug-de-vibecoder', 'a smug green beetle bug wearing dark sunglasses, with a small robot antenna, parts of its body glitching into square pixel blocks and a small purple sparkle on its back'],
+  ['select-sem-where', 'a database monster: a stack of blue and gold database cylinder discs with a huge open mouth spilling rows of small table cells like teeth, angry eyes'],
+  ['alucinacao-de-ia', 'a translucent white and cyan ghost with three mismatched eyes and a confident grin, its wavy tail dissolving into pixels'],
+  ['prompt-injection', 'a sinister hypodermic syringe creature with a glowing green liquid inside, a sharp needle, a menacing grin and two small angry eyes on the barrel'],
+  ['agente-em-loop', 'a round steel robot with dizzy spiral eyes whose arm is bent into a closed circle pointing back at its own head, a tiny red low-battery icon on its chest'],
+];
+const LAB_ENEMIES_B = [
+  ['select-em-producao', 'THE BOSS, HUGE: a towering angry mainframe database server tower with a big cracked screen face with glaring eyes and a gigantic open mouth, spewing table rows and flames, a flashing red alarm siren on top'],
+  ['ia-que-apagou-o-banco', 'THE BOSS, HUGE: a sleek menacing dark-steel AI robot with one glowing red-orange eye and a fake innocent smile, holding a cracked database cylinder half erased into a black void, a black hole in its chest'],
+];
+const labEnemySheet = (file, items, note, sizes) => ({
+  ...hkEnemySheet(file, items, note, sizes),
+  refs: ['hk-enemies-1.png'],
+  sheet: { folder: 'lab/enemies', noAnchor: true, target: { axis: 'h', size: 44 }, sizes },
+});
+calls.push(
+  { label: 'lab-items-1', images: [labItemSheet('lab-items-1.png', LAB_ITEMS_A, 'The first six are weapons and the next six are furniture and armor, all with a medieval knight and tech mix.')] },
+  { label: 'lab-items-2', images: [labItemSheet('lab-items-2.png', LAB_ITEMS_B, 'Row 1 is accessories (shield, boots, cloak, gauntlets, ring, racket) and row 2 is magical relics and charms.')] },
+  { label: 'lab-enemies-1', images: [labEnemySheet('lab-enemies-1.png', LAB_ENEMIES_A, 'All five are about the same size, a little more serious and sinister than cute.', {})] },
+  { label: 'lab-enemies-2', images: [labEnemySheet('lab-enemies-2.png', LAB_ENEMIES_B, 'Both are bosses, much bigger than a normal monster, about twice as tall.', { 'select-em-producao': 84, 'ia-que-apagou-o-banco': 88 })] },
+);
+
 // Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
 for (const c of calls) {
   for (const im of c.images) if (!im.v8) im.keys = im.keys.map((key) => (V8_REDRAWN.has(key) ? `_${key}` : key));
