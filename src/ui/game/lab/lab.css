@@ -1739,26 +1739,26 @@ body:has(.lab) .fx-canvas {
 }
 
 /* The tree itself: emoji tiles on a small grid per branch, joined by lines (the diploma tree's approach). */
-.lab-board {
+.lab-tree-board {
   width: 100%;
   max-width: calc(var(--cols, 4) * 76px);
   margin: 0 auto;
 }
 
-.lab-field {
+.lab-tree-field {
   position: relative;
   width: 100%;
   aspect-ratio: calc(var(--cols) / var(--rows) / 0.9);
 }
 
-.lab-edges {
+.lab-tree-edges {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.lab-edges polyline {
+.lab-tree-edges polyline {
   fill: none;
   stroke: var(--border);
   stroke-width: 3px;
@@ -1766,15 +1766,15 @@ body:has(.lab) .fx-canvas {
   stroke-linejoin: miter;
 }
 
-.lab-edges polyline[data-edge='open'] {
+.lab-tree-edges polyline[data-edge='open'] {
   stroke: color-mix(in srgb, var(--branch) 45%, var(--border));
 }
 
-.lab-edges polyline[data-edge='taken'] {
+.lab-tree-edges polyline[data-edge='taken'] {
   stroke: var(--branch);
 }
 
-.lab-slot {
+.lab-tree-slot {
   position: absolute;
   left: calc((var(--col) + 0.5) / var(--cols) * 100%);
   top: calc((var(--row) + 0.5) / var(--rows) * 100%);
@@ -1782,7 +1782,7 @@ body:has(.lab) .fx-canvas {
   translate: -50% -50%;
 }
 
-.lab-tile {
+.lab-tree-tile {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1801,12 +1801,12 @@ body:has(.lab) .fx-canvas {
   box-shadow: 2px 2px 0 var(--shadow-color);
 }
 
-.lab-tile-emoji {
+.lab-tree-tile-emoji {
   font-size: 24px;
   line-height: 1;
 }
 
-.lab-tile-level {
+.lab-tree-tile-level {
   font-family: var(--font-display);
   font-size: 9px;
   line-height: 1;
@@ -1814,58 +1814,58 @@ body:has(.lab) .fx-canvas {
   font-variant-numeric: tabular-nums;
 }
 
-.lab-tile:hover {
+.lab-tree-tile:hover {
   border-color: color-mix(in srgb, var(--branch) 70%, var(--border));
 }
 
-.lab-tile[data-state='locked'] {
+.lab-tree-tile[data-state='locked'] {
   border-style: dashed;
   box-shadow: none;
   opacity: 0.55;
 }
 
-.lab-tile[data-state='locked'] .lab-tile-emoji {
+.lab-tree-tile[data-state='locked'] .lab-tree-tile-emoji {
   filter: grayscale(1);
 }
 
-.lab-tile[data-state='short'] {
+.lab-tree-tile[data-state='short'] {
   border-color: color-mix(in srgb, var(--branch) 65%, var(--border));
 }
 
-.lab-tile[data-state='ready'] {
+.lab-tree-tile[data-state='ready'] {
   border-color: var(--branch);
   background: color-mix(in srgb, var(--branch) 18%, var(--surface-raised));
-  animation: lab-tile-ready 1s steps(2, end) infinite;
+  animation: lab-tree-tile-ready 1s steps(2, end) infinite;
 }
 
-.lab-tile[data-state='ready'] .lab-tile-level {
+.lab-tree-tile[data-state='ready'] .lab-tree-tile-level {
   color: var(--text);
 }
 
-.lab-tile[data-state='max'] {
+.lab-tree-tile[data-state='max'] {
   border-color: var(--legendary, #ffb938);
   background: color-mix(in srgb, var(--legendary, #ffb938) 26%, var(--surface-raised));
 }
 
-.lab-tile[data-state='max'] .lab-tile-level {
+.lab-tree-tile[data-state='max'] .lab-tree-tile-level {
   color: var(--legendary, #ffb938);
 }
 
-.lab-tile:focus-visible,
-.lab-tile[aria-pressed='true'] {
+.lab-tree-tile:focus-visible,
+.lab-tree-tile[aria-pressed='true'] {
   outline: 3px solid var(--text);
   outline-offset: 2px;
   z-index: 1;
 }
 
-@keyframes lab-tile-ready {
+@keyframes lab-tree-tile-ready {
   50% {
     transform: translateY(-2px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lab-tile[data-state='ready'] {
+  .lab-tree-tile[data-state='ready'] {
     animation: none;
   }
 }
@@ -2128,6 +2128,21 @@ body:has(.lab) .fx-canvas {
     position: sticky;
     bottom: 0;
     z-index: 2;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .lab-selected-info {
+    min-height: 0;
+  }
+
+  .lab-selected .lab-legend,
+  .lab-selected .lab-selected-balance {
+    display: none;
+  }
+
+  .lab-selected-desc {
+    font-size: 11px;
   }
 }
 
