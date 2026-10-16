@@ -2,27 +2,30 @@
 import { useEffect, useRef } from 'react';
 import type { RefObject } from 'react';
 import { formatNumber } from '@/game/engine/format';
-import { useCoins, useGame, useGameEvents, useGameState, useLabBenchView, useLabMonitorView, useLabRewardsView, useLabTreeView } from '@/game/store';
+import { useCoins, useGame, useGameEvents, useGameState, useLabBenchView, useLabMonitorView, useLabTreeView } from '@/game/store';
 import { IconButton, Keycap } from '@/ui/kit';
 import { useUi } from '../shared/uiStore';
 import { shortcutKey } from '../stage/shortcutList';
 import { Equipment, Summary } from './Bench';
-import { Compare, FightNote, Rewards } from './Decision';
+import { FightNote } from './Decision';
 import { LabUnlockDialog } from './LabEntry';
 import { useLabOverlay } from './labOverlayStore';
 import type { LabTab } from './labOverlayStore';
 import { Monitor } from './Monitor';
+import { Ranking } from './Ranking';
+import { Shop } from './Shop';
 import { Progression } from './Tree';
 import { useLabFeed } from './useLabFeed';
 
-const TABS: { id: LabTab; label: string }[] = [
-  { id: 'pesquisa', label: 'Pesquisa' },
-  { id: 'progressao', label: 'Progressão' },
+const TABS: { id: LabTab; label: string; icon: string }[] = [
+  { id: 'pesquisa', label: 'Pesquisa', icon: '🔬' },
+  { id: 'progressao', label: 'Progressão', icon: '🌳' },
+  { id: 'ranking', label: 'Ranking', icon: '🏆' },
 ];
 
 /** The room the screens may grow to, and the least they shrink to before the body scrolls instead. */
 const SCALE_MAX = 1.15;
-const SCALE_MIN = 0.66;
+const SCALE_MIN = 0.8;
 
 /**
  * Sizes the Pesquisa and Progressão blocks (desktop): 15% larger when there is room, smaller when the window is short, so the
@@ -101,16 +104,12 @@ function CoinsStat() {
 function Research() {
   const monitor = useLabMonitorView();
   const bench = useLabBenchView();
-  const rewards = useLabRewardsView();
   const feed = useLabFeed();
 
-  const compare = monitor.status === 'equip' && bench.pending ? <Compare pending={bench.pending} /> : null;
-  const decision = rewards.open || compare !== null;
-
-  // Desktop: summary | equipment | monitor, and the decision strip across the bottom when there is one. Narrow screens
-  // stack them in the order monitor, decision, summary, equipment (see the areas in lab.css).
+  // Desktop: summary | monitor | equipment. The reward options and the equip choice are drawn on the monitor's glass, so
+  // the grid never changes shape. Narrow screens stack them: monitor, summary, equipment (see the areas in lab.css).
   return (
-    <div className="lab-grid" data-decision={decision}>
+    <div className="lab-grid">
       <Summary view={bench} />
       <Equipment view={bench} />
       <section className="lab-area-monitor lab-panel" aria-label="Pesquisa em andamento">
@@ -120,12 +119,6 @@ function Research() {
         <Monitor view={monitor} feed={feed} />
         <div className="lab-note-slot">{monitor.status === 'fighting' ? <FightNote view={monitor} /> : null}</div>
       </section>
-      {decision ? (
-        <div className="lab-area-decision">
-          {rewards.open ? <Rewards view={rewards} /> : null}
-          {compare}
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -133,52 +126,66 @@ function Research() {
 function TopBar({ tab }: { tab: LabTab }) {
   const hide = useLabOverlay((store) => store.hide);
   const setTab = useLabOverlay((store) => store.setTab);
+  const openShop = useLabOverlay((store) => store.openShop);
   const monitor = useLabMonitorView();
   const bench = useLabBenchView();
 
   return (
     <header className="lab-bar">
-      <div className="lab-bar-title">
-        <h2>Laboratório de Pesquisa</h2>
-        <div role="tablist" aria-label="Seções do Laboratório" className="lab-tabs">
-          {TABS.map((entry) => (
-            <button
-              key={entry.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === entry.id}
-              data-qa={`lab-tab-${entry.id}`}
-              onClick={() => setTab(entry.id)}
-            >
-              {entry.label}
-            </button>
-          ))}
-        </div>
+      <h2 className="lab-title">
+        <span aria-hidden="true">🧪</span> Laboratório de Pesquisa
+      </h2>
+      <div role="tablist" aria-label="Seções do Laboratório" className="lab-tabs">
+        {TABS.map((entry) => (
+          <button
+            key={entry.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === entry.id}
+            data-qa={`lab-tab-${entry.id}`}
+            onClick={() => setTab(entry.id)}
+          >
+            <span className="lab-tab-icon" aria-hidden="true">
+              {entry.icon}
+            </span>
+            {entry.label}
+          </button>
+        ))}
       </div>
-      <dl className="lab-stats">
-        <div data-qa="lab-stat-phase">
-          <dt>Fase</dt>
-          <dd>{monitor.hasRun ? monitor.phase : '-'}</dd>
-        </div>
-        <div data-qa="lab-stat-best">
-          <dt>Recorde</dt>
-          <dd>{monitor.bestPhase || '-'}</dd>
-        </div>
-        <div data-qa="lab-stat-commits">
-          <dt>Commits</dt>
-          <dd>{formatNumber(monitor.wallet, { integer: true })}</dd>
-        </div>
-        <div data-qa="lab-stat-power">
-          <dt>Poder</dt>
-          <dd>{formatNumber(bench.power)}</dd>
-        </div>
-        <div data-qa="lab-stat-coins">
-          <dt>ADScoins</dt>
-          <dd>
-            <CoinsStat />
-          </dd>
-        </div>
-      </dl>
+      <button type="button" className="lab-shop-button" aria-haspopup="dialog" onClick={openShop} data-qa="lab-shop-button">
+        <span className="lab-tab-icon" aria-hidden="true">
+          🛒
+        </span>
+        Loja
+      </button>
+      <div className="lab-stats" role="group" aria-label="Números do Laboratório">
+        <dl className="lab-stat-group" aria-label="Pesquisa">
+          <div data-qa="lab-stat-phase">
+            <dt>Fase</dt>
+            <dd>{monitor.hasRun ? monitor.phase : '-'}</dd>
+          </div>
+          <div data-qa="lab-stat-best">
+            <dt>Recorde</dt>
+            <dd>{monitor.bestPhase || '-'}</dd>
+          </div>
+        </dl>
+        <dl className="lab-stat-group" aria-label="Recursos">
+          <div data-qa="lab-stat-commits">
+            <dt>Commits</dt>
+            <dd>{formatNumber(monitor.wallet, { integer: true })}</dd>
+          </div>
+          <div data-qa="lab-stat-power">
+            <dt>Poder</dt>
+            <dd>{formatNumber(bench.power)}</dd>
+          </div>
+          <div data-qa="lab-stat-coins">
+            <dt>ADScoins</dt>
+            <dd>
+              <CoinsStat />
+            </dd>
+          </div>
+        </dl>
+      </div>
       <IconButton icon="x" label="Fechar o Laboratório (Esc)" variant="secondary" size="sm" onClick={hide} data-qa="lab-close" />
     </header>
   );
@@ -206,6 +213,7 @@ export function LabOverlay() {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         // A window on top of the lab (a ceremony) owns Esc.
+        if (useLabOverlay.getState().shopOpen) return; // the shop panel owns this Esc
         const other = document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]');
         if (other && other !== node) return;
         event.preventDefault();
@@ -238,7 +246,9 @@ export function LabOverlay() {
       <div ref={bodyRef} className="lab-body">
         {tab === 'pesquisa' ? <Research /> : null}
         {tab === 'progressao' ? <Progression view={tree} /> : null}
+        {tab === 'ranking' ? <Ranking /> : null}
       </div>
+      <Shop />
       <p className="lab-foot" aria-hidden="true">
         <Keycap>{shortcutKey('lab')}</Keycap> abre · <Keycap>Esc</Keycap> fecha
       </p>

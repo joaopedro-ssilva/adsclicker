@@ -8,6 +8,7 @@ import { ASSETS } from '@/ui/art/manifest';
 import { HpBar } from '@/ui/hackathon/arena/HpBar';
 import { Button, Icon, ProgressBar } from '@/ui/kit';
 import { cssVariables } from '@/ui/theme';
+import { ScreenDecision } from './Decision';
 import { ItemArt } from './ItemArt';
 import { crackLevel, integrityTone, mobZoom, perSecond, seconds } from './labFormat';
 
@@ -178,18 +179,6 @@ function BrokenScreen({ view }: { view: LabMonitorView }) {
   );
 }
 
-function PausedScreen({ view }: { view: LabMonitorView }) {
-  return (
-    <div className="lab-center lab-paused">
-      <p className="lab-kicker">{view.status === 'equip' ? 'Item novo' : view.boss ? 'Chefão derrotado' : 'Fase concluída'}</p>
-      <p className="lab-paused-phase">Fase {view.phase}</p>
-      <p className="lab-center-text">
-        {view.status === 'equip' ? 'Decida o item abaixo: equipar ou reciclar.' : 'Escolha uma recompensa abaixo. A pesquisa espera.'}
-      </p>
-    </div>
-  );
-}
-
 interface MonitorProps {
   view: LabMonitorView;
   /** The line the screen flashes for the last thing that happened (phase cleared, item gained...). */
@@ -278,7 +267,7 @@ export function Monitor({ view, feed }: MonitorProps) {
 
           {ready ? <ReadyScreen view={view} /> : null}
           {dead ? <OffScreen view={view} /> : null}
-          {view.status === 'reward' || view.status === 'equip' ? <PausedScreen view={view} /> : null}
+          {view.status === 'reward' || view.status === 'equip' ? <ScreenDecision status={view.status} /> : null}
           {broken ? <BrokenScreen view={view} /> : null}
 
           {view.hasRun && !broken ? <Integrity view={view} /> : null}

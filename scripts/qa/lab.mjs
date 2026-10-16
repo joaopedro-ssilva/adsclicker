@@ -1,5 +1,8 @@
 // Screenshots of the Laboratório de Pesquisa on a running dev server, from a save made by scripts/dev/lab-saves.ts.
-// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=progressao] [--wait=ms] [--clicks=N] [--scroll=px]
+// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=progressao|ranking] [--board=phase|run] [--shop]
+//        [--cookie=<session token>] [--wait=ms] [--clicks=N] [--scroll=px]
+//   --tab     pesquisa (default), progressao or ranking;  --board picks the board shown on a narrow screen;  --shop opens the Loja panel
+//   --cookie  signs in as a player from scripts/dev/lab-board-seed.ts (the Ranking tab then pins that player's row)
 //   --size    viewport, e.g. 1920x1080 (default 1440x900; --mobile is 390x844)
 //   --scroll  scrolls the body of the overlay before the shot (and reports any horizontal scroll)
 //   --roster  shoots the classroom with the 9th slot instead of opening the overlay (opens nothing)
@@ -20,8 +23,17 @@ const base = process.env.QA_BASE ?? 'http://localhost:3000';
 const browser = await chromium.launch();
 const context = await browser.newContext({ viewport: viewport(), hasTouch: has('mobile') });
 const page = await context.newPage();
+// Opens the lab as a player made by scripts/dev/lab-board-seed.ts (the session token it prints). Syncs are blocked so the
+// local save of the screenshot never overwrites that player's seeded records.
+if (flag('cookie')) {
+  await context.addCookies([{ name: 'adsclicker_session', value: flag('cookie'), url: base }]);
+  await page.route('**/api/sync', (route) => route.abort());
+}
 
 const errors = [];
+page.on('response', async (response) => {
+  if (response.status() >= 400) errors.push(`http ${response.status()} ${response.url()} ${(await response.text().catch(() => '')).slice(0, 160)}`);
+});
 page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
 page.on('console', (message) => {
   if (message.type() === 'error') errors.push(`console: ${message.text()}`);
@@ -42,6 +54,8 @@ if (!has('roster')) {
   await page.waitForTimeout(500);
   const tab = flag('tab');
   if (tab) await page.locator(`[data-qa="lab-tab-${tab}"]`).click({ timeout: 2000 }).catch(() => errors.push(`tab ${tab} not found`));
+  if (has('shop')) await page.locator('[data-qa="lab-shop-button"]').click({ timeout: 2000 }).catch(() => errors.push('shop button not found'));
+  if (tab === 'ranking' && flag('board')) await page.locator(`[data-qa="lab-board-tab-${flag('board')}"]`).click({ timeout: 1000 }).catch(() => {});
   const clicks = Number(flag('clicks') ?? 0);
   for (let i = 0; i < clicks; i += 1) await page.locator('[data-qa="lab-screen"]').click({ position: { x: 120 + (i % 5) * 40, y: 120 + (i % 3) * 30 }, delay: 5 }).catch(() => {});
 }
