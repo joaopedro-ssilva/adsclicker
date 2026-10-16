@@ -25,7 +25,7 @@ export function createLabTurma(): LabTurma {
 }
 
 export function createLabState(): LabState {
-  return { unlocked: false, open: false, commits: 0, tree: {}, bestPhase: 0, counters: createLabCounters(), turma: createLabTurma() };
+  return { unlocked: false, open: false, commits: 0, tree: {}, treeVersion: LAB_TREE_VERSION, bestPhase: 0, bestPhaseBuild: [], bestRunBuild: [], counters: createLabCounters(), turma: createLabTurma() };
 }
 
 /** A run that has just begun: the first phase is spawned by startLabRun. */

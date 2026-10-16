@@ -4,6 +4,7 @@ import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
 import { labRunAvailable } from './access';
+import { noteBestPhase } from './build';
 import { labTotals } from './effects';
 import type { LabTotals } from './effects';
 import { rollItem } from './items';
@@ -234,7 +235,7 @@ export function startLabRun(state: GameState, content: GameContent, seed: number
   run.maxIntegrity = maxIntegrityFor(content, totals);
   run.integrity = run.maxIntegrity;
   lab.counters.runs += 1;
-  lab.bestPhase = Math.max(lab.bestPhase, 1);
+  noteBestPhase(lab, 1);
   lab.open = true;
   spawnPhase(state, content, totals);
   emit({ type: 'labRunStarted', seed: run.seed });
@@ -253,3 +254,5 @@ export function resetLabForGraduation(state: GameState, content: GameContent): v
   lab.turma = { run: null, equipped: {}, nextUid: 1 };
   lab.open = false;
 }
+  // A run that is still on its record phase files the build it ends with, before the items go.
+  if (run) noteBestPhase(lab, run.phase, true);

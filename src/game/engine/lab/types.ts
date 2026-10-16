@@ -92,6 +92,17 @@ export interface LabTurma {
 export interface LabCounters {
   runs: number;
   broken: number;
+/** One equipped item as a record keeps it: enough to draw the icon and its tooltip. */
+export interface LabBuildItem {
+  slot: LabSlot;
+  base: string;
+  rarity: LabRarity;
+  level: number;
+}
+
+/** The equipped items at the moment of a record (at most one per slot, in slot order). */
+export type LabBuild = LabBuildItem[];
+
   phasesCleared: number;
   bossesBeaten: number;
   itemsFound: number;
@@ -118,3 +129,7 @@ export interface LabState {
   /** What lasts only until the next graduation. */
   turma: LabTurma;
 }
+  /** The equipped items when `bestPhase` was reached (the ranking shows them). */
+  bestPhaseBuild: LabBuild;
+  /** The equipped items of the turma that holds `records.mostCoins` (the best run). */
+  bestRunBuild: LabBuild;

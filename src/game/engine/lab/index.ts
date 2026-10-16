@@ -10,11 +10,14 @@ export { buyLabNode, labNodeAvailable, labNodeCost, labNodeLevel, labTreeSpent }
 export { breakRun, drainFactor, hpFactor, isBossPhase, maxIntegrityFor, runCommits } from './phase';
 export { chooseLabReward, dropLevel, lootQuality, makeOffers, resolveLabPending } from './rewards';
 export { advanceLab, autoDps, clickDamage, clickShareCap, drainPerSecond, labClick, resetLabForGraduation, setLabOpen, startLabRun } from './run';
+export { bestRunRecord, noteBestPhase, readLabBuild, snapshotLabBuild } from './build';
 export { readLab, readLabItem, settleLabAfterLoad } from './save';
 export * from './views';
 export type {
   LabAffix,
   LabBreakReason,
+  LabBuild,
+  LabBuildItem,
   LabCounters,
   LabItem,
   LabMob,

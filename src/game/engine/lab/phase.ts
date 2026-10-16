@@ -2,6 +2,7 @@ import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
 import type { LabTotals } from './effects';
+import { noteBestPhase } from './build';
 import { labTotals } from './effects';
 import { LAB_STREAM, labIndex, labStream } from './state';
 import type { LabMob, LabRun } from './types';
@@ -107,7 +108,7 @@ export function enterNextPhase(state: GameState, content: GameContent): void {
   const run = lab.turma.run;
   if (!run) return;
   run.phase += 1;
-  lab.bestPhase = Math.max(lab.bestPhase, run.phase);
+  noteBestPhase(lab, run.phase);
   run.offers = [];
   const totals = labTotals(state, content);
   syncIntegrity(run, content, totals);
@@ -141,6 +142,6 @@ export function breakRun(state: GameState, content: GameContent, reason: 'timer'
   run.carry = 0;
   gainCommits(state, paid);
   lab.counters.broken += 1;
-  lab.bestPhase = Math.max(lab.bestPhase, run.phase);
+  noteBestPhase(lab, run.phase, true);
   emit({ type: 'labBroken', phase: run.phase, reason, commits: paid });
 }

@@ -1138,6 +1138,8 @@ describe('save', () => {
       commits: 0,
       tree: {},
       bestPhase: 0,
+      bestPhaseBuild: [],
+      bestRunBuild: [],
       counters: loaded.lab.counters,
       turma: { run: null, equipped: {}, nextUid: 1 },
     });

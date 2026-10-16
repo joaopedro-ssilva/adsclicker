@@ -2,6 +2,7 @@ import { LAB_RARITIES, LAB_SLOTS } from '../../content/labTypes';
 import type { LabItemBase, LabRarity } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import type { GameState } from '../state';
+import { noteBestPhase, readLabBuild } from './build';
 import { labTotals } from './effects';
 import { enterNextPhase, maxIntegrityFor, spawnPhase } from './phase';
 import { makeOffers } from './rewards';
@@ -203,10 +204,12 @@ export function settleLabAfterLoad(state: GameState, content: GameContent): void
     lab.turma = { run: null, equipped: {}, nextUid: 1 };
     return;
   }
-  lab.bestPhase = Math.max(lab.bestPhase, run.phase);
+  noteBestPhase(lab, run.phase);
   const totals = labTotals(state, content);
   if (run.status === 'broken') return;
   // The maximum is what the player owns says it is; a load never heals.
+  lab.bestPhaseBuild = readLabBuild(value.bestPhaseBuild, content);
+  lab.bestRunBuild = readLabBuild(value.bestRunBuild, content);
   run.maxIntegrity = maxIntegrityFor(content, totals);
   run.integrity = Math.min(Math.max(1, run.integrity), run.maxIntegrity);
 

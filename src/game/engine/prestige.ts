@@ -4,6 +4,7 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
+import { snapshotLabBuild } from './lab/build';
 import { resetLabForGraduation } from './lab/run';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
 import { masteryRank } from './mastery';
@@ -124,6 +125,8 @@ function updateRecords(state: GameState): Pick<RunSummary, 'recordsBeaten' | 're
   if (run.seconds > 0 && (records.fastestSeconds <= 0 || run.seconds < records.fastestSeconds)) records.fastestSeconds = run.seconds;
   records.mostClicks = Math.max(records.mostClicks, run.clicks);
   records.biggestCombo = Math.max(records.biggestCombo, run.maxCombo);
+  // The best turma keeps the items it was made with (the Ranking of the Laboratório shows them); they go at the reset.
+  if (state.runCoins.gt(records.mostCoins)) state.lab.bestRunBuild = snapshotLabBuild(state.lab);
   records.mostCoins = Decimal.max(records.mostCoins, state.runCoins);
   return { recordsBeaten: beaten, recordsStarted: started };
 }
