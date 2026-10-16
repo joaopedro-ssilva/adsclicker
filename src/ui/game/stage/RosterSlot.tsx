@@ -3,6 +3,7 @@ import { memo } from 'react';
 import type { ProfessorId } from '@/game/content/types';
 import { Button, Icon, ProgressBar } from '@/ui/kit';
 import { cssVariables } from '@/ui/theme';
+import { PostdocBadge } from '../shared/PostdocBadge';
 import { HeadPortrait } from './HeadPortrait';
 
 export interface RosterSlotProps {
@@ -19,11 +20,13 @@ export interface RosterSlotProps {
   lockReason: string | null;
   /** The professor honoured for this turma (picked at the last graduation). */
   honoured: boolean;
+  /** Pós-doc stars of the professor (0 = none). */
+  stars: number;
   onSelect: (id: ProfessorId) => void;
   onHire: (id: ProfessorId) => void;
 }
 
-function HiredSlot({ id, name, color, state, honoured, onSelect }: RosterSlotProps) {
+function HiredSlot({ id, name, color, state, honoured, stars, onSelect }: RosterSlotProps) {
   return (
     <button
       type="button"
@@ -31,6 +34,7 @@ function HiredSlot({ id, name, color, state, honoured, onSelect }: RosterSlotPro
       data-state={state}
       data-qa={`roster-${id}`}
       data-honoured={honoured || undefined}
+      data-starred={stars > 0 || undefined}
       style={cssVariables({ '--prof': color })}
       aria-pressed={state === 'active'}
       aria-label={`${state === 'active' ? `${name}, selecionado` : `Selecionar ${name}`}${honoured ? ', homenageado' : ''}`}
@@ -38,6 +42,7 @@ function HiredSlot({ id, name, color, state, honoured, onSelect }: RosterSlotPro
     >
       <span className="roster-face">
         <HeadPortrait professorId={id} fallback={name} />
+        <PostdocBadge stars={stars} />
       </span>
       <span className="roster-name">{name}</span>
       {honoured ? <span className="roster-honour" title="Professor homenageado nesta turma" aria-hidden="true" /> : null}

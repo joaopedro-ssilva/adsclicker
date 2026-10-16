@@ -97,6 +97,17 @@ export interface MonitorsState {
   };
 }
 
+/** Pós-doc: the permanent stars of the professors. Survives graduation. */
+export interface PostdocState {
+  /** Stars per professor (0..balance.postdoc.maxStars). Only ever grow. */
+  stars: Record<ProfessorId, number>;
+  /**
+   * The graduation count (counters.graduations) when each professor last defended, so it is one per turma: the Domínio
+   * comes back with the next turma's levels and must reach the cap again. Missing = never.
+   */
+  turma: Partial<Record<ProfessorId, number>>;
+}
+
 /** Numbers about the current run only. Zeroed at every graduation. */
 export interface RunStats {
   /** Seconds of play (offline time excluded). */
@@ -312,6 +323,9 @@ export interface GameState {
 
   /** Monitores (automation hired with diplomas). Survives graduation. */
   monitors: MonitorsState;
+  /** Pós-doc stars of the professors (see engine/postdoc). */
+  postdoc: PostdocState;
+
 
   /** O Laboratório de Pesquisa: unlock, Commits and tree last; the run and the items last until graduation (see engine/lab). */
   lab: LabState;

@@ -7,6 +7,7 @@ import { isValidFavourite } from './favourites';
 import { createInitialState, createMonitorsState, createRecords, createRunStats } from './init';
 import { readLab, settleLabAfterLoad } from './lab/save';
 import { readMaestria } from './maestria/save';
+import { readPostdoc } from './postdoc';
 import {
   GRADUATION_HISTORY_MAX,
   MAX_CARGO_BONUS,
@@ -438,6 +439,8 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.monitors = readMonitors(raw.monitors, content, now);
   // Absent in older saves: a locked, empty lab.
   state.lab = readLab(raw.lab, content);
+  // Absent in older saves: no stars.
+  state.postdoc = readPostdoc(raw.postdoc, content);
   settleLabAfterLoad(state, content);
   if (isRecord(raw.session)) {
     state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };

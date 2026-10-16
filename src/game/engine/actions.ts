@@ -14,6 +14,7 @@ import {
   graduate as graduateRaw,
   resetPrestigeTree as resetPrestigeTreeRaw,
 } from './prestige';
+import { defendPostdoc as defendPostdocRaw } from './postdoc';
 import { buyLevelled } from './purchases';
 import { hitInvasion as hitInvasionRaw } from './invasions';
 import { acceptSprint as acceptSprintRaw } from './sprints';
@@ -98,6 +99,12 @@ export function resetPrestigeTree(state: GameState, content: GameContent, now: n
 
 export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
   const bought = buyMonitorRaw(state, content, id, emit);
+export function defendPostdoc(state: GameState, content: GameContent, professor: ProfessorId, now: number, emit: Emit): boolean {
+  const done = defendPostdocRaw(state, content, professor, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
   if (bought) afterAction(state, content, now, emit);
   return bought;
 }

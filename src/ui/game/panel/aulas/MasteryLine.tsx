@@ -2,6 +2,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { content, useGame } from '@/game/store';
 import { masteryView } from '@/game/engine/views';
 import type { ProfessorId } from '@/game/content/types';
+import { PostdocDefence } from './PostdocDefence';
 
 /**
  * The professor's Domínio: rank, a thin bar to the next rank and what the bonus is right now.
@@ -34,6 +35,7 @@ export function MasteryLine({ professor }: { professor: ProfessorId }) {
         <i style={{ width: `${Math.round(view.progress * 100)}%` }} />
       </div>
       <p className="mastery-line">{line}</p>
+      <PostdocDefence professor={professor} />
     </div>
   );
 }

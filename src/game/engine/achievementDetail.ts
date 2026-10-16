@@ -9,7 +9,8 @@ import { formatDuration, formatNumber, formatPercent } from './format';
 import { horasBandsFilled } from './maestria/horas';
 import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
-import { masteryRank } from './mastery';
+import { masteryRank, postdocStars } from './mastery';
+import { totalPostdocStars } from './postdoc';
 import type { GameState } from './state';
 
 /** What the Album shows under a locked achievement: a bar, "current / target" and, when useful, the next step. */
@@ -51,6 +52,7 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   designFreeLevels: 'níveis de graça',
   cappedGraduations: 'formaturas no teto de diplomas',
   treeResets: 'resets da árvore',
+  postdocs: 'Pós-docs defendidos',
   ungratefulGraduations: 'formaturas sem homenagem',
 };
 
@@ -161,6 +163,20 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       };
     }
     case 'alignedLevels': {
+    case 'postdoc': {
+      const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
+      const short = professors.filter((id) => postdocStars(state, id) < condition.stars);
+      const reached = professors.length - short.length;
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      return {
+        text: condition.professor
+          ? `${n(Math.min(postdocStars(state, condition.professor), condition.stars))} / ${n(condition.stars)} estrelas de Pós-doc`
+          : `${n(Math.min(reached, needed))} de ${n(needed)} professores com ${n(condition.stars)} estrela${condition.stars === 1 ? '' : 's'} de Pós-doc`,
+        note: !condition.professor && reached < needed ? `Ainda sem: ${nameList(short.map((id) => professorName(id)))}.` : null,
+      };
+    }
+    case 'postdocTotal':
+      return { text: pair(totalPostdocStars(state), condition.gte, 'estrelas de Pós-doc'), note: null };
       let best = 0;
       for (const professor of index.professorList) {
         const list = index.disciplinesOf[professor.id];

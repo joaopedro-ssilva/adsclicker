@@ -7,7 +7,7 @@ import { createRunStats } from './init';
 import { snapshotLabBuild } from './lab/build';
 import { resetLabForGraduation } from './lab/run';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
-import { masteryRank } from './mastery';
+import { masteryPower } from './mastery';
 import { recordGraduationDay } from './session';
 import { GRADUATION_HISTORY_MAX } from './state';
 import type { GameState, RecordKey, RunSummary } from './state';
@@ -50,12 +50,13 @@ function angeloGain(content: GameContent, rank: number, honoured: boolean): numb
  */
 export function angeloCapFactor(state: GameState, content: GameContent): number {
   if (!state.hired.angelo) return 1;
-  return angeloGain(content, masteryRank(state, content, 'angelo'), state.honoured === 'angelo');
+  return angeloGain(content, masteryPower(state, content, 'angelo'), state.honoured === 'angelo');
 }
 
-/** The most Angelo can ever stretch the cap (Domínio maxed, plus the honour when he has been honoured): the server's ceiling. */
+/** The most Angelo can ever stretch the cap (Domínio maxed with every Pós-doc star, plus the honour when he has been honoured): the server's ceiling. */
 export function maxAngeloCapFactor(content: GameContent, honoured: boolean): number {
-  return angeloGain(content, content.balance.mastery.cap, honoured);
+  const { maxStars, bonusPerStar } = content.balance.postdoc;
+  return angeloGain(content, content.balance.mastery.cap * (1 + bonusPerStar * maxStars), honoured);
 }
 
 /**

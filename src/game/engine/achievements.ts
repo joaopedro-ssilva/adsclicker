@@ -7,7 +7,8 @@ import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
 import { horasBandsFilled } from './maestria/horas';
 import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
-import { masteryLevels, masteryRank } from './mastery';
+import { masteryLevels, masteryRank, postdocStars } from './mastery';
+import { totalPostdocStars } from './postdoc';
 import type { GameState, LastRun } from './state';
 import { achievementCount, computeStats } from './stats';
 import type { Stats } from './stats';
@@ -135,6 +136,18 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       const reached = ranks.reduce((sum, rank) => sum + rank, 0);
       return { progress: fraction(reached, condition.rank * needed), met: ranks.every((rank) => rank >= condition.rank) };
     }
+    case 'postdoc': {
+      const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      const stars = professors
+        .map((id) => Math.min(postdocStars(state, id), condition.stars))
+        .sort((a, b) => b - a)
+        .slice(0, needed);
+      const reached = stars.reduce((sum, value) => sum + value, 0);
+      return { progress: fraction(reached, condition.stars * needed), met: stars.every((value) => value >= condition.stars) };
+    }
+    case 'postdocTotal':
+      return measureAtLeast(totalPostdocStars(state), condition.gte);
     case 'alignedLevels': {
       let best = 0;
       let met = false;

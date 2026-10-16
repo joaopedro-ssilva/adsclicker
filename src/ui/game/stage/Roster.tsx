@@ -15,6 +15,7 @@ export function Roster() {
   const setActive = useGame((store) => store.setActiveProfessor);
   const hire = useGame((store) => store.hireProfessor);
   const honoured = useGameState((state) => state.honoured);
+  const stars = useGameState((state) => state.postdoc.stars);
 
   const select = useCallback(
     (id: ProfessorId) => {
@@ -53,6 +54,7 @@ export function Roster() {
             affordable={view.affordable}
             lockReason={state === 'next' && !view.canBeHired ? view.lockReason : null}
             honoured={view.id === honoured}
+            stars={stars[view.id] ?? 0}
             onSelect={select}
             onHire={hireOne}
           />

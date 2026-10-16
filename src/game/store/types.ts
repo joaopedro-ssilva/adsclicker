@@ -50,6 +50,8 @@ export type GameEvent =
   | { type: 'graduate'; diplomas: number; bonus?: number }
   /** The tree of diplomas was reset; `refunded` diplomas came back. */
   | { type: 'treeReset'; refunded: number }
+  /** A professor defended the Pós-doc and now has `stars` stars. */
+  | { type: 'postdoc'; professor: ProfessorId; stars: number }
   /** Laboratório de Pesquisa. */
   | { type: 'labUnlocked' }
   | { type: 'labRunStarted'; seed: number }
@@ -265,6 +267,8 @@ export interface GameActions {
   /** `honour`: the hired professor honoured for the next run (optional). */
   graduate(honour?: ProfessorId | null): boolean;
   buyPrestigeNode(id: string): boolean;
+  /** Pós-doc: pays the price and gives the professor a star (false when not allowed or not affordable). */
+  defendPostdoc(professor: ProfessorId): boolean;
   /** Refunds the diplomas spent on the tree and empties it. Once per turma. */
   resetPrestigeTree(): boolean;
 

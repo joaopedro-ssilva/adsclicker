@@ -4,7 +4,7 @@ import { getIndex } from './contentIndex';
 import type { Decimal } from './decimal';
 import { labClickerEffects } from './lab/effects';
 import { releaseMultiplier } from './maestria/releases';
-import { masteryRank } from './mastery';
+import { masteryPower } from './mastery';
 import type { GameState } from './state';
 
 /** Synergy bonus per other hired professor once the `synergy` feature is on (BalanceConfig has no field for it). */
@@ -152,7 +152,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
   for (const id of PROFESSOR_IDS) {
     if (!state.hired[id]) continue;
     const def = content.mastery[id];
-    const rank = masteryRank(state, content, id);
+    // The Pós-doc stars of the professor scale what the rank pays (the honour's flat part is not the rank's).
+    const rank = masteryPower(state, content, id);
     if (rank > 0) acc.push(def.perRank, rank);
     if (state.honoured === id) {
       if (def.honour.flat) acc.push(def.honour.flat);

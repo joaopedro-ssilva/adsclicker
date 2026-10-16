@@ -119,6 +119,7 @@ export const fixtureBalance: BalanceConfig = {
   milestoneStep: 100,
   milestoneMult: 2,
   mastery: { step: 25, cap: 40 },
+  postdoc: { maxStars: 5, bonusPerStar: 0.05, firstPrice: '1e30', priceGrowth: 1000 },
   tierUnlockLevel: 10,
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 5 },

@@ -17,9 +17,29 @@ export function masteryRank(state: GameState, content: GameContent, professor: P
   return Math.min(cap, Math.floor(masteryLevels(state, content, professor) / step));
 }
 
+/** Pós-doc stars of a professor (0 when none, or in a save that never had them). */
+export function postdocStars(state: GameState, professor: ProfessorId): number {
+  return state.postdoc?.stars[professor] ?? 0;
+}
+
+/** How much stronger the professor's Domínio bonuses are for their Pós-doc stars: 1 + bonusPerStar x stars. */
+export function postdocStrength(state: GameState, content: GameContent, professor: ProfessorId): number {
+  return 1 + content.balance.postdoc.bonusPerStar * postdocStars(state, professor);
+}
+
+/**
+ * The rank the Domínio bonuses are paid for: the rank scaled by the Pós-doc stars (a fractional rank is fine, the
+ * effects are per rank). Equal to the rank for a professor without stars.
+ */
+export function masteryPower(state: GameState, content: GameContent, professor: ProfessorId): number {
+  return masteryRank(state, content, professor) * postdocStrength(state, content, professor);
+}
+
 export interface MasteryView {
   professor: ProfessorId;
   rank: number;
+  /** Pós-doc stars (0..maxStars): each makes the bonuses `bonusPerStar` stronger. */
+  stars: number;
   cap: number;
   maxed: boolean;
   /** Levels summed over the professor's disciplines. */
@@ -61,12 +81,13 @@ export function masteryView(state: GameState, content: GameContent, professor: P
   return {
     professor,
     rank,
+    stars: postdocStars(state, professor),
     cap,
     maxed,
     levels,
     nextAt: maxed ? from : from + step,
     progress: maxed ? 1 : Math.min(1, (levels - from) / step),
-    line: masteryLine(content, professor, rank),
+    line: masteryLine(content, professor, rank * postdocStrength(state, content, professor)),
     honoured: state.honoured === professor,
   };
 }

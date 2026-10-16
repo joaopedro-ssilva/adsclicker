@@ -5,7 +5,7 @@ import { ZERO } from './decimal';
 import { createLabState } from './lab/state';
 import { createMaestriaState } from './maestria/slots';
 import { SAVE_VERSION } from './state';
-import type { GameState, MonitorsState, Records, RunStats, Settings } from './state';
+import type { GameState, MonitorsState, PostdocState, Records, RunStats, Settings } from './state';
 
 export function createCounters(): Record<CounterKey, number> {
   return {
@@ -37,6 +37,7 @@ export function createCounters(): Record<CounterKey, number> {
     designFreeLevels: 0,
     cappedGraduations: 0,
     treeResets: 0,
+    postdocs: 0,
     ungratefulGraduations: 0,
   };
 }
@@ -71,6 +72,12 @@ export function createMonitorsState(): MonitorsState {
 }
 
 export function defaultSettings(): Settings {
+export function createPostdocState(): PostdocState {
+  const stars = {} as PostdocState['stars'];
+  for (const id of PROFESSOR_IDS) stars[id] = 0;
+  return { stars, turma: {} };
+}
+
   return {
     sfxVolume: 0.7,
     musicVolume: 0.35,
@@ -148,6 +155,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     maestria: createMaestriaState(),
     monitors: createMonitorsState(),
     lab: createLabState(),
+    postdoc: createPostdocState(),
     session: { seconds: 0, activeAt: now },
     calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 

@@ -17,6 +17,7 @@ import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
 import { judgeLabRecords } from './labRecords';
 import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
+import { judgePostdoc } from './postdocBounds';
 
 /**
  * Seconds added to every time window. Covers network latency, the browser throttling timers,
@@ -218,6 +219,10 @@ export function judgeSave({ previous, next, elapsedMs, forced = false, content =
   if (maestriaDiplomasSpent(next, content) > next.diplomasEarned) return fail('Maestria levels beyond the diplomas earned');
 
   // Diplomas only come from graduating, and one graduation pays at most what the run's coins are worth.
+  // Pós-doc stars: only grow, one per turma, each paid with coins that were earned.
+  const postdocReason = judgePostdoc(previous, next, content);
+  if (postdocReason) return fail(postdocReason);
+
   if (diplomasDone > 0) {
     if (graduationsDone <= 0) return fail('diplomas without a graduation');
     const before = next.counters.graduations - graduationsDone;

@@ -242,6 +242,11 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       setMonitorOn(id, on) {
         run((state) => engine.setMonitorOn(state, id, on), true);
       },
+      defendPostdoc(professor) {
+        const done = run((state, emit) => engine.defendPostdoc(state, content, professor, now(), emit), true);
+        if (done) get().save();
+        return done;
+      },
       setMonitorSettings(patch) {
         run((state) => engine.setMonitorSettings(state, patch), true);
       },
