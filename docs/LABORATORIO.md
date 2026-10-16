@@ -25,6 +25,7 @@ lab: {
   unlocked, open,                 // open nunca é lido como true de um save
   commits, tree: {id: nível},     // permanentes
   bestPhase,                      // fase mais alta alcançada (quebrar na 7 conta 7)
+  bestPhaseBuild, bestRunBuild,   // itens equipados no recorde de fase e na melhor turma (ver "Recordes e builds")
   counters: { runs, broken, phasesCleared, bossesBeaten, itemsFound, itemsRecycled,
               itemLevelUps, affixRerolls, clicks, commitsEarned },
   turma: {                        // zerada na formatura
@@ -128,7 +129,11 @@ Números fixos (strings decimais), um degrau acima do Pablo (1,52e21), não minu
 
 ## Servidor
 
-O servidor lê o save com o mesmo `deserializeState` e julga com `computeStats`, então os buffs do laboratório entram na conta de verossimilhança sozinhos. Medido com o simulador (`plausibility.lab.test.ts`): o pior caso de uma compra honesta com 4 lendários nível 20, árvore cheia e todos os buffs empilhados usa cerca de 14% do teto de moedas, igual a jogar sem laboratório. O que um save forjado ganha é limitado pelos tetos acima e pelo leitor (valores presos ao que a raridade rola, nível 20). O ranking de `bestPhase`, quando existir, deve revalidar a corrida pela semente e pelo `clearLog`.
+O servidor lê o save com o mesmo `deserializeState` e julga com `computeStats`, então os buffs do laboratório entram na conta de verossimilhança sozinhos. Medido com o simulador (`plausibility.lab.test.ts`): o pior caso de uma compra honesta com 4 lendários nível 20, árvore cheia e todos os buffs empilhados usa cerca de 14% do teto de moedas, igual a jogar sem laboratório. O que um save forjado ganha é limitado pelos tetos acima e pelo leitor (valores presos ao que a raridade rola, nível 20). O ranking do Laboratório (`bestPhase` e a melhor turma, cada um com a build do recorde) está descrito em `docs/BACKEND.md` ("Ranking do Laboratório"): as regras de plausibilidade ficam em `players/labRecords.ts`. Revalidar a corrida inteira pela semente e pelo `clearLog` continua sendo uma evolução possível.
+
+## Recordes e builds
+
+`lab.bestPhaseBuild` e `lab.bestRunBuild` guardam os itens equipados (slot, base, raridade, nível) no momento do recorde: o `bestPhase` copia a build quando sobe e renova a cópia quando a corrida que está nele termina (quebra ou formatura); a melhor turma (`records.mostCoins`) copia na formatura que bate o recorde. Leitor tolerante em `engine/lab/build.ts`. A interface mostra a build no Ranking do Laboratório, a aba nova ao lado de Pesquisa e Progressão (a Loja do Laboratório é só um botão por enquanto).
 
 ## Balanceamento
 

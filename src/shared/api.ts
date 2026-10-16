@@ -279,7 +279,45 @@ export const leaderboardResponseSchema = z.object({
 });
 export type LeaderboardResponse = z.infer<typeof leaderboardResponseSchema>;
 
-/** GET /api/players/profile?nickname= — the public card of a ranked player, opened from the ranking. */
+// ---------------------------------------------------------------------------
+// GET /api/lab/leaderboard?board=phase|run — the Laboratório boards
+// ---------------------------------------------------------------------------
+
+/** phase: highest lab phase ever reached. run: most ADScoins made in a single turma. Both permanent. */
+export const LAB_BOARDS = ['phase', 'run'] as const;
+export const labBoardSchema = z.enum(LAB_BOARDS);
+export type LabBoard = z.infer<typeof labBoardSchema>;
+
+/** One equipped item of the build a record was set with. */
+export const labBuildItemSchema = z.object({
+  slot: z.string(),
+  base: z.string(),
+  rarity: z.string(),
+  level: z.number().int(),
+});
+export type LabBuildEntry = z.infer<typeof labBuildItemSchema>;
+
+export const labBoardRowSchema = z.object({
+  rank: z.number().int(),
+  nickname: z.string(),
+  /** phase: the number as text. run: ADScoins as a decimal string ("1.5e+30"). */
+  value: z.string(),
+  /** The items equipped when the record was set (empty = unknown). */
+  build: z.array(labBuildItemSchema),
+  tags: z.array(publicTagSchema).optional(),
+});
+export type LabBoardRow = z.infer<typeof labBoardRowSchema>;
+
+export const labLeaderboardResponseSchema = z.object({
+  board: labBoardSchema,
+  entries: z.array(labBoardRowSchema),
+  /** The caller's own row and place (null without a session, nickname, or a ranked record). Never cached. */
+  me: labBoardRowSchema.nullable(),
+  updatedAt: z.number(),
+});
+export type LabLeaderboardResponse = z.infer<typeof labLeaderboardResponseSchema>;
+
+/** GET /api/players/profile?nickname=— the public card of a ranked player, opened from the ranking. */
 export const playerProfileSchema = z.object({
   nickname: z.string(),
   /** What they have on screen now: professor, the skin that professor wears, the scenery. */

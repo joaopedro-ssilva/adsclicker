@@ -11,6 +11,7 @@ import { POST as hackathonSkills } from './hackathon/skills/route';
 import { POST as login } from './auth/login/route';
 import { POST as logout } from './auth/logout/route';
 import { GET as community } from './community/route';
+import { GET as labLeaderboard } from './lab/leaderboard/route';
 import { GET as leaderboard } from './leaderboard/route';
 import { GET as me } from './me/route';
 import { GET as ranks } from './me/ranks/route';
@@ -41,6 +42,7 @@ describe('without DATABASE_URL every route answers 503 unavailable', () => {
     ['login', () => login(post('/api/auth/login', { nickname: 'maria', password: 'segredo1' }))],
     ['logout', () => logout(post('/api/auth/logout', {}))],
     ['leaderboard', () => leaderboard(get('/api/leaderboard?board=coins'))],
+    ['lab leaderboard', () => labLeaderboard(get('/api/lab/leaderboard?board=phase'))],
     ['community', () => community()],
     ['hackathon profile', () => hackathonProfile(get('/api/hackathon/profile'))],
     ['hackathon create', () => hackathonCreate(post('/api/hackathon/profile', { head: 'h1' }))],
