@@ -4,7 +4,7 @@ import { LAB_TREE_VERSION } from '../../content/labTree';
 import { LAB_RARITIES } from '../../content/labTypes';
 import type { LabBuffDef, LabItemBase, LabNodeDef, LabRarity, LabRarityDef, LabEnemyDef } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
-import type { LabCounters, LabRun, LabState, LabTurma } from './types';
+import type { LabCosmetics, LabCounters, LabRun, LabState, LabTurma } from './types';
 
 export function createLabCounters(): LabCounters {
   return {
@@ -25,8 +25,25 @@ export function createLabTurma(): LabTurma {
   return { run: null, equipped: {}, nextUid: 1 };
 }
 
+/** Nothing owned, the free defaults on. These ids are the ones of content/labCosmetics.ts (checked by its test). */
+export function createLabCosmetics(): LabCosmetics {
+  return { owned: {}, monitor: 'monitor-crt-bege', theme: 'tema-fosforo', decor: [], startItem: 'mouse-quebrado' };
+}
+
 export function createLabState(): LabState {
-  return { unlocked: false, open: false, commits: 0, tree: {}, treeVersion: LAB_TREE_VERSION, bestPhase: 0, bestPhaseBuild: [], bestRunBuild: [], counters: createLabCounters(), turma: createLabTurma() };
+  return {
+    unlocked: false,
+    open: false,
+    commits: 0,
+    tree: {},
+    treeVersion: LAB_TREE_VERSION,
+    bestPhase: 0,
+    bestPhaseBuild: [],
+    bestRunBuild: [],
+    counters: createLabCounters(),
+    cosmetics: createLabCosmetics(),
+    turma: createLabTurma(),
+  };
 }
 
 /** A run that has just begun: the first phase is spawned by startLabRun. */

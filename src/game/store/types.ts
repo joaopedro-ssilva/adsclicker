@@ -66,6 +66,7 @@ export type GameEvent =
   | { type: 'labNodeBought'; id: string; level: number }
   | { type: 'labTreeReset'; refunded: number }
   | { type: 'labOffersRerolled'; phase: number }
+  | { type: 'labCosmeticGained'; id: string; how: 'shop' | 'grant' }
   /** ADScoins given to the campus; `title` is the donor title this donation just earned (an id of content/donations.ts), if any. */
   | { type: 'donate'; amount: Decimal; total: Decimal; title: string | null }
   | { type: 'offline'; coins: Decimal; awayMs: number }
@@ -269,10 +270,10 @@ export interface GameActions {
   /** `honour`: the hired professor honoured for the next run (optional). */
   graduate(honour?: ProfessorId | null): boolean;
   buyPrestigeNode(id: string): boolean;
-  /** Pós-doc: pays the price and gives the professor a star (false when not allowed or not affordable). */
-  defendPostdoc(professor: ProfessorId): boolean;
   /** Refunds the diplomas spent on the tree and empties it. Once per turma. */
   resetPrestigeTree(): boolean;
+  /** Pós-doc: pays the price and gives the professor a star (false when not allowed or not affordable). */
+  defendPostdoc(professor: ProfessorId): boolean;
   /** Gives ADScoins to the campus (Centro Comunitário). False when the amount is below 1 or above the coins in hand. */
   donateToCampus(amount: Decimal): boolean;
 
@@ -325,6 +326,10 @@ export interface GameActions {
   buyLabNode(id: string): boolean;
   /** Gives back every Commit spent on the tree and empties it. False during a run or with nothing spent. */
   resetLabTree(): boolean;
+  /** Buys a cosmetic of the lab shop with ADScoins. False when it is not for sale, owned already, or too dear. */
+  buyLabCosmetic(id: string): boolean;
+  /** Puts an owned cosmetic on, or takes a decoration off (`on = false`). False when not owned or the decor display is full. */
+  equipLabCosmetic(id: string, on?: boolean): boolean;
   /** Draws the options of the reward on screen again (tree: Retrospectiva). False without a reroll left. */
   rerollLabOffers(): boolean;
 

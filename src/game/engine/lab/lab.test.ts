@@ -1160,6 +1160,7 @@ describe('save', () => {
       bestPhase: 0,
       bestPhaseBuild: [],
       bestRunBuild: [],
+      cosmetics: { owned: {}, monitor: 'monitor-crt-bege', theme: 'tema-fosforo', decor: [], startItem: 'mouse-quebrado' },
       counters: loaded.lab.counters,
       turma: { run: null, equipped: {}, nextUid: 1 },
     });

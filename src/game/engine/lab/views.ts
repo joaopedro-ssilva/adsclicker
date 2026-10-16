@@ -3,12 +3,14 @@
  * and the tree. Pure builders over (state, content); text is pt-BR and ready to show.
  */
 import { LAB_EFFECT_KEYS, LAB_SLOTS } from '../../content/labTypes';
-import type { LabConversion, LabEffectKey, LabNodeDef, LabRarity, LabSlot } from '../../content/labTypes';
+import type { LabConversion, LabCosmeticKind, LabEffectKey, LabNodeDef, LabRarity, LabSlot } from '../../content/labTypes';
 import type { GameContent, StatKey } from '../../content/types';
 import type { Decimal } from '../decimal';
 import type { GameState } from '../state';
 import { labCanUnlock, labRunAvailable, labSlotVisible } from './access';
 import type { LabAvailability } from './access';
+import { formatNumber } from '../format';
+import { labCosmeticBuyCheck, labCosmeticOwned, labCosmeticPrice } from './cosmetics';
 import { levelUpCost, rerollCost } from './costs';
 import { labTotals, recycleMultiplier, setPieces } from './effects';
 import type { LabTotals } from './effects';
@@ -248,6 +250,8 @@ export interface LabItemView {
   power: number;
   nextPower: number | null;
   affixes: LabAffixView[];
+  /** The small fixed effect of a starting item from the shop (empty for every other item). */
+  bonus: LabLine[];
   /** The legendary effect: its text, and whether this item has it on (only legendary ones do). */
   unique: { description: string; active: boolean } | null;
   set: { id: string; name: string; pieces: number } | null;
@@ -289,6 +293,10 @@ export function labItemView(state: GameState, content: GameContent, item: LabIte
       rerollCost: reroll,
       canReroll: owned && state.lab.unlocked && state.coins.gte(reroll),
     })),
+    bonus: LAB_EFFECT_KEYS.flatMap((key) => {
+      const value = base.effects?.[key];
+      return value === undefined ? [] : [{ label: content.lab.labels.effects[key], text: labEffectText(key, value) }];
+    }),
     unique: base.unique.description ? { description: base.unique.description, active: hasUnique(item) } : null,
     set: set ? { id: set.id, name: set.name, pieces } : null,
     recycleValue: recycleValue(content, item),
@@ -541,4 +549,87 @@ export function labTreeView(state: GameState, content: GameContent): LabTreeView
   });
   const reset = labTreeResetCheck(state, content);
   return { unlocked: state.lab.unlocked, commits: state.lab.commits, spent: labTreeSpent(state, content), nodes, canReset: reset.ok, refund: reset.refund, resetReason: reset.reason };
+}
+
+// ---------------------------------------------------------------------------
+// The wardrobe and the shop
+// ---------------------------------------------------------------------------
+
+export interface LabCosmeticEntry {
+  id: string;
+  kind: LabCosmeticKind;
+  name: string;
+  description: string;
+  /** Art key of a decoration or starting item (public/assets); skins and themes are drawn in CSS. */
+  art: string | null;
+  owned: boolean;
+  /** On the monitor now (a decoration on display, or the skin/theme/starting item in use). */
+  equipped: boolean;
+  /** For sale in the shop (owned or not). False for defaults and achievement rewards. */
+  forSale: boolean;
+  /** Price as formatNumber writes it ("1 Oc"), and as the decimal string the content holds. Null when not sold. */
+  priceText: string | null;
+  price: string | null;
+  affordable: boolean;
+  /** How to get a locked cosmetic that is not for sale ("Conquista (em breve)"), or null. */
+  hint: string | null;
+  /** The small effect of a starting item, as a line of text (its description). */
+  effect: string | null;
+}
+
+export interface LabCosmeticsView {
+  decorMax: number;
+  decorOn: number;
+  /** In content order, grouped by kind. */
+  monitors: LabCosmeticEntry[];
+  themes: LabCosmeticEntry[];
+  decor: LabCosmeticEntry[];
+  starts: LabCosmeticEntry[];
+  /** Owned out of all, for the tab's summary. */
+  ownedCount: number;
+  totalCount: number;
+}
+
+function cosmeticEntry(state: GameState, content: GameContent, id: string): LabCosmeticEntry {
+  const def = content.lab.cosmetics.items.find((entry) => entry.id === id)!;
+  const cosmetics = state.lab.cosmetics;
+  const price = labCosmeticPrice(content, id);
+  const equipped =
+    def.kind === 'decor'
+      ? cosmetics.decor.includes(id)
+      : def.kind === 'monitor'
+        ? cosmetics.monitor === id
+        : def.kind === 'theme'
+          ? cosmetics.theme === id
+          : cosmetics.startItem === id;
+  return {
+    id,
+    kind: def.kind,
+    name: def.name,
+    description: def.description,
+    art: def.art ?? null,
+    owned: labCosmeticOwned(content, cosmetics, id),
+    equipped,
+    forSale: price !== null,
+    priceText: price ? formatNumber(price) : null,
+    price: def.price,
+    affordable: labCosmeticBuyCheck(state, content, id) === 'ok',
+    hint: def.hint ?? null,
+    effect: def.kind === 'start' && !def.free ? def.description : null,
+  };
+}
+
+export function labCosmeticsView(state: GameState, content: GameContent): LabCosmeticsView {
+  const of = (kind: LabCosmeticKind) => content.lab.cosmetics.items.filter((entry) => entry.kind === kind).map((entry) => cosmeticEntry(state, content, entry.id));
+  const all = content.lab.cosmetics.items.map((entry) => cosmeticEntry(state, content, entry.id));
+  return {
+    decorMax: content.lab.cosmetics.decorMax,
+    decorOn: state.lab.cosmetics.decor.length,
+    monitors: of('monitor'),
+    themes: of('theme'),
+    decor: of('decor'),
+    starts: of('start'),
+    ownedCount: all.filter((entry) => entry.owned).length,
+    totalCount: all.length,
+  };
 }

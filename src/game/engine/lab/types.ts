@@ -118,6 +118,21 @@ export interface LabCounters {
   commitsEarned: number;
 }
 
+/**
+ * What the player owns and wears of the lab's wardrobe (content/labCosmetics.ts). Permanent: it survives graduation.
+ * The defaults (CRT Bege, Fósforo Verde, the Mouse quebrado) are free and never listed in `owned`.
+ */
+export interface LabCosmetics {
+  /** Ids bought in the shop or granted (an achievement reward). */
+  owned: Record<string, true>;
+  monitor: string;
+  theme: string;
+  /** Decorations on display, in the order they were put (at most `cosmetics.decorMax`). */
+  decor: string[];
+  /** The item the next run starts with in the ferramenta slot (a base id; the Mouse quebrado by default). */
+  startItem: string;
+}
+
 export interface LabState {
   /** Bought with diplomas, once. Permanent. */
   unlocked: boolean;
@@ -136,6 +151,8 @@ export interface LabState {
   /** The equipped items of the turma that holds `records.mostCoins` (the best run). */
   bestRunBuild: LabBuild;
   counters: LabCounters;
+  /** Skins, themes, decorations and starting items. Permanent. */
+  cosmetics: LabCosmetics;
   /** What lasts only until the next graduation. */
   turma: LabTurma;
 }

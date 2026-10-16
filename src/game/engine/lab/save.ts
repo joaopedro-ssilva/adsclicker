@@ -1,13 +1,14 @@
 import { LAB_RARITIES, LAB_SLOTS } from '../../content/labTypes';
-import type { LabItemBase, LabRarity } from '../../content/labTypes';
+import type { LabCosmeticKind, LabItemBase, LabRarity } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import type { GameState } from '../state';
 import { noteBestPhase, readLabBuild } from './build';
 import { labTotals } from './effects';
 import { enterNextPhase, maxIntegrityFor, spawnPhase } from './phase';
 import { makeOffers } from './rewards';
-import { createLabCounters, createLabRun, createLabState, labIndex } from './state';
-import type { LabAffix, LabBreakReason, LabCounters, LabItem, LabMob, LabOffer, LabRun, LabRunStatus, LabState, LabTurma } from './types';
+import { labCosmeticDef, labCosmeticOwned } from './cosmetics';
+import { createLabCosmetics, createLabCounters, createLabRun, createLabState, labIndex } from './state';
+import type { LabAffix, LabBreakReason, LabCosmetics, LabCounters, LabItem, LabMob, LabOffer, LabRun, LabRunStatus, LabState, LabTurma } from './types';
 
 // Tolerant readers of the `lab` part of a save: anything missing or malformed falls back to a default, ids that no
 // longer exist are dropped, and every number is clamped to what the game could have produced.
@@ -199,6 +200,37 @@ function readTree(lab: LabState, value: Record<string, unknown>, content: GameCo
   lab.commits = Math.min(1e12, lab.commits + refund);
 }
 
+/**
+ * The wardrobe of a save. Only ids that exist (and are not free defaults) stay in `owned`; whatever is worn must be owned
+ * and of the right kind, or the default of its kind takes its place; the decorations are unique and capped.
+ */
+export function readLabCosmetics(value: unknown, content: GameContent): LabCosmetics {
+  const cosmetics = createLabCosmetics();
+  if (!isRecord(value)) return cosmetics;
+  const config = content.lab.cosmetics;
+  if (isRecord(value.owned)) {
+    for (const id in value.owned) {
+      const def = labCosmeticDef(content, id);
+      if (def && !def.free && value.owned[id] === true) cosmetics.owned[id] = true;
+    }
+  }
+  const worn = (raw: unknown, kind: LabCosmeticKind, fallback: string): string => {
+    const def = typeof raw === 'string' ? labCosmeticDef(content, raw) : undefined;
+    return def && def.kind === kind && labCosmeticOwned(content, cosmetics, def.id) ? def.id : fallback;
+  };
+  cosmetics.monitor = worn(value.monitor, 'monitor', config.defaults.monitor);
+  cosmetics.theme = worn(value.theme, 'theme', config.defaults.theme);
+  cosmetics.startItem = worn(value.startItem, 'start', config.defaults.startItem);
+  if (Array.isArray(value.decor)) {
+    for (const raw of value.decor) {
+      if (cosmetics.decor.length >= config.decorMax) break;
+      const id = worn(raw, 'decor', '');
+      if (id && !cosmetics.decor.includes(id)) cosmetics.decor.push(id);
+    }
+  }
+  return cosmetics;
+}
+
 /** The `lab` object of a save. A save without it (older ones) gets a locked, empty lab. */
 export function readLab(value: unknown, content: GameContent): LabState {
   const lab = createLabState();
@@ -211,6 +243,7 @@ export function readLab(value: unknown, content: GameContent): LabState {
   lab.bestPhaseBuild = readLabBuild(value.bestPhaseBuild, content);
   lab.bestRunBuild = readLabBuild(value.bestRunBuild, content);
   lab.counters = readCounters(value.counters);
+  lab.cosmetics = readLabCosmetics(value.cosmetics, content);
   lab.turma = readTurma(value.turma, content);
   return lab;
 }

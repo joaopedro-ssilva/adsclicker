@@ -5,6 +5,7 @@ import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
 import { labRunAvailable } from './access';
 import { noteBestPhase } from './build';
+import { labStarterId } from './cosmetics';
 import { labTotals } from './effects';
 import type { LabTotals } from './effects';
 import { rollItem } from './items';
@@ -25,7 +26,7 @@ export function autoDps(totals: LabTotals, boss: boolean): number {
 
 /** Damage one click deals: a small share of the automatic damage per second. */
 export function clickDamage(content: GameContent, totals: LabTotals, boss: boolean): number {
-  return autoDps(totals, boss) * content.lab.run.click.share;
+  return autoDps(totals, boss) * content.lab.run.click.share * (1 + Math.max(0, totals.lab.clickDamage));
 }
 
 /** Most extra damage per second the clicks can add, as a share of the automatic damage (clicks per second x share). */
@@ -234,7 +235,8 @@ export function startLabRun(state: GameState, content: GameContent, seed: number
   const run = createLabRun(seed, content.lab.run.startIntegrity);
   lab.turma.run = run;
   const index = labIndex(content);
-  giveStarter(state, content, index.bases.get(content.lab.starter), labStream(run.seed, LAB_STREAM.starter, 0));
+  // The equipped starting item (a shop cosmetic) replaces the Mouse quebrado: same power, a small effect of its own.
+  giveStarter(state, content, index.bases.get(labStarterId(state, content)), labStream(run.seed, LAB_STREAM.starter, 0));
   const owned = labTotals(state, content);
   if (owned.lab.startSetup > 0) {
     const setups = droppableAt(content, 1).filter((base) => base.slot === 'setup');

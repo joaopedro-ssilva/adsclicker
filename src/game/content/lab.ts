@@ -7,6 +7,7 @@ import { enemies as hackathonEnemies } from '../../hackathon/content/enemies';
 import { items as hackathonItems, sets } from '../../hackathon/content/items';
 import { rarities } from '../../hackathon/content/rarities';
 import { waveBuffs } from '../../hackathon/content/waveBuffs';
+import { DEFAULT_START_ITEM, LAB_DECOR_MAX, START_ITEM_EFFECTS, labCosmeticItems, labStartItems } from './labCosmetics';
 import { labEnemies, labBossCycle, labEnemyFrom } from './labEnemies';
 import { labItems, labItemSets, labItemSkillBonuses } from './labItems';
 import { LAB_TREE_VERSION, labTree, legacyTree } from './labTree';
@@ -40,8 +41,23 @@ const mouseQuebrado: LabItemBase = {
   affixes: false,
 };
 
+/**
+ * The starting items of the shop (content/labCosmetics.ts): the same as the Mouse quebrado (power only, cannot drop, no
+ * affixes) with a small effect of their own while they sit in the ferramenta slot. They take the mouse's place at the
+ * start of a run, and the item that drops over them recycles them like any other.
+ */
+const startBases: LabItemBase[] = labStartItems.map((entry) => ({
+  ...mouseQuebrado,
+  id: entry.id,
+  name: entry.name,
+  description: labCosmeticItems.find((cosmetic) => cosmetic.id === entry.id)?.description ?? '',
+  asset: entry.art,
+  effects: START_ITEM_EFFECTS[entry.id],
+}));
+
 const bases: LabItemBase[] = [
   mouseQuebrado,
+  ...startBases,
   ...hackathonItems.map((base): LabItemBase => ({ ...base, drops: true, affixes: true })),
   // The lab's own 24, from the advanced phases on (content/labItems.ts)
   ...labItems,
@@ -153,6 +169,11 @@ export const lab: LabConfig = {
 
   bases,
   starter: mouseQuebrado.id,
+  cosmetics: {
+    decorMax: LAB_DECOR_MAX,
+    defaults: { monitor: 'monitor-crt-bege', theme: 'tema-fosforo', startItem: DEFAULT_START_ITEM },
+    items: labCosmeticItems,
+  },
   sets: [...sets, ...labItemSets],
   rarities,
   enemies: [...hackathonEnemies, ...labEnemies],
@@ -218,6 +239,7 @@ export const lab: LabConfig = {
       legendaryDamage: 'Dano por lendário',
       levelCost: 'Custo de subir de nível',
       recycleBonus: 'Commits da reciclagem',
+      clickDamage: 'Dano do clique no monitor',
     },
   },
 

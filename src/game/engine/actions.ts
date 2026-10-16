@@ -99,14 +99,14 @@ export function resetPrestigeTree(state: GameState, content: GameContent, now: n
   return done;
 }
 
-export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
-  const bought = buyMonitorRaw(state, content, id, emit);
 export function defendPostdoc(state: GameState, content: GameContent, professor: ProfessorId, now: number, emit: Emit): boolean {
   const done = defendPostdocRaw(state, content, professor, emit);
   if (done) afterAction(state, content, now, emit);
   return done;
 }
 
+export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
+  const bought = buyMonitorRaw(state, content, id, emit);
   if (bought) afterAction(state, content, now, emit);
   return bought;
 }
@@ -130,7 +130,9 @@ export {
 export { buyCafe, cafeCost } from './cafe';
 
 export {
+  buyLabCosmetic,
   buyLabNode,
+  equipLabCosmetic,
   resetLabTree,
   rerollLabOffers,
   chooseLabReward,
@@ -143,6 +145,8 @@ export {
   startLabRun,
   unlockLab,
 } from './lab/actions';
+/** Gives a lab cosmetic for free (an achievement reward). Plain state change: safe to call from inside afterAction. */
+export { grantLabCosmetic } from './lab/cosmetics';
 
 /** Easter eggs: remembers the trigger so achievements with { kind: 'secret', trigger } unlock. */
 export function triggerSecret(state: GameState, content: GameContent, trigger: string, now: number, emit: Emit): void {

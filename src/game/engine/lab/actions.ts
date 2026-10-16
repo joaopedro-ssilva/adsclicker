@@ -9,6 +9,7 @@ import { afterAction } from '../lifecycle';
 import type { GameState } from '../state';
 import { unlockLab as unlockLabRaw } from './access';
 import { levelUpLabItem as levelUpLabItemRaw, rerollLabAffix as rerollLabAffixRaw } from './bench';
+import { buyLabCosmetic as buyLabCosmeticRaw, equipLabCosmetic as equipLabCosmeticRaw } from './cosmetics';
 import { chooseLabReward as chooseLabRewardRaw, rerollLabOffers as rerollLabOffersRaw, resolveLabPending as resolveLabPendingRaw } from './rewards';
 import { labClick as labClickRaw, setLabOpen as setLabOpenRaw, startLabRun as startLabRunRaw } from './run';
 import { buyLabNode as buyLabNodeRaw, resetLabTree as resetLabTreeRaw } from './tree';
@@ -78,6 +79,20 @@ export function buyLabNode(state: GameState, content: GameContent, id: string, n
 /** Refunds every Commit spent on the tree and empties it (not while a run is on). */
 export function resetLabTree(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
   const done = resetLabTreeRaw(state, content, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
+/** Buys a cosmetic of the lab shop with ADScoins. Owned for good. */
+export function buyLabCosmetic(state: GameState, content: GameContent, id: string, now: number, emit: Emit): boolean {
+  const done = buyLabCosmeticRaw(state, content, id, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
+/** Puts an owned cosmetic on (or takes a decoration off with `on = false`). Only the starting item reaches the game, at the next run. */
+export function equipLabCosmetic(state: GameState, content: GameContent, id: string, on: boolean, now: number, emit: Emit): boolean {
+  const done = equipLabCosmeticRaw(state, content, id, on);
   if (done) afterAction(state, content, now, emit);
   return done;
 }

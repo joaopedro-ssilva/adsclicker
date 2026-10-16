@@ -23,6 +23,8 @@ export interface BotOptions {
   coins?: string;
   /** Draws the options again when the best one is poor and the tree allows it. Default true. */
   reroll?: boolean;
+  /** A starting item (shop cosmetic) the run begins with instead of the Mouse quebrado. */
+  startItem?: string;
 }
 
 export interface BotResult {
@@ -50,6 +52,10 @@ function newGame(options: BotOptions): TestGame {
   for (const def of g.content.disciplines) g.state.levels[def.id] = 1;
   g.state.lab.tree = { ...(options.tree ?? {}) };
   g.state.coins = new Decimal(options.coins ?? '0');
+  if (options.startItem) {
+    g.state.lab.cosmetics.owned[options.startItem] = true;
+    g.state.lab.cosmetics.startItem = options.startItem;
+  }
   return g;
 }
 

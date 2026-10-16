@@ -1,5 +1,5 @@
-import { labBenchView, labMonitorView, labRewardsView, labSlotView, labTreeView } from '../engine/views';
-import type { LabBenchView, LabMonitorView, LabRewardsView, LabSlotView, LabTreeView } from '../engine/views';
+import { labBenchView, labCosmeticsView, labMonitorView, labRewardsView, labSlotView, labTreeView } from '../engine/views';
+import type { LabBenchView, LabCosmeticsView, LabMonitorView, LabRewardsView, LabSlotView, LabTreeView } from '../engine/views';
 import { useGameView } from './hooks';
 
 /** The 9th slot in the classroom: hidden until Pablo is hired, then the unlock and the per-turma gate. */
@@ -12,3 +12,6 @@ export const useLabBenchView = (): LabBenchView => useGameView(labBenchView);
 export const useLabRewardsView = (): LabRewardsView => useGameView(labRewardsView);
 /** The permanent tree bought with Commits. */
 export const useLabTreeView = (): LabTreeView => useGameView(labTreeView);
+
+/** The wardrobe and the shop of the Laboratório. */
+export const useLabCosmeticsView = (): LabCosmeticsView => useGameView(labCosmeticsView);

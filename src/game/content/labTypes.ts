@@ -56,6 +56,7 @@ export const LAB_EFFECT_KEYS = [
   'legendaryDamage', // + share of damage per legendary equipped
   'levelCost', // + share on the ADScoins cost of item level ups (negative = cheaper)
   'recycleBonus', // + share of the Commits a recycled item pays
+  'clickDamage', // + share of the damage a click on the monitor deals
 ] as const;
 export type LabEffectKey = (typeof LAB_EFFECT_KEYS)[number];
 export type LabEffects = Partial<Record<LabEffectKey, number>>;
@@ -85,6 +86,36 @@ export interface LabItemBase extends ItemBaseDef {
   fromPhase?: number;
   /** Rolls affixes. False for the Mouse quebrado: power only, no clicker buff. */
   affixes: boolean;
+  /** Small lab effects the item gives while it is equipped (the starting items of the shop; no other base has them). */
+  effects?: LabEffects;
+}
+
+/** What a cosmetic of the lab changes. A monitor skin, a lab theme, a decoration or the item a run starts with. */
+export type LabCosmeticKind = 'monitor' | 'theme' | 'decor' | 'start';
+
+export interface LabCosmeticDef {
+  id: string;
+  kind: LabCosmeticKind;
+  name: string;
+  /** One line shown on the card and in the preview. */
+  description: string;
+  /** ADScoins (decimal string) the shop asks. Null = not sold: a default, or an achievement reward. */
+  price: string | null;
+  /** Free from the start (the default of its kind). */
+  free?: boolean;
+  /** Shown to the player while locked and not for sale. */
+  hint?: string;
+  /** Art key (public/assets) of a decoration or a starting item. Monitor skins and themes are CSS only. */
+  art?: string;
+}
+
+/** The lab wardrobe: everything cosmetic, in one place with its prices. */
+export interface LabCosmeticsConfig {
+  /** Decorations that can be on display at once. */
+  decorMax: number;
+  /** The id equipped by default for each single-choice kind. */
+  defaults: { monitor: string; theme: string; startItem: string };
+  items: LabCosmeticDef[];
 }
 
 /** A run buff: a lasting upgrade picked as a reward. Its modifiers feed the clicker, `lab` feeds the run. */
@@ -130,6 +161,8 @@ export interface LabConfig {
   bases: LabItemBase[];
   /** Id of the base every run starts with in the ferramenta slot. */
   starter: string;
+  /** Monitor skins, lab themes, decorations and starting items, with their prices (labCosmetics.ts). */
+  cosmetics: LabCosmeticsConfig;
   sets: ItemSetDef[];
   /** Weight, extra affixes, value multiplier and recycle Commits of each rarity (the Hackathon's). */
   rarities: RarityDef[];

@@ -103,6 +103,7 @@ export function labTotals(state: GameState, content: GameContent): LabTotals {
 
   for (const item of Object.values(lab.turma.equipped)) {
     totals.power += itemPower(content, item);
+    addEffects(totals.lab, itemBase(content, item)?.effects);
     for (const affix of item.affixes) applyConversion(totals, content.lab.affixes[affix.target]?.[affix.op], affixValue(content, item, affix));
     if (hasUnique(item)) applyUnique(totals, content, item);
   }

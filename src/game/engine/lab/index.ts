@@ -11,13 +11,23 @@ export { breakRun, drainFactor, hpFactor, isBossPhase, maxIntegrityFor, runCommi
 export { chooseLabReward, dropLevel, lootQuality, makeOffers, rerollLabOffers, resolveLabPending } from './rewards';
 export { advanceLab, autoDps, clickDamage, clickShareCap, drainPerSecond, labClick, resetLabForGraduation, setLabOpen, startLabRun } from './run';
 export { bestRunRecord, noteBestPhase, readLabBuild, snapshotLabBuild } from './build';
-export { readLab, readLabItem, settleLabAfterLoad } from './save';
+export { readLab, readLabCosmetics, readLabItem, settleLabAfterLoad } from './save';
+export {
+  grantLabCosmetic,
+  labCosmeticBuyCheck,
+  labCosmeticDef,
+  labCosmeticOwned,
+  labCosmeticPrice,
+  labCosmeticsOf,
+  labStarterId,
+} from './cosmetics';
 export * from './views';
 export type {
   LabAffix,
   LabBreakReason,
   LabBuild,
   LabBuildItem,
+  LabCosmetics,
   LabCounters,
   LabItem,
   LabMob,
