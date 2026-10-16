@@ -3,15 +3,17 @@
 // Everything comes from the content lists, so new skins, sceneries, themes and achievements are included by themselves.
 import { writeFileSync } from 'node:fs';
 import { content } from '@/game/content';
+import { labCosmeticItems } from '@/game/content/labCosmetics';
 import { PROFESSOR_IDS } from '@/game/content/types';
 import { Decimal, createInitialState, exportSave } from '@/game/engine';
 
 const now = Date.now();
 const state = createInitialState(content, now);
 
-state.coins = new Decimal('1e45');
+// Enough to try the Loja, the Pós-doc and the Centro Comunitário; lifetime covers everything donated below.
+state.coins = new Decimal('1e60');
 state.runCoins = new Decimal('1e45');
-state.lifetimeCoins = new Decimal('1e46');
+state.lifetimeCoins = new Decimal('1e100');
 state.diplomas = 5000;
 state.diplomasEarned = 5000;
 
@@ -43,10 +45,21 @@ for (const monitor of content.monitors) state.monitors.units[monitor.id] = { lev
 for (const achievement of content.achievements) {
   state.achievements[achievement.id] = now;
   if (achievement.condition.kind === 'secret') state.secrets[achievement.condition.trigger] = true;
+  if (achievement.condition.kind === 'flag') state.secrets[achievement.condition.flag] = true;
 }
 for (const skin of content.skins) state.skins[skin.id] = true;
 for (const scenery of content.sceneries) state.sceneries[scenery.id] = true;
 for (const theme of content.themes) state.themes[theme.id] = true;
+
+// Laboratório: unlocked, every cosmetic owned, a record to show, and Commits for the whole tree (left empty to try it).
+state.lab.unlocked = true;
+state.lab.commits = 50_000;
+state.lab.bestPhase = 30;
+for (const cosmetic of labCosmeticItems) state.lab.cosmetics.owned[cosmetic.id] = true;
+
+// Pós-doc: three stars each (room to defend two more) and the Centro Comunitário at its last title.
+for (const id of PROFESSOR_IDS) state.postdoc.stars[id] = 3;
+state.donated = new Decimal('1e93');
 
 Object.assign(state.counters, {
   clicks: 1_500_000,
@@ -71,6 +84,8 @@ Object.assign(state.counters, {
   bolsaProfitSeconds: 7_200,
   designFreeLevels: 900,
   cappedGraduations: 6,
+  postdocs: 24,
+  donations: 12,
 });
 
 writeFileSync('dev-save.txt', exportSave(state));
