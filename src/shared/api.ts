@@ -320,6 +320,33 @@ export const labLeaderboardResponseSchema = z.object({
 });
 export type LabLeaderboardResponse = z.infer<typeof labLeaderboardResponseSchema>;
 
+// ---------------------------------------------------------------------------
+// GET /api/community/donors — the Centro Comunitário board
+// ---------------------------------------------------------------------------
+
+export const donorRowSchema = z.object({
+  rank: z.number().int(),
+  nickname: z.string(),
+  /** For the avatar, as on the community board: the professor on screen and the skin they wear. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  /** ADScoins given to the campus in total, as a decimal string ("1.5e+30"). */
+  value: z.string(),
+  /** Id of the donor title (content/donations.ts) the total earns, or null below the first one. */
+  title: z.string().nullable(),
+  tags: z.array(publicTagSchema).optional(),
+});
+export type DonorRow = z.infer<typeof donorRowSchema>;
+
+export const donorsResponseSchema = z.object({
+  /** Top 50 by total donated. */
+  entries: z.array(donorRowSchema),
+  /** The caller's own row and place (null without a session, nickname, or a donation). Never cached. */
+  me: donorRowSchema.nullable(),
+  updatedAt: z.number(),
+});
+export type DonorsResponse = z.infer<typeof donorsResponseSchema>;
+
 /** GET /api/players/profile?nickname=— the public card of a ranked player, opened from the ranking. */
 export const playerProfileSchema = z.object({
   nickname: z.string(),
@@ -331,6 +358,8 @@ export const playerProfileSchema = z.object({
   /** Epoch ms of the account creation. */
   memberSince: z.number(),
   tags: z.array(publicTagSchema).optional(),
+  /** Id of the Centro Comunitário donor title (content/donations.ts), when they hold one. */
+  donorTitle: z.string().optional(),
   stats: z.object({
     /** Decimal strings. */
     lifetimeCoins: z.string(),

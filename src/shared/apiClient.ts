@@ -19,6 +19,7 @@ import {
   adminTurmaZeroResultSchema,
   apiErrorSchema,
   communityResponseSchema,
+  donorsResponseSchema,
   labLeaderboardResponseSchema,
   leaderboardResponseSchema,
   loginResponseSchema,
@@ -102,6 +103,7 @@ export const api = {
     call('GET', `/api/leaderboard?board=${board}`, leaderboardResponseSchema, { signal }),
   labLeaderboard: (board: LabBoard, signal?: AbortSignal) =>
     call('GET', `/api/lab/leaderboard?board=${board}`, labLeaderboardResponseSchema, { signal }),
+  donors: (signal?: AbortSignal) => call('GET', '/api/community/donors', donorsResponseSchema, { signal }),
   community: (signal?: AbortSignal) => call('GET', '/api/community', communityResponseSchema, { signal }),
   profile: (nickname: string, signal?: AbortSignal) =>
     call('GET', `/api/players/profile?nickname=${encodeURIComponent(nickname)}`, playerProfileSchema, { signal }),

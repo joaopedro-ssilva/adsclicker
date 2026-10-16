@@ -15,6 +15,7 @@ import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
+import { judgeDonations } from './donationRecords';
 import { judgeLabRecords } from './labRecords';
 import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 import { judgePostdoc } from './postdocBounds';
@@ -246,6 +247,10 @@ export function judgeSave({ previous, next, elapsedMs, forced = false, content =
   // The Laboratório records (highest phase, best turma) the boards show.
   const labReason = judgeLabRecords({ previous, next, seconds, allowance, gain });
   if (labReason) return fail(labReason);
+
+  // The Centro Comunitário total the donors board shows.
+  const donationReason = judgeDonations({ previous, next, gain });
+  if (donationReason) return fail(donationReason);
 
   return { ok: true, ratio };
 }

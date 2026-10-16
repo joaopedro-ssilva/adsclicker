@@ -54,6 +54,7 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   treeResets: 'resets da árvore',
   postdocs: 'Pós-docs defendidos',
   ungratefulGraduations: 'formaturas sem homenagem',
+  donations: 'doações ao campus',
 };
 
 const n = (value: number) => formatNumber(Math.floor(value));

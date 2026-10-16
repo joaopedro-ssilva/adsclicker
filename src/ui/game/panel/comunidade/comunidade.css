@@ -1,4 +1,5 @@
 /* Community tab styles. Owned by the community engineer; import further files from here. */
+@import './centro.css';
 
 .community {
   display: flex;

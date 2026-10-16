@@ -64,6 +64,13 @@
       "when": 1792170647108,
       "tag": "0008_lab_boards",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792174664950,
+      "tag": "0009_community_center",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { toDecimal } from './decimal';
+import { Decimal, toDecimal } from './decimal';
 import type { DecimalSource } from './decimal';
 
 /**
@@ -102,4 +102,31 @@ export function formatPercent(fraction: number, decimals = 0): string {
   if (!Number.isFinite(fraction)) return '0%';
   const sign = fraction < 0 ? '-' : '';
   return `${sign}${fixed(Math.abs(fraction) * 100, decimals)}%`;
+}
+
+/**
+ * Reads an amount a player typed, the inverse of formatNumber: "5 Qad", "1,5 M", "2.500", "1e30" or plain digits.
+ * Suffixes ignore case. Returns null for anything that is not a positive finite number.
+ */
+export function parseAmount(text: string): Decimal | null {
+  const raw = text.trim().replace(/\s+/g, '');
+  if (!raw) return null;
+  const suffixMatch = /^([0-9.,]+)([a-zA-Z]+)$/.exec(raw);
+  let numberPart = raw;
+  let power = 0;
+  if (suffixMatch && !/^[0-9.,]+e[+-]?\d+$/i.test(raw)) {
+    const group3 = SUFFIXES.findIndex((suffix, i) => i > 0 && suffix.toLowerCase() === suffixMatch[2]!.toLowerCase());
+    if (group3 < 0) return null;
+    numberPart = suffixMatch[1]!;
+    power = group3 * 3;
+  }
+  // pt-BR: "." groups thousands and "," is the decimal mark; a lone "." is read as a decimal point unless it only groups.
+  let normalised: string;
+  if (/[eE]/.test(numberPart)) normalised = numberPart.replace(',', '.');
+  else if (numberPart.includes(',')) normalised = numberPart.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(numberPart) && power === 0) normalised = numberPart.replace(/\./g, '');
+  else normalised = numberPart;
+  if (!/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(normalised)) return null;
+  const value = new Decimal(power === 0 ? normalised : `${normalised}e${power}`);
+  return Number.isFinite(value.m) && Number.isFinite(value.e) && value.gt(0) ? value : null;
 }

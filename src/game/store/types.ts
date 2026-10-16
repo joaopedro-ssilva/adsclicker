@@ -66,6 +66,8 @@ export type GameEvent =
   | { type: 'labNodeBought'; id: string; level: number }
   | { type: 'labTreeReset'; refunded: number }
   | { type: 'labOffersRerolled'; phase: number }
+  /** ADScoins given to the campus; `title` is the donor title this donation just earned (an id of content/donations.ts), if any. */
+  | { type: 'donate'; amount: Decimal; total: Decimal; title: string | null }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -271,6 +273,8 @@ export interface GameActions {
   defendPostdoc(professor: ProfessorId): boolean;
   /** Refunds the diplomas spent on the tree and empties it. Once per turma. */
   resetPrestigeTree(): boolean;
+  /** Gives ADScoins to the campus (Centro Comunitário). False when the amount is below 1 or above the coins in hand. */
+  donateToCampus(amount: Decimal): boolean;
 
   /** Hires a Monitor, or raises it one level, with diplomas. */
   buyMonitor(id: MonitorId): boolean;

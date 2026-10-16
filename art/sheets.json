@@ -1591,6 +1591,18 @@
         "size": 32
       },
       "hires": 112
+    },
+    {
+      "file": "community-center.png",
+      "kind": "icon",
+      "keys": [
+        "community-center"
+      ],
+      "target": {
+        "axis": "max",
+        "size": 32
+      },
+      "hires": 112
     }
   ]
 }

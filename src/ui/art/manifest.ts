@@ -138,6 +138,7 @@ export const ASSETS: Record<string, SpriteMeta> = {
   "heads/wagner-sentinela": { w: 52, h: 53, anchor: { x: 26, y: 52 } },
   "icons/coin": { w: 21, h: 22 },
   "icons/community-center": { w: 112, h: 94 },
+  "icons/community-center": { w: 112, h: 94 },
   "icons/diploma": { w: 22, h: 14 },
   "lab/decor/cacto": { w: 102, h: 210 },
   "lab/decor/caneca-do-plantao": { w: 173, h: 210 },

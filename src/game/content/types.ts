@@ -121,7 +121,9 @@ export type CounterKey =
   /** Pós-docs defended (stars earned) over all the professors, ever. */
   | 'postdocs'
   /** Graduations made without honouring anyone. */
-  | 'ungratefulGraduations';
+  | 'ungratefulGraduations'
+  /** Donations made at the Centro Comunitário (the total given is GameState.donated). */
+  | 'donations';
 
 /** Counters of the current run only: they start again at every graduation (GameState.run). */
 export type RunCounterKey = 'levelsBought';

@@ -39,6 +39,7 @@ export function createCounters(): Record<CounterKey, number> {
     treeResets: 0,
     postdocs: 0,
     ungratefulGraduations: 0,
+    donations: 0,
   };
 }
 
@@ -112,6 +113,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     coins: ZERO,
     runCoins: ZERO,
     lifetimeCoins: ZERO,
+    donated: ZERO,
     diplomas: 0,
     diplomasEarned: 0,
 

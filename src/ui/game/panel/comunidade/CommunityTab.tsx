@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useCloud } from '@/game/cloud';
 import type { Board } from '@/shared/api';
 import { EmptyState } from '@/ui/kit';
+import { CommunityCenterButton } from './CommunityCenterButton';
 import { CommunityStats } from './CommunityStats';
 import { FeedSection } from './FeedSection';
 import { LeaderboardSection } from './LeaderboardSection';
@@ -20,6 +21,7 @@ export function CommunityTab() {
   if (data.phase === 'offline') {
     return (
       <div className="community">
+        <CommunityCenterButton />
         <EmptyState title="Comunidade offline" icon="clock">
           A comunidade está offline. Seu jogo continua salvo neste aparelho.
         </EmptyState>
@@ -40,6 +42,7 @@ export function CommunityTab() {
   return (
     <div className="community">
       <CommunityStats data={data.community} />
+      <CommunityCenterButton />
       <LeaderboardSection
         board={board}
         onBoard={setBoard}

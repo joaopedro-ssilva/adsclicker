@@ -9,6 +9,7 @@ import { Scenery } from '@/ui/art/Scenery';
 import { EmptyState, Icon, Modal } from '@/ui/kit';
 import type { IconName } from '@/ui/kit';
 import { characterSprite } from '../../shared/characterProps';
+import { DonorBadge } from './DonorBadge';
 import { TagBadge } from './TagBadge';
 
 const whole = (value: number) => formatNumber(value, { integer: true });
@@ -83,6 +84,7 @@ function ProfileBody({ profile }: { profile: Profile }) {
       </Scenery>
       <div className="profile-head">
         <TagBadge tags={profile.tags} all />
+        <DonorBadge id={profile.donorTitle} />
         <p className="profile-line">
           {profile.online ? <span className="community-dot" data-on="true" role="img" aria-label="online" /> : null}
           {profile.online ? 'Jogando agora' : 'Offline'} · {formatDuration(stats.playSeconds * 1000)} de jogo · na turma desde{' '}

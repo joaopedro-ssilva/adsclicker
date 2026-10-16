@@ -238,6 +238,8 @@ export interface GameState {
   /** Coins produced since the last graduation; decides the diplomas of the next one. */
   runCoins: Decimal;
   lifetimeCoins: Decimal;
+  /** ADScoins given to the campus (Centro Comunitário), ever. Survives graduation; decides the donor title. */
+  donated: Decimal;
   /** Diplomas available to spend. */
   diplomas: number;
   /** Diplomas ever earned; each one gives a permanent global bonus. */

@@ -1024,6 +1024,22 @@ calls.push({
   ],
 });
 
+// The Centro Comunitário button logo (Turma tab): one chunky icon of a small community-center building.
+calls.push({
+  label: 'community-center',
+  images: [
+    {
+      file: 'community-center.png',
+      kind: 'icon',
+      keys: ['community-center'],
+      refs: ['icons.png'],
+      // Kept at the drawn resolution (capped at 112 px): the button shows it at 56 px, smooth, like the hackathon items.
+      sheet: { target: { axis: 'max', size: 32 }, hires: 112 },
+      text: `${HK_BASE}. ${HK_STYLE} It shows ONE single chunky game icon, alone, centered, bold simple readable shape with a thick dark outline: a small friendly community-center building seen from the front, warm cream walls with a terracotta-red tiled roof, a tiny gabled front porch with two little columns, a double door with a warm glow, two small windows, a flag on the roof and a small gold coin-heart emblem above the door, a little green hedge at the base. Cute and welcoming, not text, no letters.`,
+    },
+  ],
+});
+
 // Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
 for (const c of calls) {
   for (const im of c.images) if (!im.v8) im.keys = im.keys.map((key) => (V8_REDRAWN.has(key) ? `_${key}` : key));

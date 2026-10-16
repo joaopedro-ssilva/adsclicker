@@ -121,6 +121,11 @@ export const players = pgTable(
     bestRunCoinsLog: doublePrecision('best_run_coins_log').notNull().default(0),
     /** The items of that turma. */
     bestRunBuild: jsonb('best_run_build').$type<LabBuild>(),
+
+    // Centro Comunitário (docs/BACKEND.md, "Centro Comunitário") --------------------------------
+    /** ADScoins given to the campus, ever (`state.donated` of the save): exact text and log10, as lifetime coins. */
+    donatedText: text('donated_text').notNull().default('0'),
+    donatedLog: doublePrecision('donated_log').notNull().default(0),
   },
   (t) => {
     // The boards only list ranked players, so each ordering is a partial index over exactly them.
@@ -138,6 +143,9 @@ export const players = pgTable(
       index('players_board_best_run_idx')
         .on(t.bestRunCoinsLog.desc(), t.id)
         .where(sql`${ranked} and ${t.bestRunCoinsLog} > 0`),
+      index('players_board_donors_idx')
+        .on(t.donatedLog.desc(), t.id)
+        .where(sql`${ranked} and ${t.donatedLog} > 0`),
     ];
   },
 );

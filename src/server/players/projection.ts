@@ -27,6 +27,9 @@ export interface Projection {
   bestRunCoinsText: string;
   bestRunCoinsLog: number;
   bestRunBuild: LabBuild | null;
+  /** Centro Comunitário: the ADScoins given to the campus, exact text and log10 (0 below one coin). */
+  donatedText: string;
+  donatedLog: number;
 }
 
 /** True when the coins are too large to store (exponent beyond MAX_COIN_EXPONENT). */
@@ -58,5 +61,7 @@ export function projectState(state: GameState): Projection {
     bestRunCoinsText: bestRun.coins.toString(),
     bestRunCoinsLog: bestRun.coins.lte(1) ? 0 : bestRun.coins.log10(),
     bestRunBuild: state.lab.unlocked && bestRun.build.length > 0 ? bestRun.build : null,
+    donatedText: state.donated.toString(),
+    donatedLog: state.donated.lte(1) ? 0 : state.donated.log10(),
   };
 }

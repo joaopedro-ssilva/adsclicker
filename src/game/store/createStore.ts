@@ -236,6 +236,11 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         return done;
       },
       buyPrestigeNode: (id) => run((state, emit) => engine.buyPrestigeNode(state, content, id, now(), emit), true),
+      donateToCampus: (amount) => {
+        const done = run((state, emit) => engine.donateToCampus(state, content, amount, now(), emit));
+        if (done) get().save();
+        return done;
+      },
       resetPrestigeTree: () => run((state, emit) => engine.resetPrestigeTree(state, content, now(), emit), true),
 
       buyMonitor: (id) => run((state, emit) => engine.buyMonitor(state, content, id, now(), emit), true),

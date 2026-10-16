@@ -23,6 +23,8 @@ import type { GameState } from './state';
 export { favouriteKey, toggleFavourite } from './favourites';
 export type { FavouriteKind } from './favourites';
 export { click } from './click';
+export { donateToCampus, donationProgress, donationTitleFor, MIN_DONATION } from './donations';
+export type { DonationProgress } from './donations';
 export type { ClickPosition } from './click';
 export {
   buyResearch,

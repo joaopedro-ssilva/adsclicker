@@ -359,6 +359,8 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.coins = readDecimal(raw.coins);
   state.runCoins = readDecimal(raw.runCoins);
   state.lifetimeCoins = Decimal.max(readDecimal(raw.lifetimeCoins), state.runCoins);
+  // Absent in older saves: nothing was donated. Never above the lifetime coins.
+  state.donated = Decimal.min(readDecimal(raw.donated), state.lifetimeCoins);
   state.diplomas = Math.floor(readNumber(raw.diplomas, 0, 0));
   state.diplomasEarned = Math.max(state.diplomas, Math.floor(readNumber(raw.diplomasEarned, 0, 0)));
 
@@ -473,6 +475,7 @@ export function serializeState(state: GameState): string {
     coins: state.coins.toString(),
     runCoins: state.runCoins.toString(),
     lifetimeCoins: state.lifetimeCoins.toString(),
+    donated: state.donated.toString(),
     run: {
       ...state.run,
       clickCoins: state.run.clickCoins.toString(),

@@ -1,6 +1,6 @@
 export { Decimal, ZERO, ONE, parseDecimal, toDecimal } from './decimal';
 export type { DecimalSource } from './decimal';
-export { formatNumber, formatDuration, formatPercent } from './format';
+export { formatNumber, formatDuration, formatPercent, parseAmount } from './format';
 export type { FormatNumberOptions } from './format';
 export { createRng } from './rng';
 export { getIndex } from './contentIndex';
