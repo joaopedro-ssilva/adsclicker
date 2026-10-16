@@ -110,15 +110,15 @@ describe('Pós-doc rule', () => {
 });
 
 describe('Pós-doc effect', () => {
-  it('makes the Domínio bonus 5% stronger per star', () => {
+  it('makes the Domínio bonus 10% stronger per star', () => {
     const g = game();
     setLevels(g.state, 'b2', 1000);
     const base = computeStats(g.state, content).costMult;
     expect(base).toBeCloseTo(0.99 ** 40, 10);
     g.state.postdoc.stars.b2 = 2;
-    expect(computeStats(g.state, content).costMult).toBeCloseTo(0.99 ** 44, 10);
+    expect(computeStats(g.state, content).costMult).toBeCloseTo(0.99 ** 48, 10);
     g.state.postdoc.stars.b2 = 5;
-    expect(computeStats(g.state, content).costMult).toBeCloseTo(0.99 ** 50, 10);
+    expect(computeStats(g.state, content).costMult).toBeCloseTo(0.99 ** 60, 10);
   });
 
   it('scales additive Domínio effects and the line shown in the view', () => {
@@ -127,9 +127,9 @@ describe('Pós-doc effect', () => {
     const plain = computeStats(g.state, content).eventReward;
     expect(plain).toBeCloseTo(1 + 0.025 * 40, 10);
     g.state.postdoc.stars.wagner = 1;
-    expect(computeStats(g.state, content).eventReward).toBeCloseTo(1 + 0.025 * 42, 10);
+    expect(computeStats(g.state, content).eventReward).toBeCloseTo(1 + 0.025 * 44, 10);
     expect(masteryView(g.state, content, 'wagner').stars).toBe(1);
-    expect(masteryView(g.state, content, 'wagner').line).toContain('105');
+    expect(masteryView(g.state, content, 'wagner').line).toContain('110');
   });
 
   it('does nothing for a professor who is not hired', () => {

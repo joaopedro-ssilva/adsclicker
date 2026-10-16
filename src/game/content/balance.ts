@@ -15,7 +15,7 @@ export const balance: BalanceConfig = {
   mastery: { step: 25, cap: 40 },
   // Pós-doc: the biggest ADScoins sink. Star 1 costs about what a strong turma produces (1e30); each next one x1000
   // (1e30, 1e33, 1e36, 1e39, 1e42). A top player holds around 1e45, so the fifth star is a real late-game goal.
-  postdoc: { maxStars: 5, bonusPerStar: 0.05, firstPrice: '1e30', priceGrowth: 1000 },
+  postdoc: { maxStars: 5, bonusPerStar: 0.1, firstPrice: '1e30', priceGrowth: 1000 },
   tierUnlockLevel: 10,
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 4 },
