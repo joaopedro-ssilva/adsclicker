@@ -248,6 +248,7 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
 
       unlockMaestria: (professor) => run((state, emit) => engine.unlockMaestria(state, content, professor, now(), emit), true),
       buyMaestriaLevel: (professor) => run((state, emit) => engine.buyMaestriaLevel(state, content, professor, now(), emit), true),
+      setMaestriaEnabled: (professor, enabled) => run((state, emit) => engine.setMaestriaEnabled(state, content, professor, enabled, now(), emit), true),
       fireRollforward: () => run((state, emit) => engine.fireRollforward(state, content, now(), emit), true),
       startSwarm: () => run((state, emit) => engine.startSwarm(state, content, now(), emit), true),
       startFesta: () => run((state, emit) => engine.startFesta(state, content, now(), emit), true),

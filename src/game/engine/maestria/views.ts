@@ -11,7 +11,7 @@ import { releaseBonusPerVersion, releaseSprintsPerVersion, releaseVersions } fro
 import { goldenActive, goldenReady, joinhaMultiplier, joinhaRechargeSeconds, joinhaSeconds } from './joinha';
 import { atLevel } from './production';
 import { rollforwardJumpMs, rollforwardMaxCharges } from './rollforward';
-import { freeSlots, maestriaLevel, maestriaNextCost, unlockedMaestrias } from './slots';
+import { activeMaestriaLevel, freeSlots, maestriaLevel, maestriaNextCost, unlockedMaestrias } from './slots';
 import { swarmCharge, swarmChargeMs } from './swarm';
 import type { ActiveSwarm } from './types';
 
@@ -27,6 +27,8 @@ export interface MaestriaCardView {
   level: number;
   maxLevel: number;
   unlocked: boolean;
+  /** Unlocked and not switched off by the player (a switched-off Maestria keeps its level but does nothing). */
+  enabled: boolean;
   /** A free slot can be put here now. */
   canUnlock: boolean;
   /** Diplomas for the next level, or null at the top or while locked. */
@@ -119,6 +121,7 @@ export function maestriasView(state: GameState, content: GameContent): Maestrias
       level,
       maxLevel: MAESTRIA_MAX_LEVEL,
       unlocked: level > 0,
+      enabled: level > 0 && state.maestria.disabled[professor] !== true,
       canUnlock: def.built && level === 0 && free > 0,
       nextCost,
       affordable: nextCost !== null && state.diplomas >= nextCost,
@@ -153,7 +156,7 @@ export interface JoinhaView {
 }
 
 export function joinhaView(state: GameState, content: GameContent, now: number = state.lastTickAt): JoinhaView | null {
-  const level = maestriaLevel(state, 'edecio');
+  const level = activeMaestriaLevel(state, 'edecio');
   if (level <= 0) return null;
   const { activeUntil, readyAt } = state.maestria.joinha;
   const seconds = joinhaSeconds(state, content);
@@ -185,7 +188,7 @@ export interface RollforwardView {
 }
 
 export function rollforwardView(state: GameState, content: GameContent): RollforwardView | null {
-  const level = maestriaLevel(state, 'gladimir');
+  const level = activeMaestriaLevel(state, 'gladimir');
   if (level <= 0) return null;
   const roll = state.maestria.rollforward;
   return {
@@ -213,7 +216,7 @@ export interface SwarmView {
 
 /** `now` defaults to the last tick, like abilityViews. */
 export function swarmView(state: GameState, content: GameContent, now: number = state.lastTickAt): SwarmView | null {
-  const level = maestriaLevel(state, 'wagner');
+  const level = activeMaestriaLevel(state, 'wagner');
   if (level <= 0) return null;
   const charge = swarmCharge(state, content, now);
   const total = swarmChargeMs(state, content);
@@ -249,7 +252,7 @@ export interface FestaView {
 }
 
 export function festaView(state: GameState, content: GameContent, now: number = state.lastTickAt): FestaView | null {
-  const level = maestriaLevel(state, 'guto');
+  const level = activeMaestriaLevel(state, 'guto');
   if (level <= 0) return null;
   const cfg = content.maestrias.festa;
   const charge = festaCharge(state, content, now);
@@ -285,7 +288,7 @@ export interface ReleasesView {
 }
 
 export function releasesView(state: GameState, content: GameContent): ReleasesView | null {
-  const level = maestriaLevel(state, 'b1');
+  const level = activeMaestriaLevel(state, 'b1');
   if (level <= 0) return null;
   const per = releaseSprintsPerVersion(state, content);
   const versions = releaseVersions(state, content);
@@ -327,7 +330,7 @@ const HORAS_LABELS: { key: keyof GameState['maestria']['horas']; label: string }
 ];
 
 export function horasView(state: GameState, content: GameContent): HorasView | null {
-  const level = maestriaLevel(state, 'angelo');
+  const level = activeMaestriaLevel(state, 'angelo');
   if (level <= 0) return null;
   const perBand = content.maestrias.horas.hoursPerBand;
   const capacity = horasCapacity(state, content);

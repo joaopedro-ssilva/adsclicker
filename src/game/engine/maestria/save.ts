@@ -110,6 +110,15 @@ export function readMaestria(value: unknown, content: GameContent): MaestriaStat
       if (level > 0) maestria.levels[id] = level;
     }
   }
+  if (isRecord(value.disabled)) {
+    for (const id of PROFESSOR_IDS) {
+      if (value.disabled[id] !== true || !maestria.levels[id]) continue;
+      maestria.disabled[id] = true;
+      const at = (isRecord(value.pausedAt) ? value.pausedAt[id] : undefined);
+      // No (or a broken) pause time: resuming then restarts the timers instead of crediting the pause.
+      maestria.pausedAt[id] = typeof at === 'number' && Number.isFinite(at) && at > 0 ? at : 0;
+    }
+  }
   // The old shape (`clicks`) is ignored: both times start at 0.
   if (isRecord(value.joinha)) maestria.joinha = { activeUntil: num(value.joinha.activeUntil, 0, 0), readyAt: num(value.joinha.readyAt, 0, 0) };
   if (isRecord(value.rollforward)) {

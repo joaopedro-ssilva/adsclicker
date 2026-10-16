@@ -7,7 +7,7 @@ import { isAbilityUnlocked } from '../requirements';
 import type { ActiveBuff, GameState } from '../state';
 import { computeStats, hasFeature } from '../stats';
 import { atLevel } from './production';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 
 const MINUTE_MS = 60_000;
 /** The first invasion of the party comes this soon (unless one is already due earlier). */
@@ -15,7 +15,7 @@ const FIRST_INVASION_MS = 5_000;
 
 /** Real time one recharge takes at the current level, in ms. 0 when Guto's Maestria is not unlocked. */
 export function festaRechargeMs(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'guto');
+  const level = activeMaestriaLevel(state, 'guto');
   return level > 0 ? atLevel(content.maestrias.festa.rechargeMinutes, level) * MINUTE_MS : 0;
 }
 
@@ -43,7 +43,7 @@ export function festaReady(state: GameState, content: GameContent, now: number):
  * ask for the abilities by hand keep their meaning. The recharge starts again at once.
  */
 export function startFesta(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
-  const level = maestriaLevel(state, 'guto');
+  const level = activeMaestriaLevel(state, 'guto');
   if (level <= 0 || !festaReady(state, content, now)) return false;
 
   const cfg = content.maestrias.festa;
@@ -82,7 +82,12 @@ export function startFesta(state: GameState, content: GameContent, now: number, 
   return true;
 }
 
+/** Ends the party's buff now (used when the Maestria is switched off). */
+export function endFestaNow(state: GameState): void {
+  state.buffs = state.buffs.filter((buff) => !buff.id.startsWith(FESTA_BUFF_PREFIX));
+}
+
 /** Starts the recharge of a fresh Maestria. */
 export function updateFesta(state: GameState, now: number): void {
-  if (maestriaLevel(state, 'guto') > 0 && state.maestria.festa.since <= 0) state.maestria.festa.since = now;
+  if (activeMaestriaLevel(state, 'guto') > 0 && state.maestria.festa.since <= 0) state.maestria.festa.since = now;
 }

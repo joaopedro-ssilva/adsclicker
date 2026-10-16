@@ -1,14 +1,14 @@
 import type { GameContent } from '../../content/types';
 import type { GameState } from '../state';
 import { atLevel } from './levelTable';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 import type { HorasState } from './types';
 
 export type HorasSource = keyof HorasState;
 
 /** Bands open at the current level; 0 when Angelo's Maestria is not unlocked. */
 export function horasBands(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'angelo');
+  const level = activeMaestriaLevel(state, 'angelo');
   return level > 0 ? atLevel(content.maestrias.horas.bands, level) : 0;
 }
 
@@ -27,7 +27,7 @@ const WEIGHT_OF: Record<HorasSource, keyof GameContent['maestrias']['horas']['we
 
 /** Called when the player does something: clicks, a defended invasion, a completed sprint, an ability, levels bought. */
 export function recordHoras(state: GameState, content: GameContent, source: HorasSource, amount = 1): void {
-  if (maestriaLevel(state, 'angelo') <= 0 || amount <= 0) return;
+  if (activeMaestriaLevel(state, 'angelo') <= 0 || amount <= 0) return;
   state.maestria.horas[source] += amount * content.maestrias.horas.weights[WEIGHT_OF[source]];
 }
 

@@ -1,7 +1,7 @@
 import type { GameContent } from '../../content/types';
 import type { GameState } from '../state';
 import { atLevel } from './levelTable';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 
 /**
  * Releases. The versions are not stored: they follow from the sprints completed in the run (which start again at
@@ -11,13 +11,13 @@ import { maestriaLevel } from './slots';
 
 /** Sprints of the run for each version at the current level; 0 when B1's Maestria is not unlocked. */
 export function releaseSprintsPerVersion(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'b1');
+  const level = activeMaestriaLevel(state, 'b1');
   return level > 0 ? atLevel(content.maestrias.releases.sprintsPerVersion, level) : 0;
 }
 
 /** Production each version adds (0.03 = +3%). */
 export function releaseBonusPerVersion(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'b1');
+  const level = activeMaestriaLevel(state, 'b1');
   return level > 0 ? atLevel(content.maestrias.releases.bonus, level) : 0;
 }
 

@@ -110,6 +110,7 @@ export {
   depositBolsaFund,
   fireRollforward,
   hitBug,
+  setMaestriaEnabled,
   sellBolsaAsset,
   startFesta,
   startSwarm,

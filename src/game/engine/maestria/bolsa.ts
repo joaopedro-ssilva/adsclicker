@@ -4,7 +4,7 @@ import { Decimal, ZERO } from '../decimal';
 import type { GameState } from '../state';
 import { atLevel } from './levelTable';
 import { steadyCoinsPerSecond } from './production';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 import type { BolsaAssetState, BolsaHolding, BolsaState } from './types';
 
 /**
@@ -24,7 +24,7 @@ const MINUTE_MS = 60_000;
 /** Steps simulated when a market opens, so the sparkline is not empty. */
 const WARMUP_STEPS = 40;
 
-export const bolsaLevel = (state: GameState): number => maestriaLevel(state, 'pablo');
+export const bolsaLevel = (state: GameState): number => activeMaestriaLevel(state, 'pablo');
 
 const emptyHolding = (): BolsaHolding => ({ units: ZERO, cost: ZERO });
 
@@ -186,7 +186,7 @@ export function bolsaSpend(state: GameState, content: GameContent, fraction: num
 export function buyAsset(state: GameState, content: GameContent, id: string, fraction: number, emit: Emit): boolean {
   const def = content.maestrias.bolsa.assets.find((asset) => asset.id === id);
   const entry = state.maestria.bolsa.assets[id];
-  if (!def || !entry || !assetOpen(state, def)) return false;
+  if (bolsaLevel(state) <= 0 || !def || !entry || !assetOpen(state, def)) return false;
   const amount = bolsaSpend(state, content, fraction);
   if (amount.lt(1)) return false;
   buyInto(state, entry.held, entry.price, amount);
@@ -197,7 +197,8 @@ export function buyAsset(state: GameState, content: GameContent, id: string, fra
 /** Sells `fraction` of what is held of an asset. */
 export function sellAsset(state: GameState, content: GameContent, id: string, fraction: number, emit: Emit): boolean {
   const entry = state.maestria.bolsa.assets[id];
-  if (!entry || entry.held.units.lte(0) || fraction <= 0) return false;
+  // Switched off: the holdings stay frozen and cannot be traded (they are cashed in at graduation anyway).
+  if (bolsaLevel(state) <= 0 || !entry || entry.held.units.lte(0) || fraction <= 0) return false;
   const sale = sellFrom(state, content, entry.held, entry.price, fraction);
   emit({ type: 'bolsa', side: 'sell', asset: id, coins: sale.payout, profit: sale.profit, capped: sale.capped });
   return true;
@@ -214,7 +215,7 @@ export function depositFund(state: GameState, content: GameContent, fraction: nu
 
 export function withdrawFund(state: GameState, content: GameContent, fraction: number, emit: Emit): boolean {
   const bolsa = state.maestria.bolsa;
-  if (bolsa.fund.units.lte(0) || fraction <= 0) return false;
+  if (bolsaLevel(state) <= 0 || bolsa.fund.units.lte(0) || fraction <= 0) return false;
   const sale = sellFrom(state, content, bolsa.fund, bolsa.fundIndex, fraction);
   emit({ type: 'bolsa', side: 'sell', asset: 'fundo', coins: sale.payout, profit: sale.profit, capped: sale.capped });
   return true;

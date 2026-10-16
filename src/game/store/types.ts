@@ -33,6 +33,7 @@ export type GameEvent =
   | { type: 'monitorAct'; monitor: MonitorId; id: string }
   /** A Maestria was unlocked (level 1) or raised. */
   | { type: 'maestria'; professor: ProfessorId; level: number }
+  | { type: 'maestriaToggle'; professor: ProfessorId; enabled: boolean }
   /** A full combo started the golden mode of Joinha de Ouro; it ends at `endsAt` (epoch ms). */
   | { type: 'joinhaStart'; endsAt: number }
   | { type: 'rollforward'; ms: number; coins: Decimal }
@@ -276,6 +277,8 @@ export interface GameActions {
   unlockMaestria(professor: ProfessorId): boolean;
   /** Buys the next level of an unlocked Maestria with diplomas. */
   buyMaestriaLevel(professor: ProfessorId): boolean;
+  /** Switches a Maestria on or off (a pause: the level stays). Free and allowed anytime. */
+  setMaestriaEnabled(professor: ProfessorId, enabled: boolean): boolean;
   /** Spends a Rollforward charge. */
   fireRollforward(): boolean;
   /** Starts the Super invasão when it is charged. */
