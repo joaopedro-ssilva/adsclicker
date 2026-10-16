@@ -183,7 +183,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     clickFromIdle: Math.max(0, acc.value('clickFromIdle', 0)),
     critChance: clamp(acc.value('critChance', combo ? balance.crit.baseChance : 0), 0, 1),
     critMult: Math.max(1, acc.value('critMult', balance.crit.baseMult)),
-    comboMax: Math.max(0, acc.value('comboMax', combo ? balance.combo.baseMax : 0)),
+    // Whole steps: lab affixes add fractions (+0.15 a point), and a fractional cap could never be filled.
+    comboMax: Math.max(0, Math.floor(acc.value('comboMax', combo ? balance.combo.baseMax : 0) + 1e-9)),
     comboStep: Math.max(0, acc.value('comboStep', balance.combo.baseStep)),
     comboDecay: Math.max(0, acc.value('comboDecay', 1)),
     autoClicks: Math.max(0, acc.value('autoClicks', 0)),

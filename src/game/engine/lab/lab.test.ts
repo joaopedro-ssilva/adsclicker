@@ -783,6 +783,8 @@ describe('item effects in computeStats', () => {
     expect(stats({ target: 'logica', op: 'pct', value: 10 }).clickPower).toBeCloseTo(1 + 10 * 2.2 * 0.01);
     const agility = stats({ target: 'agilidade', op: 'add', value: 5 });
     expect(agility.comboMax).toBeGreaterThan(base.comboMax);
+    // 5 x 2.2 x 0.15 = 1.65 steps: the cap stays a whole number, so a full combo can be reached.
+    expect(Number.isInteger(agility.comboMax)).toBe(true);
     expect(agility.comboDecay).toBeLessThan(base.comboDecay);
     expect(stats({ target: 'foco', op: 'add', value: 20 }).abilityDuration).toBeCloseTo(1 + 20 * 2.2 * 0.003);
     expect(stats({ target: 'resiliencia', op: 'add', value: 5 }).eventWindow).toBeCloseTo(1 + 5 * 2.2 * 0.015);
