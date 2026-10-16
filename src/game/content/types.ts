@@ -630,6 +630,11 @@ export interface SkinDef {
     secondary: string;
     accent: string;
   };
+  /**
+   * Where the skin comes from when it is not an achievement reward (the Laboratório collection: 'lab' drops,
+   * 'posdoc' and 'donation' from the Centro Comunitário). Unwired for now: the unlock rules come later.
+   */
+  source?: 'lab' | 'posdoc' | 'donation';
   /** Short prompt fragment for the art pipeline describing the outfit. */
   artPrompt: string;
 }
@@ -653,6 +658,8 @@ export interface SceneryDef {
     horizon: string;
     floor: string;
   };
+  /** Laboratório collection scenery that is not an achievement reward (unlock rules come later). */
+  source?: 'lab' | 'posdoc' | 'donation';
   artPrompt: string;
 }
 
