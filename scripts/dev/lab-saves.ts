@@ -48,8 +48,9 @@ function give(state: GameState, baseId: string, rarity: LabItem['rarity'], level
 }
 
 /** A run in `phase`, with a few items, `fraction` of the integrity left, after `seconds` of fighting. */
-function fighting(phase: number, fraction: number, seconds: number): GameState {
+function fighting(phase: number, fraction: number, seconds: number, tree: Record<string, number> = {}): GameState {
   const state = ready();
+  Object.assign(state.lab.tree, tree);
   startLabRun(state, content, 12345, emit);
   give(state, 'mochila-de-notebook', 'raro', 4, 1);
   give(state, 'cadeira-ergonomica', 'epico', 6, 2);
@@ -85,6 +86,9 @@ save('ready', ready());
 
 // 4. Mid fight, a few cracks
 save('fight', fighting(7, 0.62, 0.8));
+
+// 4b. Mid fight with the Firewall do lab: the shield of the phase on the integrity bar
+save('shield', fighting(7, 0.62, 0.6, { 'firewall-do-lab': 4 }));
 
 // 5. Boss
 save('boss', fighting(10, 0.4, 1.4));

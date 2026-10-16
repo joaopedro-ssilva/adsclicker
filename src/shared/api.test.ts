@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
+﻿import { describe, expect, it } from 'vitest';
 import { labBoardSchema, labLeaderboardResponseSchema, nicknameRequestSchema, syncRequestSchema } from './api';
 
 describe('labLeaderboardResponseSchema', () => {
-  const row = { rank: 1, nickname: 'Ana', value: '12', build: [{ slot: 'setup', base: 'nobreak', rarity: 'raro', level: 4 }] };
+  const row = { rank: 1, nickname: 'Ana', professor: 'edecio', skin: '', value: '12', build: [{ slot: 'setup', base: 'nobreak', rarity: 'raro', level: 4 }] };
 
   it('takes the two boards and a response with or without the caller\'s own row', () => {
     expect(labBoardSchema.safeParse('phase').success).toBe(true);

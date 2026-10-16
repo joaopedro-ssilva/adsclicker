@@ -8,6 +8,7 @@ import { ASSETS } from '@/ui/art/manifest';
 import { HpBar } from '@/ui/hackathon/arena/HpBar';
 import { Button, Icon, ProgressBar } from '@/ui/kit';
 import { cssVariables } from '@/ui/theme';
+import { playLimited } from '../panel/lib/feedback';
 import { ScreenDecision } from './Decision';
 import { ItemArt } from './ItemArt';
 import { crackLevel, integrityTone, mobZoom, perSecond, seconds } from './labFormat';
@@ -84,8 +85,11 @@ function Hud({ view }: { view: LabMonitorView }) {
 
 function Integrity({ view }: { view: LabMonitorView }) {
   const drain = view.drain > 0 ? ` · -${perSecond(view.drain)}/s` : '';
+  // The shield (tree: Firewall do lab) takes the drain first: a strip of its own under the bar, in another colour.
+  const shield = Math.ceil(view.shield);
+  const share = view.maxIntegrity > 0 ? Math.min(1, view.shield / view.maxIntegrity) : 0;
   return (
-    <div className="lab-integrity" data-qa="lab-integrity">
+    <div className="lab-integrity" data-shield={shield > 0 || undefined} data-qa="lab-integrity">
       <ProgressBar
         label="Integridade do monitor"
         value={view.integrity}
@@ -96,6 +100,12 @@ function Integrity({ view }: { view: LabMonitorView }) {
         size="sm"
         tone={integrityTone(view.integrityFraction)}
       />
+      {shield > 0 ? (
+        <div className="lab-shield" role="img" aria-label={`Escudo da fase: ${shield} pontos`} data-qa="lab-shield">
+          <span className="lab-shield-fill" style={{ width: `${share * 100}%` }} />
+          <span className="lab-shield-text">+{shield} escudo</span>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -230,6 +240,8 @@ export function Monitor({ view, feed }: MonitorProps) {
     const rect = event.currentTarget.getBoundingClientRect();
     spark(((event.clientX - rect.left) / rect.width) * 100, ((event.clientY - rect.top) / rect.height) * 100);
     click();
+    // Through the game's sound system (it follows the sound setting); limited so a fast clicker is a patter, not a buzz.
+    playLimited('labHit', 55);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -237,6 +249,7 @@ export function Monitor({ view, feed }: MonitorProps) {
     event.preventDefault();
     spark(40 + Math.random() * 20, 40 + Math.random() * 20);
     click();
+    playLimited('labHit', 55);
   };
 
   const state = broken ? 'broken' : fighting ? 'fighting' : ready ? 'ready' : dead ? 'off' : 'paused';

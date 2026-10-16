@@ -805,6 +805,38 @@ body:has(.lab) .fx-canvas {
   background: rgb(0 0 0 / 0.5);
 }
 
+/* The shield of the phase (Firewall do lab): a cyan strip under the bar that the drain eats first. */
+.lab-shield {
+  position: relative;
+  height: 14px;
+  margin-top: 4px;
+  overflow: hidden;
+  background: rgb(0 0 0 / 0.5);
+  border: 2px solid #1f5c78;
+}
+
+.lab-shield-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(4% - 2px), rgb(0 0 0 / 0.45) calc(4% - 2px) 4%),
+    linear-gradient(#6fd8ff, #2f9fd6);
+  box-shadow: 0 0 8px rgb(111 216 255 / 0.55);
+}
+
+.lab-shield-text {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #eaf9ff;
+  text-shadow: 1px 1px 0 #00263a;
+}
+
 .lab-feed {
   position: absolute;
   bottom: 56px;
@@ -2295,20 +2327,97 @@ body:has(.lab) .fx-canvas {
 
 /* Always there, so the monitor does not grow when the fight note goes away. */
 .lab-note-slot {
-  min-height: 74px;
+  min-height: 112px;
+}
+
+/* The damage under the monitor: two big numbers side by side (fixed-width slots, so nothing shifts as they change). */
+.lab-dmg {
+  display: grid;
+  gap: 6px;
+  padding: 4px 0 0;
+}
+
+.lab-dmg-tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.lab-dmg-tile {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 10px 6px;
+  background: #07120e;
+  border: 2px solid rgb(79 227 169 / 0.4);
+  box-shadow: inset 0 0 18px rgb(0 0 0 / 0.55);
+}
+
+.lab-dmg-label {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(141 255 207 / 0.8);
+}
+
+.lab-dmg-value {
+  min-width: 8ch;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  text-align: center;
+  color: #d4ffee;
+  text-shadow: 0 0 10px rgb(79 227 169 / 0.6);
+  white-space: nowrap;
+}
+
+.lab-dmg-value small {
+  font-size: 14px;
+  color: rgb(141 255 207 / 0.75);
+}
+
+.lab-dmg-note {
+  margin: 0;
+  font-size: 12px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.lab-dmg-note[data-fine] {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+@media (max-width: 719px) {
+  .lab-dmg-tiles {
+    gap: var(--space-2);
+  }
+
+  .lab-dmg-label {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+
+  .lab-dmg-value {
+    min-width: 0;
+    font-size: 24px;
+  }
 }
 
 /* ---------- Ranking: "Mais longe" and "Maior turma" ---------- */
 
+/* Centred in the body, across and down: it takes the room its content needs (the lists scroll inside their panels). */
 .lab-rank {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  flex: 1 1 0;
+  flex: 0 1 auto;
   gap: var(--space-3);
   width: 100%;
   min-height: 0;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: 1720px;
+  margin: auto;
   padding: var(--space-3);
 }
 
@@ -2537,10 +2646,121 @@ body:has(.lab) .fx-canvas {
   }
 
   .lab-rank-row {
-    grid-template-columns: 30px minmax(0, 1fr) auto;
+    grid-template-columns: 30px auto minmax(0, 1fr) auto;
   }
 
   .lab-rank-build {
     grid-column: 2 / -1;
+  }
+}
+
+/* The row opens the profile: the name is the button and its hit area covers the whole row, as on the community board. */
+.lab-rank-row {
+  position: relative;
+}
+
+.lab-rank-row[data-clickable] {
+  cursor: pointer;
+}
+
+.lab-rank-row[data-clickable]:hover {
+  outline: 2px solid color-mix(in srgb, var(--lab) 70%, transparent);
+  outline-offset: -2px;
+}
+
+.lab-rank-row:has(.community-open:focus-visible) {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+.lab-rank-open {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.lab-rank-row .community-avatar {
+  flex-shrink: 0;
+}
+
+/* Wide screens: the boards are drawn about 25% larger, so the item art reads well. */
+@media (min-width: 1024px) {
+  .lab-rank {
+    gap: 16px;
+    padding: 16px 24px;
+  }
+
+  .lab-rank-boards {
+    gap: 20px;
+  }
+
+  .lab-rank-panel {
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .lab-rank-panel .lab-section-head h3 {
+    font-size: 16px;
+  }
+
+  .lab-rank-panel .lab-section-head p {
+    font-size: 13px;
+  }
+
+  .lab-rank-list,
+  .lab-rank-pinned {
+    gap: 6px;
+  }
+
+  /* Enough rows for the lists to scroll inside the window instead of the whole page. */
+  .lab-rank-list {
+    max-height: calc(100dvh - 280px);
+  }
+
+  .lab-rank-row {
+    grid-template-columns: 40px auto minmax(0, 1fr) auto auto;
+    gap: 14px;
+    min-height: 64px;
+    padding: 6px 12px;
+  }
+
+  .lab-rank-pos {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .lab-rank-row .community-avatar {
+    zoom: 1.2;
+  }
+
+  .lab-rank-open {
+    font-size: 18px;
+  }
+
+  .lab-rank-you {
+    font-size: 12px;
+  }
+
+  .lab-rank-value {
+    min-width: 5ch;
+    font-size: 20px;
+  }
+
+  .lab-rank-build {
+    gap: 6px;
+  }
+
+  .lab-rank-slot {
+    width: 50px;
+    height: 50px;
+  }
+
+  .lab-rank-slot .lab-art {
+    width: 44px !important;
+    height: 44px !important;
   }
 }

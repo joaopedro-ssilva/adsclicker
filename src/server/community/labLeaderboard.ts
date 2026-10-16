@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { content } from '@/game/content';
 import { readLabBuild } from '@/game/engine/lab/build';
+import { professorIdSchema } from '@/shared/api';
 import type { LabBoard, LabBoardRow, LabLeaderboardResponse } from '@/shared/api';
 import type { Db } from '../db/client';
 import { players, rankedCondition } from '../db/schema';
@@ -24,16 +25,20 @@ const ordering = (board: LabBoard) =>
 
 type Source = Pick<
   typeof players.$inferSelect,
-  'nickname' | 'titles' | 'labBestPhase' | 'labBestPhaseBuild' | 'bestRunCoinsText' | 'bestRunBuild'
+  'nickname' | 'titles' | 'avatarProfessor' | 'avatarSkin' | 'labBestPhase' | 'labBestPhaseBuild' | 'bestRunCoinsText' | 'bestRunBuild'
 >;
 
 function toRow(board: LabBoard, rank: number, row: Source, catalog: Awaited<ReturnType<typeof getTagCatalog>>): LabBoardRow {
   const tags = publicTagsOf(catalog, row.titles);
   // The build is read back through the content: ids the game no longer knows drop out, whatever the row holds.
   const build = readLabBuild(board === 'phase' ? row.labBestPhaseBuild : row.bestRunBuild, content);
+  // The same avatar source as the community board: the professor on stage and the skin they wear.
+  const professor = professorIdSchema.safeParse(row.avatarProfessor);
   return {
     rank,
     nickname: row.nickname ?? '',
+    professor: professor.success ? professor.data : 'edecio',
+    skin: row.avatarSkin,
     value: board === 'phase' ? String(row.labBestPhase) : row.bestRunCoinsText,
     build,
     ...(tags ? { tags } : {}),
@@ -47,6 +52,8 @@ async function loadBoard(db: Db, board: LabBoard, now: number): Promise<LabLeade
       .select({
         nickname: players.nickname,
         titles: players.titles,
+        avatarProfessor: players.avatarProfessor,
+        avatarSkin: players.avatarSkin,
         labBestPhase: players.labBestPhase,
         labBestPhaseBuild: players.labBestPhaseBuild,
         bestRunCoinsText: players.bestRunCoinsText,

@@ -214,13 +214,15 @@ export function LabOverlay() {
       if (event.key === 'Escape') {
         // A window on top of the lab (a ceremony) owns Esc.
         if (useLabOverlay.getState().shopOpen) return; // the shop panel owns this Esc
-        const other = document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]');
-        if (other && other !== node) return;
+        // (the overlay is itself a modal dialog and comes first in the document, so look for any other one)
+        const other = Array.from(document.querySelectorAll('dialog[open], [role="dialog"][aria-modal="true"]')).some((entry) => entry !== node);
+        if (other) return;
         event.preventDefault();
         hide();
         return;
       }
       if (event.key !== 'Tab' || !node) return;
+      if (document.querySelector('dialog[open]')) return; // a native dialog (the player profile) traps its own Tab
       const items = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((item) => item.getClientRects().length > 0);
       const first = items[0];
       const last = items[items.length - 1];

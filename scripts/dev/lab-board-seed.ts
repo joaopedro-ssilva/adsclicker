@@ -2,20 +2,22 @@
 // the browser can sign in as. Never touches anything but DATABASE_URL (.env.local: the Docker database).
 // Usage: npx tsx scripts/dev/lab-board-seed.ts [nickname-of-the-viewer]   →   prints the viewer's session token
 //        (scripts/qa/lab.mjs --cookie=<token> opens the lab as that player; run it again to start over: it clears the seed first)
-import { eq, like } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { content } from '@/game/content';
 import { LAB_SLOTS } from '@/game/content/labTypes';
+import { PROFESSOR_IDS } from '@/game/content/types';
+import { createInitialState, serializeState } from '@/game/engine';
 import type { LabBuild } from '@/game/engine/lab/types';
 import { createGuest } from '@/server/auth/guest';
 import { createDb } from '@/server/db/client';
 import { players } from '@/server/db/schema';
+import { nicknameKey } from '@/server/players/nickname';
 
 process.loadEnvFile('.env.local');
 const url = process.env.DATABASE_URL;
 if (!url || !/localhost|127\.0\.0\.1/.test(url)) throw new Error('refusing to seed: DATABASE_URL is not the local database');
 
 const { sql, db } = createDb(url, { max: 1 });
-const SEED_PREFIX = 'lab-seed-';
 const viewer = process.argv[2] ?? 'Voce';
 
 /** A build from the content: one item per slot, rarity and level as given (bases are picked by slot, in content order). */
@@ -39,15 +41,20 @@ const ROWS: { name: string; phase: number; coins: number; rarities: string[]; le
 ];
 
 async function main(): Promise<void> {
-  await db.delete(players).where(like(players.nicknameKey, `${SEED_PREFIX}%`));
+  // Start over: the seeded players are found by their nickname keys (the profile card looks players up by them).
+  const keys = [...ROWS.map((row) => nicknameKey(row.name)), ...[0, 1, 2].map((i) => nicknameKey(`Escondido `)), nicknameKey(viewer)];
+  await db.delete(players).where(inArray(players.nicknameKey, keys));
   const base = Date.now() - 3 * 86_400_000;
   for (const [i, row] of ROWS.entries()) {
     const phaseBuild = build(row.rarities, row.levels, i);
     const runBuild = build(row.rarities, row.levels.map((level) => Math.max(1, level - 1)), i + 3);
     await db.insert(players).values({
       nickname: row.name,
-      nicknameKey: `${SEED_PREFIX}${i}`,
+      nicknameKey: nicknameKey(row.name),
       rev: 1,
+      // A plain save, so the profile card (opened from the Ranking) has something to show.
+      save: serializeState(createInitialState(content, Date.now())),
+      avatarProfessor: PROFESSOR_IDS[i % PROFESSOR_IDS.length],
       createdAt: new Date(base),
       lastSeenAt: new Date(),
       labBestPhase: row.phase,
@@ -63,7 +70,7 @@ async function main(): Promise<void> {
   for (const [i, extra] of hidden.entries()) {
     await db.insert(players).values({
       nickname: `Escondido ${i}`,
-      nicknameKey: `${SEED_PREFIX}hidden-${i}`,
+      nicknameKey: nicknameKey(`Escondido ${i}`),
       rev: 1,
       labBestPhase: 99,
       labBestPhaseAt: new Date(base),
@@ -79,7 +86,7 @@ async function main(): Promise<void> {
     .update(players)
     .set({
       nickname: viewer,
-      nicknameKey: `${SEED_PREFIX}viewer`,
+      nicknameKey: nicknameKey(viewer),
       rev: 1,
       labBestPhase: 17,
       labBestPhaseAt: new Date(base + 9 * 3_600_000),

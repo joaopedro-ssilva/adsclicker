@@ -300,6 +300,9 @@ export type LabBuildEntry = z.infer<typeof labBuildItemSchema>;
 export const labBoardRowSchema = z.object({
   rank: z.number().int(),
   nickname: z.string(),
+  /** For the avatar, as on the community board: the professor on screen and the skin they wear. */
+  professor: professorIdSchema,
+  skin: z.string(),
   /** phase: the number as text. run: ADScoins as a decimal string ("1.5e+30"). */
   value: z.string(),
   /** The items equipped when the record was set (empty = unknown). */

@@ -184,15 +184,27 @@ export function ScreenDecision({ status }: { status: 'reward' | 'equip' }) {
   return null;
 }
 
-/** While the fight runs: what the screen cannot say about the damage. */
+/** While the fight runs: the two damage numbers, big, and the one rule that matters about clicks. */
 export function FightNote({ view }: { view: LabMonitorView }) {
   return (
-    <section className="lab-decision lab-fight-note" aria-label="Dano">
-      <p>
-        Dano automático <b>{perSecond(view.autoDps)}</b>/s · cada clique no monitor causa <b>{perSecond(view.clickDamage)}</b> (até{' '}
-        {view.clicksPerSecond} por segundo, no máximo <b>+{perSecond(view.clickDpsCap)}</b>/s).
+    <section className="lab-dmg" aria-label="Dano" data-qa="lab-damage">
+      <div className="lab-dmg-tiles">
+        <div className="lab-dmg-tile" data-qa="lab-dmg-auto">
+          <span className="lab-dmg-label">Dano automático</span>
+          <b className="lab-dmg-value">
+            {perSecond(view.autoDps)}
+            <small>/s</small>
+          </b>
+        </div>
+        <div className="lab-dmg-tile" data-qa="lab-dmg-click">
+          <span className="lab-dmg-label">Dano por clique</span>
+          <b className="lab-dmg-value">{perSecond(view.clickDamage)}</b>
+        </div>
+      </div>
+      <p className="lab-dmg-note">No máximo {view.clicksPerSecond} cliques por segundo contam.</p>
+      <p className="lab-dmg-note" data-fine="true">
+        A pesquisa só anda com esta tela aberta.
       </p>
-      <p className="lab-center-fine">A pesquisa só anda com esta tela aberta. O clicker continua rodando por baixo.</p>
     </section>
   );
 }

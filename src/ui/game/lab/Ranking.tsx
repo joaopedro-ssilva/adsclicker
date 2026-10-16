@@ -7,6 +7,8 @@ import { useCloud } from '@/game/cloud';
 import { content } from '@/game/store';
 import type { LabBoard, LabBoardRow, LabBuildEntry } from '@/shared/api';
 import { Button } from '@/ui/kit';
+import { PlayerAvatar } from '../panel/comunidade/PlayerAvatar';
+import { PlayerProfile } from '../panel/comunidade/PlayerProfile';
 import { TagBadge } from '../panel/comunidade/TagBadge';
 import { ItemArt } from './ItemArt';
 import { SLOT_LABEL } from './labFormat';
@@ -52,15 +54,25 @@ function BuildIcons({ build }: { build: readonly LabBuildEntry[] }) {
   );
 }
 
-function Row({ board, row, me }: { board: LabBoard; row: LabBoardRow; me: boolean }) {
+function Row({ board, row, me, onOpen }: { board: LabBoard; row: LabBoardRow; me: boolean; onOpen: (nickname: string) => void }) {
   const medal = row.rank <= 3 ? row.rank : null;
   return (
-    <li className="lab-rank-row" data-me={me || undefined} data-medal={medal ?? undefined} data-qa="lab-rank-row">
+    <li className="lab-rank-row" data-me={me || undefined} data-medal={medal ?? undefined} data-clickable="true" data-qa="lab-rank-row">
       <span className="lab-rank-pos" aria-label={`Posição ${row.rank}`}>
         {row.rank}
       </span>
+      <PlayerAvatar professor={row.professor} skin={row.skin} />
       <span className="lab-rank-name">
-        <strong title={row.nickname}>{row.nickname}</strong>
+        <button
+          type="button"
+          className="community-open lab-rank-open"
+          aria-label={`Ver o perfil de ${row.nickname}`}
+          title={row.nickname}
+          data-qa="lab-rank-open-profile"
+          onClick={() => onOpen(row.nickname)}
+        >
+          {row.nickname}
+        </button>
         <TagBadge tags={row.tags} />
         {me ? <em className="lab-rank-you">você</em> : null}
       </span>
@@ -72,7 +84,15 @@ function Row({ board, row, me }: { board: LabBoard; row: LabBoardRow; me: boolea
   );
 }
 
-function Panel({ info, state, mine, onRetry }: { info: BoardInfo; state: LabBoardState; mine: string | null; onRetry: () => void }) {
+interface PanelProps {
+  info: BoardInfo;
+  state: LabBoardState;
+  mine: string | null;
+  onRetry: () => void;
+  onOpen: (nickname: string) => void;
+}
+
+function Panel({ info, state, mine, onRetry, onOpen }: PanelProps) {
   return (
     <section className="lab-panel lab-rank-panel" aria-label={info.title} data-qa={`lab-board-${info.id}`}>
       <header className="lab-section-head">
@@ -101,13 +121,13 @@ function Panel({ info, state, mine, onRetry }: { info: BoardInfo; state: LabBoar
           ) : (
             <ol className="lab-rank-list">
               {state.data.entries.map((row) => (
-                <Row key={`${row.rank}-${row.nickname}`} board={info.id} row={row} me={mine !== null && row.nickname === mine} />
+                <Row key={`${row.rank}-${row.nickname}`} board={info.id} row={row} me={mine !== null && row.nickname === mine} onOpen={onOpen} />
               ))}
             </ol>
           )}
           {state.data.me && !state.data.entries.some((row) => row.nickname === state.data.me?.nickname) ? (
             <ol className="lab-rank-pinned" aria-label="Sua posição">
-              <Row board={info.id} row={state.data.me} me />
+              <Row board={info.id} row={state.data.me} me onOpen={onOpen} />
             </ol>
           ) : null}
         </>
@@ -121,6 +141,7 @@ export function Ranking() {
   const { boards, reload } = useLabBoards();
   const nickname = useCloud((cloud) => cloud.me?.nickname ?? null);
   const [active, setActive] = useState<LabBoard>('phase');
+  const [profile, setProfile] = useState<string | null>(null);
 
   return (
     <div className="lab-rank" data-active={active} data-qa="lab-ranking">
@@ -137,10 +158,12 @@ export function Ranking() {
       <div className="lab-rank-boards">
         {BOARDS.map((info) => (
           <div key={info.id} className="lab-rank-slot-panel" data-board={info.id} data-on={active === info.id}>
-            <Panel info={info} state={boards[info.id]} mine={nickname} onRetry={reload} />
+            <Panel info={info} state={boards[info.id]} mine={nickname} onRetry={reload} onOpen={setProfile} />
           </div>
         ))}
       </div>
+      {/* The same card as the community board. It is a native dialog, so it sits over the lab and owns Esc until it closes. */}
+      {profile ? <PlayerProfile nickname={profile} onClose={() => setProfile(null)} /> : null}
     </div>
   );
 }

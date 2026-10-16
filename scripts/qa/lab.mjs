@@ -56,6 +56,20 @@ if (!has('roster')) {
   if (tab) await page.locator(`[data-qa="lab-tab-${tab}"]`).click({ timeout: 2000 }).catch(() => errors.push(`tab ${tab} not found`));
   if (has('shop')) await page.locator('[data-qa="lab-shop-button"]').click({ timeout: 2000 }).catch(() => errors.push('shop button not found'));
   if (tab === 'ranking' && flag('board')) await page.locator(`[data-qa="lab-board-tab-${flag('board')}"]`).click({ timeout: 1000 }).catch(() => {});
+  if (has('profile')) {
+    await page.locator('[data-qa="lab-rank-open-profile"]').nth(Number(flag('profile') || 0)).click({ timeout: 3000 }).catch(() => errors.push('profile button not found'));
+    await page.waitForSelector('[data-qa="player-profile"]', { timeout: 4000 }).catch(() => errors.push('profile did not open'));
+  }
+  if (has('escape')) {
+    // Esc closes the thing on top first: the profile, then the lab.
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const afterFirst = await page.evaluate(() => ({ profile: Boolean(document.querySelector('[data-qa="player-profile"]')), lab: Boolean(document.querySelector('[data-qa="lab-overlay"]')) }));
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const afterSecond = await page.evaluate(() => Boolean(document.querySelector('[data-qa="lab-overlay"]')));
+    console.log(`escape: after the first ${JSON.stringify(afterFirst)}, lab still open after the second: ${afterSecond}`);
+  }
   const clicks = Number(flag('clicks') ?? 0);
   for (let i = 0; i < clicks; i += 1) await page.locator('[data-qa="lab-screen"]').click({ position: { x: 120 + (i % 5) * 40, y: 120 + (i % 3) * 30 }, delay: 5 }).catch(() => {});
 }

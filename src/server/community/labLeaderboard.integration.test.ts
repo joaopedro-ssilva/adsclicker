@@ -133,7 +133,8 @@ describe.skipIf(!testDb)('the Laboratório boards against Postgres', () => {
     it('orders "Mais longe" by phase, then by who got there first, and ignores whoever has no record', async () => {
       await row({ nickname: 'Lenta', labBestPhase: 20, labBestPhaseAt: at(30), labBestPhaseBuild: build('raro', 3) });
       await row({ nickname: 'Primeira', labBestPhase: 20, labBestPhaseAt: at(10) });
-      await row({ nickname: 'Topo', labBestPhase: 31, labBestPhaseAt: at(50) });
+      const other = Object.keys(content.professors).find((id) => id !== 'edecio') as 'pablo';
+      await row({ nickname: 'Topo', labBestPhase: 31, labBestPhaseAt: at(50), avatarProfessor: other, avatarSkin: 'skin-x' });
       await row({ nickname: 'Baixa', labBestPhase: 4, labBestPhaseAt: at(1) });
       await row({ nickname: 'SemRecorde', labBestPhase: 0 });
 
@@ -145,6 +146,9 @@ describe.skipIf(!testDb)('the Laboratório boards against Postgres', () => {
         [4, 'Baixa', '4'],
       ]);
       expect(top.entries[2]!.build).toEqual(build('raro', 3));
+      // the avatar comes from the same columns as the community board (a default professor when none was set)
+      expect(top.entries[0]).toMatchObject({ professor: other, skin: 'skin-x' });
+      expect(top.entries[1]).toMatchObject({ professor: 'edecio', skin: '' });
       expect(top.entries[0]!.build).toEqual([]);
       expect(labLeaderboardResponseSchema.safeParse({ ...top, me: null }).success).toBe(true);
     });
