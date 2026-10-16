@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
+import type { RefObject } from 'react';
 import { formatNumber } from '@/game/engine/format';
 import { useCoins, useGame, useGameEvents, useGameState, useLabBenchView, useLabMonitorView, useLabRewardsView, useLabTreeView } from '@/game/store';
 import { IconButton, Keycap } from '@/ui/kit';
@@ -18,6 +19,54 @@ const TABS: { id: LabTab; label: string }[] = [
   { id: 'pesquisa', label: 'Pesquisa' },
   { id: 'progressao', label: 'Progressão' },
 ];
+
+/** The room the screens may grow to, and the least they shrink to before the body scrolls instead. */
+const SCALE_MAX = 1.15;
+const SCALE_MIN = 0.66;
+
+/**
+ * Sizes the Pesquisa and Progressão blocks (desktop): 15% larger when there is room, smaller when the window is short, so the
+ * whole block stays in view. Sets --lab-scale on the body; the CSS zoom does the rest. The height depends on the width the
+ * zoom leaves, so it settles over a few passes.
+ */
+function useFitScale(body: RefObject<HTMLDivElement | null>, tab: LabTab): void {
+  useEffect(() => {
+    const box = body.current;
+    const content = box?.firstElementChild;
+    if (!box || !(content instanceof HTMLElement)) return;
+    const desktop = window.matchMedia('(min-width: 1200px)');
+    let frame = 0;
+    const fit = () => {
+      frame = 0;
+      if (!desktop.matches) {
+        box.style.removeProperty('--lab-scale');
+        return;
+      }
+      let scale = Number(box.style.getPropertyValue('--lab-scale')) || SCALE_MAX;
+      for (let pass = 0; pass < 5; pass += 1) {
+        box.style.setProperty('--lab-scale', String(scale));
+        const rect = content.getBoundingClientRect();
+        if (rect.height === 0 || rect.width === 0) return;
+        const next = Math.min(SCALE_MAX, Math.max(SCALE_MIN, scale * Math.min(box.clientHeight / rect.height, box.clientWidth / rect.width)));
+        if (Math.abs(next - scale) < 0.004) break;
+        scale = next;
+      }
+    };
+    const schedule = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(fit);
+    };
+    const observer = new ResizeObserver(schedule);
+    observer.observe(box);
+    observer.observe(content);
+    desktop.addEventListener('change', schedule);
+    fit();
+    return () => {
+      observer.disconnect();
+      desktop.removeEventListener('change', schedule);
+      if (frame !== 0) window.cancelAnimationFrame(frame);
+    };
+  }, [body, tab]);
+}
 
 const FOCUSABLE = 'button:not(:disabled), a[href], [tabindex="0"]';
 
@@ -141,10 +190,12 @@ function TopBar({ tab }: { tab: LabTab }) {
  */
 export function LabOverlay() {
   const root = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const tab = useLabOverlay((store) => store.tab);
   const hide = useLabOverlay((store) => store.hide);
   const tree = useLabTreeView();
   useLabOpenContract();
+  useFitScale(bodyRef, tab);
   // The graduation scene takes the screen: the lab (its run, its items) is reset under it.
   useGameEvents(() => hide(), ['graduate']);
 
@@ -184,7 +235,7 @@ export function LabOverlay() {
   return (
     <div ref={root} className="lab" role="dialog" aria-modal="true" aria-label="Laboratório de Pesquisa" tabIndex={-1} data-qa="lab-overlay">
       <TopBar tab={tab} />
-      <div className="lab-body">
+      <div ref={bodyRef} className="lab-body">
         {tab === 'pesquisa' ? <Research /> : null}
         {tab === 'progressao' ? <Progression view={tree} /> : null}
       </div>

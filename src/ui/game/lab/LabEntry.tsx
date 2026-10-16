@@ -8,6 +8,8 @@ import { useLabEntry } from './useLabEntry';
 import { shortcutKey } from '../stage/shortcutList';
 
 const NAME = 'Laboratório de Pesquisa';
+/** What fits where a professor's name goes. */
+const SHORT_NAME = 'LABTEC';
 
 /** The pixel flask the Laboratório wears where a professor would show a portrait. */
 function LabFace({ dim = false }: { dim?: boolean }) {
@@ -32,7 +34,9 @@ export function LabRosterSlot() {
       <div className="roster-slot roster-next lab-slot" data-state="next" data-lab data-affordable={entry.affordable} data-qa="roster-lab">
         <LabFace dim />
         <div className="roster-offer">
-          <span className="roster-name">{NAME}</span>
+          <span className="roster-name" title={NAME}>
+            {SHORT_NAME}
+          </span>
           <p className="roster-cost">
             <Icon name="diploma" size={12} /> {entry.cost} diplomas
           </p>
@@ -63,7 +67,7 @@ export function LabRosterSlot() {
       }}
     >
       <LabFace />
-      <span className="roster-name">Laboratório</span>
+      <span className="roster-name">{SHORT_NAME}</span>
       <span className="lab-slot-caption">{caption}</span>
     </button>
   );

@@ -42,7 +42,7 @@ function NodeCard({ node, names, selected, onSelect }: { node: LabNodeView; name
         </span>
       </span>
       <span className="lab-node-text">{node.description}</span>
-      <span className="lab-node-need" data-locked={state === 'locked'}>
+      <span className="lab-node-need" data-locked={state === 'locked'} title={state === 'locked' ? `Requer: ${requirement(node, names)}` : undefined}>
         {state === 'locked' ? `Requer: ${requirement(node, names)}` : node.requires.length > 0 ? 'Requisito cumprido' : 'Sem requisitos'}
       </span>
       <span className="lab-node-foot">
