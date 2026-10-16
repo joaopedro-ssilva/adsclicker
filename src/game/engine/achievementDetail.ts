@@ -163,7 +163,6 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
         note: !condition.professor && reached < needed ? `Ainda abaixo: ${nameList(short.map((id) => professorName(id)))}.` : null,
       };
     }
-    case 'alignedLevels': {
     case 'postdoc': {
       const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
       const short = professors.filter((id) => postdocStars(state, id) < condition.stars);
@@ -178,6 +177,7 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
     }
     case 'postdocTotal':
       return { text: pair(totalPostdocStars(state), condition.gte, 'estrelas de Pós-doc'), note: null };
+    case 'alignedLevels': {
       let best = 0;
       for (const professor of index.professorList) {
         const list = index.disciplinesOf[professor.id];
