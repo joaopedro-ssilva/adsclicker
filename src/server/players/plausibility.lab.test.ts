@@ -37,6 +37,9 @@ function maxedLab(state: GameState): void {
     clickTimes: [], windUsed: 0, cleared: 39, bosses: 7, clearLog: [], brokenBy: 'timer', paid: 0,
   };
   state.lab.turma.nextUid = uid;
+  // The run above got to phase 40: the counters say so too (the judge ties the record to the phases cleared).
+  state.lab.counters.phasesCleared = 39;
+  state.lab.counters.bossesBeaten = 7;
 }
 
 function windows(options: SimOptions & { windows: number; windowSeconds?: number }, lab: boolean): Window[] {

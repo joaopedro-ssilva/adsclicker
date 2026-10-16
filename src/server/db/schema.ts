@@ -16,6 +16,7 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import type { LabBuild } from '@/game/engine/lab/types';
 import { flaggedAreRanked } from '../players/ranking';
 
 const timestamptz = (name: string) => timestamp(name, { withTimezone: true, mode: 'date' });
@@ -107,6 +108,19 @@ export const players = pgTable(
      * device that holds another epoch is refused, which keeps a pre-reset save off the boards.
      */
     progressEpoch: integer('progress_epoch').notNull().default(0),
+
+    // Laboratório boards (docs/BACKEND.md, "Ranking do Laboratório") ------------------------------
+    /** The highest lab phase ever reached (a permanent record, from `lab.bestPhase` of the save). 0 = never. */
+    labBestPhase: integer('lab_best_phase').notNull().default(0),
+    /** The four equipped items at that moment, sanitised against the content on write and on read. Null = unknown. */
+    labBestPhaseBuild: jsonb('lab_best_phase_build').$type<LabBuild>(),
+    /** When `labBestPhase` last went up (server clock): the tie-break, who got there first. */
+    labBestPhaseAt: timestamptz('lab_best_phase_at'),
+    /** The most ADScoins made in a single turma (the graduation record, or the run in progress when it is ahead): exact text and log10, as lifetime coins. */
+    bestRunCoinsText: text('best_run_coins_text').notNull().default('0'),
+    bestRunCoinsLog: doublePrecision('best_run_coins_log').notNull().default(0),
+    /** The items of that turma. */
+    bestRunBuild: jsonb('best_run_build').$type<LabBuild>(),
   },
   (t) => {
     // The boards only list ranked players, so each ordering is a partial index over exactly them.
@@ -118,6 +132,12 @@ export const players = pgTable(
       index('players_board_diplomas_idx').on(t.diplomasEarned.desc(), t.id).where(ranked),
       index('players_board_achievements_idx').on(t.achievements.desc(), t.id).where(ranked),
       index('players_board_clicks_idx').on(t.clicks.desc(), t.id).where(ranked),
+      index('players_board_lab_phase_idx')
+        .on(t.labBestPhase.desc(), t.labBestPhaseAt.asc(), t.id)
+        .where(sql`${ranked} and ${t.labBestPhase} > 0`),
+      index('players_board_best_run_idx')
+        .on(t.bestRunCoinsLog.desc(), t.id)
+        .where(sql`${ranked} and ${t.bestRunCoinsLog} > 0`),
     ];
   },
 );

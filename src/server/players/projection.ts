@@ -1,6 +1,11 @@
 import { PROFESSOR_IDS } from '@/game/content/types';
 import type { GameState } from '@/game/engine/state';
+import { bestRunRecord } from '@/game/engine/lab/build';
+import type { LabBuild } from '@/game/engine/lab/types';
 import { MAX_COIN_EXPONENT } from './plausibility';
+
+/** The highest lab phase a row can hold (the save reader's own ceiling). */
+export const MAX_LAB_PHASE = 100_000;
 
 /** The leaderboard columns of a player, derived from the save (see the "Projection" block of the schema). */
 export interface Projection {
@@ -16,6 +21,12 @@ export interface Projection {
   playSeconds: number;
   avatarProfessor: string;
   avatarSkin: string;
+  /** Laboratório boards: the highest phase and the best turma (most coins in one run), each with its build. Never trusted beyond the save's own sanitising and the judge. */
+  labBestPhase: number;
+  labBestPhaseBuild: LabBuild | null;
+  bestRunCoinsText: string;
+  bestRunCoinsLog: number;
+  bestRunBuild: LabBuild | null;
 }
 
 /** True when the coins are too large to store (exponent beyond MAX_COIN_EXPONENT). */
@@ -28,6 +39,7 @@ const safeInt = (value: number): number => Math.min(Number.MAX_SAFE_INTEGER, Mat
 export function projectState(state: GameState): Projection {
   const coins = state.lifetimeCoins;
   const text = coins.toString();
+  const bestRun = bestRunRecord(state);
   return {
     lifetimeCoinsText: text,
     lifetimeCoins: text,
@@ -41,5 +53,10 @@ export function projectState(state: GameState): Projection {
     playSeconds: safeInt(state.counters.playSeconds),
     avatarProfessor: state.activeProfessor,
     avatarSkin: state.equippedSkin[state.activeProfessor] ?? '',
+    labBestPhase: state.lab.unlocked ? Math.min(MAX_LAB_PHASE, Math.max(0, Math.floor(state.lab.bestPhase))) : 0,
+    labBestPhaseBuild: state.lab.unlocked && state.lab.bestPhaseBuild.length > 0 ? state.lab.bestPhaseBuild : null,
+    bestRunCoinsText: bestRun.coins.toString(),
+    bestRunCoinsLog: bestRun.coins.lte(1) ? 0 : bestRun.coins.log10(),
+    bestRunBuild: state.lab.unlocked && bestRun.build.length > 0 ? bestRun.build : null,
   };
 }

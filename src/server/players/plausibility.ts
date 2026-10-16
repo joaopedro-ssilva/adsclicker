@@ -15,6 +15,7 @@ import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
+import { judgeLabRecords } from './labRecords';
 import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
@@ -236,6 +237,10 @@ export function judgeSave({ previous, next, elapsedMs, forced = false, content =
     const bound = perRun.mul(bestNumber((r) => r.diplomaGain) * DIPLOMA_GAIN_SLACK).toNumber() * graduationsDone ** (1 - exponent) + 1 + horasBonus;
     if (Number.isFinite(bound) && diplomasDone > bound) return fail('more diplomas than the run was worth');
   }
+
+  // The Laboratório records (highest phase, best turma) the boards show.
+  const labReason = judgeLabRecords({ previous, next, seconds, allowance, gain });
+  if (labReason) return fail(labReason);
 
   return { ok: true, ratio };
 }

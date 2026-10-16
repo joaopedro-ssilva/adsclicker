@@ -175,6 +175,9 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   const drafts = ranked ? diffFeed(previous, parsed) : [];
   const platinado = shouldGrantPlatinado(player, parsed, ranked, catalog);
 
+  const projection = projectState(parsed);
+  // A new highest phase is stamped with the server's clock: the tie-break of the board (who got there first).
+  const phaseUp = projection.labBestPhase !== player.labBestPhase || (projection.labBestPhase > 0 && player.labBestPhaseAt === null);
   const values = {
     save: serializeState(parsed),
     rev: sql`${players.rev} + 1`,
@@ -183,7 +186,8 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
     flagReason,
     clockExcessSeconds: clock.excessSeconds,
     ...(platinado ? { titles: grantTagSql(PLATINADO_TAG) } : {}),
-    ...projectState(parsed),
+    ...projection,
+    ...(phaseUp ? { labBestPhaseAt: projection.labBestPhase > 0 ? new Date(now) : null } : {}),
   };
   // The epoch is part of the write: a reset that commits between our read and our write makes it match nothing.
   const sameEpoch = eq(players.progressEpoch, player.progressEpoch);
