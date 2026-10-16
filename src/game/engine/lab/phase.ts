@@ -52,8 +52,9 @@ export function armorFactor(content: GameContent, flat: number): number {
 export function addMob(run: LabRun, content: GameContent, defId: string, phase: number, boss: boolean): LabMob | null {
   const def = labIndex(content).enemies.get(defId);
   if (!def) return null;
-  const { hpScale, bossHpFactor } = content.lab.run;
-  const hp = def.hp * hpScale * (boss ? bossHpFactor : 1) * hpFactor(content, phase);
+  const { hpScale, bossHpFactor, bossHpGrowth, bossGrowthTurns, bossEvery } = content.lab.run;
+  const bossTurn = Math.max(0, Math.floor(phase / bossEvery) - 1);
+  const hp = def.hp * hpScale * (boss ? bossHpFactor * bossHpGrowth ** Math.min(bossTurn, bossGrowthTurns) : 1) * hpFactor(content, phase);
   run.mobSeq += 1;
   const mob: LabMob = { uid: run.mobSeq, def: def.id, hp, maxHp: hp };
   run.waveHp += hp;
@@ -78,13 +79,15 @@ export function spawnPhase(state: GameState, content: GameContent, totals: LabTo
   run.windUsed = 0;
   run.nextCharge = 0;
   run.bossLeft = null;
+  run.shield = Math.max(0, totals.lab.phaseShield) * run.maxIntegrity;
 
   if (isBossPhase(content, phase)) {
     const bossId = bossFor(content, phase);
     const boss = addMob(run, content, bossId, phase, true);
     if (boss) {
       run.mobs.push(boss);
-      run.bossLeft = cfg.bossTimerSeconds + totals.lab.bossTime;
+      // The first boss of the run also gets the tree's extra time.
+      run.bossLeft = cfg.bossTimerSeconds + totals.lab.bossTime + (run.bosses === 0 ? totals.lab.firstBossTime : 0);
       const charge = index.enemies.get(bossId)?.traits.find((trait) => trait.kind === 'charge');
       if (charge?.kind === 'charge') run.nextCharge = charge.everySeconds;
     }
@@ -110,6 +113,7 @@ export function enterNextPhase(state: GameState, content: GameContent): void {
   run.phase += 1;
   noteBestPhase(lab, run.phase);
   run.offers = [];
+  run.rerolled = 0;
   const totals = labTotals(state, content);
   syncIntegrity(run, content, totals);
   spawnPhase(state, content, totals);

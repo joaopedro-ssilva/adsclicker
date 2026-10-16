@@ -5,12 +5,14 @@ import type { LabItem } from './types';
 
 /**
  * ADScoins to raise an item one level: levelBase x rarityStep^rarity x levelGrowth^(level - 1). Fixed numbers, a tier
- * above Pablo's hire cost, not minutes of production. Null when the item is at the top level.
+ * above Pablo's hire cost, not minutes of production. discount is the tree's levelCost (negative = cheaper, at most 90% off).
+ * Null when the item is at the top level.
  */
-export function levelUpCost(content: GameContent, item: LabItem): Decimal | null {
+export function levelUpCost(content: GameContent, item: LabItem, discount = 0): Decimal | null {
   const { costs, items } = content.lab;
   if (item.level >= items.maxLevel) return null;
   return parseDecimal(costs.levelBase)
+    .mul(Math.max(0.1, 1 + discount))
     .mul(Decimal.pow(costs.rarityStep, rarityRank(content, item.rarity)))
     .mul(Decimal.pow(costs.levelGrowth, Math.max(1, item.level) - 1));
 }

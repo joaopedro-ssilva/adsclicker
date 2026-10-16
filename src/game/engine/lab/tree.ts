@@ -31,6 +31,39 @@ export function labTreeSpent(state: GameState, content: GameContent): number {
   return spent;
 }
 
+export interface LabTreeResetCheck {
+  ok: boolean;
+  /** Commits that would come back. */
+  refund: number;
+  /** pt-BR reason when the reset is not possible. */
+  reason: string | null;
+}
+
+/**
+ * Whether the tree can be reset now, and for how many Commits. Rule: free, any time the lab is unlocked and something was
+ * bought, except while a run is on (fighting, choosing a reward or deciding on an item). Resetting between phases would
+ * let the player re-spend the same Commits on whatever the next phase needs, so it waits for the monitor to break (or for
+ * the next graduation, when there is no run).
+ */
+export function labTreeResetCheck(state: GameState, content: GameContent): LabTreeResetCheck {
+  const refund = labTreeSpent(state, content);
+  const run = state.lab.turma.run;
+  if (!state.lab.unlocked) return { ok: false, refund, reason: 'O Laboratório ainda está trancado.' };
+  if (run && run.status !== 'broken') return { ok: false, refund, reason: 'Só dá para resetar a árvore fora de uma corrida.' };
+  if (refund <= 0) return { ok: false, refund, reason: 'Nada foi investido na árvore.' };
+  return { ok: true, refund, reason: null };
+}
+
+/** Gives every Commit spent on the tree back and empties it. Free; see labTreeResetCheck for when it is allowed. */
+export function resetLabTree(state: GameState, content: GameContent, emit: Emit): boolean {
+  const check = labTreeResetCheck(state, content);
+  if (!check.ok) return false;
+  state.lab.commits += check.refund;
+  state.lab.tree = {};
+  emit({ type: 'labTreeReset', refunded: check.refund });
+  return true;
+}
+
 /** Buys one level of a node with Commits. Needs the lab unlocked; works with the lab closed and between turmas. */
 export function buyLabNode(state: GameState, content: GameContent, id: string, emit: Emit): boolean {
   const { lab } = state;

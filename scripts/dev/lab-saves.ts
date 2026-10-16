@@ -117,5 +117,11 @@ save('broken', broken);
 // 9. The tree, with a purse
 const tree = ready();
 tree.lab.commits = 90;
-tree.lab.tree = { 'algoritmos-eficientes': 3, 'estudo-de-chefao': 1, 'monitor-reforcado': 2, 'revisao-de-pr': 1, 'codigo-limpo': 6 };
+tree.lab.tree = { 'algoritmos-eficientes': 3, 'estudo-de-chefao': 1, hotfix: 1, 'monitor-reforcado': 10, 'backup-noturno': 2, 'prazo-folgado': 1, 'revisao-de-pr': 1, 'codigo-limpo': 8, documentacao: 2, 'portfolio-do-lab': 1 };
 save('tree', tree);
+
+// 9b. The same tree with the run over (the reset button is enabled)
+const treeIdle = ready();
+treeIdle.lab.commits = 90;
+treeIdle.lab.tree = { ...tree.lab.tree };
+save('tree-idle', treeIdle);

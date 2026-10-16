@@ -1,5 +1,5 @@
 import type { Stream } from '../../../hackathon/engine/rng';
-import type { LabEnemyDef, LabItemBase } from '../../content/labTypes';
+import type { LabEnemyDef, LabItemBase, LabRarity } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
@@ -83,6 +83,13 @@ export function drainPerSecond(run: LabRun, content: GameContent, totals: LabTot
   return total * base * Math.max(minDrainMult, 1 + totals.lab.drain);
 }
 
+/** Integrity lost: the shield of the phase (tree) takes it first. */
+function drainIntegrity(run: LabRun, amount: number): void {
+  const absorbed = Math.min(run.shield, amount);
+  run.shield -= absorbed;
+  run.integrity -= amount - absorbed;
+}
+
 /** The phase is cleared: repairs, counters, and the options of the reward. */
 function phaseCleared(state: GameState, content: GameContent, totals: LabTotals, emit: Emit): void {
   const { lab } = state;
@@ -93,15 +100,18 @@ function phaseCleared(state: GameState, content: GameContent, totals: LabTotals,
   lab.counters.phasesCleared += 1;
   if (run.clearLog.length < MAX_CLEAR_LOG) run.clearLog.push(round1(run.t));
 
-  const share = totals.lab.repairPhase + (boss ? totals.lab.repairBoss : 0);
+  const fast = !boss && run.phaseTime < content.lab.run.fastClearSeconds;
+  const share = totals.lab.repairPhase + (boss ? totals.lab.repairBoss : 0) + (fast ? totals.lab.fastClearRepair : 0);
   if (share > 0) run.integrity = Math.min(run.maxIntegrity, run.integrity + run.maxIntegrity * share);
   if (boss) {
     run.bosses += 1;
     lab.counters.bossesBeaten += 1;
+    gainCommits(state, totals.lab.bossCommits * (1 + Math.max(0, totals.lab.commits)));
   }
   run.bossLeft = null;
   run.nextCharge = 0;
   run.mobs = [];
+  run.rerolled = 0;
   run.offers = makeOffers(state, content, totals);
   run.status = 'reward';
   emit({ type: 'labPhaseCleared', phase: run.phase, boss });
@@ -122,7 +132,7 @@ function stepRun(state: GameState, content: GameContent, totals: LabTotals, dt: 
     return;
   }
 
-  run.integrity -= drainPerSecond(run, content, totals) * dt;
+  drainIntegrity(run, drainPerSecond(run, content, totals) * dt);
 
   if (boss && run.nextCharge > 0 && run.phaseTime >= run.nextCharge) {
     const { drainScale, minDrainMult } = content.lab.run;
@@ -130,7 +140,7 @@ function stepRun(state: GameState, content: GameContent, totals: LabTotals, dt: 
     const charge = def?.traits.find((trait) => trait.kind === 'charge');
     if (def && charge?.kind === 'charge') {
       const hit = def.damage * charge.hitMultiplier * drainScale * drainFactor(content, run.phase);
-      run.integrity -= hit * Math.max(minDrainMult, 1 + totals.lab.drain);
+      drainIntegrity(run, hit * Math.max(minDrainMult, 1 + totals.lab.drain));
       run.nextCharge += charge.everySeconds;
     } else {
       run.nextCharge = 0;
@@ -203,10 +213,10 @@ export function setLabOpen(state: GameState, open: boolean): void {
   if (!state.lab.open && state.lab.turma.run) state.lab.turma.run.carry = 0;
 }
 
-/** Gives a new item (comum, level 1) to its slot at the start of a run. */
-function giveStarter(state: GameState, content: GameContent, base: LabItemBase | undefined, stream: Stream): void {
+/** Gives a new item (level 1) to its slot at the start of a run, if the slot is empty. */
+function giveStarter(state: GameState, content: GameContent, base: LabItemBase | undefined, stream: Stream, rarity: LabRarity = 'comum'): void {
   if (!base || state.lab.turma.equipped[base.slot]) return;
-  const item: LabItem = rollItem(content, base, 'comum', 1, stream);
+  const item: LabItem = rollItem(content, base, rarity, 1, stream);
   item.uid = state.lab.turma.nextUid;
   state.lab.turma.nextUid += 1;
   state.lab.turma.equipped[base.slot] = item;
@@ -225,10 +235,17 @@ export function startLabRun(state: GameState, content: GameContent, seed: number
   lab.turma.run = run;
   const index = labIndex(content);
   giveStarter(state, content, index.bases.get(content.lab.starter), labStream(run.seed, LAB_STREAM.starter, 0));
-  if (labTotals(state, content).lab.startSetup > 0) {
+  const owned = labTotals(state, content);
+  if (owned.lab.startSetup > 0) {
     const setups = droppableAt(content, 1).filter((base) => base.slot === 'setup');
     const stream = labStream(run.seed, LAB_STREAM.starter, 1);
     giveStarter(state, content, setups[Math.floor(stream() * setups.length)], stream);
+  }
+  // The tree's gifts: random incomum items in the slots still empty (one more slot per level).
+  for (let gift = 0; gift < Math.floor(owned.lab.startItem); gift += 1) {
+    const stream = labStream(run.seed, LAB_STREAM.starter, 10 + gift);
+    const bases = droppableAt(content, 1).filter((base) => !lab.turma.equipped[base.slot]);
+    giveStarter(state, content, bases[Math.floor(stream() * bases.length)], stream, 'incomum');
   }
 
   const totals = labTotals(state, content);
@@ -251,8 +268,8 @@ export function resetLabForGraduation(state: GameState, content: GameContent): v
   const { lab } = state;
   const run = lab.turma.run;
   if (run && run.status !== 'broken') gainCommits(state, runCommits(content, run, labTotals(state, content)));
+  // A run that is still on its record phase files the build it ends with, before the items go.
+  if (run) noteBestPhase(lab, run.phase, true);
   lab.turma = { run: null, equipped: {}, nextUid: 1 };
   lab.open = false;
 }
-  // A run that is still on its record phase files the build it ends with, before the items go.
-  if (run) noteBestPhase(lab, run.phase, true);

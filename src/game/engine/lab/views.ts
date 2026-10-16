@@ -10,13 +10,13 @@ import type { GameState } from '../state';
 import { labCanUnlock, labRunAvailable, labSlotVisible } from './access';
 import type { LabAvailability } from './access';
 import { levelUpCost, rerollCost } from './costs';
-import { labTotals, setPieces } from './effects';
+import { labTotals, recycleMultiplier, setPieces } from './effects';
 import type { LabTotals } from './effects';
 import { affixValue, hasUnique, itemBase, itemPower, recycleValue } from './items';
 import { drainPerSecond, autoDps, clickDamage, clickShareCap } from './run';
 import { isBossPhase, runCommits } from './phase';
 import { labIndex } from './state';
-import { labNodeAvailable, labNodeCost, labNodeLevel, labTreeSpent } from './tree';
+import { labNodeAvailable, labNodeCost, labNodeLevel, labTreeResetCheck, labTreeSpent } from './tree';
 import type { LabItem, LabOffer, LabRunStatus } from './types';
 
 // ---------------------------------------------------------------------------
@@ -35,10 +35,10 @@ function statText(stat: StatKey, value: number): string {
   return PLAIN_STATS.includes(stat) ? signed(value) : percent(value);
 }
 
-const LAB_PLAIN: LabEffectKey[] = ['integrityFlat', 'luck', 'firstOptions', 'secondWind', 'startSetup'];
+const LAB_PLAIN: LabEffectKey[] = ['integrityFlat', 'luck', 'firstOptions', 'secondWind', 'startSetup', 'startItem', 'offerRerolls', 'bossOptions', 'bossCommits'];
 
 function labEffectText(key: LabEffectKey, value: number): string {
-  if (key === 'bossTime') return `${signed(value)} s`;
+  if (key === 'bossTime' || key === 'firstBossTime') return `${signed(value)} s`;
   if (key === 'extraOption') return `${signed(value)}%`;
   if (key === 'startSetup') return 'sim';
   return LAB_PLAIN.includes(key) ? signed(value) : percent(value);
@@ -133,6 +133,8 @@ export interface LabMonitorView {
   maxIntegrity: number;
   /** 0..1 */
   integrityFraction: number;
+  /** Integrity points of shield left in this phase (tree: Firewall do lab), 0 without one. */
+  shield: number;
   mobs: LabMobView[];
   /** 0..1 of the wave's HP already taken down. */
   waveProgress: number;
@@ -197,10 +199,11 @@ export function labMonitorView(state: GameState, content: GameContent): LabMonit
     integrity: run?.integrity ?? 0,
     maxIntegrity: run?.maxIntegrity ?? 0,
     integrityFraction: run && run.maxIntegrity > 0 ? Math.min(1, Math.max(0, run.integrity / run.maxIntegrity)) : 0,
+    shield: run?.shield ?? 0,
     mobs,
     waveProgress: run && run.waveHp > 0 ? Math.min(1, Math.max(0, 1 - hpLeft / run.waveHp)) : 0,
     bossLeft: run?.bossLeft ?? null,
-    bossTotal: boss ? content.lab.run.bossTimerSeconds + totals.lab.bossTime : null,
+    bossTotal: boss ? content.lab.run.bossTimerSeconds + totals.lab.bossTime + (run?.bosses === 0 ? totals.lab.firstBossTime : 0) : null,
     autoDps: dps,
     clickDamage: clickDamage(content, totals, boss),
     clicksPerSecond: (click.perWindow * 1000) / click.windowMs,
@@ -261,7 +264,7 @@ export function labItemView(state: GameState, content: GameContent, item: LabIte
   const base = itemBase(content, item);
   if (!base) return null;
   const rarity = labIndex(content).rarities.get(item.rarity);
-  const cost = levelUpCost(content, item);
+  const cost = levelUpCost(content, item, labTotals(state, content).lab.levelCost);
   const reroll = rerollCost(content, item);
   const pieces = base.set ? (setPieces(state, content).get(base.set) ?? 0) : 0;
   const set = base.set ? content.lab.sets.find((entry) => entry.id === base.set) : undefined;
@@ -351,7 +354,7 @@ export function labBenchView(state: GameState, content: GameContent): LabBenchVi
     const current = slot ? lab.turma.equipped[slot] : undefined;
     if (view) {
       // What recycling pays is the rarity's value with the Commits bonus of the tree and the items, as the engine pays it.
-      const bonus = 1 + Math.max(0, totals.lab.commits);
+      const bonus = recycleMultiplier(totals);
       pending = {
         item: view,
         replaces: current ? labItemView(state, content, current, true) : null,
@@ -397,11 +400,13 @@ export interface LabRewardsView {
   phase: number;
   boss: boolean;
   options: LabOfferView[];
+  /** Times the options can still be drawn again (tree: Retrospectiva). */
+  rerollsLeft: number;
 }
 
 export function labRewardsView(state: GameState, content: GameContent): LabRewardsView {
   const run = state.lab.turma.run;
-  if (!run || run.status !== 'reward') return { open: false, phase: run?.phase ?? 0, boss: false, options: [] };
+  if (!run || run.status !== 'reward') return { open: false, phase: run?.phase ?? 0, boss: false, options: [], rerollsLeft: 0 };
   const index = labIndex(content);
 
   const options = run.offers.map((offer, i): LabOfferView => {
@@ -457,7 +462,8 @@ export function labRewardsView(state: GameState, content: GameContent): LabRewar
     }
   });
 
-  return { open: true, phase: run.phase, boss: isBossPhase(content, run.phase), options };
+  const rerollsLeft = Math.max(0, Math.floor(labTotals(state, content).lab.offerRerolls) - run.rerolled);
+  return { open: true, phase: run.phase, boss: isBossPhase(content, run.phase), options, rerollsLeft };
 }
 
 // ---------------------------------------------------------------------------
@@ -489,6 +495,10 @@ export interface LabTreeView {
   commits: number;
   spent: number;
   nodes: LabNodeView[];
+  /** Whether the tree can be reset now, the Commits that would come back and, if not, why. */
+  canReset: boolean;
+  refund: number;
+  resetReason: string | null;
 }
 
 /** The effects of a node written as the change one more level makes. */
@@ -500,6 +510,9 @@ function nodeEffects(content: GameContent, def: LabNodeDef, level: number): LabN
     if (per === undefined) continue;
     const text = (owned: number) => (key === 'startSetup' || key === 'secondWind' ? (owned > 0 ? 'sim' : 'não') : labEffectText(key, per * owned));
     lines.push({ label: content.lab.labels.effects[key], now: text(level), next: text(level + 1) });
+  }
+  for (const part of def.clicker ?? []) {
+    lines.push({ label: content.lab.labels.stats[part.stat] ?? part.stat, now: statText(part.stat, part.per * level), next: statText(part.stat, part.per * (level + 1)) });
   }
   return lines;
 }
@@ -526,5 +539,6 @@ export function labTreeView(state: GameState, content: GameContent): LabTreeView
       effects: nodeEffects(content, def, level),
     };
   });
-  return { unlocked: state.lab.unlocked, commits: state.lab.commits, spent: labTreeSpent(state, content), nodes };
+  const reset = labTreeResetCheck(state, content);
+  return { unlocked: state.lab.unlocked, commits: state.lab.commits, spent: labTreeSpent(state, content), nodes, canReset: reset.ok, refund: reset.refund, resetReason: reset.reason };
 }

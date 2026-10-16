@@ -133,6 +133,8 @@ function readRun(value: unknown, content: GameContent): LabRun | null {
       .slice(-cfg.click.perWindow);
   }
   run.windUsed = int(value.windUsed, 0, 0, 100);
+  run.shield = num(value.shield, 0, 0, run.maxIntegrity);
+  run.rerolled = int(value.rerolled, 0, 0, 100);
   run.cleared = int(value.cleared, 0, 0, MAX_PHASE);
   run.bosses = int(value.bosses, 0, 0, run.cleared);
   if (Array.isArray(value.clearLog)) {
@@ -171,6 +173,32 @@ function readTurma(value: unknown, content: GameContent): LabTurma {
   return turma;
 }
 
+/**
+ * The tree of a save. Levels bought under the current tree are kept (unknown ids dropped, levels clamped). A save made
+ * under an older tree version (or without a version) is not read at all: every Commit spent on it goes back to the wallet,
+ * priced by the old tree (`legacyTree`), and the tree starts empty.
+ */
+function readTree(lab: LabState, value: Record<string, unknown>, content: GameContent): void {
+  const tree = isRecord(value.tree) ? value.tree : {};
+  const version = int(value.treeVersion, 0, 0, 1_000_000);
+  if (version === content.lab.treeVersion) {
+    for (const def of content.lab.tree) {
+      const level = int(tree[def.id], 0, 0, def.maxLevel);
+      if (level > 0) lab.tree[def.id] = level;
+    }
+    return;
+  }
+  const old = content.lab.legacyTree[version] ?? {};
+  let refund = 0;
+  for (const id in tree) {
+    const def = old[id];
+    if (!def) continue;
+    const levels = int(tree[id], 0, 0, def.maxLevel);
+    for (let at = 0; at < levels; at += 1) refund += Math.ceil(def.cost * def.costGrowth ** at - 1e-9);
+  }
+  lab.commits = Math.min(1e12, lab.commits + refund);
+}
+
 /** The `lab` object of a save. A save without it (older ones) gets a locked, empty lab. */
 export function readLab(value: unknown, content: GameContent): LabState {
   const lab = createLabState();
@@ -178,13 +206,10 @@ export function readLab(value: unknown, content: GameContent): LabState {
   lab.unlocked = value.unlocked === true;
   lab.open = false;
   lab.commits = int(value.commits, 0, 0, 1e12);
-  if (isRecord(value.tree)) {
-    for (const def of content.lab.tree) {
-      const level = int(value.tree[def.id], 0, 0, def.maxLevel);
-      if (level > 0) lab.tree[def.id] = level;
-    }
-  }
+  readTree(lab, value, content);
   lab.bestPhase = int(value.bestPhase, 0, 0, MAX_PHASE);
+  lab.bestPhaseBuild = readLabBuild(value.bestPhaseBuild, content);
+  lab.bestRunBuild = readLabBuild(value.bestRunBuild, content);
   lab.counters = readCounters(value.counters);
   lab.turma = readTurma(value.turma, content);
   return lab;
@@ -208,8 +233,6 @@ export function settleLabAfterLoad(state: GameState, content: GameContent): void
   const totals = labTotals(state, content);
   if (run.status === 'broken') return;
   // The maximum is what the player owns says it is; a load never heals.
-  lab.bestPhaseBuild = readLabBuild(value.bestPhaseBuild, content);
-  lab.bestRunBuild = readLabBuild(value.bestRunBuild, content);
   run.maxIntegrity = maxIntegrityFor(content, totals);
   run.integrity = Math.min(Math.max(1, run.integrity), run.maxIntegrity);
 

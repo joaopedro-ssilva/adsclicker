@@ -19,6 +19,8 @@ import {
   levelUpLabItem,
   recycleLabPending,
   rerollLabAffix,
+  rerollLabOffers,
+  resetLabTree,
   setLabOpen,
   startLabRun,
   unlockLab,
@@ -27,7 +29,8 @@ import { labRunAvailable } from './access';
 import { levelUpCost, rerollCost } from './costs';
 import { labTotals } from './effects';
 import { itemPower, rarityChances, rollItem } from './items';
-import { bossFor, breakRun, spawnPhase } from './phase';
+import { labTreeResetCheck } from './tree';
+import { bossFor, breakRun, enterNextPhase, spawnPhase } from './phase';
 import { advanceLab, autoDps, clickDamage, clickShareCap } from './run';
 import { droppableAt, labIndex } from './state';
 import type { LabItem } from './types';
@@ -139,8 +142,21 @@ describe('lab content', () => {
     const ids = new Set(lab.tree.map((node) => node.id));
     expect(ids.size).toBe(lab.tree.length);
     expect(new Set(lab.tree.map((node) => node.branch))).toEqual(new Set(['codigo', 'infra', 'produto']));
-    expect(lab.tree.length).toBeGreaterThanOrEqual(9);
-    expect(lab.tree.length).toBeLessThanOrEqual(12);
+    expect(lab.tree.length).toBeGreaterThanOrEqual(30);
+    expect(lab.tree.length).toBeLessThanOrEqual(36);
+    for (const node of lab.tree) {
+      expect(node.emoji, node.id).not.toBe('');
+      expect(node.description, node.id).not.toBe('');
+      // every node can be reached: the parents sit in earlier tiers
+      for (const parent of node.requires) expect(lab.tree.find((n) => n.id === parent)!.position.row, node.id).toBeLessThan(node.position.row);
+    }
+    expect(Math.max(...lab.tree.map((node) => node.position.row)) + 1).toBeGreaterThanOrEqual(5);
+    // a few capstones need a node of another branch
+    const byId = new Map(lab.tree.map((node) => [node.id, node]));
+    const cross = lab.tree.filter((node) => node.requires.some((id) => byId.get(id)!.branch !== node.branch));
+    expect(cross.length).toBeGreaterThanOrEqual(3);
+    for (const node of cross) expect(byId.get(node.requires[0]!)!.branch, node.id).toBe(node.branch);
+    expect(lab.treeVersion).toBeGreaterThan(0);
     const spots = new Set<string>();
     for (const node of lab.tree) {
       for (const parent of node.requires) expect(ids.has(parent), `${node.id} <- ${parent}`).toBe(true);
@@ -277,7 +293,7 @@ describe('damage', () => {
     g.state.lab.turma.run!.buffs['stack-overflow'] = 1;
     const totals = labTotals(g.state, g.content);
     expect(totals.power).toBeCloseTo(10);
-    expect(autoDps(totals, false)).toBeCloseTo(10 * (1 + 0.3 + 0.3));
+    expect(autoDps(totals, false)).toBeCloseTo(10 * (1 + 0.18 + 0.3));
   });
 
   it('wears the mobs down front to back, a mob per kill', () => {
@@ -433,7 +449,7 @@ describe('breaking the monitor', () => {
 // ---------------------------------------------------------------------------
 
 describe('phases', () => {
-  it('grow the HP by 18% and the drain by 12% per phase, and every 5th phase is a boss', () => {
+  it('grow the HP by 14% and the drain by 12% per phase, and every 5th phase is a boss', () => {
     const g = started(5);
     const hpAt = (phase: number) => {
       run(g).phase = phase;
@@ -445,7 +461,7 @@ describe('phases', () => {
     // both waves draw their kinds from the stream, so compare through the factor
     const factor = labIndex(g.content).enemies.get('bug')!.hp * g.content.lab.run.hpScale;
     expect(first.every((hp) => hp >= factor * 0.5 - 1e-9)).toBe(true);
-    expect(g.content.lab.run.hpGrowth ** 10).toBeCloseTo(5.234, 2);
+    expect(g.content.lab.run.hpGrowth ** 10).toBeCloseTo(1.14 ** 10, 2);
     expect(g.content.lab.run.drainGrowth).toBe(1.12);
     expect(later.length).toBeGreaterThanOrEqual(2);
     const bosses = { 5: 'deploy-de-sexta', 10: 'select-em-producao', 15: 'ia-que-apagou-o-banco', 20: 'deploy-de-sexta', 25: 'select-em-producao' };
@@ -819,12 +835,12 @@ describe('item effects in computeStats', () => {
     expect(four.activeBonus).toBeCloseTo(base.activeBonus + 25 * 0.005);
   });
 
-  it('count run buffs too, scaled by the stacks, and the tree adds 10% per level to all of it', () => {
+  it('count run buffs too, scaled by the stacks, and the tree adds 8% per level to all of it', () => {
     const g = started();
     run(g).buffs['stack-overflow'] = 2;
     expect(computeStats(g.state, g.content).clickPower).toBeCloseTo(1 + 2 * 30 * 0.01);
     g.state.lab.tree['documentacao'] = 3;
-    expect(computeStats(g.state, g.content).clickPower).toBeCloseTo(1 + 2 * 30 * 0.01 * 1.3);
+    expect(computeStats(g.state, g.content).clickPower).toBeCloseTo(1 + 2 * 30 * 0.01 * 1.24);
   });
 
   it('are capped, whatever the items and buffs add up to', () => {
@@ -972,11 +988,12 @@ describe('Commits and the tree', () => {
     expect(buyLabNode(g.state, g.content, 'estudo-de-chefao', T0, g.emit)).toBe(false); // the parent is missing
     expect(buyLabNode(g.state, g.content, 'no-such-node', T0, g.emit)).toBe(false);
     expect(buyLabNode(g.state, g.content, 'algoritmos-eficientes', T0, g.emit)).toBe(true);
-    expect(g.state.lab.commits).toBe(992);
+    expect(g.state.lab.commits).toBe(988);
     expect(g.state.lab.tree['algoritmos-eficientes']).toBe(1);
     expect(buyLabNode(g.state, g.content, 'algoritmos-eficientes', T0, g.emit)).toBe(true);
-    expect(g.state.lab.commits).toBe(992 - 12); // ceil(8 x 1.4)
+    expect(g.state.lab.commits).toBe(988 - 18); // ceil(12 x 1.45)
     expect(buyLabNode(g.state, g.content, 'estudo-de-chefao', T0, g.emit)).toBe(true);
+    g.state.lab.commits = 100_000;
     for (let i = 0; i < 20; i += 1) buyLabNode(g.state, g.content, 'algoritmos-eficientes', T0, g.emit);
     expect(g.state.lab.tree['algoritmos-eficientes']).toBe(10);
 
@@ -987,25 +1004,25 @@ describe('Commits and the tree', () => {
     expect(view.spent).toBeGreaterThan(0);
   });
 
-  it('starts power +10% per level, integrity +10 per level and a repair after each boss', () => {
+  it('starts power +6% per level, integrity +8 per level and a repair after each boss', () => {
     const g = started();
     g.state.lab.commits = 10_000;
     buyLabNode(g.state, g.content, 'algoritmos-eficientes', T0, g.emit);
-    expect(autoDps(labTotals(g.state, g.content), false)).toBeCloseTo(5.5);
+    expect(autoDps(labTotals(g.state, g.content), false)).toBeCloseTo(5.3);
     buyLabNode(g.state, g.content, 'monitor-reforcado', T0, g.emit);
     buyLabNode(g.state, g.content, 'monitor-reforcado', T0, g.emit);
-    expect(run(g)).toMatchObject({ maxIntegrity: 120, integrity: 120 }); // a rise fills the new room
+    expect(run(g)).toMatchObject({ maxIntegrity: 116, integrity: 116 }); // a rise fills the new room
     buyLabNode(g.state, g.content, 'backup-noturno', T0, g.emit);
     run(g).phase = 5;
     spawnPhase(g.state, g.content, labTotals(g.state, g.content));
     run(g).integrity = 50;
     clearPhase(g);
-    expect(run(g).integrity).toBeCloseTo(50 + 120 * 0.05, 3);
+    expect(run(g).integrity).toBeCloseTo(50 + 116 * 0.05, 3);
     expect(run(g).bosses).toBe(1);
     expect(types(g)).toEqual(expect.arrayContaining(['labBossBeaten', 'labNodeBought']));
   });
 
-  it('adds 5 s to the boss timer per level and a comum Setup item at the start of the run', () => {
+  it('adds 4 s to the boss timer per level and a comum Setup item at the start of the run', () => {
     const a = started(1, (game) => {
       game.state.lab.tree['prazo-folgado'] = 2;
       game.state.lab.tree['setup-de-casa'] = 1;
@@ -1014,15 +1031,15 @@ describe('Commits and the tree', () => {
     expect(a.state.lab.turma.equipped.setup).toMatchObject({ rarity: 'comum', level: 1 });
     run(a).phase = 5;
     spawnPhase(a.state, a.content, labTotals(a.state, a.content));
-    expect(run(a).bossLeft).toBe(40);
+    expect(run(a).bossLeft).toBe(38);
   });
 
-  it('adds +20% Commits per level to what a break pays', () => {
+  it('adds +12% Commits per level to what a break pays', () => {
     const g = started();
     g.state.lab.tree['portfolio-do-lab'] = 2;
     run(g).cleared = 10;
     breakRun(g.state, g.content, 'integrity', g.emit);
-    expect(g.state.lab.commits).toBe(Math.floor(30 * 1.4));
+    expect(g.state.lab.commits).toBe(Math.floor(30 * 1.24));
   });
 });
 
@@ -1137,6 +1154,7 @@ describe('save', () => {
       open: false,
       commits: 0,
       tree: {},
+      treeVersion: 1,
       bestPhase: 0,
       bestPhaseBuild: [],
       bestRunBuild: [],
@@ -1153,6 +1171,7 @@ describe('save', () => {
       unlocked: 'yes',
       commits: -5,
       bestPhase: 'many',
+      treeVersion: 1,
       tree: { 'algoritmos-eficientes': 99, nope: 3, 'monitor-reforcado': -2 },
       counters: { runs: 'x', clicks: -4 },
       turma: {
@@ -1207,65 +1226,280 @@ describe('save', () => {
 });
 
 // ---------------------------------------------------------------------------
-// Pacing
+// The bigger tree: new effects, the reset and old saves
 // ---------------------------------------------------------------------------
 
-/** A simple player: takes the strongest item for its slot, a buff for damage, repairs when hurt; spends no ADScoins. */
-function bot(seed: number, tree: Record<string, number>): { phase: number; seconds: number } {
-  const g = labGame();
-  unlockLab(g.state, g.content, T0, g.emit);
-  allAulas(g);
-  g.state.lab.tree = { ...tree };
-  startLabRun(g.state, g.content, seed, T0, g.emit);
-  const slotOf = (id: string) => labIndex(g.content).bases.get(id)!.slot;
-  let now = T0;
-  for (let guard = 0; guard < 20_000 && run(g).status !== 'broken'; guard += 1) {
-    const current = run(g);
-    if (current.status === 'fighting') {
-      for (let c = 0; c < 5; c += 1) labClick(g.state, g.content, (now += 200), g.emit);
-      advanceLab(g.state, g.content, 1, g.emit);
-    } else if (current.status === 'reward') {
-      let best = 0;
-      let bestScore = -1;
-      current.offers.forEach((offer, index) => {
-        let score = 3;
-        if (offer.kind === 'item') {
-          const held = g.state.lab.turma.equipped[slotOf(offer.item.base)];
-          score = held ? 10 * (itemPower(g.content, offer.item) / itemPower(g.content, held)) : 50;
-        } else if (offer.kind === 'buff') {
-          score = 8 + (labIndex(g.content).buffs.get(offer.buff)?.lab.damage ?? 0) * 20;
-        } else if (offer.kind === 'repair') {
-          score = current.integrity < current.maxIntegrity / 2 ? 40 : 2;
-        }
-        if (score > bestScore) [best, bestScore] = [index, score];
+describe('tree effects', () => {
+  const totals = (g: TestGame) => labTotals(g.state, g.content);
+
+  it('Estagiário dedicado starts the run with random incomum items in empty slots, one more per level', () => {
+    const a = started(21, (game) => {
+      game.state.lab.tree['estagiario-dedicado'] = 2;
+    });
+    const gifts = Object.values(a.state.lab.turma.equipped).filter((entry) => entry.rarity === 'incomum');
+    expect(gifts).toHaveLength(2);
+    expect(Object.keys(a.state.lab.turma.equipped)).toHaveLength(3);
+    const again = started(21, (game) => {
+      game.state.lab.tree['estagiario-dedicado'] = 2;
+    });
+    expect(again.state.lab.turma.equipped).toEqual(a.state.lab.turma.equipped);
+    const none = started(21);
+    expect(Object.keys(none.state.lab.turma.equipped)).toEqual(['ferramenta']);
+  });
+
+  it('Hotfix adds time to the first boss only', () => {
+    const g = started(1, (game) => {
+      game.state.lab.tree.hotfix = 2;
+    });
+    run(g).phase = 5;
+    spawnPhase(g.state, g.content, totals(g));
+    expect(run(g).bossLeft).toBe(30 + 12);
+    run(g).bosses = 1;
+    run(g).phase = 10;
+    spawnPhase(g.state, g.content, totals(g));
+    expect(run(g).bossLeft).toBe(30);
+    expect(labMonitorView(g.state, g.content).bossTotal).toBe(30);
+  });
+
+  it('Retrospectiva draws the options again, as many times as it has levels, the same way every time', () => {
+    const make = () =>
+      started(33, (game) => {
+        game.state.lab.tree.retrospectiva = 1;
       });
-      chooseLabReward(g.state, g.content, best, T0, g.emit);
-    } else {
-      const pending = current.pending!;
-      const held = g.state.lab.turma.equipped[slotOf(pending.base)]!;
-      if (itemPower(g.content, pending) > itemPower(g.content, held)) equipLabPending(g.state, g.content, T0, g.emit);
-      else recycleLabPending(g.state, g.content, T0, g.emit);
-    }
-  }
-  return { phase: run(g).phase, seconds: run(g).t };
-}
+    const g = make();
+    clearPhase(g);
+    expect(run(g).status).toBe('reward');
+    const first = JSON.stringify(run(g).offers);
+    expect(labRewardsView(g.state, g.content).rerollsLeft).toBe(1);
+    expect(rerollLabOffers(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(JSON.stringify(run(g).offers)).not.toBe(first);
+    expect(rerollLabOffers(g.state, g.content, T0, g.emit)).toBe(false);
+    expect(labRewardsView(g.state, g.content).rerollsLeft).toBe(0);
+    const other = make();
+    clearPhase(other);
+    rerollLabOffers(other.state, other.content, T0, other.emit);
+    expect(run(other).offers).toEqual(run(g).offers);
+    // a new reward brings the reroll back, and a save keeps the count
+    const loaded = deserializeState(serializeState(g.state), g.content, T0)!;
+    expect(loaded.lab.turma.run!.rerolled).toBe(1);
+    chooseLabReward(g.state, g.content, 2, T0, g.emit);
+    if (run(g).status === 'equip') recycleLabPending(g.state, g.content, T0, g.emit);
+    clearPhase(g);
+    expect(labRewardsView(g.state, g.content).rerollsLeft).toBe(1);
+    const plain = started(33);
+    clearPhase(plain);
+    expect(rerollLabOffers(plain.state, plain.content, T0, plain.emit)).toBe(false);
+  });
 
-describe('pacing', () => {
-  const median = (values: number[]) => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)]!;
-  const BIG = { 'algoritmos-eficientes': 10, 'estudo-de-chefao': 5, 'monitor-reforcado': 10, 'backup-noturno': 5, 'prazo-folgado': 4, 'rede-segura': 5, 'codigo-limpo': 6 };
+  it('Speedrun repairs integrity when a regular phase falls fast, not a slow one or a boss', () => {
+    const g = started(4, (game) => {
+      game.state.lab.tree.speedrun = 2;
+    });
+    run(g).integrity = 50;
+    clearPhase(g);
+    expect(run(g).integrity).toBeCloseTo(54, 3); // 4% of 100
+    const slow = started(4, (game) => {
+      game.state.lab.tree.speedrun = 2;
+    });
+    run(slow).integrity = 50;
+    run(slow).phaseTime = 11;
+    for (const mob of run(slow).mobs) mob.hp = 0.001;
+    advanceLab(slow.state, slow.content, 0.2, slow.emit);
+    expect(run(slow).integrity).toBeCloseTo(50, 1);
+  });
 
-  it('a first run reaches a dozen phases or so, a full tree goes much deeper, and a run lasts minutes, not seconds', () => {
-    const plain = Array.from({ length: 12 }, (_, i) => bot(1000 + i * 17, {}));
-    const deep = Array.from({ length: 12 }, (_, i) => bot(1000 + i * 17, BIG));
-    expect(median(plain.map((r) => r.phase))).toBeGreaterThanOrEqual(8);
-    expect(median(plain.map((r) => r.phase))).toBeLessThanOrEqual(25);
-    expect(median(deep.map((r) => r.phase))).toBeGreaterThan(median(plain.map((r) => r.phase)) + 5);
-    expect(median(plain.map((r) => r.seconds))).toBeGreaterThan(60);
-    // every run ends: the monitor always breaks
-    for (const result of [...plain, ...deep]) expect(result.phase).toBeLessThan(100);
+  it('Mentoria adds an option to a boss reward', () => {
+    const g = started(5, (game) => {
+      game.state.lab.tree.mentoria = 1;
+    });
+    run(g).phase = 5;
+    spawnPhase(g.state, g.content, totals(g));
+    clearPhase(g);
+    expect(run(g).offers).toHaveLength(4);
+    const plain = started(5);
+    run(plain).phase = 5;
+    spawnPhase(plain.state, plain.content, totals(plain));
+    clearPhase(plain);
+    expect(run(plain).offers).toHaveLength(3);
+  });
+
+  it('Herança de código gives the new item part of the level of the one it replaces', () => {
+    const g = started(6, (game) => {
+      game.state.lab.tree['heranca-de-codigo'] = 2;
+    });
+    g.state.lab.turma.equipped.setup = item('cadeira-ergonomica', 'comum', 10, [{ target: 'foco', op: 'add', value: 1 }], 70);
+    run(g).status = 'equip';
+    run(g).pending = item('mesa-regulavel', 'raro', 2, [{ target: 'logica', op: 'add', value: 1 }], 71);
+    expect(equipLabPending(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.lab.turma.equipped.setup).toMatchObject({ base: 'mesa-regulavel', level: 6 }); // floor(10 x 0.6)
+  });
+
+  it('Firewall do lab starts every phase with a shield that the mobs drain first', () => {
+    const g = started(7, (game) => {
+      game.state.lab.tree['firewall-do-lab'] = 2;
+    });
+    expect(run(g).shield).toBeCloseTo(12, 6); // 12% of 100
+    expect(labMonitorView(g.state, g.content).shield).toBeCloseTo(12, 6);
+    run(g).mobs = run(g).mobs.slice(0, 1);
+    run(g).mobs[0]!.hp = 1e9;
+    run(g).mobs[0]!.maxHp = 1e9;
+    advanceLab(g.state, g.content, 1, g.emit);
+    expect(run(g).shield).toBeLessThan(12);
+    expect(run(g).integrity).toBe(100);
+    clearPhase(g);
+    chooseLabReward(g.state, g.content, 0, T0, g.emit);
+    if (run(g).status === 'equip') recycleLabPending(g.state, g.content, T0, g.emit);
+    expect(run(g).status).toBe('fighting');
+    expect(run(g).shield).toBeCloseTo(12, 6);
+  });
+
+  it('TDD pays Commits for each boss beaten, on the spot', () => {
+    const g = started(8, (game) => {
+      game.state.lab.tree.tdd = 2;
+      game.state.lab.tree['portfolio-do-lab'] = 1;
+    });
+    run(g).phase = 5;
+    spawnPhase(g.state, g.content, totals(g));
+    clearPhase(g);
+    expect(g.state.lab.commits).toBe(Math.floor(30 * 1.12));
+  });
+
+  it('Minimalismo and Código lendário add damage for the empty slots and the legendaries', () => {
+    const g = started(9, (game) => {
+      game.state.lab.tree.minimalismo = 2;
+      game.state.lab.tree['codigo-lendario'] = 1;
+    });
+    expect(totals(g).lab.damage).toBeCloseTo(0.2 * 3); // three empty slots
+    g.state.lab.turma.equipped.setup = item('mesa-regulavel', 'lendario', 1, [{ target: 'logica', op: 'add', value: 1 }]);
+    g.state.lab.turma.equipped.acessorio = item('relogio-de-ponto', 'lendario', 1, [{ target: 'cooldown', op: 'add', value: 1 }], 51);
+    expect(totals(g).lab.damage).toBeCloseTo(0.2 * 1 + 0.5 * 2);
+  });
+
+  it('Licenças educacionais make level ups cheaper and Reciclagem makes recycling pay more', () => {
+    const g = started(10, (game) => {
+      game.state.lab.tree['licencas-educacionais'] = 2;
+      game.state.lab.tree.reciclagem = 2;
+    });
+    const mouse = g.state.lab.turma.equipped.ferramenta!;
+    const full = levelUpCost(g.content, mouse)!;
+    const cheap = levelUpCost(g.content, mouse, totals(g).lab.levelCost)!;
+    expect(cheap.div(full).toNumber()).toBeCloseTo(0.84, 6);
+    g.state.coins = cheap;
+    expect(levelUpLabItem(g.state, g.content, 'ferramenta', T0, g.emit)).toBe(true);
+    run(g).status = 'equip';
+    run(g).pending = item('mesa-regulavel', 'raro', 1, [{ target: 'logica', op: 'add', value: 1 }], 72);
+    expect(labBenchView(g.state, g.content).pending!.recycleNew).toBe(Math.floor(30 * 1.4));
+    recycleLabPending(g.state, g.content, T0, g.emit);
+    expect(g.state.lab.commits).toBe(Math.floor(30 * 1.4));
+  });
+
+  it('small clicker nodes feed computeStats and stay under the caps', () => {
+    const g = started(11, (game) => {
+      game.state.lab.tree['mouse-gamer'] = 5;
+      game.state.lab.tree['mira-afiada'] = 4;
+      game.state.lab.tree.cafeina = 5;
+    });
+    const stats = computeStats(g.state, g.content);
+    expect(stats.clickPower).toBeCloseTo(1 + 0.2);
+    expect(labTotals(g.state, g.content).clicker.get('critChance')).toBeCloseTo(0.06);
+    expect(labTotals(g.state, g.content).clicker.get('abilityCooldown')).toBeCloseTo(-0.1);
+    g.state.lab.tree['mouse-gamer'] = 5;
+    run(g).buffs['stack-overflow'] = 90;
+    expect(computeStats(g.state, g.content).clickPower).toBe(1 + g.content.lab.caps.clickPower!);
+  });
+
+  it('shows the clicker part of a node in the tree view', () => {
+    const g = started(12);
+    const node = labTreeView(g.state, g.content).nodes.find((entry) => entry.id === 'mouse-gamer')!;
+    expect(node.effects[0]).toMatchObject({ label: 'ADScoins por clique', now: '+0%', next: '+4%' });
   });
 });
 
+describe('resetting the tree', () => {
+  function bought(): TestGame {
+    const g = labGame();
+    unlockLab(g.state, g.content, T0, g.emit);
+    allAulas(g);
+    g.state.lab.commits = 500;
+    for (const id of ['algoritmos-eficientes', 'algoritmos-eficientes', 'monitor-reforcado', 'revisao-de-pr']) buyLabNode(g.state, g.content, id, T0, g.emit);
+    return g;
+  }
+
+  it('refunds every Commit spent, empties the tree and says how many came back', () => {
+    const g = bought();
+    const spent = 500 - g.state.lab.commits;
+    expect(spent).toBe(12 + 18 + 10 + 30);
+    expect(labTreeResetCheck(g.state, g.content)).toEqual({ ok: true, refund: spent, reason: null });
+    expect(labTreeView(g.state, g.content)).toMatchObject({ canReset: true, refund: spent, spent });
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.lab.tree).toEqual({});
+    expect(g.state.lab.commits).toBe(500);
+    expect(g.events.filter((event) => event.type === 'labTreeReset')).toEqual([{ type: 'labTreeReset', refunded: spent }]);
+    // free and repeatable, but not with nothing to give back
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(false);
+    expect(labTreeView(g.state, g.content)).toMatchObject({ canReset: false, resetReason: 'Nada foi investido na árvore.' });
+    buyLabNode(g.state, g.content, 'algoritmos-eficientes', T0, g.emit);
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.lab.commits).toBe(500);
+  });
+
+  it('waits while a run is on (fighting, rewards, an item to decide) and comes back when the monitor breaks', () => {
+    const g = bought();
+    startLabRun(g.state, g.content, 99, T0, g.emit);
+    expect(labTreeResetCheck(g.state, g.content)).toMatchObject({ ok: false, reason: 'Só dá para resetar a árvore fora de uma corrida.' });
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(false);
+    clearPhase(g);
+    expect(run(g).status).toBe('reward');
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(false);
+    expect(g.state.lab.tree['algoritmos-eficientes']).toBe(2);
+    breakRun(g.state, g.content, 'integrity', g.emit);
+    const before = g.state.lab.commits;
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(true);
+    expect(g.state.lab.commits).toBe(before + 70);
+    expect(g.state.lab.tree).toEqual({});
+  });
+
+  it('is not offered while the lab is locked', () => {
+    const g = labGame();
+    expect(resetLabTree(g.state, g.content, T0, g.emit)).toBe(false);
+  });
+});
+
+describe('saves made under an older tree', () => {
+  const raw = (g: TestGame, lab: Record<string, unknown>) => {
+    const copy = JSON.parse(serializeState(g.state)) as Record<string, unknown>;
+    copy.lab = { ...(copy.lab as Record<string, unknown>), ...lab };
+    return JSON.stringify(copy);
+  };
+
+  it('gives every Commit spent on the first 12-node tree back, kept ids included', () => {
+    const g = started();
+    g.state.lab.commits = 40;
+    // priced by the old formulas: ceil(8 x 1.4^n), ceil(6 x 1.35^n), 25 (a single level), and an id that never existed
+    const old = { 'algoritmos-eficientes': 3, 'monitor-reforcado': 2, 'setup-de-casa': 1, 'nobreak-do-lab': 1, ghost: 4 };
+    const loaded = deserializeState(raw(g, { tree: old, treeVersion: undefined, commits: 40 }), g.content, T0)!;
+    const refund = 8 + 12 + 16 + (6 + 9) + 25 + 60; // ceil(8 x 1.4^2) = 16, ceil(6 x 1.35) = 9
+    expect(loaded.lab.tree).toEqual({});
+    expect(loaded.lab.commits).toBe(40 + refund);
+    expect(loaded.lab.treeVersion).toBe(g.content.lab.treeVersion);
+    // and it does not happen twice: the next save carries the version
+    const again = deserializeState(serializeState(loaded), g.content, T0)!;
+    expect(again.lab.commits).toBe(40 + refund);
+  });
+
+  it('keeps a tree of the current version, dropping only unknown ids and clamping levels', () => {
+    const g = started();
+    const loaded = deserializeState(raw(g, { tree: { hotfix: 2, 'tdd': 99, removed: 3 }, treeVersion: g.content.lab.treeVersion }), g.content, T0)!;
+    expect(loaded.lab.tree).toEqual({ hotfix: 2, tdd: g.content.lab.tree.find((node) => node.id === 'tdd')!.maxLevel });
+  });
+
+  it('an unknown future version refunds nothing and starts the tree empty rather than guessing', () => {
+    const g = started();
+    const loaded = deserializeState(raw(g, { tree: { hotfix: 2 }, treeVersion: 99, commits: 7 }), g.content, T0)!;
+    expect(loaded.lab.tree).toEqual({});
+    expect(loaded.lab.commits).toBe(7);
+  });
+});
 // ---------------------------------------------------------------------------
 // Views
 // ---------------------------------------------------------------------------

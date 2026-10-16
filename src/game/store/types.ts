@@ -62,6 +62,8 @@ export type GameEvent =
   | { type: 'labItemRecycled'; item: string; rarity: string }
   | { type: 'labItemChanged'; action: 'levelUp' | 'reroll'; item: string; level: number }
   | { type: 'labNodeBought'; id: string; level: number }
+  | { type: 'labTreeReset'; refunded: number }
+  | { type: 'labOffersRerolled'; phase: number }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -313,6 +315,10 @@ export interface GameActions {
   rerollLabAffix(slot: LabSlot, affix: number): boolean;
   /** One level of a node of the lab tree, with Commits. */
   buyLabNode(id: string): boolean;
+  /** Gives back every Commit spent on the tree and empties it. False during a run or with nothing spent. */
+  resetLabTree(): boolean;
+  /** Draws the options of the reward on screen again (tree: Retrospectiva). False without a reroll left. */
+  rerollLabOffers(): boolean;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;

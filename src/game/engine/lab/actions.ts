@@ -9,9 +9,9 @@ import { afterAction } from '../lifecycle';
 import type { GameState } from '../state';
 import { unlockLab as unlockLabRaw } from './access';
 import { levelUpLabItem as levelUpLabItemRaw, rerollLabAffix as rerollLabAffixRaw } from './bench';
-import { chooseLabReward as chooseLabRewardRaw, resolveLabPending as resolveLabPendingRaw } from './rewards';
+import { chooseLabReward as chooseLabRewardRaw, rerollLabOffers as rerollLabOffersRaw, resolveLabPending as resolveLabPendingRaw } from './rewards';
 import { labClick as labClickRaw, setLabOpen as setLabOpenRaw, startLabRun as startLabRunRaw } from './run';
-import { buyLabNode as buyLabNodeRaw } from './tree';
+import { buyLabNode as buyLabNodeRaw, resetLabTree as resetLabTreeRaw } from './tree';
 
 export function unlockLab(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
   const done = unlockLabRaw(state, content, emit);
@@ -71,6 +71,20 @@ export function rerollLabAffix(state: GameState, content: GameContent, slot: Lab
 
 export function buyLabNode(state: GameState, content: GameContent, id: string, now: number, emit: Emit): boolean {
   const done = buyLabNodeRaw(state, content, id, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
+/** Refunds every Commit spent on the tree and empties it (not while a run is on). */
+export function resetLabTree(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
+  const done = resetLabTreeRaw(state, content, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
+/** Draws the options of the reward on screen again (needs the tree's Retrospectiva). */
+export function rerollLabOffers(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
+  const done = rerollLabOffersRaw(state, content, emit);
   if (done) afterAction(state, content, now, emit);
   return done;
 }

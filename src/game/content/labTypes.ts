@@ -44,6 +44,18 @@ export const LAB_EFFECT_KEYS = [
   'firstOptions', // + options at the first reward of the run
   'secondWind', // times per phase a lethal drain leaves the monitor standing
   'startSetup', // starts the run with a comum item in the Setup slot
+  'startItem', // starts the run with this many random incomum items in empty slots
+  'firstBossTime', // + seconds on the timer of the first boss of the run
+  'offerRerolls', // times per reward the options can be drawn again
+  'fastClearRepair', // share of the maximum integrity restored by a regular phase cleared within run.fastClearSeconds
+  'bossOptions', // + options on the reward of a boss
+  'levelKeep', // share of the level of a replaced item the new one inherits
+  'phaseShield', // share of the maximum integrity every phase starts with as a shield on top
+  'bossCommits', // Commits paid at once for each boss beaten
+  'emptySlotDamage', // + share of damage per empty slot
+  'legendaryDamage', // + share of damage per legendary equipped
+  'levelCost', // + share on the ADScoins cost of item level ups (negative = cheaper)
+  'recycleBonus', // + share of the Commits a recycled item pays
 ] as const;
 export type LabEffectKey = (typeof LAB_EFFECT_KEYS)[number];
 export type LabEffects = Partial<Record<LabEffectKey, number>>;
@@ -103,6 +115,8 @@ export interface LabNodeDef {
   effects: LabEffects;
   requires: string[];
   position: { col: number; row: number };
+  /** Small clicker bonuses per level, always added before the lab caps. */
+  clicker?: { stat: StatKey; per: number }[];
 }
 
 export interface LabConfig {
@@ -122,6 +136,10 @@ export interface LabConfig {
   enemies: EnemyDef[];
   buffs: LabBuffDef[];
   tree: LabNodeDef[];
+  /** Version of the tree's nodes and prices. A save made under an older one gets every Commit spent on the tree back. */
+  treeVersion: number;
+  /** The nodes of the older versions, only to price that refund: version -> node id -> prices. */
+  legacyTree: Record<number, Record<string, { cost: number; costGrowth: number; maxLevel: number }>>;
 
   /** What each affix target is worth, by op. Targets missing here do nothing. */
   affixes: Partial<Record<LabTarget, Record<'add' | 'pct', LabConversion>>>;
@@ -200,6 +218,10 @@ export interface LabConfig {
     bossCycle: string[];
     /** Boss HP = its Hackathon HP x hpScale x this x the phase growth. */
     bossHpFactor: number;
+    /** Boss HP x this for every boss already met in the run (the 2nd boss has this x, the 3rd this squared...). */
+    bossHpGrowth: number;
+    /** ...up to this many bosses; the ones after follow the plain phase growth only. */
+    bossGrowthTurns: number;
     bossTimerSeconds: number;
     /** Enemy trait 'armor' (flat) becomes this share of the damage per point, up to armorMax. */
     armorPerPoint: number;
@@ -212,6 +234,8 @@ export interface LabConfig {
     minDrainMult: number;
     /** Lowest the maximum integrity can go. */
     minIntegrity: number;
+    /** A regular phase cleared in less than this many seconds counts as a fast clear (tree: fastClearRepair). */
+    fastClearSeconds: number;
   };
 
   rewards: {

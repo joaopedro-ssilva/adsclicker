@@ -1,5 +1,6 @@
 import { createStream } from '../../../hackathon/engine/rng';
 import type { Stream } from '../../../hackathon/engine/rng';
+import { LAB_TREE_VERSION } from '../../content/labTree';
 import { LAB_RARITIES } from '../../content/labTypes';
 import type { LabBuffDef, LabItemBase, LabNodeDef, LabRarity, LabRarityDef, LabEnemyDef } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
@@ -49,6 +50,8 @@ export function createLabRun(seed: number, integrity: number): LabRun {
     buffs: {},
     clickTimes: [],
     windUsed: 0,
+    shield: 0,
+    rerolled: 0,
     cleared: 0,
     bosses: 0,
     clearLog: [],

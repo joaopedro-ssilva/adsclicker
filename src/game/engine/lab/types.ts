@@ -71,6 +71,10 @@ export interface LabRun {
   clickTimes: number[];
   /** Second winds used in this phase. */
   windUsed: number;
+  /** Shield of the phase (tree: phaseShield): integrity points the mobs drain before the real integrity. */
+  shield: number;
+  /** Times the options of the reward on screen were drawn again (tree: offerRerolls). */
+  rerolled: number;
   /** Phases cleared and bosses beaten. */
   cleared: number;
   bosses: number;
@@ -88,10 +92,6 @@ export interface LabTurma {
   nextUid: number;
 }
 
-/** Lifetime numbers of the lab. */
-export interface LabCounters {
-  runs: number;
-  broken: number;
 /** One equipped item as a record keeps it: enough to draw the icon and its tooltip. */
 export interface LabBuildItem {
   slot: LabSlot;
@@ -103,6 +103,10 @@ export interface LabBuildItem {
 /** The equipped items at the moment of a record (at most one per slot, in slot order). */
 export type LabBuild = LabBuildItem[];
 
+/** Lifetime numbers of the lab. */
+export interface LabCounters {
+  runs: number;
+  broken: number;
   phasesCleared: number;
   bossesBeaten: number;
   itemsFound: number;
@@ -123,13 +127,15 @@ export interface LabState {
   commits: number;
   /** Levels of the lab tree. Survives graduation. */
   tree: Record<string, number>;
+  /** Version of the tree these levels were bought in (content treeVersion); an older one is refunded when read. */
+  treeVersion: number;
   /** The highest phase ever reached (a run that breaks in phase 7 reached 7). Permanent. */
   bestPhase: number;
-  counters: LabCounters;
-  /** What lasts only until the next graduation. */
-  turma: LabTurma;
-}
   /** The equipped items when `bestPhase` was reached (the ranking shows them). */
   bestPhaseBuild: LabBuild;
   /** The equipped items of the turma that holds `records.mostCoins` (the best run). */
   bestRunBuild: LabBuild;
+  counters: LabCounters;
+  /** What lasts only until the next graduation. */
+  turma: LabTurma;
+}

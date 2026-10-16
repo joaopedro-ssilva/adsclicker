@@ -3,6 +3,7 @@ import type { LabBonus, LabConversion, LabEffectKey, LabEffects, LabModifier } f
 import type { Effect, GameContent, StatKey } from '../../content/types';
 import type { GameState } from '../state';
 import { affixValue, hasUnique, itemBase, itemPower } from './items';
+import { LAB_SLOTS } from '../../content/labTypes';
 import { labIndex } from './state';
 import type { LabItem } from './types';
 
@@ -83,6 +84,11 @@ export function setPieces(state: GameState, content: GameContent): Map<string, n
   return pieces;
 }
 
+/** What a recycled item's Commits are multiplied by: the Commits bonus and the recycling bonus of the tree. */
+export function recycleMultiplier(totals: LabTotals): number {
+  return (1 + Math.max(0, totals.lab.commits)) * (1 + Math.max(0, totals.lab.recycleBonus));
+}
+
 const EMPTY: LabEffectTotals = emptyEffects();
 
 /**
@@ -123,8 +129,16 @@ export function labTotals(state: GameState, content: GameContent): LabTotals {
   for (const id in lab.tree) {
     const def = index.nodes.get(id);
     const level = lab.tree[id] ?? 0;
-    if (def && level > 0) addEffects(totals.lab, def.effects, level);
+    if (!def || level <= 0) continue;
+    addEffects(totals.lab, def.effects, level);
+    for (const part of def.clicker ?? []) addClicker(totals.clicker, part.stat, part.per * level);
   }
+
+  // Damage that depends on the build: the empty slots (early help) and the legendaries (late reward).
+  const equipped = Object.values(lab.turma.equipped);
+  const empty = LAB_SLOTS.length - equipped.length;
+  const legendaries = equipped.filter((item) => hasUnique(item)).length;
+  totals.lab.damage += totals.lab.emptySlotDamage * Math.max(0, empty) + totals.lab.legendaryDamage * legendaries;
 
   // The lab's bonuses to the clicker grow with the tree and stop at the caps, whatever the items and buffs add up to.
   const factor = 1 + Math.max(0, totals.lab.clicker);

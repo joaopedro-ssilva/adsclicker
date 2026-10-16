@@ -3,7 +3,7 @@ import type { LabItemBase, LabRarity } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
-import { labTotals } from './effects';
+import { labTotals, recycleMultiplier } from './effects';
 import type { LabTotals } from './effects';
 import { atLeast, itemSlot, recycleValue, rollItem, rollRarity } from './items';
 import { enterNextPhase, gainCommits, isBossPhase, syncIntegrity } from './phase';
@@ -11,6 +11,9 @@ import { LAB_STREAM, droppableAt, labIndex, labStream } from './state';
 import type { LabItem, LabOffer } from './types';
 
 type OfferKind = LabOffer['kind'];
+
+/** Stream index step between the draws of the same reward (bigger than any phase). */
+const OFFER_REROLL_STRIDE = 100_000;
 
 /** Item level of a drop of this phase. */
 export function dropLevel(content: GameContent, phase: number, boss: boolean): number {
@@ -60,12 +63,13 @@ function offerItem(
   return rollItem(content, base, rarity, dropLevel(content, phase, boss), stream);
 }
 
-/** How many options this reward shows: 3, +1 on the first reward with the tree, +1 by the chance luck gives. */
+/** How many options this reward shows: 3, +1 on the first reward and +1 on a boss reward with the tree, +1 by the chance luck gives. */
 function optionCount(state: GameState, content: GameContent, totals: LabTotals, stream: Stream): number {
   const run = state.lab.turma.run;
   const { options, maxOptions } = content.lab.rewards;
   let count = options;
   if (run && run.cleared === 1) count += Math.max(0, Math.floor(totals.lab.firstOptions));
+  if (run && isBossPhase(content, run.phase)) count += Math.max(0, Math.floor(totals.lab.bossOptions));
   // Always drawn, so the rest of the stream does not depend on the chance.
   const roll = stream() * 100;
   if (roll < totals.lab.extraOption) count += 1;
@@ -83,7 +87,8 @@ export function makeOffers(state: GameState, content: GameContent, totals: LabTo
   const cfg = content.lab.rewards;
   const phase = run.phase;
   const boss = isBossPhase(content, phase);
-  const stream = labStream(run.seed, LAB_STREAM.offers, phase);
+  // Each time the options are drawn again (tree: Retrospectiva) the stream moves on to a new set of rolls.
+  const stream = labStream(run.seed, LAB_STREAM.offers, phase + run.rerolled * OFFER_REROLL_STRIDE);
   const count = optionCount(state, content, totals, stream);
   const quality = lootQuality(content, totals, phase);
 
@@ -146,8 +151,7 @@ function equip(state: GameState, content: GameContent, item: LabItem): LabItem |
 
 /** Commits a recycled item pays, with the tree's and items' bonus. */
 function recycleCommits(state: GameState, content: GameContent, item: LabItem): number {
-  const bonus = 1 + Math.max(0, labTotals(state, content).lab.commits);
-  return Math.floor(recycleValue(content, item) * bonus);
+  return Math.floor(recycleValue(content, item) * recycleMultiplier(labTotals(state, content)));
 }
 
 /** Picks the option at `index` of the reward on screen. An item for an occupied slot waits for equipLabPending / recycleLabPending. */
@@ -192,6 +196,24 @@ export function chooseLabReward(state: GameState, content: GameContent, index: n
   return true;
 }
 
+/** Most of the replaced item's level a new one can inherit. */
+const MAX_LEVEL_KEEP = 0.9;
+
+/**
+ * Draws the options of the reward on screen again (tree: Retrospectiva), up to offerRerolls times per reward. The new
+ * set comes from the same seed with the next stream, so a replay of the run makes the same choices.
+ */
+export function rerollLabOffers(state: GameState, content: GameContent, emit: Emit): boolean {
+  const run = state.lab.turma.run;
+  if (!run || run.status !== 'reward') return false;
+  const totals = labTotals(state, content);
+  if (run.rerolled >= Math.floor(totals.lab.offerRerolls)) return false;
+  run.rerolled += 1;
+  run.offers = makeOffers(state, content, totals);
+  emit({ type: 'labOffersRerolled', phase: run.phase });
+  return true;
+}
+
 /** Settles the item waiting for a decision: equip it (the one in the slot is recycled) or recycle it. */
 export function resolveLabPending(state: GameState, content: GameContent, equipIt: boolean, emit: Emit): boolean {
   const { lab } = state;
@@ -199,6 +221,10 @@ export function resolveLabPending(state: GameState, content: GameContent, equipI
   if (!run || run.status !== 'equip' || !run.pending) return false;
   const pending = run.pending;
   if (equipIt) {
+    // Herança de código: the new item inherits part of the level of the one it replaces.
+    const old = lab.turma.equipped[itemSlot(content, pending) ?? 'ferramenta'];
+    const keep = Math.min(MAX_LEVEL_KEEP, Math.max(0, labTotals(state, content).lab.levelKeep));
+    if (old && keep > 0) pending.level = Math.min(content.lab.items.maxLevel, Math.max(pending.level, Math.floor(old.level * keep)));
     const previous = equip(state, content, pending);
     if (previous) {
       gainCommits(state, recycleCommits(state, content, previous));

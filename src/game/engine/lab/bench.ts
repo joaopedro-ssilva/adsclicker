@@ -4,6 +4,7 @@ import type { Emit } from '../../store/types';
 import { spend } from '../economy';
 import type { GameState } from '../state';
 import { levelUpCost, rerollCost } from './costs';
+import { labTotals } from './effects';
 import { rerollAffix } from './items';
 import { LAB_STREAM, labStream } from './state';
 
@@ -15,7 +16,7 @@ export function levelUpLabItem(state: GameState, content: GameContent, slot: Lab
   const { lab } = state;
   const item = lab.turma.equipped[slot];
   if (!lab.unlocked || !item) return false;
-  const cost = levelUpCost(content, item);
+  const cost = levelUpCost(content, item, labTotals(state, content).lab.levelCost);
   if (!cost || state.coins.lt(cost)) return false;
   spend(state, cost);
   item.level += 1;

@@ -122,6 +122,8 @@ export { buyCafe, cafeCost } from './cafe';
 
 export {
   buyLabNode,
+  resetLabTree,
+  rerollLabOffers,
   chooseLabReward,
   equipLabPending,
   labClick,

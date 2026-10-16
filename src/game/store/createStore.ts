@@ -292,6 +292,8 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
       levelUpLabItem: (slot) => run((state, emit) => engine.levelUpLabItem(state, content, slot, now(), emit), true),
       rerollLabAffix: (slot, affix) => run((state, emit) => engine.rerollLabAffix(state, content, slot, affix, now(), emit), true),
       buyLabNode: (id) => run((state, emit) => engine.buyLabNode(state, content, id, now(), emit), true),
+      rerollLabOffers: () => run((state, emit) => engine.rerollLabOffers(state, content, now(), emit), true),
+      resetLabTree: () => run((state, emit) => engine.resetLabTree(state, content, now(), emit), true),
 
       triggerSecret(trigger) {
         run((state, emit) => engine.triggerSecret(state, content, trigger, now(), emit), true);
