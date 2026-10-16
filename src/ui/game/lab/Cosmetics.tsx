@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import type { LabCosmeticEntry, LabCosmeticsView } from '@/game/engine/views';
 import { content, useGame, useLabCosmeticsView } from '@/game/store';
 import { Button } from '@/ui/kit';
@@ -22,20 +21,6 @@ function equippedLook(view: LabCosmeticsView): Look {
     theme: view.themes.find((entry) => entry.equipped)?.id ?? content.lab.cosmetics.defaults.theme,
     decor: view.decor.filter((entry) => entry.equipped).map((entry) => entry.id),
     start: view.starts.find((entry) => entry.equipped)?.id ?? content.lab.cosmetics.defaults.startItem,
-  };
-}
-
-function withPreview(look: Look, entry: LabCosmeticEntry | undefined, max: number): Look {
-  // A cosmetic that is not owned stays a mystery: the preview does not show it.
-  if (!entry || !entry.owned) return look;
-  if (entry.kind === 'monitor') return { ...look, monitor: entry.id };
-  if (entry.kind === 'theme') return { ...look, theme: entry.id };
-  if (entry.kind === 'start') return { ...look, start: entry.id };
-  if (look.decor.includes(entry.id)) return look;
-  // A full display shows the new object in place of the last one.
-  return {
-    ...look,
-    decor: [...look.decor.slice(0, Math.max(0, max - 1)), entry.id],
   };
 }
 
@@ -76,12 +61,9 @@ interface GroupProps {
   hint: string;
   entries: LabCosmeticEntry[];
   full?: boolean;
-  setPreview: (id: string | null) => void;
-  select: (id: string) => void;
-  selected: string | null;
 }
 
-function Group({ title, hint, entries, full, setPreview, select, selected }: GroupProps) {
+function Group({ title, hint, entries, full }: GroupProps) {
   const equip = useGame((store) => store.equipLabCosmetic);
   const openShop = useLabOverlay((store) => store.openShop);
   const kind = entries[0]?.kind ?? 'group';
@@ -124,18 +106,7 @@ function Group({ title, hint, entries, full, setPreview, select, selected }: Gro
               </Button>
             ) : null;
           }
-          return (
-            <CosmeticCard
-              key={entry.id}
-              entry={entry}
-              lock={<Price entry={entry} />}
-              actions={actions}
-              onPreview={setPreview}
-              onSelect={select}
-              selected={selected === entry.id}
-              mask
-            />
-          );
+          return <CosmeticCard key={entry.id} entry={entry} lock={<Price entry={entry} />} actions={actions} mask />;
         })}
       </ul>
     </section>
@@ -146,14 +117,8 @@ function Group({ title, hint, entries, full, setPreview, select, selected }: Gro
 export function Cosmetics() {
   const view = useLabCosmeticsView();
   const openShop = useLabOverlay((store) => store.openShop);
-  const [hover, setHover] = useState<string | null>(null);
-  const [selected, setSelected] = useState<string | null>(null);
-  const all = [...view.monitors, ...view.themes, ...view.decor, ...view.starts];
-  const shown = all.find((entry) => entry.id === (hover ?? selected));
-  const look = withPreview(equippedLook(view), shown, view.decorMax);
+  const look = equippedLook(view);
   const full = view.decorOn >= view.decorMax;
-
-  const common = { setPreview: setHover, select: setSelected, selected };
   return (
     <div className="lab-cosm" data-qa="lab-cosmetics">
       <section className="lab-panel lab-cosm-stage" aria-label="Pré-visualização">
@@ -164,40 +129,21 @@ export function Cosmetics() {
           </p>
         </header>
         <PreviewStage look={look} />
-        <div className="lab-cosm-caption" aria-live="polite">
-          {shown ? (
-            <>
-              <p className="lab-cosm-caption-name">{shown.owned ? shown.name : '???'}</p>
-              {shown.owned ? <p>{shown.description}</p> : null}
-              <p className="lab-cosm-caption-state">
-                {shown.owned ? shown.equipped ? 'Em uso agora.' : 'Seu. Aperte Equipar para usar.' : <Price entry={shown} />}
-              </p>
-            </>
-          ) : (
-            <p>Passe o mouse (ou toque) em um cosmético para ver como fica.</p>
-          )}
-        </div>
         <Button variant="secondary" onClick={openShop} data-qa="lab-cosm-open-shop">
           Abrir a Loja
         </Button>
       </section>
 
       <section className="lab-panel lab-cosm-catalog" aria-label="Cosméticos">
-        <Group title="Skins do monitor" hint="A moldura e o brilho da tela." entries={view.monitors} {...common} />
-        <Group title="Tema do Laboratório" hint="As cores de todo o laboratório e o brilho do monitor." entries={view.themes} {...common} />
+        <Group title="Skins do monitor" hint="A moldura e o brilho da tela." entries={view.monitors} />
+        <Group title="Tema do Laboratório" hint="As cores de todo o laboratório e o brilho do monitor." entries={view.themes} />
         <Group
           title={`Decoração (${view.decorOn}/${view.decorMax})`}
           hint="Objetos em volta do monitor, nunca sobre a tela."
           entries={view.decor}
           full={full}
-          {...common}
         />
-        <Group
-          title="Item inicial"
-          hint="Substitui o Mouse quebrado no começo de cada pesquisa. Vale na próxima."
-          entries={view.starts}
-          {...common}
-        />
+        <Group title="Item inicial" hint="Substitui o Mouse quebrado no começo de cada pesquisa. Vale na próxima." entries={view.starts} />
       </section>
     </div>
   );
