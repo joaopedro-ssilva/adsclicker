@@ -415,5 +415,5 @@ export const achievements: AchievementDef[] = [
   ach('secret-wallpaper', 'secret', 'Papel de Parede', '🖼️', 'Fique 5 minutos com o painel lateral escondido, só admirando o cenário.', { kind: 'secret', trigger: 'wallpaper' }, { scenery: 'aurora' }, true),
   ach('secret-fitting', 'secret', 'Provador', '🪞', 'Troque de skin 10 vezes em 1 minuto. Nada serviu de primeira.', { kind: 'secret', trigger: 'fitting-room' }, { skin: 'b2-look' }, true),
   ach('secret-lettuce', 'secret', 'Mão de Alface', '🥬', 'Venda com prejuízo na Bolsa do Pablo. A planilha chorou.', { kind: 'secret', trigger: 'lettuce-hands' }, { skin: 'pablo-trader' }, true),
-  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não derrote nenhum bug na mão. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, { skin: 'wagner-cafe' }, true),
+  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não clique em nenhum bug até ela acabar, vencendo ou perdendo. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, { skin: 'wagner-cafe' }, true),
 ];

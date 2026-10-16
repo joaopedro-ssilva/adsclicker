@@ -120,7 +120,8 @@ export function SecretWatchers() {
           swarm.current = { uid: event.uid, byHand: false };
           break;
         case 'swarmHit':
-          if (swarm.current?.uid === event.uid && event.killed && !event.auto) swarm.current.byHand = true;
+          // Any click on a bug spoils it, kill or not; the bugs Wagner's Maestria defeats on its own do not.
+          if (swarm.current?.uid === event.uid && !event.auto) swarm.current.byHand = true;
           break;
         case 'swarmEnd':
           if (swarm.current?.uid === event.uid && !swarm.current.byHand) fireSecret('hands-off');
