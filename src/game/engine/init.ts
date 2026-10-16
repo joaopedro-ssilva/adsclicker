@@ -72,13 +72,13 @@ export function createMonitorsState(): MonitorsState {
   return { units, settings: { comprasShare: 0.5, pesquisaShare: 0.5, sprintPick: 'first' } };
 }
 
-export function defaultSettings(): Settings {
 export function createPostdocState(): PostdocState {
   const stars = {} as PostdocState['stars'];
   for (const id of PROFESSOR_IDS) stars[id] = 0;
   return { stars, turma: {} };
 }
 
+export function defaultSettings(): Settings {
   return {
     sfxVolume: 0.7,
     musicVolume: 0.35,
@@ -155,9 +155,9 @@ export function createInitialState(content: GameContent, now: number): GameState
     honouredBefore: {},
     abilitiesTried: {},
     maestria: createMaestriaState(),
+    postdoc: createPostdocState(),
     monitors: createMonitorsState(),
     lab: createLabState(),
-    postdoc: createPostdocState(),
     session: { seconds: 0, activeAt: now },
     calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 

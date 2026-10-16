@@ -323,11 +323,11 @@ export interface GameState {
   /** Maestrias: the slots spent, their levels and the runtime of each (see engine/maestria). */
   maestria: MaestriaState;
 
-  /** Monitores (automation hired with diplomas). Survives graduation. */
-  monitors: MonitorsState;
   /** Pós-doc stars of the professors (see engine/postdoc). */
   postdoc: PostdocState;
 
+  /** Monitores (automation hired with diplomas). Survives graduation. */
+  monitors: MonitorsState;
 
   /** O Laboratório de Pesquisa: unlock, Commits and tree last; the run and the items last until graduation (see engine/lab). */
   lab: LabState;

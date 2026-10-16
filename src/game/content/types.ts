@@ -155,12 +155,12 @@ export type Condition =
   | { kind: 'professorLevels'; professor: ProfessorId; gte: number }
   /** Domínio rank of one professor, or of every professor when none is named (or of `count` of them, when given). */
   | { kind: 'mastery'; rank: number; professor?: ProfessorId; count?: number }
-  /** Every discipline of some professor sits at exactly the same level, this one or higher. */
-  | { kind: 'alignedLevels'; level: number }
   /** Pós-doc stars: of one professor, or (no professor) of `count` professors (default all) each with at least `stars`. */
   | { kind: 'postdoc'; stars: number; professor?: ProfessorId; count?: number }
   /** Pós-doc stars of every professor added up. */
   | { kind: 'postdocTotal'; gte: number }
+  /** Every discipline of some professor sits at exactly the same level, this one or higher. */
+  | { kind: 'alignedLevels'; level: number }
   /** Every ability of the game was used at least once. */
   | { kind: 'abilitiesTried' }
   /** Every ability of the game is running at the same time. */
@@ -719,6 +719,12 @@ export interface BalanceConfig {
   clickLimit?: { perSecond: number; windowMs: number };
   /** Domínio: one rank per `step` levels summed over a professor's disciplines, up to `cap` ranks. */
   mastery: { step: number; cap: number };
+  /**
+   * Pós-doc: a professor with the Domínio maxed can defend it once per turma for a permanent star (up to `maxStars`).
+   * Each star makes that professor's Domínio `bonusPerStar` stronger. Star k (1-based) costs
+   * firstPrice x priceGrowth ^ (k - 1) ADScoins.
+   */
+  postdoc: { maxStars: number; bonusPerStar: number; firstPrice: DecimalString; priceGrowth: number };
   graduation: {
     /** Coins produced in the run that are worth the first diploma. */
     base: DecimalString;
@@ -728,12 +734,6 @@ export interface BalanceConfig {
     bonusPerDiploma: number;
     /** Ceiling of the diploma bonus (additive, 3 = +300%). Omitted = no ceiling. */
     maxBonus?: number;
-  /**
-   * Pós-doc: a professor with the Domínio maxed can defend it once per turma for a permanent star (up to `maxStars`).
-   * Each star makes that professor's Domínio `bonusPerStar` stronger. Star k (1-based) costs
-   * firstPrice x priceGrowth ^ (k - 1) ADScoins.
-   */
-  postdoc: { maxStars: number; bonusPerStar: number; firstPrice: DecimalString; priceGrowth: number };
     /**
      * Most diplomas one graduation can pay: base x growth ^ graduations already done (10, 20, 40...
      * with 10 and 2). Coins past it count for nothing, so sitting on a run stops paying. Omitted = no cap.

@@ -439,10 +439,10 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.abilitiesTried = readBooleans(raw.abilitiesTried, (id) => index.abilities.has(id));
   state.maestria = readMaestria(raw.maestria, content);
   state.monitors = readMonitors(raw.monitors, content, now);
-  // Absent in older saves: a locked, empty lab.
-  state.lab = readLab(raw.lab, content);
   // Absent in older saves: no stars.
   state.postdoc = readPostdoc(raw.postdoc, content);
+  // Absent in older saves: a locked, empty lab.
+  state.lab = readLab(raw.lab, content);
   settleLabAfterLoad(state, content);
   if (isRecord(raw.session)) {
     state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };
