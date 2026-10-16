@@ -96,6 +96,11 @@ export function labIndex(content: GameContent): LabIndex {
   return index;
 }
 
+/** The bases that can drop in this phase, in content order: the advanced ones wait for their `fromPhase`. */
+export function droppableAt(content: GameContent, phase: number): LabItemBase[] {
+  return labIndex(content).droppable.filter((base) => (base.fromPhase ?? 1) <= phase);
+}
+
 // ---------------------------------------------------------------------------
 // Seeded streams
 // ---------------------------------------------------------------------------

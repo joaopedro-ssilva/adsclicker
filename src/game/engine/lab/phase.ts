@@ -10,6 +10,13 @@ export function isBossPhase(content: GameContent, phase: number): boolean {
   return phase % content.lab.run.bossEvery === 0;
 }
 
+/** The boss of a boss phase: the cycle in order (phase 5 the first, phase 10 the second...), starting over at the end. */
+export function bossFor(content: GameContent, phase: number): string {
+  const { bossEvery, bossCycle } = content.lab.run;
+  const turn = Math.max(0, Math.floor(phase / bossEvery) - 1);
+  return bossCycle[turn % bossCycle.length] ?? bossCycle[0] ?? '';
+}
+
 /** HP of the mobs of a phase, as a multiple of their level-1 HP. */
 export function hpFactor(content: GameContent, phase: number): number {
   return content.lab.run.hpGrowth ** (Math.max(1, phase) - 1);
@@ -72,11 +79,12 @@ export function spawnPhase(state: GameState, content: GameContent, totals: LabTo
   run.bossLeft = null;
 
   if (isBossPhase(content, phase)) {
-    const boss = addMob(run, content, cfg.bossEnemy, phase, true);
+    const bossId = bossFor(content, phase);
+    const boss = addMob(run, content, bossId, phase, true);
     if (boss) {
       run.mobs.push(boss);
       run.bossLeft = cfg.bossTimerSeconds + totals.lab.bossTime;
-      const charge = index.enemies.get(cfg.bossEnemy)?.traits.find((trait) => trait.kind === 'charge');
+      const charge = index.enemies.get(bossId)?.traits.find((trait) => trait.kind === 'charge');
       if (charge?.kind === 'charge') run.nextCharge = charge.everySeconds;
     }
   }

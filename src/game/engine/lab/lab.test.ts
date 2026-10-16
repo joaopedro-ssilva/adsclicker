@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { content as realContent } from '../../content';
+import { labEnemyFrom } from '../../content/labEnemies';
+import { LAB_ADVANCED_FROM, LAB_LATE_FROM } from '../../content/labItems';
 import { LAB_RARITIES, LAB_SLOTS } from '../../content/labTypes';
 import type { GameContent } from '../../content/types';
 import { buyPrestigeNode, graduate } from '../actions';
@@ -25,9 +27,9 @@ import { labRunAvailable } from './access';
 import { levelUpCost, rerollCost } from './costs';
 import { labTotals } from './effects';
 import { itemPower, rarityChances, rollItem } from './items';
-import { breakRun, spawnPhase } from './phase';
+import { bossFor, breakRun, spawnPhase } from './phase';
 import { advanceLab, autoDps, clickDamage, clickShareCap } from './run';
-import { labIndex } from './state';
+import { droppableAt, labIndex } from './state';
 import type { LabItem } from './types';
 import { labBenchView, labMonitorView, labRewardsView, labSlotView, labTreeView } from './views';
 
@@ -88,8 +90,10 @@ function types(g: TestGame): string[] {
 describe('lab content', () => {
   const lab = realContent.lab;
 
-  it('has the 24 hackathon bases plus the Mouse quebrado, which cannot drop and rolls nothing', () => {
-    expect(lab.bases.filter((base) => base.drops)).toHaveLength(24);
+  it('has the 24 hackathon bases (from the start) and the lab\'s own 24 (advanced), plus the Mouse quebrado, which cannot drop and rolls nothing', () => {
+    expect(lab.bases.filter((base) => base.drops)).toHaveLength(48);
+    expect(lab.bases.filter((base) => base.drops && base.fromPhase === undefined)).toHaveLength(24);
+    expect(lab.bases.filter((base) => base.fromPhase !== undefined)).toHaveLength(24);
     const mouse = lab.bases.find((base) => base.id === lab.starter);
     expect(mouse).toMatchObject({ slot: 'ferramenta', drops: false, affixes: false });
     const rolled = rollItem(realContent, mouse!, 'comum', 1, () => 0.5);
@@ -149,7 +153,7 @@ describe('lab content', () => {
 
   it('has a boss, a split enemy and an unlock phase for every regular enemy', () => {
     const index = labIndex(realContent);
-    expect(index.enemies.get(lab.run.bossEnemy)?.boss).toBe(true);
+    for (const id of lab.run.bossCycle) expect(index.enemies.get(id)?.boss).toBe(true);
     for (const id of Object.keys(lab.run.enemyFrom)) expect(index.enemies.get(id)?.boss).toBe(false);
     for (const enemy of lab.enemies) {
       for (const trait of enemy.traits) if (trait.kind === 'split') expect(index.enemies.has(trait.into)).toBe(true);
@@ -444,10 +448,11 @@ describe('phases', () => {
     expect(g.content.lab.run.hpGrowth ** 10).toBeCloseTo(5.234, 2);
     expect(g.content.lab.run.drainGrowth).toBe(1.12);
     expect(later.length).toBeGreaterThanOrEqual(2);
-    for (const phase of [5, 10, 15]) {
-      hpAt(phase);
+    const bosses = { 5: 'deploy-de-sexta', 10: 'select-em-producao', 15: 'ia-que-apagou-o-banco', 20: 'deploy-de-sexta', 25: 'select-em-producao' };
+    for (const [phase, boss] of Object.entries(bosses)) {
+      hpAt(Number(phase));
       expect(run(g).mobs).toHaveLength(1);
-      expect(run(g).mobs[0]!.def).toBe('deploy-de-sexta');
+      expect(run(g).mobs[0]!.def).toBe(boss);
       expect(run(g).bossLeft).toBe(30);
     }
     hpAt(6);
@@ -476,6 +481,97 @@ describe('phases', () => {
     advanceLab(g.state, g.content, 0.1, g.emit);
     expect(run(g).status).toBe('fighting');
     expect(run(g).mobs.map((mob) => mob.def)).toEqual(['bug-de-merge', 'bug-de-merge']);
+  });
+});
+
+describe('advanced content', () => {
+  const lab = realContent.lab;
+  const advanced = lab.bases.filter((base) => base.fromPhase !== undefined);
+  const newRegulars = Object.keys(labEnemyFrom);
+
+  it('rolls the lab\'s own bases only at or after their phase, and all of them show up late', () => {
+    const seen = new Set<string>();
+    for (let phase = 1; phase <= 20; phase += 1) {
+      for (let seed = 1; seed <= 25; seed += 1) {
+        const g = started(seed * 7919 + phase);
+        run(g).phase = phase;
+        spawnPhase(g.state, g.content, labTotals(g.state, g.content));
+        clearPhase(g);
+        for (const offer of run(g).offers) {
+          if (offer.kind !== 'item') continue;
+          const base = labIndex(g.content).bases.get(offer.item.base)!;
+          expect(base.fromPhase ?? 1, `${base.id} at phase ${phase}`).toBeLessThanOrEqual(phase);
+          if (base.fromPhase !== undefined) seen.add(base.id);
+        }
+      }
+    }
+    expect(seen.size).toBe(advanced.length);
+    expect(Math.min(...advanced.map((base) => base.fromPhase!))).toBeGreaterThanOrEqual(LAB_ADVANCED_FROM);
+    expect(advanced.some((base) => base.fromPhase! >= LAB_LATE_FROM)).toBe(true);
+  });
+
+  it('keeps the starting Setup of the tree among the first bases', () => {
+    for (const base of droppableAt(realContent, 1)) expect(base.fromPhase).toBeUndefined();
+  });
+
+  it('brings the new regular enemies in at their phase and not before', () => {
+    for (const id of newRegulars) {
+      const from = lab.run.enemyFrom[id]!;
+      expect(from).toBeGreaterThanOrEqual(6);
+      let appears = false;
+      for (let phase = Math.max(1, from - 2); phase <= from + 4; phase += 1) {
+        if (phase % lab.run.bossEvery === 0) continue;
+        for (let seed = 1; seed <= 80; seed += 1) {
+          const g = started(seed * 104729 + phase);
+          run(g).phase = phase;
+          spawnPhase(g.state, g.content, labTotals(g.state, g.content));
+          for (const mob of run(g).mobs) {
+            if (mob.def === id) {
+              expect(phase, `${id} at ${phase}`).toBeGreaterThanOrEqual(from);
+              appears = true;
+            }
+          }
+        }
+      }
+      expect(appears, id).toBe(true);
+    }
+  });
+
+  it('cycles three bosses every 5th phase', () => {
+    expect([5, 10, 15, 20, 25, 30].map((phase) => bossFor(realContent, phase))).toEqual([
+      'deploy-de-sexta',
+      'select-em-producao',
+      'ia-que-apagou-o-banco',
+      'deploy-de-sexta',
+      'select-em-producao',
+      'ia-que-apagou-o-banco',
+    ]);
+  });
+
+  it('charges with the boss of the phase, and the drain follows its traits', () => {
+    const g = started(77);
+    run(g).phase = 10;
+    spawnPhase(g.state, g.content, labTotals(g.state, g.content));
+    expect(run(g).nextCharge).toBe(8);
+    run(g).phase = 15;
+    spawnPhase(g.state, g.content, labTotals(g.state, g.content));
+    expect(run(g).nextCharge).toBe(7);
+    const before = run(g).integrity;
+    run(g).phaseTime = 7;
+    advanceLab(g.state, g.content, 0.1, g.emit);
+    expect(before - run(g).integrity).toBeGreaterThan(0);
+    expect(run(g).nextCharge).toBe(14);
+  });
+
+  it('survive a save: items of the new bases and the new enemies are accepted', () => {
+    const g = started(88);
+    const base = advanced.find((entry) => entry.slot === 'ferramenta')!;
+    g.state.lab.turma.equipped.ferramenta = item(base.id, 'lendario', 4, [{ target: base.primary.target, op: base.primary.op, value: base.primary.min * 2.5 }]);
+    run(g).phase = 15;
+    spawnPhase(g.state, g.content, labTotals(g.state, g.content));
+    const copy = deserializeState(serializeState(g.state), g.content, T0)!;
+    expect(copy.lab.turma.equipped.ferramenta?.base).toBe(base.id);
+    expect(copy.lab.turma.run?.mobs.map((mob) => mob.def)).toEqual(['ia-que-apagou-o-banco']);
   });
 });
 

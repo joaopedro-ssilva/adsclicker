@@ -10,6 +10,14 @@ Mini-jogo roguelike alcançado pela sala de aula. Reaproveita o conteúdo do mod
 - **A corrida só anda com o Laboratório aberto** (`setLabOpen`). Fechado = pausado. Sem progresso offline: cada tick alimenta a corrida com no máximo 2 s reais.
 - **Formatura:** a corrida, os itens equipados e os buffs somem. Ficam o desbloqueio, os Commits, a árvore e os recordes. Uma corrida ainda em andamento é paga como se tivesse quebrado ali (Commits das fases e chefões).
 
+## Conteúdo próprio do Laboratório (fases avançadas)
+
+Além do que vem do Hackathon, o Laboratório tem **24 bases de item** (6 por espaço, `content/labItems.ts`, arte em `lab/items/`) e **7 inimigos** (5 comuns e 2 chefões, `content/labEnemies.ts`, arte em `lab/enemies/`).
+
+- **Itens:** só caem a partir de `fromPhase` (fase 8 depois do primeiro chefão, 10 e 13 para os melhores; constantes `LAB_ADVANCED_FROM` e `LAB_LATE_FROM`). Mesmas raridades e a mesma tabela de afixos; o lendário usa efeitos lab-only (`skillBonuses`, ids próprios), `secondWind` ou `critSplash`. Conjunto novo: Guilda dos Professores (2 e 4 peças). O Setup de casa da árvore só sorteia bases sem `fromPhase`.
+- **Inimigos comuns** (`enemyFrom`): Bug de VibeCoder (fase 6), Select sem WHERE (8), Alucinação de IA (9), Prompt Injection (11), Agente em loop (13).
+- **Chefões** (`run.bossCycle`, a ordem a cada 5ª fase): fase 5 Deploy de Sexta, 10 Select sem WHERE em produção, 15 A IA que Apagou o Banco, 20 volta ao Deploy e assim por diante (`bossFor`).
+
 ## Estado (`GameState.lab`)
 
 ```

@@ -69,6 +69,8 @@ export interface LabBonus {
 export interface LabItemBase extends ItemBaseDef {
   /** Can drop as a reward. False for the Mouse quebrado, the item every run starts with. */
   drops: boolean;
+  /** First phase it can drop in. Missing = from the start (the Hackathon's 24 bases). */
+  fromPhase?: number;
   /** Rolls affixes. False for the Mouse quebrado: power only, no clicker buff. */
   affixes: boolean;
 }
@@ -194,7 +196,8 @@ export interface LabConfig {
     enemyFrom: Record<string, number>;
     /** Every Nth phase is a boss. */
     bossEvery: number;
-    bossEnemy: string;
+    /** The bosses in order: the 1st boss phase fights the 1st, the 2nd the 2nd..., then the list starts over. */
+    bossCycle: string[];
     /** Boss HP = its Hackathon HP x hpScale x this x the phase growth. */
     bossHpFactor: number;
     bossTimerSeconds: number;

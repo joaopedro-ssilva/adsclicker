@@ -7,9 +7,9 @@ import { labRunAvailable } from './access';
 import { labTotals } from './effects';
 import type { LabTotals } from './effects';
 import { rollItem } from './items';
-import { addMob, armorFactor, breakRun, drainFactor, gainCommits, maxIntegrityFor, runCommits, spawnPhase } from './phase';
+import { addMob, armorFactor, bossFor, breakRun, drainFactor, gainCommits, maxIntegrityFor, runCommits, spawnPhase } from './phase';
 import { makeOffers } from './rewards';
-import { LAB_STREAM, createLabRun, labIndex, labStream } from './state';
+import { LAB_STREAM, createLabRun, droppableAt, labIndex, labStream } from './state';
 import type { LabItem, LabRun } from './types';
 
 const round1 = (value: number) => Math.round(value * 10) / 10;
@@ -124,8 +124,8 @@ function stepRun(state: GameState, content: GameContent, totals: LabTotals, dt: 
   run.integrity -= drainPerSecond(run, content, totals) * dt;
 
   if (boss && run.nextCharge > 0 && run.phaseTime >= run.nextCharge) {
-    const { bossEnemy, drainScale, minDrainMult } = content.lab.run;
-    const def = labIndex(content).enemies.get(bossEnemy);
+    const { drainScale, minDrainMult } = content.lab.run;
+    const def = labIndex(content).enemies.get(bossFor(content, run.phase));
     const charge = def?.traits.find((trait) => trait.kind === 'charge');
     if (def && charge?.kind === 'charge') {
       const hit = def.damage * charge.hitMultiplier * drainScale * drainFactor(content, run.phase);
@@ -225,7 +225,7 @@ export function startLabRun(state: GameState, content: GameContent, seed: number
   const index = labIndex(content);
   giveStarter(state, content, index.bases.get(content.lab.starter), labStream(run.seed, LAB_STREAM.starter, 0));
   if (labTotals(state, content).lab.startSetup > 0) {
-    const setups = index.droppable.filter((base) => base.slot === 'setup');
+    const setups = droppableAt(content, 1).filter((base) => base.slot === 'setup');
     const stream = labStream(run.seed, LAB_STREAM.starter, 1);
     giveStarter(state, content, setups[Math.floor(stream() * setups.length)], stream);
   }

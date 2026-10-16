@@ -7,7 +7,7 @@ import { labTotals } from './effects';
 import type { LabTotals } from './effects';
 import { atLeast, itemSlot, recycleValue, rollItem, rollRarity } from './items';
 import { enterNextPhase, gainCommits, isBossPhase, syncIntegrity } from './phase';
-import { LAB_STREAM, labIndex, labStream } from './state';
+import { LAB_STREAM, droppableAt, labIndex, labStream } from './state';
 import type { LabItem, LabOffer } from './types';
 
 type OfferKind = LabOffer['kind'];
@@ -46,7 +46,7 @@ function offerItem(
   taken: Set<string>,
 ): LabItem | null {
   const { equipped } = state.lab.turma;
-  const all = labIndex(content).droppable;
+  const all = droppableAt(content, phase);
   const fresh = all.filter((base) => !taken.has(base.id));
   const pool: LabItemBase[] = fresh.length > 0 ? fresh : all;
   const base = pickWeighted(

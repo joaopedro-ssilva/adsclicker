@@ -7,6 +7,8 @@ import { enemies as hackathonEnemies } from '../../hackathon/content/enemies';
 import { items as hackathonItems, sets } from '../../hackathon/content/items';
 import { rarities } from '../../hackathon/content/rarities';
 import { waveBuffs } from '../../hackathon/content/waveBuffs';
+import { labEnemies, labBossCycle, labEnemyFrom } from './labEnemies';
+import { labItems, labItemSets, labItemSkillBonuses } from './labItems';
 import type {
   LabBonus,
   LabBuffDef,
@@ -40,6 +42,8 @@ const mouseQuebrado: LabItemBase = {
 const bases: LabItemBase[] = [
   mouseQuebrado,
   ...hackathonItems.map((base): LabItemBase => ({ ...base, drops: true, affixes: true })),
+  // The lab's own 24, from the advanced phases on (content/labItems.ts)
+  ...labItems,
 ];
 
 // ---------------------------------------------------------------------------
@@ -85,6 +89,7 @@ const skillBonuses: Record<string, LabBonus> = {
   refatorar: { lab: { repairPhase: 0.03 } },
   firewall: { lab: { drain: -0.15 } },
   'cafe-duplo': { clicker: [{ stat: 'abilityCooldown', value: -0.15 }], lab: { damage: 0.1 } },
+  ...labItemSkillBonuses,
 };
 
 // ---------------------------------------------------------------------------
@@ -313,9 +318,9 @@ export const lab: LabConfig = {
 
   bases,
   starter: mouseQuebrado.id,
-  sets,
+  sets: [...sets, ...labItemSets],
   rarities,
-  enemies: hackathonEnemies,
+  enemies: [...hackathonEnemies, ...labEnemies],
   buffs,
   tree,
 
@@ -402,9 +407,9 @@ export const lab: LabConfig = {
     waveMin: 2,
     waveMax: 6,
     waveGrowEvery: 3,
-    enemyFrom: { bug: 1, 'loop-infinito': 2, 'conflito-de-merge': 3, 'vazamento-de-memoria': 4, 'codigo-legado': 6 },
+    enemyFrom: { bug: 1, 'loop-infinito': 2, 'conflito-de-merge': 3, 'vazamento-de-memoria': 4, 'codigo-legado': 6, ...labEnemyFrom },
     bossEvery: 5,
-    bossEnemy: 'deploy-de-sexta',
+    bossCycle: labBossCycle,
     bossHpFactor: 0.4,
     bossTimerSeconds: 30,
     armorPerPoint: 0.08,
