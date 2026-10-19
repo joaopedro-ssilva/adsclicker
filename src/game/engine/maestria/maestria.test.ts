@@ -390,7 +390,9 @@ describe('diploma cap', () => {
 
   it('has a server ceiling of Domínio maxed, with the honour only once Angelo has been honoured', () => {
     const perRank = content.mastery.angelo.perRank[0]?.value ?? 0;
-    expect(maxAngeloCapFactor(content, false)).toBeCloseTo(1 + perRank * content.balance.mastery.cap, 9);
+    // Domínio maxed with every Pós-doc star (each makes the Domínio bonus 5% stronger).
+    const { maxStars, bonusPerStar } = content.balance.postdoc;
+    expect(maxAngeloCapFactor(content, false)).toBeCloseTo(1 + perRank * content.balance.mastery.cap * (1 + bonusPerStar * maxStars), 9);
     expect(maxAngeloCapFactor(content, true)).toBeGreaterThan(maxAngeloCapFactor(content, false));
   });
 });

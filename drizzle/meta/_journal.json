@@ -50,6 +50,34 @@
       "when": 1791946769781,
       "tag": "0006_platinado_tag",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792088550356,
+      "tag": "0007_player_clock_excess",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792170647108,
+      "tag": "0008_lab_boards",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792174664950,
+      "tag": "0009_community_center",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792176336089,
+      "tag": "0010_lab_profile",
+      "breakpoints": true
     }
   ]
 }

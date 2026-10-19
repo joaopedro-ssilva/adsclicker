@@ -40,6 +40,9 @@ export const FAMILY_LABELS: Record<AchievementFamily, string> = {
   sprints: 'Sprints',
   graduation: 'Formatura',
   collection: 'Coleção',
+  laboratorio: 'Laboratório',
+  comunidade: 'Comunidade',
+  posdoc: 'Pós-doc',
   secret: 'Segredos',
 };
 
@@ -51,5 +54,8 @@ export const FAMILY_ORDER: AchievementFamily[] = [
   'sprints',
   'graduation',
   'collection',
+  'laboratorio',
+  'comunidade',
+  'posdoc',
   'secret',
 ];

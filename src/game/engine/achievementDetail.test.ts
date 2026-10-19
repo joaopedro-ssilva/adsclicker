@@ -82,7 +82,7 @@ describe('achievement detail', () => {
     expect(views).toHaveLength(realContent.achievements.length);
     for (const def of realContent.achievements) {
       const view = views.find((v) => v.id === def.id)!;
-      if (def.condition.kind === 'secret') {
+      if (def.condition.kind === 'secret' || def.secret) {
         expect(view.text).toBeNull();
         expect(view.progress).toBeNull();
       } else {

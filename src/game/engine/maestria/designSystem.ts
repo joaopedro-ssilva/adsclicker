@@ -8,7 +8,7 @@ import { levelledLock } from '../requirements';
 import type { GameState } from '../state';
 import { computeStats } from '../stats';
 import { atLevel } from './production';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 
 /** A class that got free levels from a purchase. */
 export interface DesignGift {
@@ -18,13 +18,13 @@ export interface DesignGift {
 
 /** Chance that a level bought reaches other classes; 0 when B2's Maestria is not unlocked. */
 export function designSystemChance(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'b2');
+  const level = activeMaestriaLevel(state, 'b2');
   return level > 0 ? atLevel(content.maestrias.designSystem.chance, level) : 0;
 }
 
 /** Classes one reach gives a level to. */
 export function designSystemReach(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'b2');
+  const level = activeMaestriaLevel(state, 'b2');
   return level > 0 ? atLevel(content.maestrias.designSystem.reach, level) : 0;
 }
 

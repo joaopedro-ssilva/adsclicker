@@ -3,20 +3,20 @@ import type { Emit } from '../../store/types';
 import type { GameState } from '../state';
 import { shiftMaestriaTimers } from './timers';
 import { atLevel, steadyCoinsPerSecond } from './production';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 
 /** Stored charges that make a spend a "triple" one (an achievement counts it). */
 const TRIPLE_CHARGES = 3;
 
 /** Charges the Rollforward can hold at the current level; 0 when it is not unlocked. */
 export function rollforwardMaxCharges(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'gladimir');
+  const level = activeMaestriaLevel(state, 'gladimir');
   return level > 0 ? atLevel(content.maestrias.rollforward.maxCharges, level) : 0;
 }
 
 /** How far one charge jumps the game forward, in ms. */
 export function rollforwardJumpMs(state: GameState, content: GameContent): number {
-  return atLevel(content.maestrias.rollforward.jumpSeconds, maestriaLevel(state, 'gladimir')) * 1000;
+  return atLevel(content.maestrias.rollforward.jumpSeconds, activeMaestriaLevel(state, 'gladimir')) * 1000;
 }
 
 /** Called by every manual click after it was paid: fills the next charge. */
@@ -38,7 +38,7 @@ export function recordRollforwardClick(state: GameState, content: GameContent): 
  */
 export function fireRollforward(state: GameState, content: GameContent, emit: Emit): boolean {
   const roll = state.maestria.rollforward;
-  if (maestriaLevel(state, 'gladimir') <= 0 || roll.charges < 1) return false;
+  if (activeMaestriaLevel(state, 'gladimir') <= 0 || roll.charges < 1) return false;
 
   const ms = rollforwardJumpMs(state, content);
   const coins = steadyCoinsPerSecond(state, content).mul(ms / 1000);

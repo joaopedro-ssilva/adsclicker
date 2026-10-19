@@ -5,7 +5,7 @@ import { clickValueWith, gain } from '../economy';
 import type { GameState } from '../state';
 import { computeStats } from '../stats';
 import { atLevel, steadyCoinsPerSecond } from './production';
-import { maestriaLevel } from './slots';
+import { activeMaestriaLevel } from './slots';
 import type { ActiveSwarm, SwarmBug } from './types';
 
 const MINUTE_MS = 60_000;
@@ -20,7 +20,7 @@ const swarmConfig = (content: GameContent): MaestriasConfig['swarm'] => content.
 
 /** Real time one charge takes to fill at the current level, in ms. 0 when the Maestria is not unlocked. */
 export function swarmChargeMs(state: GameState, content: GameContent): number {
-  const level = maestriaLevel(state, 'wagner');
+  const level = activeMaestriaLevel(state, 'wagner');
   return level > 0 ? atLevel(swarmConfig(content).chargeMinutes, level) * MINUTE_MS : 0;
 }
 
@@ -56,7 +56,7 @@ export function swarmSeconds(
 
 /** Starts the Super invasão when it is charged. The charge starts filling again at once. */
 export function startSwarm(state: GameState, content: GameContent, now: number, emit: Emit): boolean {
-  const level = maestriaLevel(state, 'wagner');
+  const level = activeMaestriaLevel(state, 'wagner');
   if (level <= 0 || !swarmReady(state, content, now)) return false;
 
   const cfg = swarmConfig(content);
@@ -158,7 +158,7 @@ function finished(swarm: ActiveSwarm, cfg: MaestriasConfig['swarm'], now: number
 
 function settle(state: GameState, content: GameContent, swarm: ActiveSwarm, emit: Emit): void {
   const cfg = swarmConfig(content);
-  const level = maestriaLevel(state, 'wagner');
+  const level = activeMaestriaLevel(state, 'wagner');
   const cleared = swarm.defeated >= cfg.bugs && swarm.bossDefeated;
   const seconds = swarmSeconds(content, level, swarm.defeated, swarm.bossDefeated, cleared);
 
@@ -185,10 +185,16 @@ function settle(state: GameState, content: GameContent, swarm: ActiveSwarm, emit
   });
 }
 
+/** Ends the swarm in progress now, paying what was defeated so far (used when the Maestria is switched off). */
+export function endSwarmNow(state: GameState, content: GameContent, emit: Emit): void {
+  const swarm = state.maestria.swarm.active;
+  if (swarm) settle(state, content, swarm, emit);
+}
+
 /** A click on a bug. The boss and the bugs lose one point of health per click. */
 export function hitSwarmBug(state: GameState, content: GameContent, uid: number, now: number, emit: Emit): boolean {
   const swarm = state.maestria.swarm.active;
-  if (!swarm || now >= swarm.endsAt) return false;
+  if (!swarm || activeMaestriaLevel(state, 'wagner') <= 0 || now >= swarm.endsAt) return false;
   const bug = swarm.bugs.find((entry) => entry.uid === uid);
   if (!bug || (!bug.boss && now >= bug.expiresAt)) return false;
   damage(swarm, bug, emit, false);
@@ -198,9 +204,10 @@ export function hitSwarmBug(state: GameState, content: GameContent, uid: number,
 
 /** Spawns, firewalls, expires and ends the swarm in progress. Also starts the charge of a fresh Maestria. */
 export function updateSwarm(state: GameState, content: GameContent, now: number, rng: () => number, emit: Emit): void {
-  const level = maestriaLevel(state, 'wagner');
+  const level = activeMaestriaLevel(state, 'wagner');
   const swarmState = state.maestria.swarm;
   if (level > 0 && swarmState.since <= 0) swarmState.since = now;
+  if (level <= 0) return;
 
   const swarm = swarmState.active;
   if (!swarm) return;

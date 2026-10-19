@@ -15,6 +15,9 @@ import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
 import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
+import { judgeDonations } from './donationRecords';
+import { judgeLabRecords } from './labRecords';
+import { judgePostdoc } from './postdocBounds';
 import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestriaSlotsUsed } from './maestriaBounds';
 
 /**
@@ -112,6 +115,11 @@ export interface JudgeInput {
   next: GameState;
   /** Server clock milliseconds since the previous accepted sync. Ignored without `previous`. */
   elapsedMs: number;
+  /**
+   * The player chose to overwrite the cloud with their save (a conflict between devices): the offline
+   * returns in it may have been earned on the other device's time, so they keep the generous bound.
+   */
+  forced?: boolean;
   content?: GameContent;
 }
 
@@ -125,6 +133,7 @@ function rates(state: GameState, content: GameContent) {
     click: clickValue(state, content),
     autoClicks: stats.autoClicks,
     offlineSeconds: stats.offlineHours * 3600 * stats.offlineRate,
+    offlineRate: stats.offlineRate,
     diplomaGain: stats.diplomaGain,
     lumpFactor: lumpFactor(stats),
     // What a click is worth at best, as a multiple of the base click: full combo and the average crit.
@@ -134,7 +143,7 @@ function rates(state: GameState, content: GameContent) {
 }
 
 
-export function judgeSave({ previous, next, elapsedMs, content = gameContent }: JudgeInput): Verdict {
+export function judgeSave({ previous, next, elapsedMs, forced = false, content = gameContent }: JudgeInput): Verdict {
   let ratio = 0;
   const nextRates = rates(next, content);
   const prevRates = previous ? rates(previous, content) : null;
@@ -182,7 +191,11 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   const clicksAllowed = handClicksDone + autoClicks * window + AUTO_CLICK_BUFF_CLICKS * allowance;
 
   const returns = Math.min(offlineReturns, 1 + window / OFFLINE_RETURN_EVERY_SECONDS);
-  const offlineSeconds = returns * bestNumber((r) => r.offlineSeconds);
+  // Each return pays for the time away, so together they cannot pay for more time than went by: the offline rate
+  // times the real window. Without this bound a clock pushed forward once a minute collects a full cap (hours
+  // of production) per minute. A forced overwrite and a first sync have no real window to hold the returns to.
+  const offlineCap = previous && !forced ? window * bestNumber((r) => r.offlineRate) : Infinity;
+  const offlineSeconds = Math.min(returns * bestNumber((r) => r.offlineSeconds), offlineCap);
   const lumps = REWARD_LUMP_SECONDS * bestNumber((r) => r.lumpFactor) * allowance;
   const maestriaWindow = { clicks: handClicksDone, seconds: window };
   const maestriaSeconds = Math.max(
@@ -206,6 +219,10 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
   if (maestriaSlotsUsed(next) > next.counters.graduations) return fail('more Maestrias than graduations');
   if (maestriaDiplomasSpent(next, content) > next.diplomasEarned) return fail('Maestria levels beyond the diplomas earned');
 
+  // Pós-doc stars: only grow, one per turma, each paid with coins that were earned.
+  const postdocReason = judgePostdoc(previous, next, content);
+  if (postdocReason) return fail(postdocReason);
+
   // Diplomas only come from graduating, and one graduation pays at most what the run's coins are worth.
   if (diplomasDone > 0) {
     if (graduationsDone <= 0) return fail('diplomas without a graduation');
@@ -226,6 +243,14 @@ export function judgeSave({ previous, next, elapsedMs, content = gameContent }: 
     const bound = perRun.mul(bestNumber((r) => r.diplomaGain) * DIPLOMA_GAIN_SLACK).toNumber() * graduationsDone ** (1 - exponent) + 1 + horasBonus;
     if (Number.isFinite(bound) && diplomasDone > bound) return fail('more diplomas than the run was worth');
   }
+
+  // The Laboratório records (highest phase, best turma) the boards show.
+  const labReason = judgeLabRecords({ previous, next, seconds, allowance, gain });
+  if (labReason) return fail(labReason);
+
+  // The Centro Comunitário total the donors board shows.
+  const donationReason = judgeDonations({ previous, next, gain });
+  if (donationReason) return fail(donationReason);
 
   return { ok: true, ratio };
 }

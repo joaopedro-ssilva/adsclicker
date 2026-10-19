@@ -112,6 +112,17 @@ describe('save round trip', () => {
     expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.sceneryEffects).toBe(true);
   });
 
+  it('loads a save from before the number notation setting with names, and keeps the choice', () => {
+    const { state, content } = richGame();
+    const raw = JSON.parse(serializeState(state));
+    delete raw.settings.numberNotation;
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.numberNotation).toBe('names');
+    raw.settings.numberNotation = 'scientific';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.numberNotation).toBe('scientific');
+    raw.settings.numberNotation = 'roman';
+    expect(deserializeState(JSON.stringify(raw), content, T0)!.settings.numberNotation).toBe('names');
+  });
+
   it('keeps the tree reset mark, and loads a save from before it as never used', () => {
     const { state, content } = richGame();
     state.treeResetGraduation = 4;

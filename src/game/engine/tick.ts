@@ -5,6 +5,7 @@ import { expireBuffs } from './buffs';
 import { decayCombo } from './combo';
 import { clickValueWith, coinsPerSecondWith, gain } from './economy';
 import { updateInvasions } from './invasions';
+import { advanceLab } from './lab/run';
 import { updateMaestrias } from './maestria';
 import { runMonitors } from './monitors';
 import { countSession, touchCalendar } from './session';
@@ -74,6 +75,8 @@ export function advance(state: GameState, content: GameContent, now: number, rng
   offerSprints(state, content, now, rng, emit);
   updateMaestrias(state, content, now, rng, emit);
   runMonitors(state, content, now, rng, emit);
+  // The Laboratório run moves only while its screen is open, and only by the time that really passed.
+  advanceLab(state, content, (now - start) / 1000, emit);
   state.lastTickAt = now;
   touchCalendar(state, now);
   invalidateStats(state);

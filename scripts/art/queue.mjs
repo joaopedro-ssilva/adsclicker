@@ -327,9 +327,20 @@ const hkItemSheet = (file, items, note) => ({
   kind: 'icon',
   keys: items.map((i) => i[0]),
   refs: ['icons.png'],
-  sheet: { folder: 'hackathon/items', layout: [6, 6], target: { axis: 'max', size: 28 } },
+  // The Laboratório shows the items at the resolution they were drawn at, not as pixel art.
+  sheet: { folder: 'hackathon/items', layout: [6, 6], target: { axis: 'max', size: 28 }, hires: true },
   text: `${HK_BASE}. ${HK_STYLE} It shows 12 separate chunky game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size, bold simple readable shapes with a thick dark outline. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
 });
+
+// The Laboratório's starting item, drawn against the first item sheet so it matches the other 24.
+const labMouseSheet = {
+  file: 'lab-mouse-quebrado.png',
+  kind: 'icon',
+  keys: ['mouse-quebrado'],
+  refs: ['hk-items-1.png'],
+  sheet: { folder: 'hackathon/items', target: { axis: 'max', size: 28 }, hires: 210 },
+  text: `${HK_BASE}. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. It shows ONE single game item icon, alone, centered, drawn at the same size as one icon of the reference, bold simple readable shape with a thick dark outline: a cheap old broken computer mouse, dull beige-grey plastic, a big crack across the shell, the left button chipped off, a strip of grey duct tape holding it together, a frayed cable with exposed copper wires curling out. It must read clearly as "the worst mouse", but still cute.`,
+};
 
 const hkArena = {
   file: 'hk-arena.png',
@@ -782,6 +793,252 @@ for (const professor of Object.keys(HEAD_VARIANTS)) {
     .png()
     .toFile(path.join(RAW_DIR, `ref-head-${professor}.png`));
 }
+
+// 15) The Laboratório's starting item (queued last so the numbered prompt files above keep their names).
+calls.push({ label: 'lab-mouse-quebrado', images: [labMouseSheet] });
+
+// 16) The Laboratório's own items and enemies (src/game/content/labItems.ts, labEnemies.ts): RPG-meets-tech gear and
+//     "serious but funny" enemies. Appended at the very end so the numbered prompt files above keep their names.
+const LAB_ITEMS_A = [
+  ['espada-do-sir-edecio', 'a knightly steel broadsword standing upright, a thin glowing cyan circuit trace running along the blade, a golden crossguard and a red pen-nib shaped gem on the pommel'],
+  ['sabre-de-luz-do-glad', 'a futuristic energy sword standing upright: a glowing crimson-red blade of pure light and a black metal hilt with tiny buttons and a small blue LED'],
+  ['martelo-teclado-de-guerra', 'a big medieval war hammer whose hammer head is a block of a mechanical keyboard with colourful keycaps, a wooden handle wrapped in a coiled USB cable'],
+  ['cajado-do-mago-pablo', 'a gnarled wooden wizard staff topped with a small tree of connected glowing blue orbs, like a binary tree diagram'],
+  ['pincel-arco-iris-da-b2', 'a giant artist paintbrush with a wooden handle and rainbow-coloured bristles dripping bright paint'],
+  ['espeto-sagrado-do-guto', 'a long metal barbecue skewer with grilled meat chunks and pepper pieces, a small golden holy halo glowing above it'],
+  ['trono-do-reitor', 'a grand ornate throne-like office chair with a red velvet cushion, golden armrests and a tall carved back topped with a tiny graduation cap'],
+  ['servidor-fortaleza', 'a server rack built like a small stone castle fortress with battlements, a tiny drawbridge and blinking green LEDs in the arrow-slit windows'],
+  ['armadura-full-stack', 'a suit of plate armor on a stand, made of layered plates in blue, green and orange, with thin glowing circuit lines'],
+  ['mesa-redonda-scrum', 'a round oak table seen slightly from above, covered with colourful sticky notes in columns like a kanban board, a small banner flag standing in the middle'],
+  ['sofa-do-plantao', 'a comfy worn-out sofa with a rumpled blanket, a pillow and a steaming coffee mug on the armrest'],
+  ['forja-de-silicio', 'a blacksmith anvil with a glowing red-hot microchip on top, a soldering iron resting beside it and a few orange sparks'],
+];
+const LAB_ITEMS_B = [
+  ['escudo-firewall-do-wagner', 'a knight heater shield painted like a red brick wall with orange flames licking the top, a steel padlock emblem in the middle'],
+  ['botas-de-entrega-continua', 'a pair of leather adventurer boots with a glowing green circular two-arrow loop emblem on the side and glowing soles'],
+  ['capa-do-sudo-invisivel', 'a dark violet hooded cloak with a faint translucent shimmer along its edges, held by a small round clasp'],
+  ['manoplas-do-product-owner', 'a pair of armored gauntlets in purple with gold trim, a tiny yellow sticky note stuck on one finger'],
+  ['anel-de-um-so-build', 'a gold ring with a thin band of tiny engraved binary dots and a glowing green hexagonal gem'],
+  ['raquete-escudo-do-padel', 'a padel racket (a solid round-headed paddle with round holes, no strings) built like a round shield with a golden rim, a small yellow ball beside it'],
+  ['cristal-de-gpu', 'a glowing teal crystal shaped like a computer chip, held in a metal ring mount on a chain, thin circuit lines on its facets'],
+  ['grimorio-de-algoritmos', 'an ancient thick spellbook with a leather cover, metal corners, a chain clasp and a glowing flowchart sigil on the cover'],
+  ['olho-da-ia', 'a golden amulet on a chain with a big glowing blue eye in the middle, the iris drawn as a tiny circuit pattern'],
+  ['pe-de-coelho-de-producao', 'a lucky white rabbit foot charm on a short silver chain with a tiny round green status light'],
+  ['fenix-do-rollback', 'a small phoenix bird amulet made of orange and gold flames, a circular rewind arrow on its spread wings'],
+  ['dado-de-vinte-lados', 'a twenty-sided die (d20) in translucent purple with gold engraved dots instead of numbers, glinting'],
+];
+const labItemSheet = (file, items, note) => ({
+  ...hkItemSheet(file, items, note),
+  refs: ['hk-items-1.png'],
+  sheet: { folder: 'lab/items', layout: [6, 6], target: { axis: 'max', size: 28 }, hires: 210 },
+  text: `${HK_BASE}. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. It shows 12 separate fantasy-RPG-meets-tech game item icons arranged in a clean grid of exactly 2 rows with 6 icons each, with wide empty magenta gaps between all icons and between the two rows, nothing touching, each icon one single object drawn at about the same size as one icon of the reference, bold simple readable shapes with a thick dark outline, no text and no letters. ${note} Row 1 left to right: ${list(items.slice(0, 6).map((i) => i[1]))}. Row 2 left to right: ${list(items.slice(6).map((i) => i[1]))}.`,
+});
+
+const LAB_ENEMIES_A = [
+  ['bug-de-vibecoder', 'a smug green beetle bug wearing dark sunglasses, with a small robot antenna, parts of its body glitching into square pixel blocks and a small purple sparkle on its back'],
+  ['select-sem-where', 'a database monster: a stack of blue and gold database cylinder discs with a huge open mouth spilling rows of small table cells like teeth, angry eyes'],
+  ['alucinacao-de-ia', 'a translucent white and cyan ghost with three mismatched eyes and a confident grin, its wavy tail dissolving into pixels'],
+  ['prompt-injection', 'a sinister hypodermic syringe creature with a glowing green liquid inside, a sharp needle, a menacing grin and two small angry eyes on the barrel'],
+  ['agente-em-loop', 'a round steel robot with dizzy spiral eyes whose arm is bent into a closed circle pointing back at its own head, a tiny red low-battery icon on its chest'],
+];
+const LAB_ENEMIES_B = [
+  ['select-em-producao', 'THE BOSS, HUGE: a towering angry mainframe database server tower with a big cracked screen face with glaring eyes and a gigantic open mouth, spewing table rows and flames, a flashing red alarm siren on top'],
+  ['ia-que-apagou-o-banco', 'THE BOSS, HUGE: a sleek menacing dark-steel AI robot with one glowing red-orange eye and a fake innocent smile, holding a cracked database cylinder half erased into a black void, a black hole in its chest'],
+];
+const labEnemySheet = (file, items, note, sizes) => ({
+  ...hkEnemySheet(file, items, note, sizes),
+  refs: ['hk-enemies-1.png'],
+  sheet: { folder: 'lab/enemies', noAnchor: true, target: { axis: 'h', size: 44 }, sizes },
+});
+calls.push(
+  { label: 'lab-items-1', images: [labItemSheet('lab-items-1.png', LAB_ITEMS_A, 'The first six are weapons and the next six are furniture and armor, all with a medieval knight and tech mix.')] },
+  { label: 'lab-items-2', images: [labItemSheet('lab-items-2.png', LAB_ITEMS_B, 'Row 1 is accessories (shield, boots, cloak, gauntlets, ring, racket) and row 2 is magical relics and charms.')] },
+  { label: 'lab-enemies-1', images: [labEnemySheet('lab-enemies-1.png', LAB_ENEMIES_A, 'All five are about the same size, a little more serious and sinister than cute.', {})] },
+  { label: 'lab-enemies-2', images: [labEnemySheet('lab-enemies-2.png', LAB_ENEMIES_B, 'Both are bosses, much bigger than a normal monster, about twice as tall.', { 'select-em-producao': 84, 'ia-que-apagou-o-banco': 88 })] },
+);
+
+// 17) Laboratório collection: 8 lab skins, 8 Pós-doc skins, 2 donation skins, 6 sceneries, 12 decor objects and
+//     6 starting items. Appended at the end so the numbered prompt files above keep their names.
+const LAB_THEME = 'The outfit mixes fantasy RPG with tech.';
+const POSDOC_GOWN =
+  'an elegant doctoral gown: a long black academic gown with wide sleeves and a white collar, a broad golden stole draped over both shoulders and hanging down the front, a large golden five-pointed star on the chest, polished black shoes; both hands visible and empty, held in front of the body';
+const LAB_BODIES_A = [
+  ['edecio-sir-edecio', 'a knight: polished steel plate armor with thin glowing cyan circuit lines running along the plates, a short royal-blue tabard, steel shoulder plates, leaving the hands bare, holding a big steel broadsword upright with a thin glowing cyan circuit trace along the blade, a golden crossguard and a red gem on the pommel'],
+  ['gladimir-darth-glad', 'a parody dark space-wizard: a long black robe with a dark red inner lining, the hood hanging down around the neck stub, a black tunic, a wide dark belt, black gloves, holding a glowing crimson-red energy sword (a lightsaber-like blade of red light) with a black hilt; menacing but a bit goofy, no logos'],
+  ['b2-pintora-arco-iris', 'a painter: a white apron heavily splattered with colourful paint over a light t-shirt, rolled sleeves, paint-stained jeans, holding a giant paintbrush taller than herself with rainbow-coloured bristles dripping bright paint'],
+  ['wagner-paladino-firewall', 'a paladin: armor built from red-orange bricks with small orange flames licking from the shoulder plates, a dark undersuit, holding a large heater shield painted like a red brick wall with a steel padlock emblem in the middle; one hand free'],
+];
+const LAB_BODIES_B = [
+  ['b1-product-owner', 'a product owner knight: a dark purple tunic, purple armored gauntlets with gold trim on both hands, a short cape made of overlapping yellow, pink and blue sticky notes, dark trousers, boots'],
+  ['angelo-reitor-mor', 'a supreme university rector: a long black academic toga with red and gold trim and a wide golden sash across the chest, holding an ornate tall golden sceptre topped with a small black mortarboard cap'],
+  ['pablo-mago-grafos', 'a graph wizard: a long deep-blue robe with wide sleeves covered in a pattern of teal and gold graph nodes joined by thin lines, a golden belt, holding a gnarled wooden staff topped with a small tree of connected glowing blue orbs'],
+];
+const LAB_GUTO = [
+  ['guto-churrasqueiro-sagrado', 'a sacred barbecue warrior: a dark red leather battle apron over a plain tunic, leather vambraces, a heavy belt with tongs, holding a long metal skewer with grilled meat chunks and pepper pieces, a small golden holy halo glowing above the skewer tip'],
+  ['guto-posdoc', POSDOC_GOWN],
+];
+const POSDOC_A = ['edecio', 'gladimir', 'b2', 'wagner'].map((p) => [`${p}-posdoc`, POSDOC_GOWN]);
+const POSDOC_B = ['b1', 'angelo', 'pablo'].map((p) => [`${p}-posdoc`, POSDOC_GOWN]);
+const DONATION = [
+  ['pablo-mecenas', 'a gala patron: a black tuxedo jacket with satin lapels, a white shirt, a black bow tie, white gloves, polished black shoes, and a big golden coin brooch with a dollar-like swirl on the chest'],
+  ['angelo-nome-no-predio', 'a GOLDEN STATUE of himself: the whole body is shiny gold metal including the suit, the hands, the shoes and the bare neck stub (the neck stub is gold too, not skin), darker gold in the shadows and pale yellow highlights, standing stiff and proud on its own feet, no pedestal'],
+];
+const labSkinSheet = (file, items, extra = {}) => {
+  const sheet = v4BodySheet(file, items, extra);
+  return { ...sheet, text: `${sheet.text} ${LAB_THEME}` };
+};
+const LAB_HEAD_ROWS = {
+  edecio: [
+    ['edecio-sir-edecio', 'an open-face polished steel knight helmet with a short cyan plume and thin glowing cyan circuit lines, face fully visible'],
+    ['edecio-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  gladimir: [
+    ['gladimir-darth-glad', 'a deep black hood pulled up over the head with a dark red inner lining, face fully visible and lit, a stern but slightly goofy expression'],
+    ['gladimir-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  b2: [
+    ['b2-pintora-arco-iris', 'a tilted rainbow-striped painter beret with a tiny paintbrush stuck in it, a few paint dots on the cheek'],
+    ['b2-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  wagner: [
+    ['wagner-paladino-firewall', 'an open-face paladin helmet made of red-orange bricks with small orange flames on top, face fully visible'],
+    ['wagner-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  guto: [
+    ['guto-churrasqueiro-sagrado', 'a white chef toque with a small golden halo ring floating just above it'],
+    ['guto-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  b1: [
+    ['b1-product-owner', 'a purple headband with a yellow sticky note stuck on the front'],
+    ['b1-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+  ],
+  angelo: [
+    ['angelo-reitor-mor', 'a golden crown whose top is a flat black mortarboard board, a gold crown rim below it and a gold tassel'],
+    ['angelo-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+    ['angelo-nome-no-predio', 'his own head as a shiny GOLDEN STATUE: smooth gold metal skin, gold hair, a stern noble expression, same face shape'],
+  ],
+  pablo: [
+    ['pablo-mago-grafos', 'a pointed dark-blue wizard hat covered with a pattern of joined glowing nodes and thin lines, with a gold band'],
+    ['pablo-posdoc', 'a black doctoral mortarboard cap with a long golden tassel and a small golden star on the flat top'],
+    ['pablo-mecenas', 'neatly slicked-back hair and a thin gold monocle chain at one cheek, an elegant gala look'],
+  ],
+};
+const labHeadSheet = (professor) => {
+  const base = headVariantSheet(professor);
+  const items = LAB_HEAD_ROWS[professor];
+  const first = HEAD_VARIANTS[professor];
+  return {
+    ...base,
+    file: `heads-lab-${professor}.png`,
+    keys: ['_ref', ...items.map((i) => i[0])],
+    text: base.text
+      .replace(`${(first?.length ?? 0) + 1} times`, `${items.length + 1} times`)
+      .replace(/Left to right after the plain one: .*$/, `Left to right after the plain one: ${list(items.map((i) => i[1]))}.`),
+  };
+};
+const LAB_SCENERIES = [
+  v6Scenery('datacenter-em-chamas', 'datacenter', 'a burning datacenter corridor: server racks on both sides with orange flames and black smoke pouring out, sparks, melted cables hanging from the ceiling, red emergency lights and a sprinkler spraying water, a dramatic red and orange glow'),
+  v6Scenery('sala-do-tesouro', 'masmorra', 'a fantasy dungeon treasure room with stone brick walls, open wooden treasure chests spilling gold coins and gems, and weapon racks and armor stands holding glowing legendary gear in blue, purple and gold light, torches on the walls'),
+  v6Scenery('fortaleza-do-wagner', 'castelo', 'the courtyard of a castle that is also a server: tall stone fortress walls and towers with battlements, glowing orange firewall brick walls with flames, server racks built into the towers with green blinking LEDs, a drawbridge and banners without text'),
+  v6Scenery('taverna-da-guilda', 'cantina', 'a cosy fantasy RPG tavern with a big round table in the middle covered with colourful sticky notes like a scrum board, wooden beams, a stone fireplace with a warm fire, barrels, hanging lanterns, mugs and a notice board of quests, warm candlelight'),
+  v6Scenery('salao-da-defesa', 'formatura', 'a grand doctoral thesis defence hall: a long examiners table with five chairs on a low stage, a projector screen, tall wooden panelled walls with academic banners without text, rows of audience benches, high windows with golden light, a gold and red colour scheme'),
+  v6Scenery('centro-comunitario', 'jardim', 'a lively campus community centre hall: colourful bunting, a wooden donors plaque with small gold nameplates (no readable text) on the back wall, a long table with food and drink donations, boxes and a mural painted by students, big windows with sunlight, a welcoming atmosphere'),
+];
+const LAB_DECOR = [
+  ['poster-funciona-na-minha-maquina', 'a framed wall poster with a cartoon computer and the short text "FUNCIONA NA MINHA MAQUINA" in bold letters (only this text, spelled exactly)'],
+  ['caneca-do-plantao', 'a chunky coffee mug with a steaming dark coffee and a small shield-shaped label, the words are not shown'],
+  ['luz-neon-codigo', 'a glowing neon wall sign shaped like the symbols "</>" in bright cyan and pink tubes'],
+  ['lixeira-reciclagem', 'a small office recycling bin with a green recycling arrows symbol, a few crumpled paper balls and a floppy disk sticking out'],
+  ['gato-dormindo-no-monitor', 'an old CRT-style computer monitor with a fluffy orange cat curled up asleep on top of it'],
+  ['luminaria', 'a retro articulated desk lamp with a warm yellow glow'],
+  ['quadro-branco-diagrama', 'a small whiteboard on legs covered with a hand-drawn diagram of boxes, arrows and a flowchart in blue and red markers, a marker on the tray'],
+  ['pilha-de-livros-de-algoritmos', 'a tall stack of five thick textbooks in different colours with a small tree diagram on the top cover and a bookmark sticking out'],
+  ['trofeu-de-hackathon', 'a golden trophy cup on a small base with a tiny laptop emblem on the cup and a blue ribbon'],
+  ['cacto', 'a cute green cactus with a tiny pink flower in a terracotta pot'],
+  ['fones-pendurados', 'a pair of over-ear headphones hanging on a wall hook by their band, cable dangling'],
+  ['mini-servidor', 'a tiny desktop server tower with rows of blinking green, amber and blue LEDs and a few cables plugged in'],
+];
+const LAB_START = [
+  ['mouse-dourado', 'a shiny golden computer mouse with a gleaming gold shell, a polished gold scroll wheel and a coiled gold cable'],
+  ['mouse-com-fita-colorida', 'a basic grey computer mouse wrapped with a spiral of colourful tape strips (red, blue, yellow, green), cable included'],
+  ['mouse-de-bolinha', 'an old beige ball mouse seen from the top with a visible rubber ball peeking out under it, two chunky buttons and a thick cable'],
+  ['trackball', 'a large trackball device with a big glossy blue ball in the middle, four buttons around it and a dark grey body'],
+  ['teclado-de-membrana-velho', 'an old yellowed membrane keyboard with a few missing keys, crumbs, dusty grey keys and a coiled cable'],
+  ['mousepad-gamer-rgb', 'a wide gaming mousepad with a glowing rainbow RGB edge and a dark patterned surface'],
+];
+const labGridSheet = (file, folder, items, layout, intro) => ({
+  file,
+  kind: 'icon',
+  keys: items.map((i) => i[0]),
+  refs: ['hk-items-1.png'],
+  sheet: { folder, layout, target: { axis: 'max', size: 28 }, hires: 210 },
+  text: `${HK_BASE}. Match the style of the reference image exactly: same chunky pixel-art game item icons, same thick dark outline, same shading, palette richness and level of detail. ${intro} arranged in a clean grid, with wide empty magenta gaps between all objects and between the rows, nothing touching, each object one single item drawn at about the same size as one icon of the reference, bold simple readable shapes with a thick dark outline. ${layout.length === 1 ? '' : `Rows: ${layout.join(' + ')} objects. `}${layout
+    .map((count, row) => {
+      const start = layout.slice(0, row).reduce((a, b) => a + b, 0);
+      return `Row ${row + 1} left to right: ${list(items.slice(start, start + count).map((i) => i[1]))}.`;
+    })
+    .join(' ')}`,
+});
+
+// style references for the new sceneries: a shipped scenery, enlarged
+for (const ref of new Set(LAB_SCENERIES.flatMap((image) => image.refs))) {
+  const id = ref.replace(/^ref-scenery-|\.png$/g, '');
+  const source = path.join(ROOT, 'public', 'assets', 'sceneries', `${id}.png`);
+  if (!fs.existsSync(source)) continue;
+  const { width = 480, height = 270 } = await sharp(source).metadata();
+  await sharp(source).resize(width * 3, height * 3, { kernel: 'nearest' }).png().toFile(path.join(RAW_DIR, ref));
+}
+
+calls.push(
+  { label: 'lab-skins-1', images: [labSkinSheet('skins-lab-1.png', LAB_BODIES_A)] },
+  { label: 'lab-skins-2', images: [labSkinSheet('skins-lab-2.png', LAB_BODIES_B)] },
+  { label: 'lab-skins-guto', images: [labSkinSheet('skins-lab-guto.png', LAB_GUTO, { rules: GUTO_RULES, sheet: { darkSkin: true } })] },
+  { label: 'lab-posdoc-1', images: [labSkinSheet('skins-posdoc-1.png', POSDOC_A)] },
+  { label: 'lab-posdoc-2', images: [labSkinSheet('skins-posdoc-2.png', POSDOC_B)] },
+  { label: 'lab-donation', images: [labSkinSheet('skins-lab-donation.png', DONATION)] },
+  ...Object.keys(LAB_HEAD_ROWS).map((professor) => ({ label: `heads-lab-${professor}`, images: [labHeadSheet(professor)] })),
+  ...LAB_SCENERIES.map((image) => ({ label: image.file.replace('.png', ''), images: [image] })),
+  {
+    label: 'lab-decor',
+    images: [labGridSheet('lab-decor.png', 'lab/decor', LAB_DECOR, [6, 6], 'It shows 12 separate cosy hacker-lab decoration objects (small pixel-art props, front view)')],
+  },
+  {
+    label: 'lab-start',
+    images: [labGridSheet('lab-start.png', 'lab/start', LAB_START, [3, 3], 'It shows 6 separate old and quirky computer peripherals (game item icons)')],
+  },
+);
+
+// The Centro Comunitário button logo (Turma tab): one chunky icon of a small community-center building.
+calls.push({
+  label: 'community-center',
+  images: [
+    {
+      file: 'community-center.png',
+      kind: 'icon',
+      keys: ['community-center'],
+      refs: ['icons.png'],
+      // Kept at the drawn resolution (capped at 112 px): the button shows it at 56 px, smooth, like the hackathon items.
+      sheet: { target: { axis: 'max', size: 32 }, hires: 112 },
+      text: `${HK_BASE}. ${HK_STYLE} It shows ONE single chunky game icon, alone, centered, bold simple readable shape with a thick dark outline: a small friendly community-center building seen from the front, warm cream walls with a terracotta-red tiled roof, a tiny gabled front porch with two little columns, a double door with a warm glow, two small windows, a flag on the roof and a small gold coin-heart emblem above the door, a little green hedge at the base. Cute and welcoming, not text, no letters.`,
+    },
+  ],
+});
+
+// The Centro Comunitário button logo (Turma tab): one chunky icon of a small community-center building.
+calls.push({
+  label: 'community-center',
+  images: [
+    {
+      file: 'community-center.png',
+      kind: 'icon',
+      keys: ['community-center'],
+      refs: ['icons.png'],
+      // Kept at the drawn resolution (capped at 112 px): the button shows it at 56 px, smooth, like the hackathon items.
+      sheet: { target: { axis: 'max', size: 32 }, hires: 112 },
+      text: `${HK_BASE}. ${HK_STYLE} It shows ONE single chunky game icon, alone, centered, bold simple readable shape with a thick dark outline: a small friendly community-center building seen from the front, warm cream walls with a terracotta-red tiled roof, a tiny gabled front porch with two little columns, a double door with a warm glow, two small windows, a flag on the roof and a small gold coin-heart emblem above the door, a little green hedge at the base. Cute and welcoming, not text, no letters.`,
+    },
+  ],
+});
 
 // Sprites redrawn by a later sheet: earlier sheets keep their place but no longer write them.
 for (const c of calls) {

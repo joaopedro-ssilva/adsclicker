@@ -29,11 +29,16 @@ import {
 import { milestoneMultAt, nextMilestone, previousMilestone } from './formulas';
 export { masteryLevels, masteryLine, masteryRank, masteryView, masteryViews } from './mastery';
 export type { MasteryView } from './mastery';
+export { masteryPower, postdocStars, postdocStrength } from './mastery';
+export { canDefendPostdoc, postdocPrice, postdocTotalPrice, postdocView, postdocViews, totalPostdocStars } from './postdoc';
+export type { PostdocBlock, PostdocView } from './postdoc';
 export { monitorsView } from './monitors';
 import { diplomaCap, diplomasFor, diplomasForRun, prestigeNodeAvailable, prestigeNodeCost, runCoinsFor } from './prestige';
 export { diplomaBonus } from './stats';
 import { horasBandsFilled } from './maestria/horas';
 export * from './maestria/views';
+export * from './lab/views';
+export { labRunAvailable } from './lab/access';
 import { effectiveBuyAmount, quoteLevels } from './purchases';
 import { hireLock, isAbilityUnlocked, levelledLock, researchLock } from './requirements';
 import type { GameState } from './state';

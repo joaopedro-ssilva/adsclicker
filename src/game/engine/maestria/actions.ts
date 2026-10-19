@@ -5,6 +5,7 @@ import type { GameState } from '../state';
 import { buyAsset as buyAssetRaw, depositFund as depositFundRaw, sellAsset as sellAssetRaw, withdrawFund as withdrawFundRaw } from './bolsa';
 import { startFesta as startFestaRaw } from './festa';
 import { fireRollforward as fireRollforwardRaw } from './rollforward';
+import { setMaestriaEnabled as setMaestriaEnabledRaw } from './toggle';
 import { buyMaestriaLevel as buyMaestriaLevelRaw, unlockMaestria as unlockMaestriaRaw } from './slots';
 import { hitSwarmBug as hitSwarmBugRaw, startSwarm as startSwarmRaw } from './swarm';
 
@@ -18,6 +19,12 @@ export function unlockMaestria(state: GameState, content: GameContent, professor
 
 export function buyMaestriaLevel(state: GameState, content: GameContent, professor: ProfessorId, now: number, emit: Emit): boolean {
   const done = buyMaestriaLevelRaw(state, content, professor, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
+export function setMaestriaEnabled(state: GameState, content: GameContent, professor: ProfessorId, enabled: boolean, now: number, emit: Emit): boolean {
+  const done = setMaestriaEnabledRaw(state, content, professor, enabled, now, emit);
   if (done) afterAction(state, content, now, emit);
   return done;
 }

@@ -7,6 +7,7 @@ type SceneSeed = {
   default?: boolean;
   ambient: Ambient;
   floats?: boolean;
+  source?: SceneryDef['source'];
   palette: [string, string, string];
   scene: string;
 };
@@ -22,12 +23,13 @@ const make = (seed: SceneSeed): SceneryDef => ({
   asset: `sceneries/${seed.id}`,
   ambient: seed.ambient,
   ...(seed.floats ? { floats: true } : {}),
+  ...(seed.source ? { source: seed.source } : {}),
   palette: { sky: seed.palette[0], horizon: seed.palette[1], floor: seed.palette[2] },
   artPrompt: `${seed.scene}. ${FRAMING}`,
 });
 
-/** The closed list of 42 sceneries (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
-export const sceneries: SceneryDef[] = [
+/** The original 42 sceneries (GAME_DESIGN section 6). The late collections below join them in `sceneries`. */
+const mainSceneries: SceneryDef[] = [
   make({
     id: 'sala-de-aula',
     name: 'Sala de Aula',
@@ -367,3 +369,67 @@ export const sceneries: SceneryDef[] = [
     scene: 'cosy teachers lounge with a big wooden table with coffee mugs and stacks of papers, comfortable armchairs, a coffee machine and a notice board with timetables at the back, bookshelves, a warm afternoon light through a window',
   }),
 ];
+
+/**
+ * The late sceneries: four of the Laboratório, the Pós-doc defence hall and the Centro Comunitário. `source` marks the
+ * collection of each; every one is the reward of exactly one achievement.
+ */
+export const labSceneries: SceneryDef[] = [
+  make({
+    id: 'datacenter-em-chamas',
+    name: 'Datacenter em Chamas',
+    description: 'Racks soltando fumaça, cabos derretidos e um sprinkler fazendo o que pode. O uptime ficou na lembrança.',
+    ambient: 'embers',
+    source: 'lab',
+    palette: ['#1a0c10', '#7a2a1a', '#2f2a34'],
+    scene: 'burning datacenter corridor with server racks on both sides with orange flames and black smoke, sparks, melted cables hanging from the ceiling, red emergency lights, a sprinkler spraying water, a dramatic red and orange glow',
+  }),
+  make({
+    id: 'sala-do-tesouro',
+    name: 'Sala do Tesouro',
+    description: 'Baús abertos cheios de ouro e armaduras lendárias brilhando em azul, roxo e dourado. O drop raro mora aqui.',
+    ambient: 'dust',
+    source: 'lab',
+    palette: ['#14121c', '#3a3a4a', '#5a4a38'],
+    scene: 'fantasy dungeon treasure room with stone brick walls, open wooden treasure chests spilling gold coins and gems, weapon racks and armor stands holding glowing legendary gear, torches on the walls',
+  }),
+  make({
+    id: 'fortaleza-do-wagner',
+    name: 'Fortaleza do Wagner',
+    description: 'Um castelo que também é servidor: muralhas com firewall, torres com racks e a ponte levadiça sempre erguida.',
+    ambient: 'leaves',
+    source: 'lab',
+    palette: ['#8ec5f0', '#6a7a8a', '#8a7a4a'],
+    scene: 'castle courtyard where the castle is also a server, tall stone fortress walls and towers with battlements, glowing orange firewall brick walls with flames, server racks in the towers with green blinking LEDs, a drawbridge and banners without text',
+  }),
+  make({
+    id: 'taverna-da-guilda',
+    name: 'Taverna da Guilda',
+    description: 'Uma taverna de RPG com a mesa redonda do scrum no meio, lareira acesa e um quadro de missões. A daily dura até a caneca esvaziar.',
+    ambient: 'dust',
+    source: 'lab',
+    palette: ['#3a2418', '#7a5a3a', '#a07a50'],
+    scene: 'cosy fantasy RPG tavern with a big round table in the middle covered with colorful sticky notes like a scrum board, wooden beams, a stone fireplace with a warm fire, barrels, hanging lanterns, mugs and a quest notice board, warm candlelight',
+  }),
+  make({
+    id: 'salao-da-defesa',
+    name: 'Salão da Defesa',
+    description: 'Um salão solene com mesa de banca, tela de projeção e bancos para a plateia. Aqui se defende o pós-doc.',
+    ambient: 'dust',
+    source: 'posdoc',
+    palette: ['#3a1a1a', '#7a2a2a', '#a0602a'],
+    scene: 'grand doctoral thesis defence hall with a long examiners table with five chairs on a low stage, a projector screen, tall wood panelled walls with academic banners without text, rows of audience benches, high windows with golden light, gold and red colour scheme',
+  }),
+  make({
+    id: 'centro-comunitario',
+    name: 'Centro Comunitário',
+    description: 'Um salão cheio de vida, com bandeirinhas, mural dos alunos e uma placa dos doadores. Aqui o campus se junta.',
+    ambient: 'confetti',
+    source: 'donation',
+    palette: ['#e8d8b0', '#c9a060', '#c8a870'],
+    scene: 'lively campus community centre hall with colorful bunting, a wooden donors plaque with small gold nameplates on the back wall, a long table with food and drink donations, boxes and a mural painted by students, big windows with sunlight',
+  }),
+];
+
+/** The closed list of 48 sceneries: the original 42 and the 6 late ones. Each non-default one is the reward of exactly one achievement. */
+export const sceneries: SceneryDef[] = [...mainSceneries, ...labSceneries];

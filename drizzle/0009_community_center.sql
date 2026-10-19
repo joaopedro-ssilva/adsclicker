@@ -1,0 +1,3 @@
+ALTER TABLE "players" ADD COLUMN "donated_text" text DEFAULT '0' NOT NULL;--> statement-breakpoint
+ALTER TABLE "players" ADD COLUMN "donated_log" double precision DEFAULT 0 NOT NULL;--> statement-breakpoint
+CREATE INDEX "players_board_donors_idx" ON "players" USING btree ("donated_log" DESC NULLS LAST,"id") WHERE "players"."nickname" is not null and not "players"."flagged" and not "players"."banned" and not "players"."test_account" and "players"."donated_log" > 0;

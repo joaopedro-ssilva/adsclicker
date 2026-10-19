@@ -16,6 +16,8 @@ import {
   uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
+import type { LabProfileData } from '@/game/engine/lab/profile';
+import type { LabBuild } from '@/game/engine/lab/types';
 import { flaggedAreRanked } from '../players/ranking';
 
 const timestamptz = (name: string) => timestamp(name, { withTimezone: true, mode: 'date' });
@@ -88,6 +90,12 @@ export const players = pgTable(
      * this player (docs/BACKEND.md, "Jogador confiável"). The admin can still flag them by hand.
      */
     trusted: boolean('trusted').notNull().default(false),
+    /**
+     * The leaky bucket of the game-clock check (players/clockCheck.ts): seconds of game time the saves
+     * claimed beyond what the server's clock allowed, still unpaid. Reaching the limit flags the player
+     * and empties it. 0 for anyone who never ran ahead.
+     */
+    clockExcessSeconds: doublePrecision('clock_excess_seconds').notNull().default(0),
 
     // Titles and launch reset ------------------------------------------------------------------
     /**
@@ -101,6 +109,26 @@ export const players = pgTable(
      * device that holds another epoch is refused, which keeps a pre-reset save off the boards.
      */
     progressEpoch: integer('progress_epoch').notNull().default(0),
+
+    // Laboratório boards (docs/BACKEND.md, "Ranking do Laboratório") ------------------------------
+    /** The highest lab phase ever reached (a permanent record, from `lab.bestPhase` of the save). 0 = never. */
+    labBestPhase: integer('lab_best_phase').notNull().default(0),
+    /** The four equipped items at that moment, sanitised against the content on write and on read. Null = unknown. */
+    labBestPhaseBuild: jsonb('lab_best_phase_build').$type<LabBuild>(),
+    /** When `labBestPhase` last went up (server clock): the tie-break, who got there first. */
+    labBestPhaseAt: timestamptz('lab_best_phase_at'),
+    /** The most ADScoins made in a single turma (the graduation record, or the run in progress when it is ahead): exact text and log10, as lifetime coins. */
+    bestRunCoinsText: text('best_run_coins_text').notNull().default('0'),
+    bestRunCoinsLog: doublePrecision('best_run_coins_log').notNull().default(0),
+    /** The items of that turma. */
+    bestRunBuild: jsonb('best_run_build').$type<LabBuild>(),
+    /** The public lab profile (GET /api/lab/profile): what the player wears in the lab and their lifetime lab numbers. Null = lab never unlocked. */
+    labProfile: jsonb('lab_profile').$type<LabProfileData>(),
+
+    // Centro Comunitário (docs/BACKEND.md, "Centro Comunitário") --------------------------------
+    /** ADScoins given to the campus, ever (`state.donated` of the save): exact text and log10, as lifetime coins. */
+    donatedText: text('donated_text').notNull().default('0'),
+    donatedLog: doublePrecision('donated_log').notNull().default(0),
   },
   (t) => {
     // The boards only list ranked players, so each ordering is a partial index over exactly them.
@@ -112,6 +140,15 @@ export const players = pgTable(
       index('players_board_diplomas_idx').on(t.diplomasEarned.desc(), t.id).where(ranked),
       index('players_board_achievements_idx').on(t.achievements.desc(), t.id).where(ranked),
       index('players_board_clicks_idx').on(t.clicks.desc(), t.id).where(ranked),
+      index('players_board_lab_phase_idx')
+        .on(t.labBestPhase.desc(), t.labBestPhaseAt.asc(), t.id)
+        .where(sql`${ranked} and ${t.labBestPhase} > 0`),
+      index('players_board_best_run_idx')
+        .on(t.bestRunCoinsLog.desc(), t.id)
+        .where(sql`${ranked} and ${t.bestRunCoinsLog} > 0`),
+      index('players_board_donors_idx')
+        .on(t.donatedLog.desc(), t.id)
+        .where(sql`${ranked} and ${t.donatedLog} > 0`),
     ];
   },
 );

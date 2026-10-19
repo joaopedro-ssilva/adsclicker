@@ -19,6 +19,9 @@ import {
   adminTurmaZeroResultSchema,
   apiErrorSchema,
   communityResponseSchema,
+  donorsResponseSchema,
+  labLeaderboardResponseSchema,
+  labProfileSchema,
   leaderboardResponseSchema,
   loginResponseSchema,
   playerProfileSchema,
@@ -34,6 +37,7 @@ import type {
   AdminTagPatch,
   ApiError,
   Board,
+  LabBoard,
   LoginRequest,
   NicknameRequest,
   PasswordRequest,
@@ -98,6 +102,11 @@ export const api = {
   logout: () => call('POST', '/api/auth/logout', okResponseSchema, { body: {} }),
   leaderboard: (board: Board, signal?: AbortSignal) =>
     call('GET', `/api/leaderboard?board=${board}`, leaderboardResponseSchema, { signal }),
+  labLeaderboard: (board: LabBoard, signal?: AbortSignal) =>
+    call('GET', `/api/lab/leaderboard?board=${board}`, labLeaderboardResponseSchema, { signal }),
+  labProfile: (nickname: string, signal?: AbortSignal) =>
+    call('GET', `/api/lab/profile?nickname=${encodeURIComponent(nickname)}`, labProfileSchema, { signal }),
+  donors: (signal?: AbortSignal) => call('GET', '/api/community/donors', donorsResponseSchema, { signal }),
   community: (signal?: AbortSignal) => call('GET', '/api/community', communityResponseSchema, { signal }),
   profile: (nickname: string, signal?: AbortSignal) =>
     call('GET', `/api/players/profile?nickname=${encodeURIComponent(nickname)}`, playerProfileSchema, { signal }),

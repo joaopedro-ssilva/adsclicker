@@ -1,7 +1,9 @@
 'use client';
 import { useEffect } from 'react';
 import { abilityViews, bolsaView, festaView, hasFeature, rollforwardView, swarmView } from '@/game/engine/views';
+import { labSlotVisible } from '@/game/engine/lab/access';
 import { content, useGame } from '@/game/store';
+import { useLabOverlay } from '../lab/labOverlayStore';
 import { useJournal } from '../moments/journalStore';
 import { playLimited } from '../panel/lib/feedback';
 import { useUi } from '../shared/uiStore';
@@ -14,9 +16,13 @@ function isEditable(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && (target.isContentEditable || /^(input|textarea|select)$/i.test(target.tagName));
 }
 
-/** A window (the native dialogs of the kit, the ceremonies) or the Bolsa is open: the keys belong to it. */
+/** A window (the native dialogs of the kit, the ceremonies), the Bolsa or the Laboratório is open: the keys belong to it. */
 function windowOpen(): boolean {
-  return document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]') !== null || useBolsaPanel.getState().open;
+  return (
+    document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]') !== null ||
+    useBolsaPanel.getState().open ||
+    useLabOverlay.getState().shown
+  );
 }
 
 /** The cards of the Aulas tab for a professor, in the order it shows them: the disciplines by tier, then the click upgrade. */
@@ -83,6 +89,14 @@ function press(id: ShortcutId, repeat: boolean): void {
     case 'journal':
       if (!ui.photo) useJournal.getState().show();
       break;
+    case 'lab': {
+      // Pablo's hire shows the slot: unlocked it opens the screen, locked it asks for the diplomas.
+      if (ui.photo || !labSlotVisible(state, content)) break;
+      const overlay = useLabOverlay.getState();
+      if (state.lab.unlocked) overlay.show();
+      else overlay.askUnlock();
+      break;
+    }
   }
 }
 

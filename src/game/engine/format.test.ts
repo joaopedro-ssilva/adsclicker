@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Decimal } from './decimal';
-import { formatDuration, formatNumber, formatPercent } from './format';
+import { formatDuration, formatNumber, formatPercent, getNumberNotation, parseAmount, setNumberNotation } from './format';
 
 describe('formatNumber', () => {
   it('shows small numbers whole, with pt-BR separators', () => {
@@ -58,10 +58,63 @@ describe('formatNumber', () => {
     expect(formatNumber(new Decimal('9.999e32'))).toBe('1 Dc');
   });
 
-  it('switches to scientific notation after Dc', () => {
-    expect(formatNumber(new Decimal('1.234e36'))).toBe('1,23e36');
-    expect(formatNumber(new Decimal('1e100'))).toBe('1e100');
-    expect(formatNumber(new Decimal('9.999e40'))).toBe('1e41');
+  it('keeps abbreviating past Dc with the real names, three letters at most', () => {
+    expect(formatNumber(new Decimal('1.234e36'))).toBe('1,23 Ud');
+    expect(formatNumber(new Decimal('1.86e36'))).toBe('1,86 Ud');
+    expect(formatNumber(new Decimal('1e45'))).toBe('1 Qad');
+    expect(formatNumber(new Decimal('9.999e40'))).toBe('100 Dd');
+    expect(formatNumber(new Decimal('9.999e41'))).toBe('1 Td');
+    expect(formatNumber(new Decimal('2e63'))).toBe('2 Vg');
+    expect(formatNumber(new Decimal('1e93'))).toBe('1 Tg');
+    expect(formatNumber(new Decimal('1e123'))).toBe('1 Qag');
+  });
+
+  it('switches to scientific notation after Qag (1e123)', () => {
+    expect(formatNumber(new Decimal('1e126'))).toBe('1e126');
+    expect(formatNumber(new Decimal('1.234e200'))).toBe('1,23e200');
+    expect(formatNumber(new Decimal('9.999e125'))).toBe('1e126');
+  });
+
+  it('scientific notation only takes over from the decilhão (1e33); below it the names stay', () => {
+    const sci = { notation: 'scientific' } as const;
+    expect(formatNumber(1234, sci)).toBe('1.234');
+    expect(formatNumber(12_500, sci)).toBe('12,5 K');
+    expect(formatNumber(1.5e6, sci)).toBe('1,5 M');
+    expect(formatNumber(new Decimal('2.5e32'), sci)).toBe('250 No');
+    expect(formatNumber(new Decimal('1e33'), sci)).toBe('1e33');
+    expect(formatNumber(new Decimal('3e33'), sci)).toBe('3e33');
+    expect(formatNumber(new Decimal('1.86e36'), sci)).toBe('1,86e36');
+    expect(formatNumber(new Decimal('9.999e40'), sci)).toBe('1e41');
+    expect(formatNumber(new Decimal('1.234e200'), sci)).toBe('1,23e200');
+    expect(formatNumber(new Decimal('-1.86e36'), sci)).toBe('-1,86e36');
+  });
+
+  it('rolls over to scientific across the decilhão boundary', () => {
+    expect(formatNumber(new Decimal('9.999e32'), { notation: 'scientific' })).toBe('1e33');
+    expect(formatNumber(new Decimal('9.999e32'), { notation: 'names' })).toBe('1 Dc');
+  });
+
+  it('follows the module default and an explicit notation wins', () => {
+    expect(getNumberNotation()).toBe('names');
+    setNumberNotation('scientific');
+    try {
+      expect(formatNumber(new Decimal('1.86e36'))).toBe('1,86e36');
+      expect(formatNumber(new Decimal('1.86e36'), { notation: 'names' })).toBe('1,86 Ud');
+    } finally {
+      setNumberNotation('names');
+    }
+    expect(formatNumber(new Decimal('1.86e36'))).toBe('1,86 Ud');
+  });
+
+  it('parseAmount reads both forms regardless of the notation', () => {
+    setNumberNotation('scientific');
+    try {
+      expect(parseAmount('1,86 Ud')!.eq(new Decimal('1.86e36'))).toBe(true);
+      expect(parseAmount('1,86e36')!.eq(new Decimal('1.86e36'))).toBe(true);
+      expect(parseAmount('2.500')!.eq(2500)).toBe(true);
+    } finally {
+      setNumberNotation('names');
+    }
   });
 
   it('handles negatives, huge values and bad input', () => {

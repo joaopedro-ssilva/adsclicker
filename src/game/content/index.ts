@@ -4,6 +4,7 @@ import { balance } from './balance';
 import { clickUpgrades } from './clickUpgrades';
 import { disciplines } from './disciplines';
 import { invasions } from './invasions';
+import { lab } from './lab';
 import { maestrias } from './maestrias';
 import { mastery } from './mastery';
 import { monitors } from './monitors';
@@ -35,5 +36,6 @@ export const content: GameContent = {
   mastery,
   maestrias,
   monitors,
+  lab,
   balance,
 };

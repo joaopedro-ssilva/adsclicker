@@ -1,15 +1,29 @@
 import { PROFESSOR_IDS } from '../content/types';
 import type { AchievementDef, Condition, CounterKey, GameContent } from '../content/types';
-import { achievementsDone, bolsaHeld, cleanRunSteps, lastRunValue, measureCondition, monitorsReached, ownedCount, prestigeProgress } from './achievements';
+import {
+  achievementsDone,
+  bolsaHeld,
+  cleanRunSteps,
+  labStatValue,
+  labTreeProgress,
+  lastRunValue,
+  measureCondition,
+  monitorsReached,
+  ownedCount,
+  prestigeProgress,
+  rarityCollection,
+} from './achievements';
 import type { Probe } from './achievements';
 import { getIndex } from './contentIndex';
 import { parseDecimal } from './decimal';
 import { levelOf } from './economy';
 import { formatDuration, formatNumber, formatPercent } from './format';
+import { setPieces } from './lab/effects';
 import { horasBandsFilled } from './maestria/horas';
 import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
-import { masteryRank } from './mastery';
+import { masteryRank, postdocStars } from './mastery';
+import { totalPostdocStars } from './postdoc';
 import type { GameState } from './state';
 
 /** What the Album shows under a locked achievement: a bar, "current / target" and, when useful, the next step. */
@@ -51,8 +65,12 @@ const COUNTER_UNIT: Record<CounterKey, string> = {
   designFreeLevels: 'níveis de graça',
   cappedGraduations: 'formaturas no teto de diplomas',
   treeResets: 'resets da árvore',
+  postdocs: 'Pós-docs defendidos',
   ungratefulGraduations: 'formaturas sem homenagem',
+  donations: 'doações ao campus',
 };
+
+const LAB_STAT_UNIT = { bestPhase: 'fases', broken: 'monitores quebrados', itemsRecycled: 'itens reciclados' } as const;
 
 const n = (value: number) => formatNumber(Math.floor(value));
 const pair = (value: number, target: number, unit: string) => `${n(Math.min(value, target))} / ${n(target)} ${unit}`;
@@ -152,13 +170,28 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
       const short = professors.filter((id) => masteryRank(state, content, id) < condition.rank);
       const reached = professors.length - short.length;
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
       return {
         text: condition.professor
           ? `domínio ${n(Math.min(masteryRank(state, content, condition.professor), condition.rank))} / ${n(condition.rank)}`
-          : `${n(reached)} de ${n(professors.length)} professores no domínio ${n(condition.rank)}`,
-        note: !condition.professor && short.length > 0 ? `Ainda abaixo: ${nameList(short.map((id) => professorName(id)))}.` : null,
+          : `${n(Math.min(reached, needed))} de ${n(needed)} professores no domínio ${n(condition.rank)}`,
+        note: !condition.professor && reached < needed ? `Ainda abaixo: ${nameList(short.map((id) => professorName(id)))}.` : null,
       };
     }
+    case 'postdoc': {
+      const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
+      const short = professors.filter((id) => postdocStars(state, id) < condition.stars);
+      const reached = professors.length - short.length;
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      return {
+        text: condition.professor
+          ? `${n(Math.min(postdocStars(state, condition.professor), condition.stars))} / ${n(condition.stars)} estrelas de Pós-doc`
+          : `${n(Math.min(reached, needed))} de ${n(needed)} professores com ${n(condition.stars)} estrela${condition.stars === 1 ? '' : 's'} de Pós-doc`,
+        note: !condition.professor && reached < needed ? `Ainda sem: ${nameList(short.map((id) => professorName(id)))}.` : null,
+      };
+    }
+    case 'postdocTotal':
+      return { text: pair(totalPostdocStars(state), condition.gte, 'estrelas de Pós-doc'), note: null };
     case 'alignedLevels': {
       let best = 0;
       for (const professor of index.professorList) {
@@ -186,7 +219,11 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       return { text: `${n(content.research.length - missing.length)} de ${n(content.research.length)} pesquisas`, note: 'Todas as pesquisas compradas na mesma turma.' };
     }
     case 'rarityOwned': {
-      const list = content.skins.filter((skin) => skin.rarity === condition.rarity);
+      if (condition.gte !== undefined) {
+        const owned = content.skins.filter((skin) => skin.rarity === condition.rarity && state.skins[skin.id]).length;
+        return { text: `${n(owned)} de ${n(condition.gte)} skins`, note: null };
+      }
+      const list = rarityCollection(content, condition.rarity);
       const owned = list.filter((skin) => state.skins[skin.id]).length;
       return { text: `${n(owned)} de ${n(list.length)} skins`, note: null };
     }
@@ -236,6 +273,8 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
       const list = (condition.of === 'sceneries' ? content.sceneries : content.themes).filter((item) => !(condition.except ?? []).includes(item.id));
       const have = condition.of === 'sceneries' ? state.sceneries : state.themes;
       const missing = list.filter((item) => !have[item.id]);
+      // A count leaves the choice open, so naming what is missing would only mislead.
+      if (condition.gte !== undefined) return { text: pair(owned, condition.gte, unit), note: null };
       return { text: pair(owned, total, unit), note: missing.length > 0 ? `Ainda falta: ${nameList(missing.map((item) => item.name))}.` : null };
     }
     case 'everyAchievement': {
@@ -260,12 +299,35 @@ function describe(state: GameState, content: GameContent, condition: Condition, 
         text: pair(monitorsReached(state, content, condition.maxed === true), condition.gte, condition.maxed ? 'monitores no nível máximo' : 'monitores contratados'),
         note: null,
       };
+    case 'donated':
+      return { text: `${formatNumber(state.donated)} / ${formatNumber(parseDecimal(condition.gte))} moedas doadas`, note: null };
+    case 'flag':
+      return { text: 'ainda não aconteceu', note: null };
+    case 'labStat': {
+      if (condition.stat === 'unlocked') return { text: state.lab.unlocked ? 'desbloqueado' : 'trancado', note: null };
+      const unit = LAB_STAT_UNIT[condition.stat];
+      return { text: pair(labStatValue(state, condition.stat), condition.gte, unit), note: null };
+    }
+    case 'labEquipped': {
+      const have = Object.values(state.lab.turma.equipped).filter((item) => item.rarity === condition.rarity).length;
+      const rarityName = content.lab.rarities.find((rarity) => rarity.id === condition.rarity)?.name.toLowerCase() ?? condition.rarity;
+      return { text: pair(have, condition.gte, `itens ${rarityName}s equipados`), note: 'Todos equipados ao mesmo tempo, na mesma turma.' };
+    }
+    case 'labSet': {
+      const name = content.lab.sets.find((set) => set.id === condition.set)?.name ?? 'o conjunto';
+      return { text: pair(setPieces(state, content).get(condition.set) ?? 0, condition.pieces, `peças de ${name}`), note: 'Equipadas ao mesmo tempo, na mesma turma.' };
+    }
+    case 'labTree': {
+      const { branches, whole } = labTreeProgress(state, content);
+      const best = condition.scope === 'all' ? whole : branches.reduce((top, entry) => (entry.ratio > top.ratio ? entry : top), { ratio: 0, done: false });
+      return { text: `${formatPercent(best.ratio)} ${condition.scope === 'all' ? 'da árvore' : 'do ramo mais adiantado'}`, note: null };
+    }
   }
 }
 
 /** Progress and the "o que falta" text of one achievement. Locked secrets reveal nothing. */
 export function achievementDetail(state: GameState, content: GameContent, def: AchievementDef, probe: Probe): ProgressDetail {
-  if (def.condition.kind === 'secret') return { progress: null, text: null, note: null };
+  if (def.condition.kind === 'secret' || def.secret) return { progress: null, text: null, note: null };
   if (state.achievements[def.id] !== undefined) return { progress: 1, text: null, note: null };
   const measure = measureCondition(state, content, def.condition, probe);
   const described = describe(state, content, def.condition, probe);

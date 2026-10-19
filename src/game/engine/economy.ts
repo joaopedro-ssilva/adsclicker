@@ -25,6 +25,7 @@ export function disciplineMultiplier(state: GameState, stats: Stats, def: Discip
     stats.idlePower *
     stats.globalPower *
     (state.activeProfessor === def.professor ? stats.activeBonus : 1) *
+    (state.honoured === def.professor ? stats.honouredBonus : 1) *
     (1 + stats.synergy * Math.max(0, others))
   );
 }
@@ -32,7 +33,7 @@ export function disciplineMultiplier(state: GameState, stats: Stats, def: Discip
 /**
  * Coins/second of one discipline at `level`:
  * baseProduction x level x 2^milestones x disc x prof x idlePower x globalPower
- *   x (on stage ? activeBonus : 1) x (1 + synergy x other hired professors)
+ *   x (on stage ? activeBonus : 1) x (honoured ? honouredBonus : 1) x (1 + synergy x other hired professors)
  */
 export function disciplineProduction(
   state: GameState,

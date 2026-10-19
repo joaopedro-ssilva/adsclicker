@@ -8,6 +8,7 @@ type SkinSeed = {
   /** The skin has its own head, drawn wearing the headgear (heads/<skinId>). */
   headgear?: boolean;
   default?: boolean;
+  source?: SkinDef['source'];
   palette: [string, string, string];
   artPrompt: string;
 };
@@ -21,14 +22,15 @@ const make = (professor: ProfessorId, seeds: SkinSeed[]): SkinDef[] =>
     rarity: seed.rarity,
     description: seed.description,
     ...(seed.default ? { default: true } : {}),
+    ...(seed.source ? { source: seed.source } : {}),
     body: `skins/${seed.id}`,
     ...(seed.headgear ? { head: `heads/${seed.id}` } : {}),
     palette: { primary: seed.palette[0], secondary: seed.palette[1], accent: seed.palette[2] },
     artPrompt: seed.artPrompt,
   }));
 
-/** The closed list of 95 skins (GAME_DESIGN section 6). Each non-default one is the reward of exactly one achievement. */
-export const skins: SkinDef[] = [
+/** The original 95 skins (GAME_DESIGN section 6). The late collections below join them in `skins`. */
+const mainSkins: SkinDef[] = [
   ...make('edecio', [
     {
       id: 'edecio-default',
@@ -857,3 +859,163 @@ export const skins: SkinDef[] = [
     },
   ]),
 ];
+
+const POSDOC_PALETTE: [string, string, string] = ['#1a1a22', '#f5c542', '#f2f2f2'];
+const POSDOC_PROMPT = 'elegant black doctoral gown with a broad golden stole and a large golden star on the chest, black mortarboard with a gold tassel';
+const posdoc = (id: string, desc: string): SkinSeed => ({
+  id,
+  name: 'Pós-doc',
+  rarity: 'legendary',
+  description: desc,
+  headgear: true,
+  source: 'posdoc',
+  palette: POSDOC_PALETTE,
+  artPrompt: POSDOC_PROMPT,
+});
+
+/**
+ * The Laboratório collection (RPG meets tech), Pós-doc gowns and the Centro Comunitário donation skins: 18 skins that
+ * are merged into `skins` below. `source` marks the collection of each ('lab', 'posdoc', 'donation'); every one is the
+ * reward of exactly one achievement, like the rest.
+ */
+export const labSkins: SkinDef[] = [
+  ...make('edecio', [
+    {
+      id: 'edecio-sir-edecio',
+      name: 'Sir Edécio',
+      rarity: 'epic',
+      description: 'Armadura de aço com circuitos brilhando e a Espada do Sir Edécio. Cada commit é uma cavalgada.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#aab4c4', '#2f5fb8', '#22d3ee'],
+      artPrompt: 'steel knight plate armor with glowing cyan circuit lines, royal blue tabard, big broadsword with a cyan circuit blade, open-face knight helmet with cyan plume',
+    },
+    posdoc('edecio-posdoc', 'Beca preta, estola dourada e a estrela do pós-doutorado. A palestra de abertura dura tanto quanto a titulação.'),
+  ]),
+  ...make('gladimir', [
+    {
+      id: 'gladimir-darth-glad',
+      name: 'Darth Glad',
+      rarity: 'legendary',
+      description: 'Manto escuro de capuz, sabre de luz vermelho e o lado sombrio do banco de dados. Eu sou seu DBA.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#16161c', '#b91c1c', '#ef4444'],
+      artPrompt: 'parody dark space wizard, long black robe with dark red lining, black hood, black gloves, glowing crimson energy sword with a black hilt',
+    },
+    posdoc('gladimir-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutor em tudo que tem tabela.'),
+  ]),
+  ...make('b2', [
+    {
+      id: 'b2-pintora-arco-iris',
+      name: 'Pintora Arco-Íris',
+      rarity: 'epic',
+      description: 'Avental respingado de tinta, boina listrada e um pincel gigante de cerdas coloridas. O protótipo é uma tela em branco.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#f5f5f5', '#ec4899', '#facc15'],
+      artPrompt: 'white paint-splattered apron over a light t-shirt, paint-stained jeans, rainbow striped beret, giant paintbrush with rainbow bristles',
+    },
+    posdoc('b2-posdoc', 'Beca preta, estola dourada e estrela no peito. Doutora em design e em ficar com a última palavra na cor.'),
+  ]),
+  ...make('wagner', [
+    {
+      id: 'wagner-paladino-firewall',
+      name: 'Paladino Firewall',
+      rarity: 'epic',
+      description: 'Armadura de tijolos em chamas e um escudo de firewall com cadeado. Nenhuma porta passa daqui.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#c2410c', '#fb923c', '#94a3b8'],
+      artPrompt: 'armor built from red-orange bricks with small flames on the shoulders, brick wall heater shield with a steel padlock, open-face brick helmet with flames',
+    },
+    posdoc('wagner-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutor em segurança, e ninguém consegue invadir o currículo.'),
+  ]),
+  ...make('guto', [
+    {
+      id: 'guto-churrasqueiro-sagrado',
+      name: 'Churrasqueiro Sagrado',
+      rarity: 'epic',
+      description: 'Avental de batalha, pinça na cinta e um espeto abençoado com halo. A brasa pede silêncio.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#7f1d1d', '#a16207', '#fde68a'],
+      artPrompt: 'dark red leather battle apron over a tunic, leather vambraces, tongs on the belt, long skewer with grilled meat and a small golden halo, white chef toque with a golden halo',
+    },
+    posdoc('guto-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutor em atmosfera, de nuvem e de churrasco.'),
+  ]),
+  ...make('b1', [
+    {
+      id: 'b1-product-owner',
+      name: 'Product Owner',
+      rarity: 'epic',
+      description: 'Manoplas roxas, capa de post-its e uma faixa na testa com um adesivo. O backlog se curva ao seu comando.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#6d28d9', '#facc15', '#f472b6'],
+      artPrompt: 'dark purple tunic, purple armored gauntlets with gold trim, short cape made of overlapping yellow pink and blue sticky notes, purple headband with a yellow sticky note',
+    },
+    posdoc('b1-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutora em roadmap, com a defesa já priorizada.'),
+  ]),
+  ...make('angelo', [
+    {
+      id: 'angelo-reitor-mor',
+      name: 'Reitor Angelo',
+      rarity: 'legendary',
+      description: 'Toga acadêmica, capelo-coroa e um cetro dourado. O despacho vale como lei.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#1a1a22', '#b91c1c', '#f5c542'],
+      artPrompt: 'long black academic toga with red and gold trim and a golden sash, golden crown with a black mortarboard top, tall golden sceptre topped with a mortarboard',
+    },
+    posdoc('angelo-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutor em horário, com a banca já de acordo.'),
+    {
+      id: 'angelo-nome-no-predio',
+      name: 'Nome no Prédio',
+      rarity: 'mythic',
+      description: 'A estátua dourada do próprio Angelo, de terno e tudo. Um prédio inteiro com o nome dele, e a placa polida toda manhã.',
+      headgear: true,
+      source: 'donation',
+      palette: ['#d4a017', '#fde047', '#92400e'],
+      artPrompt: 'shiny gold statue of a man in a suit, entirely gold metal including hands shoes and neck, stiff proud pose, golden statue head',
+    },
+  ]),
+  ...make('pablo', [
+    {
+      id: 'pablo-mago-grafos',
+      name: 'Mago Pablo',
+      // Mythic: the whole Laboratório tree, about fifty runs at one a turma, is the longest chase among the late skins.
+      rarity: 'mythic',
+      description: 'Manto azul com padrão de grafos e um cajado de nós conectados. Todo caminho mínimo é um feitiço.',
+      headgear: true,
+      source: 'lab',
+      palette: ['#1e3a8a', '#14b8a6', '#facc15'],
+      artPrompt: 'long deep blue wizard robe with teal and gold graph node pattern, golden belt, pointed wizard hat with graph pattern, gnarled staff with a small tree of glowing nodes',
+    },
+    posdoc('pablo-posdoc', 'Beca preta, estola dourada e estrela no peito. Pós-doutor em demonstrações, com todas as provas já feitas.'),
+    {
+      id: 'pablo-mecenas',
+      name: 'Mecenas',
+      rarity: 'mythic',
+      description: 'Smoking de gala, luvas brancas e um broche de moeda dourada. Quem financia a ciência também entra pela porta da frente.',
+      headgear: true,
+      source: 'donation',
+      palette: ['#14141c', '#f5c542', '#f2f2f2'],
+      artPrompt: 'black gala tuxedo with satin lapels, white gloves, black bow tie, big golden coin brooch, slicked hair with a thin gold monocle',
+    },
+  ]),
+];
+
+const RARITY_RANK: Record<Rarity, number> = { common: 0, rare: 1, epic: 2, legendary: 3, mythic: 4 };
+
+/**
+ * The closed list of 113 skins: the original 95 and the 18 late ones. Each non-default skin is the reward of exactly one
+ * achievement. A professor's skins stay ordered from common to mythic, the late ones slotted in by rarity.
+ */
+export const skins: SkinDef[] = (() => {
+  const all = [...mainSkins, ...labSkins];
+  const order = [...new Set(all.map((skin) => skin.professor))];
+  return order.flatMap((professor) =>
+    all.filter((skin) => skin.professor === professor).sort((a, b) => RARITY_RANK[a.rarity] - RARITY_RANK[b.rarity]),
+  );
+})();

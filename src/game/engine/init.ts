@@ -2,9 +2,10 @@ import { MONITOR_IDS, PROFESSOR_IDS } from '../content/types';
 import type { CounterKey, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import { ZERO } from './decimal';
+import { createLabState } from './lab/state';
 import { createMaestriaState } from './maestria/slots';
 import { SAVE_VERSION } from './state';
-import type { GameState, MonitorsState, Records, RunStats, Settings } from './state';
+import type { GameState, MonitorsState, PostdocState, Records, RunStats, Settings } from './state';
 
 export function createCounters(): Record<CounterKey, number> {
   return {
@@ -36,7 +37,9 @@ export function createCounters(): Record<CounterKey, number> {
     designFreeLevels: 0,
     cappedGraduations: 0,
     treeResets: 0,
+    postdocs: 0,
     ungratefulGraduations: 0,
+    donations: 0,
   };
 }
 
@@ -69,6 +72,12 @@ export function createMonitorsState(): MonitorsState {
   return { units, settings: { comprasShare: 0.5, pesquisaShare: 0.5, sprintPick: 'first' } };
 }
 
+export function createPostdocState(): PostdocState {
+  const stars = {} as PostdocState['stars'];
+  for (const id of PROFESSOR_IDS) stars[id] = 0;
+  return { stars, turma: {} };
+}
+
 export function defaultSettings(): Settings {
   return {
     sfxVolume: 0.7,
@@ -79,6 +88,7 @@ export function defaultSettings(): Settings {
     reducedMotion: 'system',
     floatingNumbers: true,
     sceneryEffects: true,
+    numberNotation: 'names',
     devMultiplier: 1,
   };
 }
@@ -104,6 +114,7 @@ export function createInitialState(content: GameContent, now: number): GameState
     coins: ZERO,
     runCoins: ZERO,
     lifetimeCoins: ZERO,
+    donated: ZERO,
     diplomas: 0,
     diplomasEarned: 0,
 
@@ -145,7 +156,9 @@ export function createInitialState(content: GameContent, now: number): GameState
     honouredBefore: {},
     abilitiesTried: {},
     maestria: createMaestriaState(),
+    postdoc: createPostdocState(),
     monitors: createMonitorsState(),
+    lab: createLabState(),
     session: { seconds: 0, activeAt: now },
     calendar: { day: 0, streak: 0, gradDay: 0, gradsToday: 0 },
 

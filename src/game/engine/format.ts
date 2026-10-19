@@ -1,13 +1,45 @@
-import { toDecimal } from './decimal';
+import { Decimal, toDecimal } from './decimal';
 import type { DecimalSource } from './decimal';
 
-/** Short-scale suffixes by thousands group: 1e3 K, 1e6 M ... 1e33 Dc. Past that: scientific. */
-const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'] as const;
+/**
+ * Short-scale suffixes by thousands group, at most three letters: 1e3 K, 1e6 M ... 1e33 Dc, then the real names
+ * abbreviated (undecilhão Ud, duodecilhão Dd ... vigintilhão Vg ... trigintilhão Tg ... quadragintilhão Qag, 1e123).
+ * Past that: scientific.
+ */
+const SUFFIXES = [
+  '', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No',
+  'Dc', 'Ud', 'Dd', 'Td', 'Qad', 'Qid', 'Sxd', 'Spd', 'Ocd', 'Nod',
+  'Vg', 'Uv', 'Dv', 'Tv', 'Qav', 'Qiv', 'Sxv', 'Spv', 'Ocv', 'Nov',
+  'Tg', 'Ut', 'Dt', 'Tt', 'Qat', 'Qit', 'Sxt', 'Spt', 'Oct', 'Not',
+  'Qag',
+] as const;
 
 /** Below this the number is shown whole with thousands separators: 1.234. */
 const PLAIN_LIMIT_EXPONENT = 4;
 
+/**
+ * How numbers from the decilhão (1e33, Dc) up are written: "names" keeps the suffixes ("1,86 Ud"), "scientific"
+ * writes "1,86e36". Below 1e33 the suffixes (K, M, B ... No) are always used.
+ */
+export type NumberNotation = 'names' | 'scientific';
+
+/** First exponent written in scientific form under the "scientific" notation (the decilhão). */
+const SCIENTIFIC_FROM_EXPONENT = 33;
+
+let defaultNotation: NumberNotation = 'names';
+
+/** The notation every formatNumber call without an explicit one follows. The UI sets it from the player setting. */
+export function setNumberNotation(notation: NumberNotation): void {
+  defaultNotation = notation;
+}
+
+export function getNumberNotation(): NumberNotation {
+  return defaultNotation;
+}
+
 export interface FormatNumberOptions {
+  /** Overrides the module default for this call. Server-side texts pass nothing and keep "names". */
+  notation?: NumberNotation;
   /** Drop fractions below 10.000 (coin counters): 15,7 becomes 15. */
   integer?: boolean;
   /** Significant digits of the abbreviated form. Default 3: "12,5 K", "3,21 M". */
@@ -47,6 +79,8 @@ export function formatNumber(value: DecimalSource, opts: FormatNumberOptions = {
   }
 
   const exponent = abs.e;
+  const scientificFromDecilhao = (opts.notation ?? defaultNotation) === 'scientific';
+  if (scientificFromDecilhao && exponent >= SCIENTIFIC_FROM_EXPONENT) return sign + scientific(abs.m, exponent, digits);
   let group3 = Math.floor(exponent / 3);
   if (group3 >= SUFFIXES.length) return sign + scientific(abs.m, exponent, digits);
 
@@ -55,7 +89,9 @@ export function formatNumber(value: DecimalSource, opts: FormatNumberOptions = {
   if (mantissa >= 1000) {
     mantissa /= 1000;
     group3 += 1;
-    if (group3 >= SUFFIXES.length) return sign + scientific(mantissa, group3 * 3, digits);
+    if (group3 >= SUFFIXES.length || (scientificFromDecilhao && group3 * 3 >= SCIENTIFIC_FROM_EXPONENT)) {
+      return sign + scientific(mantissa, group3 * 3, digits);
+    }
   }
   return `${sign}${fixed(mantissa, fractionDigitsFor(mantissa, digits))} ${SUFFIXES[group3]}`;
 }
@@ -92,4 +128,31 @@ export function formatPercent(fraction: number, decimals = 0): string {
   if (!Number.isFinite(fraction)) return '0%';
   const sign = fraction < 0 ? '-' : '';
   return `${sign}${fixed(Math.abs(fraction) * 100, decimals)}%`;
+}
+
+/**
+ * Reads an amount a player typed, the inverse of formatNumber: "5 Qad", "1,5 M", "2.500", "1e30" or plain digits.
+ * Suffixes ignore case. Returns null for anything that is not a positive finite number.
+ */
+export function parseAmount(text: string): Decimal | null {
+  const raw = text.trim().replace(/\s+/g, '');
+  if (!raw) return null;
+  const suffixMatch = /^([0-9.,]+)([a-zA-Z]+)$/.exec(raw);
+  let numberPart = raw;
+  let power = 0;
+  if (suffixMatch && !/^[0-9.,]+e[+-]?\d+$/i.test(raw)) {
+    const group3 = SUFFIXES.findIndex((suffix, i) => i > 0 && suffix.toLowerCase() === suffixMatch[2]!.toLowerCase());
+    if (group3 < 0) return null;
+    numberPart = suffixMatch[1]!;
+    power = group3 * 3;
+  }
+  // pt-BR: "." groups thousands and "," is the decimal mark; a lone "." is read as a decimal point unless it only groups.
+  let normalised: string;
+  if (/[eE]/.test(numberPart)) normalised = numberPart.replace(',', '.');
+  else if (numberPart.includes(',')) normalised = numberPart.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(numberPart) && power === 0) normalised = numberPart.replace(/\./g, '');
+  else normalised = numberPart;
+  if (!/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?$/i.test(normalised)) return null;
+  const value = new Decimal(power === 0 ? normalised : `${normalised}e${power}`);
+  return Number.isFinite(value.m) && Number.isFinite(value.e) && value.gt(0) ? value : null;
 }

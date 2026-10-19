@@ -2,8 +2,9 @@ import { PROFESSOR_IDS } from '../content/types';
 import type { Effect, Feature, GameContent, ProfessorId } from '../content/types';
 import { getIndex } from './contentIndex';
 import type { Decimal } from './decimal';
+import { labClickerEffects } from './lab/effects';
 import { releaseMultiplier } from './maestria/releases';
-import { masteryRank } from './mastery';
+import { masteryPower } from './mastery';
 import type { GameState } from './state';
 
 /** Synergy bonus per other hired professor once the `synergy` feature is on (BalanceConfig has no field for it). */
@@ -34,6 +35,7 @@ export const BASE_SYNERGY = 0.05;
  * | costMult           | 1                                                                      |
  * | costGrowth         | balance.costGrowth, never below balance.minCostGrowth                  |
  * | activeBonus        | balance.activeBonus                                                    |
+ * | honouredBonus      | 1 (the honoured professor's disciplines; lab items raise it)           |
  * | eventInterval      | 1                                                                      |
  * | eventWindow        | 1                                                                      |
  * | eventReward        | 1                                                                      |
@@ -60,6 +62,7 @@ export interface Stats {
   /** Per-level cost growth already clamped to balance.minCostGrowth. */
   costGrowth: number;
   activeBonus: number;
+  honouredBonus: number;
   eventInterval: number;
   eventWindow: number;
   eventReward: number;
@@ -144,12 +147,15 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     if (def && levels > 0) acc.push(def.effects, levels);
   }
   for (const buff of state.buffs) acc.push(buff.effects);
+  // The Laboratório: equipped items and run buffs of this turma, capped and scaled by the lab tree.
+  if (state.lab.unlocked) acc.push(labClickerEffects(state, content));
 
   // Domínio and the honoured professor. They only count while the professor is hired.
   for (const id of PROFESSOR_IDS) {
     if (!state.hired[id]) continue;
     const def = content.mastery[id];
-    const rank = masteryRank(state, content, id);
+    // The Pós-doc stars of the professor scale what the rank pays (the honour's flat part is not the rank's).
+    const rank = masteryPower(state, content, id);
     if (rank > 0) acc.push(def.perRank, rank);
     if (state.honoured === id) {
       if (def.honour.flat) acc.push(def.honour.flat);
@@ -179,7 +185,8 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     clickFromIdle: Math.max(0, acc.value('clickFromIdle', 0)),
     critChance: clamp(acc.value('critChance', combo ? balance.crit.baseChance : 0), 0, 1),
     critMult: Math.max(1, acc.value('critMult', balance.crit.baseMult)),
-    comboMax: Math.max(0, acc.value('comboMax', combo ? balance.combo.baseMax : 0)),
+    // Whole steps: lab affixes add fractions (+0.15 a point), and a fractional cap could never be filled.
+    comboMax: Math.max(0, Math.floor(acc.value('comboMax', combo ? balance.combo.baseMax : 0) + 1e-9)),
     comboStep: Math.max(0, acc.value('comboStep', balance.combo.baseStep)),
     comboDecay: Math.max(0, acc.value('comboDecay', 1)),
     autoClicks: Math.max(0, acc.value('autoClicks', 0)),
@@ -188,6 +195,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     costMult: Math.max(0, acc.value('costMult', 1)),
     costGrowth: Math.max(balance.minCostGrowth, acc.value('costGrowth', balance.costGrowth)),
     activeBonus: acc.value('activeBonus', balance.activeBonus),
+    honouredBonus: acc.value('honouredBonus', 1),
     eventInterval: Math.max(0.05, acc.value('eventInterval', 1)),
     eventWindow: Math.max(0.05, acc.value('eventWindow', 1)),
     eventReward: Math.max(0, acc.value('eventReward', 1)),

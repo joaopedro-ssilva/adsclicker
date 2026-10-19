@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { SYNC_INTERVAL_MS, saveSummarySchema } from '@/shared/api';
 import type { ApiError, CloudBonusPayload, CloudSave, Me, SaveSummary } from '@/shared/api';
 import type { ApiResult, api as realApi } from '@/shared/apiClient';
+import type { ClockReport } from '../clock/trustedClock';
 import type { StorageLike } from '../store/createStore';
 import type { GameEvent } from '../store/types';
 import { isFreshDevice, sameProgress } from './summary';
@@ -54,6 +55,8 @@ export interface CloudDeps {
   env: CloudEnv;
   storage: () => StorageLike | null;
   now: () => number;
+  /** Anything wrong with the page's clock (clock/trustedClock.ts), sent along with the save; null when nothing is. */
+  clockReport?: () => ClockReport | null;
   timers: {
     set: (fn: () => void, ms: number) => unknown;
     clear: (handle: unknown) => void;
@@ -176,6 +179,16 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         deps.storage()?.setItem(CLOUD_KEY, JSON.stringify({ rev, force: forceNext, pending: pending.length > 0 ? pending : undefined, epoch: epoch ?? undefined } satisfies Persisted));
       } catch {
         // storage blocked: the revision then lives for this session only
+      }
+    };
+
+    /** The clock report for a sync body: present only when the page's clock looks tampered with. */
+    const clockField = (): { clock?: ClockReport } => {
+      try {
+        const report = deps.clockReport?.();
+        return report ? { clock: report } : {};
+      } catch {
+        return {}; // reporting must never stop a save from syncing
       }
     };
 
@@ -306,7 +319,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
       persist();
       const sentEpoch = epoch ?? 0; // never learned = the test phase = 0
       const result = await api.sync(
-        { save: game.serialize(), baseRev: rev, force: forced || undefined, epoch: sentEpoch },
+        { save: game.serialize(), baseRev: rev, force: forced || undefined, epoch: sentEpoch, ...clockField() },
         { keepalive },
       );
       if (!started) return;
@@ -499,7 +512,7 @@ export function createCloudStore(deps: CloudDeps): UseBoundStore<StoreApi<CloudS
         const conflict = get().conflict;
         if (!conflict) return;
         const result = await exclusive(() =>
-          api.sync({ save: game.serialize(), baseRev: conflict.cloud.rev, force: true, epoch: epoch ?? 0 }),
+          api.sync({ save: game.serialize(), baseRev: conflict.cloud.rev, force: true, epoch: epoch ?? 0, ...clockField() }),
         );
         if (result.ok && result.data.status === 'reset') {
           startOver(result.data.epoch, result.data.me);

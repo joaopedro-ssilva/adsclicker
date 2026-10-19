@@ -18,6 +18,9 @@ export const SYNC_INTERVAL_MS = 45_000;
 /** A player counts as online when their last sync is newer than this. */
 export const ONLINE_WINDOW_MS = 120_000;
 
+/** Largest clock skew the sync accepts in its `clock` report (a year); anything beyond is not a report to keep. */
+export const CLOCK_SKEW_MAX_MS = 86_400_000 * 365;
+
 export const NICKNAME_MIN = 3;
 export const NICKNAME_MAX = 16;
 export const PASSWORD_MIN = 6;
@@ -136,6 +139,19 @@ export const syncRequestSchema = z.object({
    * whose epoch is not the account's gets `status: 'reset'` and nothing is written.
    */
   epoch: z.number().int().min(0).optional(),
+  /**
+   * What the browser saw about its own clock (game/clock/trustedClock.ts). Sent only when something is
+   * off, so an honest client never carries it. A forgeable hint: the server's own check of the save
+   * against its clock is the defence; this only makes it quicker and leaves a trail in the logs.
+   */
+  clock: z
+    .object({
+      /** `Date.now`, `performance.now` or `requestAnimationFrame` is no longer the browser's own function. */
+      patched: z.boolean(),
+      /** The page's `Date.now()` minus the browser's real one, in ms (0 when they agree). */
+      skewMs: z.number().int().min(-CLOCK_SKEW_MAX_MS).max(CLOCK_SKEW_MAX_MS),
+    })
+    .optional(),
 });
 export type SyncRequest = z.infer<typeof syncRequestSchema>;
 
@@ -263,7 +279,112 @@ export const leaderboardResponseSchema = z.object({
 });
 export type LeaderboardResponse = z.infer<typeof leaderboardResponseSchema>;
 
-/** GET /api/players/profile?nickname= — the public card of a ranked player, opened from the ranking. */
+// ---------------------------------------------------------------------------
+// GET /api/lab/leaderboard?board=phase|run — the Laboratório boards
+// ---------------------------------------------------------------------------
+
+/** phase: highest lab phase ever reached. run: most ADScoins made in a single turma. Both permanent. */
+export const LAB_BOARDS = ['phase', 'run'] as const;
+export const labBoardSchema = z.enum(LAB_BOARDS);
+export type LabBoard = z.infer<typeof labBoardSchema>;
+
+/** One equipped item of the build a record was set with. */
+export const labBuildItemSchema = z.object({
+  slot: z.string(),
+  base: z.string(),
+  rarity: z.string(),
+  level: z.number().int(),
+});
+export type LabBuildEntry = z.infer<typeof labBuildItemSchema>;
+
+export const labBoardRowSchema = z.object({
+  rank: z.number().int(),
+  nickname: z.string(),
+  /** For the avatar, as on the community board: the professor on screen and the skin they wear. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  /** phase: the number as text. run: ADScoins as a decimal string ("1.5e+30"). */
+  value: z.string(),
+  /** The items equipped when the record was set (empty = unknown). */
+  build: z.array(labBuildItemSchema),
+  tags: z.array(publicTagSchema).optional(),
+});
+export type LabBoardRow = z.infer<typeof labBoardRowSchema>;
+
+export const labLeaderboardResponseSchema = z.object({
+  board: labBoardSchema,
+  entries: z.array(labBoardRowSchema),
+  /** The caller's own row and place (null without a session, nickname, or a ranked record). Never cached. */
+  me: labBoardRowSchema.nullable(),
+  updatedAt: z.number(),
+});
+export type LabLeaderboardResponse = z.infer<typeof labLeaderboardResponseSchema>;
+
+// ---------------------------------------------------------------------------
+// GET /api/lab/profile?nickname= — the public Laboratório profile of a ranked player
+// ---------------------------------------------------------------------------
+
+export const labProfileSchema = z.object({
+  nickname: z.string(),
+  /** For the avatar, as on the boards. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  tags: z.array(publicTagSchema).optional(),
+  /** What they wear in the lab: monitor skin, theme, decorations on display (ids of the content), and the starting item. */
+  monitor: z.string(),
+  theme: z.string(),
+  decor: z.array(z.string()),
+  startItem: z.string(),
+  /** The best phase and the items equipped when they reached it (empty = unknown). */
+  bestPhase: z.number().int(),
+  phaseBuild: z.array(labBuildItemSchema),
+  /** The best turma (ADScoins as a decimal string, "0" when none) and its items. */
+  bestRunCoins: z.string(),
+  runBuild: z.array(labBuildItemSchema),
+  stats: z.object({
+    commitsEarned: z.number(),
+    runs: z.number(),
+    broken: z.number(),
+    phasesCleared: z.number(),
+    bossesBeaten: z.number(),
+    itemsFound: z.number(),
+    itemsRecycled: z.number(),
+    itemLevelUps: z.number(),
+    affixRerolls: z.number(),
+    clicks: z.number(),
+    cosmeticsOwned: z.number(),
+  }),
+});
+export type LabProfile = z.infer<typeof labProfileSchema>;
+
+// ---------------------------------------------------------------------------
+// GET /api/community/donors — the Centro Comunitário board
+// ---------------------------------------------------------------------------
+
+export const donorRowSchema = z.object({
+  rank: z.number().int(),
+  nickname: z.string(),
+  /** For the avatar, as on the community board: the professor on screen and the skin they wear. */
+  professor: professorIdSchema,
+  skin: z.string(),
+  /** ADScoins given to the campus in total, as a decimal string ("1.5e+30"). */
+  value: z.string(),
+  /** Id of the donor title (content/donations.ts) the total earns, or null below the first one. */
+  title: z.string().nullable(),
+  tags: z.array(publicTagSchema).optional(),
+});
+export type DonorRow = z.infer<typeof donorRowSchema>;
+
+export const donorsResponseSchema = z.object({
+  /** Top 50 by total donated. */
+  entries: z.array(donorRowSchema),
+  /** The caller's own row and place (null without a session, nickname, or a donation). Never cached. */
+  me: donorRowSchema.nullable(),
+  updatedAt: z.number(),
+});
+export type DonorsResponse = z.infer<typeof donorsResponseSchema>;
+
+/** GET /api/players/profile?nickname=— the public card of a ranked player, opened from the ranking. */
 export const playerProfileSchema = z.object({
   nickname: z.string(),
   /** What they have on screen now: professor, the skin that professor wears, the scenery. */
@@ -274,6 +395,8 @@ export const playerProfileSchema = z.object({
   /** Epoch ms of the account creation. */
   memberSince: z.number(),
   tags: z.array(publicTagSchema).optional(),
+  /** Id of the Centro Comunitário donor title (content/donations.ts), when they hold one. */
+  donorTitle: z.string().optional(),
   stats: z.object({
     /** Decimal strings. */
     lifetimeCoins: z.string(),

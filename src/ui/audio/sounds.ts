@@ -19,6 +19,7 @@ export const soundNames = [
   'golden',
   'rollforward',
   'festa',
+  'labHit',
 ] as const;
 
 export type SoundName = (typeof soundNames)[number];
@@ -59,6 +60,8 @@ export const sounds: Record<SoundName, SoundDef> = {
   uiTap: { notes: [81], step: 0.02, wave: 'triangle', length: 0.035, volume: 0.1 },
   golden: { notes: [79, 84, 88, 91, 96], step: 0.05, wave: 'square', layer: 'triangle', length: 0.12, noise: 0.03 },
   festa: { notes: [60, 64, 67, 72, 76, 79, 84, 88, 91, 96], step: 0.06, wave: 'square', layer: 'triangle', length: 0.14, noise: 0.04 },
+  // A crisp keyboard-like hit on the Laboratório monitor: a bright tick, a low knock and a pinch of noise.
+  labHit: { notes: [88, 55], step: 0.018, wave: 'square', length: 0.055, volume: 0.13, noise: 0.025 },
   rollforward: { notes: [55, 60, 67, 72, 79, 84, 91], step: 0.035, wave: 'sawtooth', layer: 'square', volume: 0.09 },
 };
 

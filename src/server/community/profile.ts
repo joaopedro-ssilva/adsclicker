@@ -6,7 +6,7 @@
 import { and, eq } from 'drizzle-orm';
 import { content } from '@/game/content';
 import { PROFESSOR_IDS } from '@/game/content/types';
-import { clickValue, coinsPerSecond, deserializeState } from '@/game/engine';
+import { clickValue, coinsPerSecond, deserializeState, donationTitleFor } from '@/game/engine';
 import { unlockedMaestrias } from '@/game/engine/maestria';
 import type { GameState } from '@/game/engine/state';
 import { ONLINE_WINDOW_MS, professorIdSchema } from '@/shared/api';
@@ -33,6 +33,7 @@ export function buildProfile(row: ProfileRow, state: GameState | null, tags: Pla
   const avatar = professorIdSchema.safeParse(row.avatarProfessor);
   const professor = state?.activeProfessor ?? (avatar.success ? avatar.data : 'edecio');
   const skin = state?.equippedSkin[professor] ?? row.avatarSkin;
+  const donorTitle = state ? donationTitleFor(state.donated) : null;
   return {
     nickname: row.nickname ?? '',
     professor,
@@ -41,6 +42,7 @@ export function buildProfile(row: ProfileRow, state: GameState | null, tags: Pla
     online: row.lastSeenAt.getTime() > now - ONLINE_WINDOW_MS,
     memberSince: row.createdAt.getTime(),
     ...(tags ? { tags } : {}),
+    ...(donorTitle ? { donorTitle: donorTitle.id } : {}),
     stats: {
       lifetimeCoins: state ? state.lifetimeCoins.toString() : '0',
       coinsPerSecond: state ? coinsPerSecond(state, content).toString() : '0',

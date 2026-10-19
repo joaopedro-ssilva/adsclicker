@@ -1,0 +1,92 @@
+// Screenshots of the Laboratório de Pesquisa on a running dev server, from a save made by scripts/dev/lab-saves.ts.
+// Usage: node scripts/qa/lab.mjs <save.json> <out.png> [--mobile] [--size=WxH] [--roster] [--tab=progressao|ranking] [--board=phase|run] [--shop]
+//        [--cookie=<session token>] [--wait=ms] [--clicks=N] [--scroll=px]
+//   --tab     pesquisa (default), progressao or ranking;  --board picks the board shown on a narrow screen;  --shop opens the Loja panel
+//   --cookie  signs in as a player from scripts/dev/lab-board-seed.ts (the Ranking tab then pins that player's row)
+//   --size    viewport, e.g. 1920x1080 (default 1440x900; --mobile is 390x844)
+//   --scroll  scrolls the body of the overlay before the shot (and reports any horizontal scroll)
+//   --roster  shoots the classroom with the 9th slot instead of opening the overlay (opens nothing)
+//   --clicks  clicks the monitor N times before the shot
+import { readFileSync } from 'node:fs';
+import { chromium } from '@playwright/test';
+
+const [saveFile, out = 'lab.png', ...flags] = process.argv.slice(2);
+const flag = (name) => flags.find((f) => f.startsWith(`--${name}=`))?.slice(name.length + 3);
+const has = (name) => flags.some((f) => f === `--${name}` || f.startsWith(`--${name}=`));
+
+const viewport = () => {
+  if (has('mobile')) return { width: 390, height: 844 };
+  const [width, height] = (flag('size') ?? '1440x900').split('x').map(Number);
+  return { width, height };
+};
+const base = process.env.QA_BASE ?? 'http://localhost:3000';
+const browser = await chromium.launch();
+const context = await browser.newContext({ viewport: viewport(), hasTouch: has('mobile') });
+const page = await context.newPage();
+// Opens the lab as a player made by scripts/dev/lab-board-seed.ts (the session token it prints). Syncs are blocked so the
+// local save of the screenshot never overwrites that player's seeded records.
+if (flag('cookie')) {
+  await context.addCookies([{ name: 'adsclicker_session', value: flag('cookie'), url: base }]);
+  await page.route('**/api/sync', (route) => route.abort());
+}
+
+const errors = [];
+page.on('response', async (response) => {
+  if (response.status() >= 400) errors.push(`http ${response.status()} ${response.url()} ${(await response.text().catch(() => '')).slice(0, 160)}`);
+});
+page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`));
+page.on('console', (message) => {
+  if (message.type() === 'error') errors.push(`console: ${message.text()}`);
+});
+
+const save = readFileSync(saveFile, 'utf8');
+await page.addInitScript((value) => window.localStorage.setItem('adsclicker.save', value), save);
+await page.goto(base, { waitUntil: 'networkidle' });
+await page.waitForTimeout(1500);
+for (const name of ['Usar a nuvem', 'Depois', 'Coletar', 'Bora clicar!']) {
+  await page.getByRole('button', { name }).click({ timeout: 800 }).catch(() => {});
+  await page.waitForTimeout(300);
+}
+
+if (!has('roster')) {
+  await page.locator('[data-qa="roster-lab"]').first().scrollIntoViewIfNeeded().catch(() => {});
+  await page.locator('[data-qa="roster-lab"]').first().click({ timeout: 4000 }).catch(() => errors.push('lab slot not found'));
+  await page.waitForTimeout(500);
+  const tab = flag('tab');
+  if (tab) await page.locator(`[data-qa="lab-tab-${tab}"]`).click({ timeout: 2000 }).catch(() => errors.push(`tab ${tab} not found`));
+  if (has('shop')) await page.locator('[data-qa="lab-shop-button"]').click({ timeout: 2000 }).catch(() => errors.push('shop button not found'));
+  if (tab === 'ranking' && flag('board')) await page.locator(`[data-qa="lab-board-tab-${flag('board')}"]`).click({ timeout: 1000 }).catch(() => {});
+  if (has('profile')) {
+    await page.locator('[data-qa="lab-rank-open-profile"]').nth(Number(flag('profile') || 0)).click({ timeout: 3000 }).catch(() => errors.push('profile button not found'));
+    await page.waitForSelector('[data-qa="lab-profile"], [data-qa="lab-profile-class"]', { timeout: 4000 }).catch(() => errors.push('profile did not open'));
+  }
+  if (has('escape')) {
+    // Esc closes the thing on top first: the profile, then the lab.
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const afterFirst = await page.evaluate(() => ({ profile: Boolean(document.querySelector('[data-qa="lab-profile"], [data-qa="player-profile"]')), lab: Boolean(document.querySelector('[data-qa="lab-overlay"]')) }));
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    const afterSecond = await page.evaluate(() => Boolean(document.querySelector('[data-qa="lab-overlay"]')));
+    console.log(`escape: after the first ${JSON.stringify(afterFirst)}, lab still open after the second: ${afterSecond}`);
+  }
+  const clicks = Number(flag('clicks') ?? 0);
+  for (let i = 0; i < clicks; i += 1) await page.locator('[data-qa="lab-screen"]').click({ position: { x: 120 + (i % 5) * 40, y: 120 + (i % 3) * 30 }, delay: 5 }).catch(() => {});
+}
+const scroll = Number(flag('scroll') ?? 0);
+if (scroll > 0) await page.evaluate((top) => document.querySelector('.lab-body')?.scrollTo(0, top), scroll);
+const horizontal = await page.evaluate(() => {
+  const body = document.querySelector('.lab-body');
+  return body ? body.scrollWidth - body.clientWidth : 0;
+});
+if (horizontal > 1) errors.push(`horizontal scroll in the lab: ${horizontal}px`);
+await page.waitForTimeout(Number(flag('wait') ?? 400));
+await page.screenshot({ path: out });
+await browser.close();
+
+if (errors.length > 0) {
+  console.log(`ERRORS (${errors.length}):\n${errors.slice(0, 20).join('\n')}`);
+  process.exitCode = 1;
+} else {
+  console.log(`ok ${out}`);
+}

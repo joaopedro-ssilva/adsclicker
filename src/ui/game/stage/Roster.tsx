@@ -5,6 +5,7 @@ import { formatNumber } from '@/game/engine/format';
 import { useGame, useGameState, useProfessorViews } from '@/game/store';
 import type { ProfessorId } from '@/game/content/types';
 import { audio } from '@/ui/audio';
+import { LabRosterSlot } from '../lab/LabEntry';
 import { RosterSlot } from './RosterSlot';
 
 /** One portrait per professor along the bottom of the stage: hired (click to put on stage), the next to hire, then locked ones. */
@@ -14,6 +15,7 @@ export function Roster() {
   const setActive = useGame((store) => store.setActiveProfessor);
   const hire = useGame((store) => store.hireProfessor);
   const honoured = useGameState((state) => state.honoured);
+  const stars = useGameState((state) => state.postdoc.stars);
 
   const select = useCallback(
     (id: ProfessorId) => {
@@ -52,11 +54,14 @@ export function Roster() {
             affordable={view.affordable}
             lockReason={state === 'next' && !view.canBeHired ? view.lockReason : null}
             honoured={view.id === honoured}
+            stars={stars[view.id] ?? 0}
             onSelect={select}
             onHire={hireOne}
           />
         );
       })}
+      {/* The ninth "professor": the Laboratório de Pesquisa, after Pablo is hired. */}
+      <LabRosterSlot />
     </nav>
   );
 }

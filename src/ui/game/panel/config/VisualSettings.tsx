@@ -1,3 +1,4 @@
+import { Decimal, formatNumber } from '@/game/engine';
 import { useGame } from '@/game/store';
 import type { Settings } from '@/game/engine/state';
 import { audio } from '@/ui/audio';
@@ -11,11 +12,19 @@ const MOTION_OPTIONS: { value: Settings['reducedMotion']; label: string }[] = [
   { value: 'on', label: 'Reduzida' },
 ];
 
+const NOTATION_OPTIONS: { value: Settings['numberNotation']; label: string }[] = [
+  { value: 'names', label: 'Nomes' },
+  { value: 'scientific', label: 'Científica' },
+];
+
+const EXAMPLE = new Decimal('1.86e36');
+
 /** Reduced motion, floating numbers and scenery effects. */
 export function VisualSettings() {
   const reducedMotion = useGame((store) => store.state.settings.reducedMotion);
   const floatingNumbers = useGame((store) => store.state.settings.floatingNumbers);
   const sceneryEffects = useGame((store) => store.state.settings.sceneryEffects);
+  const notation = useGame((store) => store.state.settings.numberNotation);
   const updateSettings = useGame((store) => store.updateSettings);
 
   return (
@@ -37,6 +46,32 @@ export function VisualSettings() {
                 onClick={() => {
                   audio.play('uiTap');
                   updateSettings({ reducedMotion: option.value });
+                }}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+        <div className="setting-row setting-row-stack">
+          <span className="setting-text">
+            <span className="setting-label">Notação dos números</span>
+            <span className="setting-hint">
+              A partir do decilhão (Dc, 10^33), mostrar os números com nomes (1,86 Ud) ou em notação científica
+              (1,86e36). Abaixo disso os nomes ficam sempre (K, M, B…). Ex.: {formatNumber(EXAMPLE, { notation })}
+            </span>
+          </span>
+          <div className="setting-choice" role="group" aria-label="Notação dos números">
+            {NOTATION_OPTIONS.map((option) => (
+              <Button
+                key={option.value}
+                size="sm"
+                variant="secondary"
+                aria-pressed={notation === option.value}
+                data-qa={`setting-notation-${option.value}`}
+                onClick={() => {
+                  audio.play('uiTap');
+                  updateSettings({ numberNotation: option.value });
                 }}
               >
                 {option.label}

@@ -1,4 +1,5 @@
 import { api } from '@/shared/apiClient';
+import { clockGuard, trustedNow } from '../clock/trustedClock';
 import { browserEnv, browserStorage, liveGame } from './browser';
 import { createCloudStore } from './createCloud';
 
@@ -14,6 +15,7 @@ export const useCloud = createCloudStore({
   game: liveGame,
   env: browserEnv,
   storage: browserStorage,
-  now: () => Date.now(),
+  now: trustedNow,
+  clockReport: () => clockGuard.report(),
   timers: { set: (fn, ms) => setTimeout(fn, ms), clear: (handle) => clearTimeout(handle as ReturnType<typeof setTimeout>) },
 });

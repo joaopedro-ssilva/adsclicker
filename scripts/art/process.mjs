@@ -39,6 +39,8 @@ function liftSkin(img, { g, b }) {
 const BODY_NECK_DROP = { 'b2-paleta': 4 };
 /** Heads whose hood or collar should hang over the neck: rows the head is lowered onto the body. */
 const HEAD_DROP = { 'gladimir-mestre': 4, 'pablo-galactico': 3 };
+/** Bodies sized by their neck even when a tall prop made the first pass shrink them far below the usual measure. */
+const FORCE_NECK_SCALE = new Set(['gladimir-darth-glad', 'b2-pintora-arco-iris']);
 /** Rows from the neck anchor to the feet that every professor body ends up with. */
 const BODY_BELOW_NECK = 46;
 /** Icons: their longest side. */
@@ -715,7 +717,26 @@ async function processSheet(sheet, anchors) {
     const key = sheet.keys[k];
     if (key.startsWith('_')) continue;
     const item = cropItem(img, groups[k]);
-    const tall = typicalH > 0 && item.h > typicalH * 1.12;
+    // sheet.hires: the item keeps the resolution it was drawn at (cut out of the magenta, no pixel-art sampling).
+    // A number caps its longest side, scaled down smoothly (an item drawn alone comes out much bigger than a grid's).
+    if (sheet.hires) {
+      removeFringe(item);
+      removeIsolated(item);
+      let sprite = trim(item);
+      if (typeof sheet.hires === 'number' && Math.max(sprite.w, sprite.h) > sheet.hires) {
+        const { data, info } = await sharp(Buffer.from(sprite.data.buffer), { raw: { width: sprite.w, height: sprite.h, channels: 4 } })
+          .resize(sheet.hires, sheet.hires, { fit: 'inside', kernel: 'lanczos3' })
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+        sprite = { data: new Uint8ClampedArray(data), w: info.width, h: info.height };
+      }
+      const rel = `${folder}/${key}`;
+      await savePng(sprite, path.join(ASSETS_DIR, `${rel}.png`));
+      delete anchors[rel];
+      console.log(`  ${rel}  ${sprite.w}x${sprite.h}  (hires)`);
+      continue;
+    }
+    const tall =typicalH > 0 && item.h > typicalH * 1.12;
     const itemTarget = sheet.sizes?.[key] ? { ...target, size: sheet.sizes[key] } : target;
     const { b, px, py } = shared ? { b: shared.b, px: 0, py: 0 } : detectBlock(item, itemTarget, key, tall ? typicalH : undefined);
     let sprite = blockSample(item, b, px, py);
@@ -729,7 +750,7 @@ async function processSheet(sheet, anchors) {
       // sized by the whole sprite, a raised staff or a cape shrinks the body and the professor looks smaller.
       const below = sprite.h - (anchor.top ?? anchor.y);
       // A neck found in the wrong place gives an absurd measure: leave such a body as it is.
-      const sane = below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3;
+      const sane = FORCE_NECK_SCALE.has(key) || (below > BODY_BELOW_NECK * 0.75 && below < BODY_BELOW_NECK * 1.3);
       if (!sheet.target && sane && Math.abs(below - BODY_BELOW_NECK) >= 1) {
         sprite = blockSample(item, (b * below) / BODY_BELOW_NECK, 0, 0);
         removeFringe(sprite);

@@ -114,7 +114,7 @@ function FestaButton({ view }: { view: FestaView }) {
 function BolsaButton({ view }: { view: BolsaView }) {
   const open = useBolsaPanel((store) => store.show);
   const held = view.totalValue.gt(0);
-  const caption = held ? `${formatNumber(view.totalValue, { integer: true })} Oc` : 'Abrir';
+  const caption = held ? `${formatNumber(view.totalValue, { integer: true })}` : 'Abrir';
 
   return (
     <Tooltip content="Bolsa de tokens: compre ativos de IA com ADScoins e venda quando o preço subir. Tem também um fundo lento e seguro.">
@@ -124,7 +124,7 @@ function BolsaButton({ view }: { view: BolsaView }) {
         data-qa="bolsa-open"
         data-state={held ? 'running' : 'ready'}
         onClick={open}
-        aria-label={`Abrir a Bolsa de tokens, ${caption}`}
+        aria-label={`Abrir a Bolsa de tokens, ${held ? `${caption} ADScoins` : caption}`}
       >
         <Meter value={view.limit.gt(0) ? Math.min(1, view.invested.div(view.limit).toNumber()) : 0} max={1} label="Bolsa de tokens" size="md" showLabel={false}>
           <span aria-hidden="true">📈</span>

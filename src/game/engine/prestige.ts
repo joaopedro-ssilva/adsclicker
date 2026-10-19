@@ -4,8 +4,10 @@ import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal, ratio } from './decimal';
 import { createRunStats } from './init';
+import { snapshotLabBuild } from './lab/build';
+import { resetLabForGraduation } from './lab/run';
 import { horasBandsFilled, liquidateBolsa, resetMaestriasForGraduation } from './maestria';
-import { masteryRank } from './mastery';
+import { masteryPower } from './mastery';
 import { recordGraduationDay } from './session';
 import { GRADUATION_HISTORY_MAX } from './state';
 import type { GameState, RecordKey, RunSummary } from './state';
@@ -48,12 +50,13 @@ function angeloGain(content: GameContent, rank: number, honoured: boolean): numb
  */
 export function angeloCapFactor(state: GameState, content: GameContent): number {
   if (!state.hired.angelo) return 1;
-  return angeloGain(content, masteryRank(state, content, 'angelo'), state.honoured === 'angelo');
+  return angeloGain(content, masteryPower(state, content, 'angelo'), state.honoured === 'angelo');
 }
 
-/** The most Angelo can ever stretch the cap (Domínio maxed, plus the honour when he has been honoured): the server's ceiling. */
+/** The most Angelo can ever stretch the cap (Domínio maxed with every Pós-doc star, plus the honour when he has been honoured): the server's ceiling. */
 export function maxAngeloCapFactor(content: GameContent, honoured: boolean): number {
-  return angeloGain(content, content.balance.mastery.cap, honoured);
+  const { maxStars, bonusPerStar } = content.balance.postdoc;
+  return angeloGain(content, content.balance.mastery.cap * (1 + bonusPerStar * maxStars), honoured);
 }
 
 /**
@@ -123,6 +126,8 @@ function updateRecords(state: GameState): Pick<RunSummary, 'recordsBeaten' | 're
   if (run.seconds > 0 && (records.fastestSeconds <= 0 || run.seconds < records.fastestSeconds)) records.fastestSeconds = run.seconds;
   records.mostClicks = Math.max(records.mostClicks, run.clicks);
   records.biggestCombo = Math.max(records.biggestCombo, run.maxCombo);
+  // The best turma keeps the items it was made with (the Ranking of the Laboratório shows them); they go at the reset.
+  if (state.runCoins.gt(records.mostCoins)) state.lab.bestRunBuild = snapshotLabBuild(state.lab);
   records.mostCoins = Decimal.max(records.mostCoins, state.runCoins);
   return { recordsBeaten: beaten, recordsStarted: started };
 }
@@ -235,6 +240,8 @@ export function graduate(
   state.combo = { steps: 0, lastClickAt: 0 };
   state.autoClickCarry = 0;
   resetMaestriasForGraduation(state);
+  // The run, the equipped items and the run buffs of the Laboratório do not carry over (Commits and the tree do).
+  resetLabForGraduation(state, content);
   if (!hasFeature(state, content, 'bulkBuy')) state.buyAmount = 1;
 
   emit(bonus > 0 ? { type: 'graduate', diplomas: diplomas + bonus, bonus } : { type: 'graduate', diplomas });

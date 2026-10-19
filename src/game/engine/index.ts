@@ -1,7 +1,7 @@
 export { Decimal, ZERO, ONE, parseDecimal, toDecimal } from './decimal';
 export type { DecimalSource } from './decimal';
-export { formatNumber, formatDuration, formatPercent } from './format';
-export type { FormatNumberOptions } from './format';
+export { formatNumber, formatDuration, formatPercent, parseAmount, setNumberNotation, getNumberNotation } from './format';
+export type { FormatNumberOptions, NumberNotation } from './format';
 export { createRng } from './rng';
 export { getIndex } from './contentIndex';
 export type { ContentIndex } from './contentIndex';

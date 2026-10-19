@@ -46,6 +46,13 @@ export interface SwarmResult {
 export interface MaestriaState {
   /** Professor -> level (1..5) of the Maestria that got a slot. Missing = not unlocked. */
   levels: Partial<Record<ProfessorId, number>>;
+  /**
+   * Maestrias the player switched off. A pause, not a loss: the level stays, and unlocking or buying levels still works.
+   * It stays as the player left it through graduation.
+   */
+  disabled: Partial<Record<ProfessorId, true>>;
+  /** Game time (epoch ms) each disabled Maestria was switched off, so turning it back on resumes its timers instead of crediting the pause. */
+  pausedAt: Partial<Record<ProfessorId, number>>;
   /** Joinha de Ouro (epoch ms). `activeUntil` = when the golden mode ends; `readyAt` = when the recharge after it ends. 0 = none. Reset at graduation. */
   joinha: { activeUntil: number; readyAt: number };
   /** Rollforward. `clicks` fills the next charge, `charges` are the full ones stored. Reset at graduation. */

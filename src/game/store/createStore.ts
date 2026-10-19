@@ -236,7 +236,17 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
         return done;
       },
       buyPrestigeNode: (id) => run((state, emit) => engine.buyPrestigeNode(state, content, id, now(), emit), true),
+      donateToCampus: (amount) => {
+        const done = run((state, emit) => engine.donateToCampus(state, content, amount, now(), emit));
+        if (done) get().save();
+        return done;
+      },
       resetPrestigeTree: () => run((state, emit) => engine.resetPrestigeTree(state, content, now(), emit), true),
+      defendPostdoc(professor) {
+        const done = run((state, emit) => engine.defendPostdoc(state, content, professor, now(), emit), true);
+        if (done) get().save();
+        return done;
+      },
 
       buyMonitor: (id) => run((state, emit) => engine.buyMonitor(state, content, id, now(), emit), true),
       setMonitorOn(id, on) {
@@ -248,6 +258,7 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
 
       unlockMaestria: (professor) => run((state, emit) => engine.unlockMaestria(state, content, professor, now(), emit), true),
       buyMaestriaLevel: (professor) => run((state, emit) => engine.buyMaestriaLevel(state, content, professor, now(), emit), true),
+      setMaestriaEnabled: (professor, enabled) => run((state, emit) => engine.setMaestriaEnabled(state, content, professor, enabled, now(), emit), true),
       fireRollforward: () => run((state, emit) => engine.fireRollforward(state, content, now(), emit), true),
       startSwarm: () => run((state, emit) => engine.startSwarm(state, content, now(), emit), true),
       startFesta: () => run((state, emit) => engine.startFesta(state, content, now(), emit), true),
@@ -268,6 +279,33 @@ export function createGameStore(deps: StoreDeps): UseBoundStore<StoreApi<GameSto
           state.cloudBonus = readCloudBonus(bonus);
         });
       },
+
+      unlockLab: () => run((state, emit) => engine.unlockLab(state, content, now(), emit), true),
+      setLabOpen(open) {
+        run((state) => {
+          if (state.lab.open === open) return false;
+          engine.setLabOpen(state, open);
+          return true;
+        });
+      },
+      startLabRun() {
+        // The seed is drawn here, outside the engine: the run is replayable from it.
+        const seed = Math.floor(rng() * 4294967296) >>> 0;
+        return run((state, emit) => engine.startLabRun(state, content, seed, now(), emit), true);
+      },
+      labClick() {
+        run((state, emit) => engine.labClick(state, content, now(), emit));
+      },
+      chooseLabReward: (index) => run((state, emit) => engine.chooseLabReward(state, content, index, now(), emit), true),
+      equipLabPending: () => run((state, emit) => engine.equipLabPending(state, content, now(), emit), true),
+      recycleLabPending: () => run((state, emit) => engine.recycleLabPending(state, content, now(), emit), true),
+      levelUpLabItem: (slot) => run((state, emit) => engine.levelUpLabItem(state, content, slot, now(), emit), true),
+      rerollLabAffix: (slot, affix) => run((state, emit) => engine.rerollLabAffix(state, content, slot, affix, now(), emit), true),
+      buyLabNode: (id) => run((state, emit) => engine.buyLabNode(state, content, id, now(), emit), true),
+      rerollLabOffers: () => run((state, emit) => engine.rerollLabOffers(state, content, now(), emit), true),
+      resetLabTree: () => run((state, emit) => engine.resetLabTree(state, content, now(), emit), true),
+      buyLabCosmetic: (id) => run((state, emit) => engine.buyLabCosmetic(state, content, id, now(), emit), true),
+      equipLabCosmetic: (id, on = true) => run((state, emit) => engine.equipLabCosmetic(state, content, id, on, now(), emit), true),
 
       triggerSecret(trigger) {
         run((state, emit) => engine.triggerSecret(state, content, trigger, now(), emit), true);

@@ -1,5 +1,5 @@
 import type Decimal from 'break_infinity.js';
-import type { MonitorId, ProfessorId, Rarity } from '../content/types';
+import type { LabSlot, MonitorId, ProfessorId, Rarity } from '../content/types';
 import type { BuyAmount, CloudBonus, GameState, MonitorsState, Settings } from '../engine/state';
 
 // ---------------------------------------------------------------------------
@@ -33,6 +33,7 @@ export type GameEvent =
   | { type: 'monitorAct'; monitor: MonitorId; id: string }
   /** A Maestria was unlocked (level 1) or raised. */
   | { type: 'maestria'; professor: ProfessorId; level: number }
+  | { type: 'maestriaToggle'; professor: ProfessorId; enabled: boolean }
   /** A full combo started the golden mode of Joinha de Ouro; it ends at `endsAt` (epoch ms). */
   | { type: 'joinhaStart'; endsAt: number }
   | { type: 'rollforward'; ms: number; coins: Decimal }
@@ -49,6 +50,25 @@ export type GameEvent =
   | { type: 'graduate'; diplomas: number; bonus?: number }
   /** The tree of diplomas was reset; `refunded` diplomas came back. */
   | { type: 'treeReset'; refunded: number }
+  /** A professor defended the Pós-doc and now has `stars` stars. */
+  | { type: 'postdoc'; professor: ProfessorId; stars: number }
+  /** Laboratório de Pesquisa. */
+  | { type: 'labUnlocked' }
+  | { type: 'labRunStarted'; seed: number }
+  | { type: 'labPhaseCleared'; phase: number; boss: boolean }
+  | { type: 'labBossBeaten'; phase: number }
+  /** The monitor broke (the boss timer ran out or the integrity hit 0); `commits` were paid. */
+  | { type: 'labBroken'; phase: number; reason: 'timer' | 'integrity'; commits: number }
+  /** An item was taken from the rewards; `equipped` is false when it waits for a decision (the slot is taken). */
+  | { type: 'labItemGained'; item: string; rarity: string; equipped: boolean }
+  | { type: 'labItemRecycled'; item: string; rarity: string }
+  | { type: 'labItemChanged'; action: 'levelUp' | 'reroll'; item: string; level: number }
+  | { type: 'labNodeBought'; id: string; level: number }
+  | { type: 'labTreeReset'; refunded: number }
+  | { type: 'labOffersRerolled'; phase: number }
+  | { type: 'labCosmeticGained'; id: string; how: 'shop' | 'grant' }
+  /** ADScoins given to the campus; `title` is the donor title this donation just earned (an id of content/donations.ts), if any. */
+  | { type: 'donate'; amount: Decimal; total: Decimal; title: string | null }
   | { type: 'offline'; coins: Decimal; awayMs: number }
   | { type: 'saved' }
   | { type: 'loaded' }
@@ -252,6 +272,10 @@ export interface GameActions {
   buyPrestigeNode(id: string): boolean;
   /** Refunds the diplomas spent on the tree and empties it. Once per turma. */
   resetPrestigeTree(): boolean;
+  /** Pós-doc: pays the price and gives the professor a star (false when not allowed or not affordable). */
+  defendPostdoc(professor: ProfessorId): boolean;
+  /** Gives ADScoins to the campus (Centro Comunitário). False when the amount is below 1 or above the coins in hand. */
+  donateToCampus(amount: Decimal): boolean;
 
   /** Hires a Monitor, or raises it one level, with diplomas. */
   buyMonitor(id: MonitorId): boolean;
@@ -264,6 +288,8 @@ export interface GameActions {
   unlockMaestria(professor: ProfessorId): boolean;
   /** Buys the next level of an unlocked Maestria with diplomas. */
   buyMaestriaLevel(professor: ProfessorId): boolean;
+  /** Switches a Maestria on or off (a pause: the level stays). Free and allowed anytime. */
+  setMaestriaEnabled(professor: ProfessorId, enabled: boolean): boolean;
   /** Spends a Rollforward charge. */
   fireRollforward(): boolean;
   /** Starts the Super invasão when it is charged. */
@@ -277,6 +303,35 @@ export interface GameActions {
   sellBolsaAsset(id: string, fraction: number): boolean;
   depositBolsaFund(fraction: number): boolean;
   withdrawBolsaFund(fraction: number): boolean;
+
+  /** Laboratório de Pesquisa (see docs/LABORATORIO.md). Spends 30 diplomas once, after Pablo is hired. */
+  unlockLab(): boolean;
+  /** The lab screen is open (the run advances) or closed (the run is paused). */
+  setLabOpen(open: boolean): void;
+  /** Starts the run of this turma, with a seed drawn now. Only when every aula is at level 1 or more, once per turma. */
+  startLabRun(): boolean;
+  /** A click on the monitor. Past 5 clicks in a second it counts for nothing. */
+  labClick(): void;
+  /** Picks one of the options after a phase. */
+  chooseLabReward(index: number): boolean;
+  /** The item waiting for a decision takes its slot (the one in it is recycled into Commits). */
+  equipLabPending(): boolean;
+  /** The item waiting for a decision is recycled into Commits. */
+  recycleLabPending(): boolean;
+  /** Raises the item in the slot one level with ADScoins. */
+  levelUpLabItem(slot: LabSlot): boolean;
+  /** Rolls one affix of the item in the slot again with ADScoins. */
+  rerollLabAffix(slot: LabSlot, affix: number): boolean;
+  /** One level of a node of the lab tree, with Commits. */
+  buyLabNode(id: string): boolean;
+  /** Gives back every Commit spent on the tree and empties it. False during a run or with nothing spent. */
+  resetLabTree(): boolean;
+  /** Buys a cosmetic of the lab shop with ADScoins. False when it is not for sale, owned already, or too dear. */
+  buyLabCosmetic(id: string): boolean;
+  /** Puts an owned cosmetic on, or takes a decoration off (`on = false`). False when not owned or the decor display is full. */
+  equipLabCosmetic(id: string, on?: boolean): boolean;
+  /** Draws the options of the reward on screen again (tree: Retrospectiva). False without a reroll left. */
+  rerollLabOffers(): boolean;
 
   /** Easter eggs: unlocks achievements whose condition is { kind: 'secret', trigger }. */
   triggerSecret(trigger: string): void;

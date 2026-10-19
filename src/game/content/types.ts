@@ -6,6 +6,8 @@
  * and parsed by the engine with break_infinity.js.
  */
 
+import type { LabConfig, LabRarity } from './labTypes';
+
 export type DecimalString = string;
 
 export const PROFESSOR_IDS = [
@@ -55,6 +57,7 @@ export type StatKey =
   | 'costMult' // multiplies every discipline/click-upgrade cost (discounts are < 1)
   | 'costGrowth' // added to the per-level cost growth (negative = cheaper)
   | 'activeBonus' // multiplier for the disciplines of the professor on stage
+  | 'honouredBonus' // multiplier for the disciplines of the honoured professor (lab items)
   | 'eventInterval' // multiplies the time between invasions (lower = more often)
   | 'eventWindow' // multiplies how long an invasion stays on screen
   | 'eventReward'
@@ -116,8 +119,12 @@ export type CounterKey =
   | 'cappedGraduations'
   /** Times the diploma tree was reset. */
   | 'treeResets'
+  /** Pós-docs defended (stars earned) over all the professors, ever. */
+  | 'postdocs'
   /** Graduations made without honouring anyone. */
-  | 'ungratefulGraduations';
+  | 'ungratefulGraduations'
+  /** Donations made at the Centro Comunitário (the total given is GameState.donated). */
+  | 'donations';
 
 /** Counters of the current run only: they start again at every graduation (GameState.run). */
 export type RunCounterKey = 'levelsBought';
@@ -147,8 +154,12 @@ export type Condition =
   | { kind: 'runCounter'; counter: RunCounterKey; gte: number }
   /** Sum of the levels of one professor's disciplines. */
   | { kind: 'professorLevels'; professor: ProfessorId; gte: number }
-  /** Domínio rank of one professor, or of every professor when none is named. */
-  | { kind: 'mastery'; rank: number; professor?: ProfessorId }
+  /** Domínio rank of one professor, or of every professor when none is named (or of `count` of them, when given). */
+  | { kind: 'mastery'; rank: number; professor?: ProfessorId; count?: number }
+  /** Pós-doc stars: of one professor, or (no professor) of `count` professors (default all) each with at least `stars`. */
+  | { kind: 'postdoc'; stars: number; professor?: ProfessorId; count?: number }
+  /** Pós-doc stars of every professor added up. */
+  | { kind: 'postdocTotal'; gte: number }
   /** Every discipline of some professor sits at exactly the same level, this one or higher. */
   | { kind: 'alignedLevels'; level: number }
   /** Every ability of the game was used at least once. */
@@ -158,7 +169,8 @@ export type Condition =
   /** Every research of the game is bought in the current run. */
   | { kind: 'everyResearch' }
   /** Every skin of that rarity is owned. */
-  | { kind: 'rarityOwned'; rarity: Rarity }
+  /** Skins of a rarity: every one of the original set, or (with `gte`) that many of any of them. */
+  | { kind: 'rarityOwned'; rarity: Rarity; gte?: number }
   /** Different professors honoured at a graduation, ever. */
   | { kind: 'honoured'; gte: number }
   /** Graduations made on the same calendar day (the day of the last one). */
@@ -172,7 +184,8 @@ export type Condition =
   /** At least `unlocked` Maestrias are unlocked, each at level `level` or more (default 1). */
   | { kind: 'maestrias'; unlocked: number; level?: number }
   /** Every scenery (or theme) of the game is owned, except the ones named: the rewards of the achievement itself. */
-  | { kind: 'everyOwned'; of: 'sceneries' | 'themes'; except?: string[] }
+  /** Sceneries or themes: all of them, or (with `gte`) that many, leaving out `except`. */
+  | { kind: 'everyOwned'; of: 'sceneries' | 'themes'; except?: string[]; gte?: number }
   /** Every achievement of the game is unlocked, except the ones named (the achievement itself). */
   | { kind: 'everyAchievement'; except?: string[] }
   /** Every node of the Formatura tree is at its maximum level. */
@@ -185,6 +198,21 @@ export type Condition =
   | { kind: 'bolsaPortfolio' }
   /** At least `gte` Monitores are hired, or at their top level when `maxed`. */
   | { kind: 'monitors'; gte: number; maxed?: boolean }
+  /** ADScoins given to the campus in total (GameState.donated) reach `gte`. */
+  | { kind: 'donated'; gte: DecimalString }
+  /**
+   * A yes/no fact the engine noted by name in GameState.secrets when it happened (a single big donation, a lab boss
+   * beaten...). Unlike `secret` it is not an easter egg: the achievement can be public.
+   */
+  | { kind: 'flag'; flag: string }
+  /** A Laboratório number: the lab unlocked (1), the best phase, or one of the lifetime counters. */
+  | { kind: 'labStat'; stat: 'unlocked' | 'bestPhase' | 'broken' | 'itemsRecycled'; gte: number }
+  /** At least `gte` equipped lab items of this rarity right now. */
+  | { kind: 'labEquipped'; rarity: LabRarity; gte: number }
+  /** At least `pieces` equipped pieces of this lab item set. */
+  | { kind: 'labSet'; set: string; pieces: number }
+  /** Every node of the lab tree at its top level: of any one branch, or of the whole tree. */
+  | { kind: 'labTree'; scope: 'branch' | 'all' }
   /** Fired by name from the UI or engine (easter eggs): useGame.getState().triggerSecret(id). */
   | { kind: 'secret'; trigger: string };
 
@@ -575,6 +603,12 @@ export type AchievementFamily =
   | 'sprints'
   | 'graduation'
   | 'collection'
+  /** Laboratório de Pesquisa. */
+  | 'laboratorio'
+  /** Centro Comunitário (donations). */
+  | 'comunidade'
+  /** Pós-doc stars. */
+  | 'posdoc'
   | 'secret';
 
 export interface AchievementDef {
@@ -591,6 +625,8 @@ export interface AchievementDef {
     skin?: string;
     scenery?: string;
     theme?: string;
+    /** A Laboratório cosmetic that only an achievement hands out (content/labCosmetics.ts); granted with grantLabCosmetic. */
+    labCosmetic?: string;
   };
 }
 
@@ -622,6 +658,12 @@ export interface SkinDef {
     secondary: string;
     accent: string;
   };
+  /**
+   * Which collection the skin belongs to when it is part of the late content (the Laboratório: 'lab', 'posdoc' gowns and
+   * 'donation' skins of the Centro Comunitário). Each one is still the reward of exactly one achievement; the
+   * rarity collection feats (Colecionador de Lendárias, Panteão...) only count skins without a `source`.
+   */
+  source?: 'lab' | 'posdoc' | 'donation';
   /** Short prompt fragment for the art pipeline describing the outfit. */
   artPrompt: string;
 }
@@ -645,6 +687,8 @@ export interface SceneryDef {
     horizon: string;
     floor: string;
   };
+  /** Which late collection the scenery belongs to (Laboratório, Pós-doc, Centro Comunitário); still an achievement reward. */
+  source?: 'lab' | 'posdoc' | 'donation';
   artPrompt: string;
 }
 
@@ -702,6 +746,12 @@ export interface BalanceConfig {
   clickLimit?: { perSecond: number; windowMs: number };
   /** Domínio: one rank per `step` levels summed over a professor's disciplines, up to `cap` ranks. */
   mastery: { step: number; cap: number };
+  /**
+   * Pós-doc: a professor with the Domínio maxed can defend it once per turma for a permanent star (up to `maxStars`).
+   * Each star makes that professor's Domínio `bonusPerStar` stronger. Star k (1-based) costs
+   * firstPrice x priceGrowth ^ (k - 1) ADScoins.
+   */
+  postdoc: { maxStars: number; bonusPerStar: number; firstPrice: DecimalString; priceGrowth: number };
   graduation: {
     /** Coins produced in the run that are worth the first diploma. */
     base: DecimalString;
@@ -721,6 +771,8 @@ export interface BalanceConfig {
   };
 }
 
+export * from './labTypes';
+
 export interface GameContent {
   professors: Record<ProfessorId, ProfessorDef>;
   disciplines: DisciplineDef[];
@@ -737,5 +789,7 @@ export interface GameContent {
   mastery: Record<ProfessorId, MasteryDef>;
   monitors: MonitorDef[];
   maestrias: MaestriasConfig;
+  /** The Laboratório de Pesquisa (see content/lab.ts). */
+  lab: LabConfig;
   balance: BalanceConfig;
 }

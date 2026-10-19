@@ -2,7 +2,7 @@ import { content, useGame } from '@/game/store';
 import type { MaestriaCardView } from '@/game/engine/views';
 import type { ProfessorId } from '@/game/content/types';
 import { themeVariables, useReducedMotion } from '@/ui/ThemeProvider';
-import { Badge, Button, Icon } from '@/ui/kit';
+import { Badge, Button, Icon, Tooltip } from '@/ui/kit';
 import { playLimited, shake } from '../../lib/feedback';
 import { Portrait } from '../../lib/Portrait';
 import { MaestriaLive } from './MaestriaLive';
@@ -19,6 +19,7 @@ export function MaestriaCard({ card, slotFree, onPickSlot }: MaestriaCardProps) 
   const professor = content.professors[card.professor];
   const reduced = useReducedMotion();
   const buy = useGame((store) => store.buyMaestriaLevel);
+  const setEnabled = useGame((store) => store.setMaestriaEnabled);
   const state = !card.built ? 'soon' : card.unlocked ? 'on' : 'off';
 
   const upgrade = (element: HTMLElement) => {
@@ -31,6 +32,7 @@ export function MaestriaCard({ card, slotFree, onPickSlot }: MaestriaCardProps) 
     <article
       className="maestria"
       data-state={state}
+      data-enabled={card.unlocked ? card.enabled : undefined}
       data-qa={`maestria-${card.professor}`}
       style={themeVariables(undefined, professor.color)}
     >
@@ -59,7 +61,13 @@ export function MaestriaCard({ card, slotFree, onPickSlot }: MaestriaCardProps) 
                 </li>
               ))}
             </ul>
-            <MaestriaLive professor={card.professor} />
+            {card.enabled ? (
+              <MaestriaLive professor={card.professor} />
+            ) : (
+              <p className="maestria-paused" data-qa={`maestria-paused-${card.professor}`}>
+                Desativada: o nível e o progresso ficam guardados, mas nada dessa Maestria funciona até você ligar de novo.
+              </p>
+            )}
           </>
         ) : null}
         {card.built && !card.unlocked ? (
@@ -75,6 +83,22 @@ export function MaestriaCard({ card, slotFree, onPickSlot }: MaestriaCardProps) 
       </div>
 
       <div className="maestria-action">
+        {card.built && card.unlocked ? (
+          <Tooltip content="Desligar pausa os efeitos dessa Maestria até você ligar de novo.">
+            <button
+              type="button"
+              role="switch"
+              className="maestria-switch"
+              aria-checked={card.enabled}
+              aria-label={`Maestria de ${professor.name}: ${card.enabled ? 'ativa' : 'desativada'}`}
+              data-qa={`maestria-toggle-${card.professor}`}
+              onClick={() => void setEnabled(card.professor, !card.enabled)}
+            >
+              <i aria-hidden="true" />
+              <span>{card.enabled ? 'Ativa' : 'Desativada'}</span>
+            </button>
+          </Tooltip>
+        ) : null}
         {!card.built ? (
           <Badge tone="neutral">Em breve</Badge>
         ) : !card.unlocked ? (

@@ -77,6 +77,7 @@ export const soundLabels: Record<SoundName, string> = {
   uiTap: 'Toque',
   golden: 'Clique de ouro',
   rollforward: 'Rollforward',
+  labHit: 'Clique no monitor do Laboratório',
   festa: 'Festa de lançamento',
 };
 

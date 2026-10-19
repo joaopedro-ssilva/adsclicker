@@ -14,6 +14,7 @@ import {
   graduate as graduateRaw,
   resetPrestigeTree as resetPrestigeTreeRaw,
 } from './prestige';
+import { defendPostdoc as defendPostdocRaw } from './postdoc';
 import { buyLevelled } from './purchases';
 import { hitInvasion as hitInvasionRaw } from './invasions';
 import { acceptSprint as acceptSprintRaw } from './sprints';
@@ -22,6 +23,8 @@ import type { GameState } from './state';
 export { favouriteKey, toggleFavourite } from './favourites';
 export type { FavouriteKind } from './favourites';
 export { click } from './click';
+export { donateToCampus, donationProgress, donationTitleFor, MIN_DONATION } from './donations';
+export type { DonationProgress } from './donations';
 export type { ClickPosition } from './click';
 export {
   buyResearch,
@@ -96,6 +99,12 @@ export function resetPrestigeTree(state: GameState, content: GameContent, now: n
   return done;
 }
 
+export function defendPostdoc(state: GameState, content: GameContent, professor: ProfessorId, now: number, emit: Emit): boolean {
+  const done = defendPostdocRaw(state, content, professor, emit);
+  if (done) afterAction(state, content, now, emit);
+  return done;
+}
+
 export function buyMonitor(state: GameState, content: GameContent, id: MonitorId, now: number, emit: Emit): boolean {
   const bought = buyMonitorRaw(state, content, id, emit);
   if (bought) afterAction(state, content, now, emit);
@@ -110,6 +119,7 @@ export {
   depositBolsaFund,
   fireRollforward,
   hitBug,
+  setMaestriaEnabled,
   sellBolsaAsset,
   startFesta,
   startSwarm,
@@ -118,6 +128,25 @@ export {
 } from './maestria/actions';
 
 export { buyCafe, cafeCost } from './cafe';
+
+export {
+  buyLabCosmetic,
+  buyLabNode,
+  equipLabCosmetic,
+  resetLabTree,
+  rerollLabOffers,
+  chooseLabReward,
+  equipLabPending,
+  labClick,
+  levelUpLabItem,
+  recycleLabPending,
+  rerollLabAffix,
+  setLabOpen,
+  startLabRun,
+  unlockLab,
+} from './lab/actions';
+/** Gives a lab cosmetic for free (an achievement reward). Plain state change: safe to call from inside afterAction. */
+export { grantLabCosmetic } from './lab/cosmetics';
 
 /** Easter eggs: remembers the trigger so achievements with { kind: 'secret', trigger } unlock. */
 export function triggerSecret(state: GameState, content: GameContent, trigger: string, now: number, emit: Emit): void {

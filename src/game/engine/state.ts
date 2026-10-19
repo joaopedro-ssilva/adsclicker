@@ -1,5 +1,6 @@
 import type Decimal from 'break_infinity.js';
 import type { CounterKey, Effect, MonitorId, ProfessorId } from '../content/types';
+import type { LabState } from './lab/types';
 import type { MaestriaState } from './maestria/types';
 
 /** Bump when the saved shape changes and add a migration in save.ts. */
@@ -94,6 +95,17 @@ export interface MonitorsState {
     /** Which offer the Monitor de Sprints takes. */
     sprintPick: SprintPick;
   };
+}
+
+/** Pós-doc: the permanent stars of the professors. Survives graduation. */
+export interface PostdocState {
+  /** Stars per professor (0..balance.postdoc.maxStars). Only ever grow. */
+  stars: Record<ProfessorId, number>;
+  /**
+   * The graduation count (counters.graduations) when each professor last defended, so it is one per turma: the Domínio
+   * comes back with the next turma's levels and must reach the cap again. Missing = never.
+   */
+  turma: Partial<Record<ProfessorId, number>>;
 }
 
 /** Numbers about the current run only. Zeroed at every graduation. */
@@ -206,6 +218,8 @@ export interface Settings {
   floatingNumbers: boolean;
   /** Ambient particles of the sceneries and the glow of mythic skins. The scenery image and the professor stay either way. */
   sceneryEffects: boolean;
+  /** Numbers from the decilhão (1e33) up as names ("1,86 Ud") or scientific ("1,86e36"). Below that the names always show. */
+  numberNotation: 'names' | 'scientific';
   /**
    * Admin/dev knob: multiplies every source of coins. 1 in normal play.
    * Set from the /admin page for demos and quick progression tests.
@@ -226,6 +240,8 @@ export interface GameState {
   /** Coins produced since the last graduation; decides the diplomas of the next one. */
   runCoins: Decimal;
   lifetimeCoins: Decimal;
+  /** ADScoins given to the campus (Centro Comunitário), ever. Survives graduation; decides the donor title. */
+  donated: Decimal;
   /** Diplomas available to spend. */
   diplomas: number;
   /** Diplomas ever earned; each one gives a permanent global bonus. */
@@ -309,8 +325,14 @@ export interface GameState {
   /** Maestrias: the slots spent, their levels and the runtime of each (see engine/maestria). */
   maestria: MaestriaState;
 
+  /** Pós-doc stars of the professors (see engine/postdoc). */
+  postdoc: PostdocState;
+
   /** Monitores (automation hired with diplomas). Survives graduation. */
   monitors: MonitorsState;
+
+  /** O Laboratório de Pesquisa: unlock, Commits and tree last; the run and the items last until graduation (see engine/lab). */
+  lab: LabState;
 
   /** The current sitting: seconds played and when the player last acted. Restarted at every boot. */
   session: { seconds: number; activeAt: number };

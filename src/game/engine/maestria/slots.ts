@@ -8,6 +8,8 @@ import type { MaestriaState } from './types';
 export function createMaestriaState(): MaestriaState {
   return {
     levels: {},
+    disabled: {},
+    pausedAt: {},
     joinha: { activeUntil: 0, readyAt: 0 },
     rollforward: { clicks: 0, charges: 0 },
     swarm: { since: 0, seq: 0, active: null },
@@ -20,6 +22,19 @@ export function createMaestriaState(): MaestriaState {
 /** Level of a professor's Maestria: 0 = not unlocked. */
 export function maestriaLevel(state: GameState, professor: ProfessorId): number {
   return state.maestria.levels[professor] ?? 0;
+}
+
+/** True when the Maestria is unlocked and the player has not switched it off: the only state in which it does anything. */
+export function maestriaActive(state: GameState, professor: ProfessorId): boolean {
+  return maestriaLevel(state, professor) > 0 && state.maestria.disabled[professor] !== true;
+}
+
+/**
+ * Level that counts for EFFECTS: the owned level, or 0 while the Maestria is switched off. Every production bonus,
+ * trigger, timer and action reads this one; maestriaLevel stays for ownership (cards, costs, achievements).
+ */
+export function activeMaestriaLevel(state: GameState, professor: ProfessorId): number {
+  return state.maestria.disabled[professor] === true ? 0 : maestriaLevel(state, professor);
 }
 
 export function unlockedMaestrias(state: GameState): ProfessorId[] {

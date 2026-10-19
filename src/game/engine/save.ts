@@ -5,7 +5,10 @@ import { getIndex } from './contentIndex';
 import { Decimal, ZERO, parseDecimal } from './decimal';
 import { isValidFavourite } from './favourites';
 import { createInitialState, createMonitorsState, createRecords, createRunStats } from './init';
+import { grantLabCosmetic } from './lab/cosmetics';
+import { readLab, settleLabAfterLoad } from './lab/save';
 import { readMaestria } from './maestria/save';
+import { readPostdoc } from './postdoc';
 import {
   GRADUATION_HISTORY_MAX,
   MAX_CARGO_BONUS,
@@ -308,6 +311,7 @@ function readSettings(value: unknown, fallback: Settings): Settings {
     reducedMotion: motion === 'on' || motion === 'off' || motion === 'system' ? motion : fallback.reducedMotion,
     floatingNumbers: typeof value.floatingNumbers === 'boolean' ? value.floatingNumbers : fallback.floatingNumbers,
     sceneryEffects: typeof value.sceneryEffects === 'boolean' ? value.sceneryEffects : fallback.sceneryEffects,
+    numberNotation: value.numberNotation === 'scientific' || value.numberNotation === 'names' ? value.numberNotation : fallback.numberNotation,
     devMultiplier: readNumber(value.devMultiplier, fallback.devMultiplier, MIN_DEV_MULTIPLIER, MAX_DEV_MULTIPLIER),
   };
 }
@@ -357,6 +361,8 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.coins = readDecimal(raw.coins);
   state.runCoins = readDecimal(raw.runCoins);
   state.lifetimeCoins = Decimal.max(readDecimal(raw.lifetimeCoins), state.runCoins);
+  // Absent in older saves: nothing was donated. Never above the lifetime coins.
+  state.donated = Decimal.min(readDecimal(raw.donated), state.lifetimeCoins);
   state.diplomas = Math.floor(readNumber(raw.diplomas, 0, 0));
   state.diplomasEarned = Math.max(state.diplomas, Math.floor(readNumber(raw.diplomasEarned, 0, 0)));
 
@@ -388,7 +394,10 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.graduationHistory = readGraduationHistory(raw.graduationHistory);
 
   const triggers = new Set<string>();
-  for (const def of content.achievements) if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);
+  for (const def of content.achievements) {
+    if (def.condition.kind === 'secret') triggers.add(def.condition.trigger);
+    else if (def.condition.kind === 'flag') triggers.add(def.condition.flag);
+  }
   state.achievements = readNumbers(raw.achievements, (id) => index.achievements.has(id), 0);
   state.secrets = readBooleans(raw.secrets, (trigger) => triggers.has(trigger));
 
@@ -435,6 +444,16 @@ export function mergeSave(raw: RawSave, content: GameContent, now: number): Game
   state.abilitiesTried = readBooleans(raw.abilitiesTried, (id) => index.abilities.has(id));
   state.maestria = readMaestria(raw.maestria, content);
   state.monitors = readMonitors(raw.monitors, content, now);
+  // Absent in older saves: no stars.
+  state.postdoc = readPostdoc(raw.postdoc, content);
+  // Absent in older saves: a locked, empty lab.
+  state.lab = readLab(raw.lab, content);
+  // The lab was just read, so the achievement rewards for it (granted above to a blank lab) are handed out again.
+  for (const id in state.achievements) {
+    const labCosmetic = index.achievements.get(id)?.reward?.labCosmetic;
+    if (labCosmetic) grantLabCosmetic(state, content, labCosmetic);
+  }
+  settleLabAfterLoad(state, content);
   if (isRecord(raw.session)) {
     state.session = { seconds: readNumber(raw.session.seconds, 0, 0), activeAt: readNumber(raw.session.activeAt, now, 0, now) };
   }
@@ -466,6 +485,7 @@ export function serializeState(state: GameState): string {
     coins: state.coins.toString(),
     runCoins: state.runCoins.toString(),
     lifetimeCoins: state.lifetimeCoins.toString(),
+    donated: state.donated.toString(),
     run: {
       ...state.run,
       clickCoins: state.run.clickCoins.toString(),

@@ -2,6 +2,7 @@
  * A small, valid GameContent for tests. Cheap numbers and one professor per feature, so every
  * engine rule can be exercised without depending on the real content.
  */
+import { lab } from '../../content/lab';
 import { maestrias } from '../../content/maestrias';
 import { monitors } from '../../content/monitors';
 import { PROFESSOR_IDS } from '../../content/types';
@@ -118,6 +119,7 @@ export const fixtureBalance: BalanceConfig = {
   milestoneStep: 100,
   milestoneMult: 2,
   mastery: { step: 25, cap: 40 },
+  postdoc: { maxStars: 5, bonusPerStar: 0.05, firstPrice: '1e30', priceGrowth: 1000 },
   tierUnlockLevel: 10,
   baseClick: 1,
   combo: { windowMs: 1500, baseMax: 20, baseStep: 0.05, decayPerSecond: 5 },
@@ -332,6 +334,7 @@ export function createFixtureContent(): GameContent {
     mastery: neutralMastery(),
     monitors: monitors.map((def) => ({ ...def, levels: [...def.levels] })),
     maestrias: structuredClone(maestrias),
+    lab: structuredClone(lab),
     balance: { ...fixtureBalance, graduation: { ...fixtureBalance.graduation } },
   };
 }

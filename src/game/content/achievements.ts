@@ -1,6 +1,17 @@
+import { GENEROUS_DONATION_FLAG, donationTitleById } from './donations';
+import { LAB_FLAGS, labBossFlag } from './labFlags';
 import type { AchievementDef, AchievementFamily, Condition, CounterKey, ProfessorId } from './types';
 
-const counter = (key: CounterKey, gte: number): Condition => ({ kind: 'counter', counter: key, gte });
+/** Total donated that earns a Centro Comunitário title: the thresholds live in donations.ts only. */
+const donatedTitle = (id: string): Condition => {
+  const title = donationTitleById.get(id);
+  if (!title) throw new Error(`Unknown donation title "${id}"`);
+  return { kind: 'donated', gte: title.threshold };
+};
+const stars = (professor: ProfessorId, count: number): Condition => ({ kind: 'postdoc', stars: count, professor });
+const flag = (name: string): Condition => ({ kind: 'flag', flag: name });
+
+const counter =(key: CounterKey, gte: number): Condition => ({ kind: 'counter', counter: key, gte });
 const hired = (professor: ProfessorId): Condition => ({ kind: 'professorHired', professor });
 const allLevel = (professor: ProfessorId, level: number): Condition => ({ kind: 'allDisciplinesLevel', professor, level });
 const allResearch = (professor: ProfessorId): Condition => ({ kind: 'allResearch', professor });
@@ -28,7 +39,7 @@ const ach = (
 });
 
 /**
- * 153 achievements. Each gives +1% global production; some also grant a skin, scenery or theme.
+ * 189 achievements. Each gives +1% global production; some also grant a skin, scenery, theme or Laboratório cosmetic.
  * Every non-default cosmetic is granted by exactly one achievement, and harder ones give rarer skins:
  * common = hire / early clicks, rare = discipline level 25, epic = all research, legendary = level 100
  * or a long-haul challenge; mythic (one per professor) is reserved for the hardest feat of each family
@@ -255,7 +266,7 @@ export const achievements: AchievementDef[] = [
     gte: 500,
   }, { scenery: 'servidor-antigo' }),
   ach('mastery-all-10', 'professor', 'Corpo Docente', '🧑‍🏫', 'Deixe os 8 professores com Domínio 10 ou mais ao mesmo tempo.', { kind: 'mastery', rank: 10 }, { scenery: 'castelo' }),
-  ach('mastery-all-cap', 'professor', 'Mestres da Casa', '🏫', 'Deixe os 8 professores com o Domínio no máximo (40) ao mesmo tempo. Cada um já tem cadeira cativa na sala.', { kind: 'mastery', rank: 40 }, {
+  ach('mastery-all-cap', 'professor', 'Mestres da Casa', '🏫', 'Deixe 5 professores com o Domínio no máximo (40) ao mesmo tempo. Metade da sala já tem cadeira cativa.', { kind: 'mastery', rank: 40, count: 5 }, {
     scenery: 'sala-dos-professores',
   }),
   ach('design-500', 'professor', 'Sistema que se Desenha', '🧩', 'Receba 500 níveis de graça do Design System. A Bruna B2 reaproveita componente, e você reaproveita nível.', counter('designFreeLevels', 500), {
@@ -372,28 +383,29 @@ export const achievements: AchievementDef[] = [
   // ------------------------------------------------------------------ collection (11)
   ach('skins-10', 'collection', 'Guarda-Roupa Colorido', '👕', 'Tenha 10 skins.', { kind: 'skinsOwned', gte: 10 }, { theme: 'pastel' }),
   ach('skins-25', 'collection', 'Provador Lotado', '🧥', 'Tenha 25 skins.', { kind: 'skinsOwned', gte: 25 }, { scenery: 'camarim' }),
-  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha todas as 95 skins.', { kind: 'skinsOwned', gte: 95 }, { theme: 'holografico' }),
+  ach('skins-all', 'collection', 'Álbum Completo', '📒', 'Tenha 95 skins, quaisquer que sejam. O Álbum enche, a mochila nem tanto.', { kind: 'skinsOwned', gte: 95 }, { theme: 'holografico' }),
   ach('achievements-25', 'collection', 'Vitrine Cheia', '🏆', 'Conquiste 25 conquistas.', { kind: 'achievements', gte: 25 }, { theme: 'prata' }),
   ach('achievements-50', 'collection', 'Parede de Troféus', '🥇', 'Conquiste 50 conquistas.', { kind: 'achievements', gte: 50 }, { theme: 'platina' }),
   ach('achievements-75', 'collection', 'Quase Tudo', '🌟', 'Conquiste 75 conquistas.', { kind: 'achievements', gte: 75 }, { scenery: 'trofeus' }),
   ach('days-7', 'collection', 'Sequência de Sete', '🗓️', 'Jogue 7 dias seguidos. Frequência de 100%.', counter('bestDayStreak', 7), { scenery: 'por-do-sol' }),
-  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha todas as skins raras.', { kind: 'rarityOwned', rarity: 'rare' }, {
+  ach('rares-all', 'collection', 'Colecionador de Raras', '💠', 'Tenha 26 skins raras.', { kind: 'rarityOwned', rarity: 'rare', gte: 26 }, {
     skin: 'b2-curadora',
   }),
-  ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha todas as skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic' }, {
+  ach('epics-all', 'collection', 'Colecionador de Épicas', '🔮', 'Tenha 26 skins épicas. A coleção brilha mais que o prisma.', { kind: 'rarityOwned', rarity: 'epic', gte: 26 }, {
     skin: 'b2-prisma',
   }),
-  ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha todas as skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary' }, {
+  ach('legendaries-all', 'collection', 'Colecionador de Lendárias', '🌠', 'Tenha 16 skins lendárias. Só falta o céu como limite.', { kind: 'rarityOwned', rarity: 'legendary', gte: 16 }, {
     scenery: 'galaxia',
   }),
-  ach('mythics-all', 'collection', 'Panteão', '🏛️', 'Tenha as 8 skins míticas, uma de cada professor. Cada pedestal com o seu nome gravado.', { kind: 'rarityOwned', rarity: 'mythic' }, {
+  ach('mythics-all', 'collection', 'Panteão', '🏛️', 'Tenha 8 skins míticas. Cada pedestal com um nome gravado.', { kind: 'rarityOwned', rarity: 'mythic', gte: 8 }, {
     scenery: 'panteao',
   }),
-  ach('sceneries-all', 'collection', 'Volta ao Mundo', '🗺️', 'Tenha todos os cenários do jogo. Da sala de aula ao Panteão, sem pular o Nether.', { kind: 'everyOwned', of: 'sceneries' }, { theme: 'grego' }),
-  ach('themes-all', 'collection', 'Paleta Infinita', '🖌️', 'Tenha todos os temas do jogo (o Arco-íris é o prêmio e não entra na conta). Combina com tudo, até com o erro de compilação.', {
+  ach('sceneries-all', 'collection', 'Volta ao Mundo', '🗺️', 'Tenha 42 cenários. Da sala de aula ao Panteão, sem pular o Nether.', { kind: 'everyOwned', of: 'sceneries', gte: 42 }, { theme: 'grego' }),
+  ach('themes-all', 'collection', 'Paleta Infinita', '🖌️', 'Tenha 16 temas (o Arco-íris é o prêmio e não entra na conta). Combina com tudo, até com o erro de compilação.', {
     kind: 'everyOwned',
     of: 'themes',
     except: ['arco-iris'],
+    gte: 16,
   }, { theme: 'arco-iris' }),
   ach('achievements-100', 'collection', 'Cem por Cento', '🎯', 'Conquiste 100 conquistas. São +100% de produção global, redondinho.', { kind: 'achievements', gte: 100 }, {
     skin: 'gladimir-neyglad',
@@ -403,7 +415,90 @@ export const achievements: AchievementDef[] = [
     except: ['platinum'],
   }),
 
-  // ------------------------------------------------------------------ secret (6)
+  // ------------------------------------------------------------------ laboratorio (14, plus 2 secret ones below)
+  ach('lab-unlock', 'laboratorio', 'Primeiro Commit', '🧪', 'Abra as portas do Laboratório. A mensagem do commit é "teste", como manda a tradição.', { kind: 'labStat', stat: 'unlocked', gte: 1 }),
+  ach('lab-boss-friday', 'laboratorio', 'Sobreviveu à Sexta', '🚀', 'Derrote o Deploy de Sexta no Laboratório. Foi às 17:59 e o rollback nem precisou aparecer.', flag(labBossFlag('deploy-de-sexta')), {
+    labCosmetic: 'trofeu-de-hackathon',
+    skin: 'guto-churrasqueiro-sagrado',
+  }),
+  ach('lab-boss-where', 'laboratorio', 'WHERE 1=1', '🗃️', 'Derrote o Select sem WHERE em produção. Dessa vez a consulta só trouxe o que devia.', flag(labBossFlag('select-em-producao')), {
+    skin: 'wagner-paladino-firewall',
+  }),
+  ach('lab-boss-ai', 'laboratorio', 'Rollback Bem-sucedido', '⏪', 'Derrote A IA que Apagou o Banco. O backup estava em dia, pela primeira vez na história da TI.', flag(labBossFlag('ia-que-apagou-o-banco')), {
+    skin: 'angelo-reitor-mor',
+  }),
+  ach('lab-broken-10', 'laboratorio', 'Tela Azul', '🟦', 'Quebre o monitor do Laboratório 10 vezes. Reiniciar resolve, mas ninguém salvou o arquivo.', { kind: 'labStat', stat: 'broken', gte: 10 }, {
+    theme: 'bsod',
+  }),
+  ach('lab-minimalist', 'laboratorio', 'Minimalista', '🪶', 'Derrote o primeiro chefão com um único item equipado. Menos é mais, mesmo quando é só o Mouse quebrado.', flag(LAB_FLAGS.minimalist), {
+    scenery: 'fortaleza-do-wagner',
+  }),
+  ach('lab-legendary-4', 'laboratorio', 'Full Lendário', '🌟', 'Equipe 4 itens lendários ao mesmo tempo. O monitor só falta pedir autógrafo.', { kind: 'labEquipped', rarity: 'lendario', gte: 4 }, {
+    skin: 'b2-pintora-arco-iris',
+    scenery: 'sala-do-tesouro',
+  }),
+  ach('lab-set-guilda', 'laboratorio', 'Guilda Completa', '🛡️', 'Equipe as 4 peças da Guilda dos Professores. A taverna reservou a mesa redonda para vocês.', { kind: 'labSet', set: 'guilda-dos-professores', pieces: 4 }, {
+    skin: 'edecio-sir-edecio',
+    scenery: 'taverna-da-guilda',
+  }),
+  ach('lab-set-plantao', 'laboratorio', 'Plantão Completo', '🚨', 'Equipe as 4 peças do Kit Plantão. Chamado às três da manhã, e você já estava de pé.', { kind: 'labSet', set: 'kit-plantao', pieces: 4 }, {
+    skin: 'b1-product-owner',
+  }),
+  ach('lab-phase-25', 'laboratorio', 'Fase 25', '🔥', 'Alcance a fase 25 do Laboratório. O monitor ainda aguenta, o resto do prédio já pediu arrego.', { kind: 'labStat', stat: 'bestPhase', gte: 25 }, {
+    skin: 'gladimir-darth-glad',
+  }),
+  ach('lab-phase-40', 'laboratorio', 'Fase 40', '🌋', 'Alcance a fase 40 do Laboratório. O datacenter está pegando fogo, mas o uptime é de gente que não desiste.', { kind: 'labStat', stat: 'bestPhase', gte: 40 }, {
+    scenery: 'datacenter-em-chamas',
+  }),
+  ach('lab-branch', 'laboratorio', 'Arquiteto', '🏗️', 'Leve um ramo inteiro da árvore do Laboratório ao nível máximo. O diagrama enfim deixou de ser rascunho.', { kind: 'labTree', scope: 'branch' }, {
+    labCosmetic: 'tema-grimorio',
+  }),
+  ach('lab-tree', 'laboratorio', 'Doutor em Commits', '📖', 'Leve a árvore inteira do Laboratório ao nível máximo. A tese tem trinta e quatro capítulos e nenhum merge conflict.', { kind: 'labTree', scope: 'all' }, {
+    skin: 'pablo-mago-grafos',
+  }),
+  ach('lab-recycle-100', 'laboratorio', 'Reciclador', '♻️', 'Recicle 100 itens no Laboratório. Lixo de um é Commit de outro.', { kind: 'labStat', stat: 'itemsRecycled', gte: 100 }, {
+    labCosmetic: 'gato-dormindo-no-monitor',
+  }),
+
+  // ------------------------------------------------------------------ comunidade (7)
+  ach('donate-voluntario', 'comunidade', 'Mão Estendida', '🙋', 'Doe 1 T de ADScoins ao Centro Comunitário e vire Voluntário. O crachá vem com café.', donatedTitle('voluntario')),
+  ach('donate-apoiador', 'comunidade', 'Cota de Apoio', '🤝', 'Doe 1 Sp de ADScoins ao campus no total e vire Apoiador. A cantina já sabe o seu nome.', donatedTitle('apoiador')),
+  ach('donate-patrocinador', 'comunidade', 'Logo no Cartaz', '🏷️', 'Doe 1 Dc de ADScoins ao campus no total e vire Patrocinador. O seu logo saiu pequeno, mas saiu.', donatedTitle('patrocinador'), {
+    scenery: 'centro-comunitario',
+  }),
+  ach('donate-mecenas', 'comunidade', 'Camarote da Ciência', '🎭', 'Doe 1 Qad de ADScoins ao campus no total e vire Mecenas. Poltrona reservada na defesa de tese.', donatedTitle('mecenas'), {
+    skin: 'pablo-mecenas',
+  }),
+  ach('donate-benfeitor', 'comunidade', 'Fundo Perpétuo', '🏛️', 'Doe 1 Vg de ADScoins ao campus no total e vire Benfeitor. A reitoria já esqueceu o que é orçamento.', donatedTitle('benfeitor'), {
+    theme: 'marmore-do-campus',
+  }),
+  ach('donate-nome', 'comunidade', 'Nome na Fachada', '🪧', 'Doe 1 Tg de ADScoins ao campus no total e ganhe o seu Nome no Prédio. A placa é dourada e o zelador, feliz.', donatedTitle('nome-no-predio'), {
+    skin: 'angelo-nome-no-predio',
+  }),
+  ach('donate-all', 'comunidade', 'Doação Generosa', '🎁', 'Doe todas as suas ADScoins de uma vez só, com pelo menos 1 Sp na mão. Ficou sem um tostão, mas com a consciência de ouro.', flag(GENEROUS_DONATION_FLAG)),
+
+  // ------------------------------------------------------------------ posdoc (13)
+  ach('postdoc-1', 'posdoc', 'Primeira Estrela', '⭐', 'Defenda o seu primeiro Pós-doc. A banca aprovou, a estola dourada ainda está sendo bordada.', { kind: 'postdocTotal', gte: 1 }),
+  ach('postdoc-5', 'posdoc', 'Cinco Estrelas', '🌟', 'Leve um professor às 5 estrelas de Pós-doc. Hotel de luxo, mas para o currículo.', { kind: 'postdoc', stars: 5, count: 1 }),
+  ach('postdoc-all', 'posdoc', 'Corpo Docente Estrelado', '✨', 'Deixe os 8 professores com pelo menos 1 estrela de Pós-doc. A sala dos professores virou planetário.', { kind: 'postdoc', stars: 1 }, {
+    scenery: 'salao-da-defesa',
+  }),
+  ach('postdoc-20', 'posdoc', 'Constelação', '🌌', 'Some 20 estrelas de Pós-doc entre todos os professores. Já dá para desenhar um carneiro no teto do salão.', { kind: 'postdocTotal', gte: 20 }, {
+    theme: 'ouro-do-doutorado',
+  }),
+  ach('postdoc-40', 'posdoc', 'Galáxia Docente', '🪐', 'Chegue às 40 estrelas de Pós-doc: os 8 professores com as 5 cada. Nem o CNPq tem tanta bolsa.', { kind: 'postdocTotal', gte: 40 }, {
+    theme: 'ceu-estrelado',
+  }),
+  ach('postdoc-edecio', 'posdoc', 'Doutor Edécio', '🎓', 'Leve o Edécio a 3 estrelas de Pós-doc. A palestra de abertura agora tem intervalo.', stars('edecio', 3), { skin: 'edecio-posdoc' }),
+  ach('postdoc-gladimir', 'posdoc', 'Doutor Gladimir', '🎓', 'Leve o Gladimir a 3 estrelas de Pós-doc. Tese indexada, normalizada e com backup.', stars('gladimir', 3), { skin: 'gladimir-posdoc' }),
+  ach('postdoc-b2', 'posdoc', 'Doutora Bruna B2', '🎓', 'Leve a Bruna B2 a 3 estrelas de Pós-doc. A banca elogiou até o espaçamento entre as linhas.', stars('b2', 3), { skin: 'b2-posdoc' }),
+  ach('postdoc-wagner', 'posdoc', 'Doutor Wagner', '🎓', 'Leve o Wagner a 3 estrelas de Pós-doc. Ninguém conseguiu invadir a defesa, nem com engenharia social.', stars('wagner', 3), { skin: 'wagner-posdoc' }),
+  ach('postdoc-guto', 'posdoc', 'Doutor Guto', '🎓', 'Leve o Guto a 3 estrelas de Pós-doc. A tese subiu para a nuvem e o coquetel, para o churrasco.', stars('guto', 3), { skin: 'guto-posdoc' }),
+  ach('postdoc-b1', 'posdoc', 'Doutora Bruna B1', '🎓', 'Leve a Bruna B1 a 3 estrelas de Pós-doc. O backlog da defesa já estava priorizado desde a primeira sprint.', stars('b1', 3), { skin: 'b1-posdoc' }),
+  ach('postdoc-angelo', 'posdoc', 'Doutor Angelo', '🎓', 'Leve o Angelo a 3 estrelas de Pós-doc. A banca foi marcada no horário que ele preferia, claro.', stars('angelo', 3), { skin: 'angelo-posdoc' }),
+  ach('postdoc-pablo', 'posdoc', 'Doutor Pablo', '🎓', 'Leve o Pablo a 3 estrelas de Pós-doc. Todas as demonstrações já estavam feitas, a banca só assistiu.', stars('pablo', 3), { skin: 'pablo-posdoc' }),
+
+  // ------------------------------------------------------------------ secret (14)
   ach('secret-logo', 'secret', 'Curioso Demais', '🔎', 'Clique 10 vezes no logo do jogo.', { kind: 'secret', trigger: 'logo-clicks' }, { theme: 'terminal' }, true),
   ach('secret-night-owl', 'secret', 'Coruja da Madrugada', '🦉', 'Jogue entre 3h e 5h da manhã.', { kind: 'secret', trigger: 'night-owl' }, { scenery: 'madrugada' }, true),
   ach('secret-swap', 'secret', 'Professor Rotativo', '🔄', 'Troque de professor 20 vezes em 1 minuto.', { kind: 'secret', trigger: 'swap-spree' }, { skin: 'angelo-escala' }, true),
@@ -415,5 +510,9 @@ export const achievements: AchievementDef[] = [
   ach('secret-wallpaper', 'secret', 'Papel de Parede', '🖼️', 'Fique 5 minutos com o painel lateral escondido, só admirando o cenário.', { kind: 'secret', trigger: 'wallpaper' }, { scenery: 'aurora' }, true),
   ach('secret-fitting', 'secret', 'Provador', '🪞', 'Troque de skin 10 vezes em 1 minuto. Nada serviu de primeira.', { kind: 'secret', trigger: 'fitting-room' }, { skin: 'b2-look' }, true),
   ach('secret-lettuce', 'secret', 'Mão de Alface', '🥬', 'Venda com prejuízo na Bolsa do Pablo. A planilha chorou.', { kind: 'secret', trigger: 'lettuce-hands' }, { skin: 'pablo-trader' }, true),
-  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não derrote nenhum bug na mão. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, { skin: 'wagner-cafe' }, true),
+  ach('secret-hands-off', 'secret', 'Deixa Comigo', '🙌', 'Dispare uma Super invasão e não clique em nenhum bug até ela acabar, vencendo ou perdendo. O firewall cuida.', { kind: 'secret', trigger: 'hands-off' }, { skin: 'wagner-cafe' }, true),
+  ach('secret-lab-mouse', 'secret', 'Mouse de Estimação', '🐭', 'Passe da fase 10 do Laboratório ainda com o Mouse quebrado do começo na mão. Ele já tem nome e pedigree.', flag(LAB_FLAGS.starterMouse), undefined, true),
+  ach('secret-lab-hands', 'secret', 'Sem as Mãos', '🙌', 'Chegue à fase 10 do Laboratório sem clicar no monitor nenhuma vez. Quem precisa de dedo quando se tem script?', flag(LAB_FLAGS.noHands), {
+    labCosmetic: 'mousepad-gamer-rgb',
+  }, true),
 ];

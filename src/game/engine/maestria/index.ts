@@ -6,7 +6,7 @@ import { updateBolsa } from './bolsa';
 import { updateFesta } from './festa';
 import { updateSwarm } from './swarm';
 
-export { createMaestriaState, buyMaestriaLevel, freeSlots, maestriaLevel, maestriaNextCost, maestriaSpent, unlockMaestria, unlockedMaestrias } from './slots';
+export { createMaestriaState, buyMaestriaLevel, activeMaestriaLevel, freeSlots, maestriaActive, maestriaLevel, maestriaNextCost, maestriaSpent, unlockMaestria, unlockedMaestrias } from './slots';
 export { goldenActive, goldenFactor, goldenReady, joinhaMultiplier, joinhaRechargeSeconds, joinhaSeconds, maybeStartGolden } from './joinha';
 export { fireRollforward, recordRollforwardClick, rollforwardJumpMs, rollforwardMaxCharges } from './rollforward';
 export { hitSwarmBug, startSwarm, swarmCharge, swarmChargeMs, swarmMaxSeconds, swarmReady, swarmSeconds, updateSwarm } from './swarm';
@@ -33,6 +33,7 @@ export {
   updateBolsa,
   withdrawFund,
 } from './bolsa';
+export { setMaestriaEnabled } from './toggle';
 export { readMaestria } from './save';
 export { atLevel, steadyCoinsPerSecond } from './production';
 export type { ActiveSwarm, BolsaAssetState, BolsaHolding, BolsaState, HorasState, MaestriaState, SwarmBug } from './types';

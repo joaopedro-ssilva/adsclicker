@@ -1,13 +1,16 @@
 import { PROFESSOR_IDS } from '../content/types';
-import type { AchievementDef, Condition, GameContent } from '../content/types';
+import type { AchievementDef, Condition, GameContent, Rarity, SkinDef } from '../content/types';
 import type { Emit } from '../store/types';
 import { getIndex } from './contentIndex';
 import { Decimal, parseDecimal, ratio } from './decimal';
 import { clickValueWith, coinsPerSecondWith, levelOf } from './economy';
+import { grantLabCosmetic } from './lab/cosmetics';
+import { setPieces } from './lab/effects';
 import { horasBandsFilled } from './maestria/horas';
 import { releaseVersions } from './maestria/releases';
 import { maestriaLevel } from './maestria/slots';
-import { masteryLevels, masteryRank } from './mastery';
+import { masteryLevels, masteryRank, postdocStars } from './mastery';
+import { totalPostdocStars } from './postdoc';
 import type { GameState, LastRun } from './state';
 import { achievementCount, computeStats } from './stats';
 import type { Stats } from './stats';
@@ -126,15 +129,27 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       return measureAtLeast(masteryLevels(state, content, condition.professor), condition.gte);
     case 'mastery': {
       const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
-      let reached = 0;
-      let met = true;
-      for (const id of professors) {
-        const rank = masteryRank(state, content, id);
-        reached += Math.min(rank, condition.rank);
-        if (rank < condition.rank) met = false;
-      }
-      return { progress: fraction(reached, condition.rank * professors.length), met };
+      // `count` asks for only some of the professors: the best-ranked ones are the ones that count.
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      const ranks = professors
+        .map((id) => Math.min(masteryRank(state, content, id), condition.rank))
+        .sort((a, b) => b - a)
+        .slice(0, needed);
+      const reached = ranks.reduce((sum, rank) => sum + rank, 0);
+      return { progress: fraction(reached, condition.rank * needed), met: ranks.every((rank) => rank >= condition.rank) };
     }
+    case 'postdoc': {
+      const professors = condition.professor ? [condition.professor] : index.professorList.map((p) => p.id);
+      const needed = Math.min(condition.count ?? professors.length, professors.length);
+      const stars = professors
+        .map((id) => Math.min(postdocStars(state, id), condition.stars))
+        .sort((a, b) => b - a)
+        .slice(0, needed);
+      const reached = stars.reduce((sum, value) => sum + value, 0);
+      return { progress: fraction(reached, condition.stars * needed), met: stars.every((value) => value >= condition.stars) };
+    }
+    case 'postdocTotal':
+      return measureAtLeast(totalPostdocStars(state), condition.gte);
     case 'alignedLevels': {
       let best = 0;
       let met = false;
@@ -165,7 +180,12 @@ export function measureCondition(state: GameState, content: GameContent, conditi
       return { progress: total === 0 ? 0 : bought / total, met: total > 0 && bought === total };
     }
     case 'rarityOwned': {
-      const list = content.skins.filter((skin) => skin.rarity === condition.rarity);
+      // A count: any skin of the rarity counts, the late ones included, so new skins never move the goal.
+      if (condition.gte !== undefined) {
+        const owned = content.skins.filter((skin) => skin.rarity === condition.rarity && state.skins[skin.id]).length;
+        return measureAtLeast(owned, condition.gte);
+      }
+      const list = rarityCollection(content, condition.rarity);
       const owned = list.filter((skin) => state.skins[skin.id]).length;
       return { progress: list.length === 0 ? 0 : owned / list.length, met: list.length > 0 && owned === list.length };
     }
@@ -198,6 +218,7 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'everyOwned': {
       const { owned, total } = ownedCount(state, content, condition.of, condition.except);
+      if (condition.gte !== undefined) return measureAtLeast(owned, condition.gte);
       return { progress: total === 0 ? 0 : owned / total, met: total > 0 && owned === total };
     }
     case 'everyAchievement': {
@@ -218,7 +239,75 @@ export function measureCondition(state: GameState, content: GameContent, conditi
     }
     case 'monitors':
       return measureAtLeast(monitorsReached(state, content, condition.maxed === true), condition.gte);
+    case 'donated': {
+      // The thresholds are log milestones, so the bar fills on the log scale too.
+      const target = parseDecimal(condition.gte);
+      const met = state.donated.gte(target);
+      const progress = met ? 1 : state.donated.lte(1) || target.lte(1) ? 0 : fraction(state.donated.log10(), target.log10());
+      return { progress, met };
+    }
+    case 'flag':
+      return measureBoolean(state.secrets[condition.flag] === true);
+    case 'labStat':
+      return measureAtLeast(labStatValue(state, condition.stat), condition.gte);
+    case 'labEquipped':
+      return measureAtLeast(Object.values(state.lab.turma.equipped).filter((item) => item.rarity === condition.rarity).length, condition.gte);
+    case 'labSet':
+      return measureAtLeast(setPieces(state, content).get(condition.set) ?? 0, condition.pieces);
+    case 'labTree': {
+      const { branches, whole } = labTreeProgress(state, content);
+      const best = condition.scope === 'all' ? whole : branches.reduce((top, entry) => (entry.ratio > top.ratio ? entry : top), { ratio: 0, done: false });
+      return { progress: best.ratio, met: best.done };
+    }
   }
+}
+
+/** A lab number a `labStat` condition reads. */
+export function labStatValue(state: GameState, stat: 'unlocked' | 'bestPhase' | 'broken' | 'itemsRecycled'): number {
+  const { lab } = state;
+  switch (stat) {
+    case 'unlocked':
+      return lab.unlocked ? 1 : 0;
+    case 'bestPhase':
+      return lab.bestPhase;
+    case 'broken':
+      return lab.counters.broken;
+    case 'itemsRecycled':
+      return lab.counters.itemsRecycled;
+  }
+}
+
+export interface LabTreeShare {
+  /** Levels owned over the levels of the nodes, 0..1. */
+  ratio: number;
+  /** Every node at its top level. */
+  done: boolean;
+}
+
+/** How full each branch of the lab tree is, and the whole tree. */
+export function labTreeProgress(state: GameState, content: GameContent): { branches: LabTreeShare[]; whole: LabTreeShare } {
+  const byBranch = new Map<string, { levels: number; total: number }>();
+  let levels = 0;
+  let total = 0;
+  for (const node of content.lab.tree) {
+    const owned = Math.min(node.maxLevel, state.lab.tree[node.id] ?? 0);
+    const entry = byBranch.get(node.branch) ?? { levels: 0, total: 0 };
+    entry.levels += owned;
+    entry.total += node.maxLevel;
+    byBranch.set(node.branch, entry);
+    levels += owned;
+    total += node.maxLevel;
+  }
+  const share = (entry: { levels: number; total: number }): LabTreeShare => ({
+    ratio: entry.total === 0 ? 0 : entry.levels / entry.total,
+    done: entry.total > 0 && entry.levels === entry.total,
+  });
+  return { branches: [...byBranch.values()].map(share), whole: share({ levels, total }) };
+}
+
+/** The skins of one rarity a collection feat asks for: the late collections (Laboratório, Pós-doc, donations) stay out of it. */
+export function rarityCollection(content: GameContent, rarity: Rarity): SkinDef[] {
+  return content.skins.filter((skin) => skin.rarity === rarity && !skin.source);
 }
 
 /** Sceneries or themes owned out of all those of the game, leaving out the ones an achievement hands out itself. */
@@ -263,7 +352,7 @@ export function monitorsReached(state: GameState, content: GameContent, maxed: b
 
 /** 0..1 progress of an achievement, or null when not measurable. 1 once unlocked. */
 export function achievementProgress(state: GameState, content: GameContent, def: AchievementDef, probe: Probe): number | null {
-  if (state.achievements[def.id] !== undefined) return def.condition.kind === 'secret' ? null : 1;
+  if (state.achievements[def.id] !== undefined) return def.condition.kind === 'secret' || def.secret ? null : 1;
   return measureCondition(state, content, def.condition, probe).progress;
 }
 
@@ -285,6 +374,7 @@ export function grantAchievementRewards(state: GameState, content: GameContent, 
     state.themes[reward.theme] = true;
     emit({ type: 'unlock', kind: 'theme', id: reward.theme });
   }
+  if (reward.labCosmetic) grantLabCosmetic(state, content, reward.labCosmetic, emit);
 }
 
 /**

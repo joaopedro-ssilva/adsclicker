@@ -3,7 +3,7 @@ import type { CssVariables } from '@/ui/theme';
 /**
  * The glow of each mythic skin. One entry per skin id: the colours tint the banded halo, the sparkles and the outline
  * around the professor on stage (MythicAura.tsx, mythic.css), the frame of the skin in the Álbum and the unlock
- * ceremony. A ninth mythic is one more entry here.
+ * ceremony. A new mythic is one more entry here.
  */
 export interface MythicEffect {
   /** Main colour: halo, outline, the frame in the Álbum and the ceremony on dark themes. Taken from the skin. */
@@ -23,6 +23,11 @@ export const MYTHIC_EFFECTS: Record<string, MythicEffect> = {
   'b1-imperatriz': { color: '#8b4fe8', accent: '#fcd34d', ink: '#5b21b6' },
   'angelo-chanceler': { color: '#f7dc8a', accent: '#ffffff', ink: '#8a6a00' },
   'pablo-singularidade': { color: '#a855f7', accent: '#fb923c', ink: '#7a2bc0' },
+  // The two donation skins of the Centro Comunitário: a gold statue and a gala tuxedo with a coin brooch.
+  'angelo-nome-no-predio': { color: '#e6b422', accent: '#fff0a8', ink: '#7a5600' },
+  'pablo-mecenas': { color: '#f2c94c', accent: '#f2f2f2', ink: '#14141c' },
+  // Mago Pablo, the reward of the whole Laboratório tree: graph-blue robe, teal nodes, a gold staff tip.
+  'pablo-mago-grafos': { color: '#3b82f6', accent: '#2dd4bf', ink: '#1e3a8a' },
 };
 
 /** The effect of a skin, or undefined when the skin has none (it is not mythic). */
