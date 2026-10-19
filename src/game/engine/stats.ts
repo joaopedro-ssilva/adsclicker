@@ -35,6 +35,7 @@ export const BASE_SYNERGY = 0.05;
  * | costMult           | 1                                                                      |
  * | costGrowth         | balance.costGrowth, never below balance.minCostGrowth                  |
  * | activeBonus        | balance.activeBonus                                                    |
+ * | honouredBonus      | 1 (the honoured professor's disciplines; lab items raise it)           |
  * | eventInterval      | 1                                                                      |
  * | eventWindow        | 1                                                                      |
  * | eventReward        | 1                                                                      |
@@ -61,6 +62,7 @@ export interface Stats {
   /** Per-level cost growth already clamped to balance.minCostGrowth. */
   costGrowth: number;
   activeBonus: number;
+  honouredBonus: number;
   eventInterval: number;
   eventWindow: number;
   eventReward: number;
@@ -193,6 +195,7 @@ export function computeStats(state: GameState, content: GameContent): Stats {
     costMult: Math.max(0, acc.value('costMult', 1)),
     costGrowth: Math.max(balance.minCostGrowth, acc.value('costGrowth', balance.costGrowth)),
     activeBonus: acc.value('activeBonus', balance.activeBonus),
+    honouredBonus: acc.value('honouredBonus', 1),
     eventInterval: Math.max(0.05, acc.value('eventInterval', 1)),
     eventWindow: Math.max(0.05, acc.value('eventWindow', 1)),
     eventReward: Math.max(0, acc.value('eventReward', 1)),

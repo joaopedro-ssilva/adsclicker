@@ -304,7 +304,7 @@ export interface GameActions {
   depositBolsaFund(fraction: number): boolean;
   withdrawBolsaFund(fraction: number): boolean;
 
-  /** Laboratório de Pesquisa (see docs/LABORATORIO.md). Spends 100 diplomas once, after Pablo is hired. */
+  /** Laboratório de Pesquisa (see docs/LABORATORIO.md). Spends 30 diplomas once, after Pablo is hired. */
   unlockLab(): boolean;
   /** The lab screen is open (the run advances) or closed (the run is paused). */
   setLabOpen(open: boolean): void;

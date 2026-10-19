@@ -93,7 +93,7 @@ export function LabStripChip() {
   );
 }
 
-/** "Gastar 100 diplomas?", like the graduation confirmation. The Laboratório stays yours across graduations. */
+/** "Gastar 30 diplomas?", like the graduation confirmation. The Laboratório stays yours across graduations. */
 export function LabUnlockDialog() {
   const open = useLabOverlay((store) => store.unlockAsk);
   const close = useLabOverlay((store) => store.closeUnlock);

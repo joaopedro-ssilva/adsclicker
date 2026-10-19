@@ -57,7 +57,7 @@ export const PATCHES: readonly Patch[] = [
     secretRarities: ['legendary', 'mythic'],
     secretSceneries: ['datacenter-em-chamas', 'salao-da-defesa'],
     notes: [
-      'Laboratório de Pesquisa: depois de contratar o Pablo aparece o LABTEC, o nono slot. Custa 100 diplomas uma vez e fica seu para sempre. A pesquisa de cada turma abre quando todas as aulas têm pelo menos nível 1 (tecla L).',
+      'Laboratório de Pesquisa: depois de contratar o Pablo aparece o LABTEC, o nono slot. Custa 30 diplomas uma vez e fica seu para sempre. A pesquisa de cada turma abre quando todas as aulas têm pelo menos nível 1 (tecla L).',
       'No monitor, os mobs caem pelo poder dos seus itens; clicar ajuda um pouco (até 5 cliques por segundo). Cada fase vencida oferece 3 recompensas: item, buff, Commits ou reparo. Os chefões têm 30 segundos, e o monitor quebra se a integridade zerar.',
       'Os itens da Bancada também turbinam o clicker até a formatura: clique, combo, crítico, habilidades, invasões e sprints. ADScoins sobem o nível dos itens e sorteiam atributos de novo.',
       '48 itens e 14 inimigos, entre eles a Espada do Sir Edécio, o Sabre de Luz do Darth Glad, o Bug de VibeCoder e o Select sem WHERE em produção. Os itens mais fortes só caem nas fases avançadas.',

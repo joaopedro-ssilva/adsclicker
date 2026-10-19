@@ -11,7 +11,7 @@ interface LabOverlayStore {
   tab: LabTab;
   /** The "Loja do Laboratório" panel. */
   shopOpen: boolean;
-  /** The "spend 100 diplomas?" confirmation. */
+  /** The "spend 30 diplomas?" confirmation. */
   unlockAsk: boolean;
   /** Sections of the Cosméticos tab the player folded (kept for the session). */
   folded: Record<string, true>;

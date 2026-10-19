@@ -4,7 +4,7 @@ Mini-jogo roguelike alcançado pela sala de aula. Reaproveita o conteúdo do mod
 
 ## Decisões do dono
 
-- **Liberação:** depois de contratar o Pablo aparece um 9º "professor", o Laboratório. Desbloquear custa **100 diplomas, uma vez** (`lab.unlocked`, permanente). O bônus de produção usa `diplomasEarned`, então nada se perde.
+- **Liberação:** depois de contratar o Pablo aparece um 9º "professor", o Laboratório. Desbloquear custa **30 diplomas, uma vez** (`lab.unlocked`, permanente). O bônus de produção usa `diplomasEarned`, então nada se perde.
 - **Porta por turma:** a corrida e o inventário só existem na turma quando **toda aula (disciplina) está no nível 1 ou mais**. A regra é uma função só, `labRunAvailable`, que devolve o motivo para a interface ("Faltam 5 aulas").
 - **Uma corrida por turma.** Monitor quebrado (`status: 'broken'`) encerra o Laboratório até a próxima formatura. Itens e buffs continuam valendo no clicker até lá.
 - **A corrida só anda com o Laboratório aberto** (`setLabOpen`). Fechado = pausado. Sem progresso offline: cada tick alimenta a corrida com no máximo 2 s reais.

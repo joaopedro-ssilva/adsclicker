@@ -93,7 +93,8 @@ const affixes: LabConfig['affixes'] = {
   cooldown: both(conv([part('abilityCooldown', -0.008)])),
   bossDamage: both(conv([part('eventReward', 0.01)])),
   commitsGain: both(conv([part('sprintReward', 0.01)])),
-  skillPower: both(conv([part('activeBonus', 0.005)])),
+  // The honoured professor's production: the on-stage bonus it used to feed no longer mattered.
+  skillPower: both(conv([part('honouredBonus', 0.005)])),
   // lab only
   sorte: both(conv([], { luck: 1 })),
   lootQuality: both(conv([], { luck: 1 })),
@@ -165,7 +166,7 @@ const buffs: LabBuffDef[] = [
 // ---------------------------------------------------------------------------
 
 export const lab: LabConfig = {
-  unlock: { professor: 'pablo', diplomas: 100 },
+  unlock: { professor: 'pablo', diplomas: 30 },
 
   bases,
   starter: mouseQuebrado.id,
@@ -196,7 +197,7 @@ export const lab: LabConfig = {
     abilityCooldown: 0.6,
     eventReward: 3,
     sprintReward: 3,
-    activeBonus: 1.5,
+    honouredBonus: 1.5,
   },
   labels: {
     stats: {
@@ -209,7 +210,7 @@ export const lab: LabConfig = {
       abilityCooldown: 'Recarga das habilidades',
       eventReward: 'Recompensa dos eventos',
       sprintReward: 'Recompensa das sprints',
-      activeBonus: 'Bônus do professor em sala',
+      honouredBonus: 'Produção do professor homenageado',
     },
     effects: {
       damage: 'Dano automático',

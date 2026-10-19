@@ -57,6 +57,7 @@ export type StatKey =
   | 'costMult' // multiplies every discipline/click-upgrade cost (discounts are < 1)
   | 'costGrowth' // added to the per-level cost growth (negative = cheaper)
   | 'activeBonus' // multiplier for the disciplines of the professor on stage
+  | 'honouredBonus' // multiplier for the disciplines of the honoured professor (lab items)
   | 'eventInterval' // multiplies the time between invasions (lower = more often)
   | 'eventWindow' // multiplies how long an invasion stays on screen
   | 'eventReward'

@@ -58,7 +58,7 @@ describe('Laboratório actions in the store', () => {
     const { store, events } = setup((state) => labReady(state));
     const { getState } = store;
     expect(getState().unlockLab()).toBe(true);
-    expect(getState().state.diplomas).toBe(50);
+    expect(getState().state.diplomas).toBe(120);
     expect(getState().unlockLab()).toBe(false);
 
     expect(getState().startLabRun()).toBe(true);

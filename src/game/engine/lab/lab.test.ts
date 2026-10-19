@@ -197,22 +197,22 @@ describe('lab content', () => {
 // ---------------------------------------------------------------------------
 
 describe('unlock', () => {
-  it('shows the slot once Pablo is hired and costs 100 diplomas, once', () => {
+  it('shows the slot once Pablo is hired and costs 30 diplomas, once', () => {
     const g = newCleanGame();
     expect(labSlotView(g.state, g.content).visible).toBe(false);
     g.state.diplomas = 500;
     expect(unlockLab(g.state, g.content, T0, g.emit)).toBe(false); // Pablo is not hired
     hire(g.state, 'pablo');
-    expect(labSlotView(g.state, g.content)).toMatchObject({ visible: true, unlocked: false, canUnlock: true, cost: 100 });
+    expect(labSlotView(g.state, g.content)).toMatchObject({ visible: true, unlocked: false, canUnlock: true, cost: 30 });
 
-    g.state.diplomas = 99;
+    g.state.diplomas = 29;
     expect(unlockLab(g.state, g.content, T0, g.emit)).toBe(false);
     expect(g.state.lab.unlocked).toBe(false);
 
     g.state.diplomas = 130;
     g.state.diplomasEarned = 130;
     expect(unlockLab(g.state, g.content, T0, g.emit)).toBe(true);
-    expect(g.state.diplomas).toBe(30);
+    expect(g.state.diplomas).toBe(100);
     expect(g.state.diplomasEarned).toBe(130); // the production bonus is not touched
     expect(g.state.lab.unlocked).toBe(true);
     expect(types(g)).toContain('labUnlocked');
@@ -793,7 +793,7 @@ describe('item effects in computeStats', () => {
     expect(stats({ target: 'cooldown', op: 'add', value: 5 }).abilityCooldown).toBeCloseTo(1 - 5 * 2.2 * 0.008);
     expect(stats({ target: 'bossDamage', op: 'add', value: 5 }).eventReward).toBeCloseTo(1 + 5 * 2.2 * 0.01);
     expect(stats({ target: 'commitsGain', op: 'add', value: 5 }).sprintReward).toBeCloseTo(1 + 5 * 2.2 * 0.01);
-    expect(stats({ target: 'skillPower', op: 'add', value: 5 }).activeBonus).toBeCloseTo(base.activeBonus + 5 * 2.2 * 0.005);
+    expect(stats({ target: 'skillPower', op: 'add', value: 5 }).honouredBonus).toBeCloseTo(base.honouredBonus + 5 * 2.2 * 0.005);
     // lab-only affixes do not touch the clicker
     const luck = stats({ target: 'sorte', op: 'add', value: 5 });
     expect(luck.clickPower).toBe(base.clickPower);
@@ -835,7 +835,7 @@ describe('item effects in computeStats', () => {
     const four = computeStats(g.state, g.content);
     expect(four.abilityCooldown).toBeCloseTo(1 - 15 * 0.008);
     expect(four.eventWindow).toBeCloseTo(1 + 10 * 0.015);
-    expect(four.activeBonus).toBeCloseTo(base.activeBonus + 25 * 0.005);
+    expect(four.honouredBonus).toBeCloseTo(base.honouredBonus + 25 * 0.005);
   });
 
   it('count run buffs too, scaled by the stacks, and the tree adds 8% per level to all of it', () => {
