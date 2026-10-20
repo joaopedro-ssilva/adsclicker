@@ -193,3 +193,59 @@ describe('isRollback', () => {
     expect(isRollback(next, next)).toBe(false);
   });
 });
+
+describe('multi-device conflict resolution and post-graduation resilience', () => {
+  it('allows forced conflict resolution when delta play time justifies the coin gain', () => {
+    const { previous, next } = lastWindow({ clicksPerSecond: 4, windows: 10, seed: 1 });
+    // Simulate mobile device playing 1 hour offline ahead of the cloud save
+    const advancedMobile = roundTrip(next);
+    advancedMobile.counters.playSeconds = previous.counters.playSeconds + 3600;
+    // Add production corresponding to 1 hour
+    advancedMobile.lifetimeCoins = previous.lifetimeCoins.add(new Decimal('500000'));
+    advancedMobile.runCoins = previous.runCoins.add(new Decimal('500000'));
+    advancedMobile.counters.clicks = previous.counters.clicks + 500;
+
+    // Normal sync with 10 s ping fails because 500,000 coins in 10 s is impossible
+    const normalVerdict = judgeSave({ previous, next: advancedMobile, elapsedMs: 10_000, forced: false });
+    expect(normalVerdict.ok).toBe(false);
+
+    // Forced conflict resolution passes because elapsed time is judged by device play delta (3600 s)
+    const forcedVerdict = judgeSave({ previous, next: advancedMobile, elapsedMs: 10_000, forced: true });
+    expect(forcedVerdict.ok).toBe(true);
+  });
+
+  it('allows saves synced immediately after graduation without baseline', () => {
+    const { next } = lastWindow({ clicksPerSecond: 4, windows: 10, seed: 1 });
+    const postGrad = roundTrip(next);
+    // Simulate state right after clicking graduate: 1 graduation, 8 diplomas earned with 6e22 coins,
+    // but levels and runCoins reset to 0 (so current CPS snapshot is at starting line).
+    postGrad.counters.graduations = 1;
+    postGrad.diplomasEarned = 8;
+    postGrad.lifetimeCoins = new Decimal('6e22');
+    postGrad.levels = {};
+    postGrad.coins = new Decimal(0);
+    postGrad.runCoins = new Decimal(0);
+    postGrad.counters.playSeconds = 3600;
+
+    const verdict = judgeSave({ previous: null, next: postGrad, elapsedMs: 0 });
+    expect(verdict.ok).toBe(true);
+  });
+
+
+
+
+
+  it('still rejects post-graduation saves with fraudulent coins beyond diploma worth', () => {
+    const [sample] = playWindows({ clicksPerSecond: 4, windows: 1, windowSeconds: 3600, graduateMinDiplomas: 1, seed: 3 });
+    const postGrad = roundTrip(sample!.next);
+    postGrad.levels = {};
+    postGrad.counters.graduations = 1;
+    postGrad.diplomasEarned = 1;
+    // 1 diploma is worth thousands of coins, not 1e70
+    postGrad.lifetimeCoins = new Decimal('1e70');
+
+    const verdict = judgeSave({ previous: null, next: postGrad, elapsedMs: 0 });
+    expect(verdict.ok).toBe(false);
+  });
+});
+

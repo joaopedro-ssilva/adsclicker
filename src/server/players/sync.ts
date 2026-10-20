@@ -118,25 +118,31 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   // writes nothing: the ranking stays clean. It is told to start over (docs/BACKEND.md).
   if ((request.epoch ?? 0) !== player.progressEpoch) return { body: resetBody(player, multiplier, bonus, catalog), cookies };
 
-  if (player.rev > request.baseRev && !request.force) {
+  const isConflict = player.rev > request.baseRev;
+  if (isConflict && !request.force) {
     return { body: conflictBody(player, multiplier, bonus, catalog), cookies };
   }
+
+  // A forced overwrite is only accepted when there was an actual conflict (the cloud moved ahead).
+  // A client on the current revision cannot pass force: true to bypass the regular time check.
+  const forced = Boolean(request.force && isConflict);
 
   // The client's own multiplier and bonus are never trusted: the server's replace them before anything is computed.
   parsed.settings.devMultiplier = multiplier;
   parsed.cloudBonus = bonus ? { cargo: bonus.cargo, mentors: bonus.mentors } : { cargo: 1, mentors: {} };
 
   // A forced overwrite that goes back to older progress (the other device's save) has no baseline:
-  // it is judged like a first sync, by its own play time. One that moves forward is judged as usual,
-  // so `force` is not a way around the elapsed-time check.
+  // it is judged like a first sync, by its own play time. One that moves forward keeps the baseline
+  // but uses its device play time delta in plausibility.
   const stored = player.save !== null ? deserializeState(player.save, content, now) : null;
-  const previous = stored && !(request.force && isRollback(stored, parsed)) ? stored : null;
+  const previous = stored && !(forced && isRollback(stored, parsed)) ? stored : null;
   const elapsedMs = now - player.lastSeenAt.getTime();
-  const coinVerdict = judgeSave({ previous, next: parsed, elapsedMs, forced: request.force });
+  const coinVerdict = judgeSave({ previous, next: parsed, elapsedMs, forced });
   // Game time against the server's clock (a speedhack makes the first run ahead of the second). The bucket is
   // stored whatever the verdict, so the excess keeps counting across syncs.
   const patched = request.clock?.patched === true;
-  const clock = judgeClock({ previous, next: parsed, elapsedMs, excessSeconds: player.clockExcessSeconds, patched, forced: request.force });
+  const clock = judgeClock({ previous, next: parsed, elapsedMs, excessSeconds: player.clockExcessSeconds, patched, forced });
+
   const verdict: Verdict = coinVerdict.ok && clock.suspect ? { ok: false, reason: clock.reason } : coinVerdict;
   if (patched || Math.abs(request.clock?.skewMs ?? 0) >= CLOCK_SKEW_LOG_MS) {
     logEvent(
@@ -166,7 +172,7 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
       playerId: player.id,
       nickname: player.nickname,
       route: '/api/sync',
-      detail: { reason: verdict.reason.slice(0, FLAG_REASON_MAX), alreadyFlagged: player.flagged, force: Boolean(request.force) },
+      detail: { reason: verdict.reason.slice(0, FLAG_REASON_MAX), alreadyFlagged: player.flagged, force: forced },
     });
   }
   const flagged = player.flagged || suspect;
@@ -191,9 +197,10 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
   };
   // The epoch is part of the write: a reset that commits between our read and our write makes it match nothing.
   const sameEpoch = eq(players.progressEpoch, player.progressEpoch);
-  const where = request.force
+  const where = forced
     ? and(eq(players.id, player.id), sameEpoch)
     : and(eq(players.id, player.id), eq(players.rev, player.rev), sameEpoch);
+
 
   const newRev = await writeSync(db, player.id, values, where, drafts);
   if (newRev === null) {
