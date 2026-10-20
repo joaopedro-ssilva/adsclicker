@@ -17,22 +17,52 @@ const RECOMMENDATION = {
   local: 'Recomendamos este aparelho: ele tem mais progresso.',
   cloud: 'Recomendamos a nuvem: ela tem mais progresso.',
   tie: 'Os dois estão no mesmo ponto. Pode ficar com qualquer um.',
+  mixed: 'Os aparelhos têm progressos diferentes. Compare o tempo de jogo e os diplomas com atenção antes de escolher.',
 } as const;
 
 function ConflictBody({ conflict }: { conflict: CloudConflict }) {
-  const useCloudSave = useCloud((store) => store.useCloudSave);
+  const adoptCloud = useCloud((store) => store.useCloudSave);
   const keepLocalSave = useCloud((store) => store.keepLocalSave);
   // Frozen when the dialog opens: the game keeps running behind it, and the numbers must not move under the choice.
-  const [local] = useState(() => summarizeState(useGame.getState().state));
+  const [localState] = useState(() => useGame.getState().state);
+  const [local] = useState(() => summarizeState(localState));
+  const [localSavedAt] = useState(() => localState.lastSavedAt);
   const [now] = useState(() => Date.now());
   const [pending, setPending] = useState(false);
+  const [confirming, setConfirming] = useState<'local' | 'cloud' | null>(null);
+
   const best = moreProgress(local, conflict.cloud.summary);
 
-  const keepLocal = async () => {
+  const localHasLoss =
+    conflict.cloud.summary.playSeconds > local.playSeconds ||
+    conflict.cloud.summary.diplomasEarned > local.diplomasEarned;
+
+  const cloudHasLoss =
+    local.playSeconds > conflict.cloud.summary.playSeconds ||
+    local.diplomasEarned > conflict.cloud.summary.diplomasEarned;
+
+  const handleKeepLocal = async () => {
+    if (confirming !== 'local' && localHasLoss) {
+      setConfirming('local');
+      return;
+    }
     setPending(true);
     await keepLocalSave();
     setPending(false);
   };
+
+  const handleUseCloud = () => {
+    if (confirming !== 'cloud' && cloudHasLoss) {
+      setConfirming('cloud');
+      return;
+    }
+    adoptCloud();
+  };
+
+
+
+  const localButtonVariant = best === 'local' ? 'primary' : 'secondary';
+  const cloudButtonVariant = best === 'cloud' ? 'primary' : 'secondary';
 
   return (
     <div className="conflict">
@@ -41,19 +71,44 @@ function ConflictBody({ conflict }: { conflict: CloudConflict }) {
         <SaveColumn
           title="Este aparelho"
           summary={local}
-          savedAt="agora"
+          savedAt={formatSavedAt(localSavedAt, now)}
           recommended={best === 'local'}
           testId="conflict-local"
           note="Substitui o que está na nuvem."
           action={
-            <Button
-              variant={best === 'cloud' ? 'secondary' : 'primary'}
-              disabled={pending}
-              data-qa="conflict-keep-local"
-              onClick={keepLocal}
-            >
-              Manter este aparelho
-            </Button>
+            confirming === 'local' ? (
+              <div className="conflict-confirm">
+                <p className="conflict-confirm-msg">A nuvem tem mais diplomas ou tempo de jogo. Deseja substituir mesmo assim?</p>
+                <div className="conflict-confirm-actions">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    disabled={pending}
+                    data-qa="conflict-confirm-keep-local"
+                    onClick={handleKeepLocal}
+                  >
+                    Sim, substituir
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => setConfirming(null)}
+                  >
+                    Voltar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant={localButtonVariant}
+                disabled={pending}
+                data-qa="conflict-keep-local"
+                onClick={handleKeepLocal}
+              >
+                Manter este aparelho
+              </Button>
+            )
           }
         />
         <SaveColumn
@@ -64,21 +119,48 @@ function ConflictBody({ conflict }: { conflict: CloudConflict }) {
           testId="conflict-cloud"
           note="Substitui o progresso deste aparelho."
           action={
-            <Button
-              variant={best === 'cloud' ? 'primary' : 'secondary'}
-              disabled={pending}
-              data-qa="conflict-use-cloud"
-              onClick={useCloudSave}
-            >
-              Usar a nuvem
-            </Button>
+            confirming === 'cloud' ? (
+              <div className="conflict-confirm">
+                <p className="conflict-confirm-msg">Este aparelho tem mais diplomas ou tempo de jogo. Deseja substituir mesmo assim?</p>
+                <div className="conflict-confirm-actions">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    disabled={pending}
+                    data-qa="conflict-confirm-use-cloud"
+                    onClick={handleUseCloud}
+                  >
+                    Sim, usar nuvem
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={pending}
+                    onClick={() => setConfirming(null)}
+                  >
+                    Voltar
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant={cloudButtonVariant}
+                disabled={pending}
+                data-qa="conflict-use-cloud"
+                onClick={handleUseCloud}
+              >
+                Usar a nuvem
+              </Button>
+            )
           }
         />
+
       </div>
-      <p className="conflict-advice">{RECOMMENDATION[best]}</p>
+      <p className="conflict-advice" data-dominance={best}>{RECOMMENDATION[best]}</p>
     </div>
   );
 }
+
 
 /** Blocks the game until the player picks which progress to keep. It cannot be closed by accident. */
 export function ConflictDialog() {

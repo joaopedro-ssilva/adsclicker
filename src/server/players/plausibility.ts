@@ -14,7 +14,7 @@ import type { GameContent } from '@/game/content/types';
 import { Decimal, ZERO, clickValue, coinsPerSecond, parseDecimal, statsOf } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import { horasMaxDiplomas, maestriaLevel } from '@/game/engine/maestria';
-import { capBase, maxAngeloCapFactor } from '@/game/engine/prestige';
+import { capBase, maxAngeloCapFactor, runCoinsFor } from '@/game/engine/prestige';
 import { judgeDonations } from './donationRecords';
 import { judgeLabRecords } from './labRecords';
 import { judgePostdoc } from './postdocBounds';
@@ -164,7 +164,11 @@ export function judgeSave({ previous, next, elapsedMs, forced = false, content =
     if (next.diplomasEarned < previous.diplomasEarned) return fail('diplomas went backwards');
 
     gain = Decimal.max(ZERO, next.lifetimeCoins.sub(previous.lifetimeCoins));
-    seconds = Math.max(0, elapsedMs) / 1000;
+    const realSeconds = Math.max(0, elapsedMs) / 1000;
+    const deltaPlay = Math.max(0, next.counters.playSeconds - previous.counters.playSeconds);
+    // When resolving a multi-device conflict (forced), the overwrite represents progress earned on
+    // that other device. Its elapsed game time is bounded by the delta of its own play time.
+    seconds = forced ? Math.max(realSeconds, deltaPlay) : realSeconds;
     offlineReturns = Math.max(0, next.counters.offlineCollections - previous.counters.offlineCollections);
     clicksDone = next.counters.clicks - previous.counters.clicks;
     graduationsDone = next.counters.graduations - previous.counters.graduations;
@@ -209,11 +213,25 @@ export function judgeSave({ previous, next, elapsedMs, forced = false, content =
     previous ? joinhaClickFactor(previous, content, maestriaWindow) : 1,
   );
   const clickFactor = bestNumber((r) => r.clickFactor) * CLICK_BUFF_SLACK * goldenFactor;
-  const ceiling = best((r) => r.cps)
+  let ceiling = best((r) => r.cps)
     .mul(productionSeconds)
     .add(best((r) => r.click).mul(clicksAllowed * clickFactor));
+
+  // A save without a baseline (first sync, rollback or fresh guest) that has already graduated has
+  // had its disciplines reset, so its snapshot CPS is at the starting line. Its lifetime coins were
+  // earned across past turmas backed by its earned diplomas. The ceiling must cover what those diplomas
+  // were worth to avoid false positives on saves synced immediately after graduating.
+  if (!previous && next.counters.graduations > 0 && next.diplomasEarned > 0) {
+    const historicalRun = runCoinsFor(next.diplomasEarned, content, nextRates.stats);
+    const historicalCeiling = historicalRun
+      .mul(DIPLOMA_GAIN_SLACK)
+      .mul(Math.min(next.counters.graduations, 1000) + 1);
+    ceiling = Decimal.max(ceiling, historicalCeiling);
+  }
+
   ratio = gain.div(Decimal.max(ceiling, 1e-9)).toNumber();
   if (gain.gt(ceiling)) return fail('more coins than the state can produce in the time elapsed');
+
 
   // Maestrias: a slot per graduation, and the levels were paid with diplomas that were earned.
   if (maestriaSlotsUsed(next) > next.counters.graduations) return fail('more Maestrias than graduations');

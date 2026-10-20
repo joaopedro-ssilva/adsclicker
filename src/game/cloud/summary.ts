@@ -27,15 +27,42 @@ export function sameProgress(a: SaveSummary, b: SaveSummary): boolean {
   );
 }
 
-/** Which save has gone further, by ADScoins produced in the lifetime, then by play time. */
-export function moreProgress(local: SaveSummary, cloud: SaveSummary): 'local' | 'cloud' | 'tie' {
-  const a = parseDecimal(local.lifetimeCoins);
-  const b = parseDecimal(cloud.lifetimeCoins);
-  if (a.gt(b)) return 'local';
-  if (a.lt(b)) return 'cloud';
-  if (local.playSeconds === cloud.playSeconds) return 'tie';
-  return local.playSeconds > cloud.playSeconds ? 'local' : 'cloud';
+export type ProgressDominance = 'local' | 'cloud' | 'tie' | 'mixed';
+
+/**
+ * Which save has gone further across permanent milestones (diplomas, achievements, professors),
+ * invested play time, and lifetime coins.
+ *
+ * - 'tie': Both saves are identical in all tracked progress metrics.
+ * - 'local': Local strictly dominates or matches cloud across all metrics, with at least one higher.
+ * - 'cloud': Cloud strictly dominates or matches local across all metrics, with at least one higher.
+ * - 'mixed': Saves have branched or progressed in different dimensions (e.g. one has more diplomas
+ *   while the other collected more offline coins). Neither should be recommended over the other.
+ */
+export function moreProgress(local: SaveSummary, cloud: SaveSummary): ProgressDominance {
+  const localCoins = parseDecimal(local.lifetimeCoins);
+  const cloudCoins = parseDecimal(cloud.lifetimeCoins);
+
+  const localWins =
+    local.diplomasEarned > cloud.diplomasEarned ||
+    local.professors > cloud.professors ||
+    local.achievements > cloud.achievements ||
+    local.playSeconds > cloud.playSeconds ||
+    localCoins.gt(cloudCoins);
+
+  const cloudWins =
+    cloud.diplomasEarned > local.diplomasEarned ||
+    cloud.professors > local.professors ||
+    cloud.achievements > local.achievements ||
+    cloud.playSeconds > local.playSeconds ||
+    cloudCoins.gt(localCoins);
+
+  if (!localWins && !cloudWins) return 'tie';
+  if (localWins && !cloudWins) return 'local';
+  if (cloudWins && !localWins) return 'cloud';
+  return 'mixed';
 }
+
 
 /** A device with no real progress, which can take the cloud save without asking. */
 export function isFreshDevice(summary: SaveSummary): boolean {

@@ -200,6 +200,49 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       expect(row!.coins).toBe(c!.lifetimeCoins.toString());
     });
 
+    it('resolves a multi-device conflict with force: true and legitimate played progress without flagging', async () => {
+      // Device A synced a few windows early on.
+      const initial = savesOf(2, { seed: 10 });
+      const created = await syncPlayer(db, { request: body(initial[0]!, 0), token: null, ip: '10.0.0.1', now: T0 });
+      const token = tokenOf(created.cookies);
+      await syncPlayer(db, { request: body(initial[1]!, 1), token, ip: '10.0.0.1', now: T0 + 45_000 });
+
+      // Device B played 10 more windows offline (~450 s of real play) while the cloud was at rev 2.
+      const deviceBSaves = savesOf(12, { seed: 10 });
+      const deviceBSave = deviceBSaves.at(-1)!;
+
+      // Device B connects only 5 seconds after Device A's sync. It first gets a conflict.
+      const conflict = await syncPlayer(db, { request: body(deviceBSave, 1), token, ip: '10.0.0.1', now: T0 + 50_000 });
+      expect(conflict.body.status).toBe('conflict');
+
+      // The player chooses "Manter este aparelho" (force: true), just 2 seconds later.
+      // Server elapsed is only 2 s, but delta play time is ~450 s.
+      const resolved = await syncPlayer(db, { request: body(deviceBSave, 1, true), token, ip: '10.0.0.1', now: T0 + 52_000 });
+      expect(resolved.body).toMatchObject({ status: 'ok', rev: 3 });
+
+      const [row] = await db.select({ flagged: players.flagged, coins: players.lifetimeCoinsText }).from(players);
+      expect(row!.flagged).toBe(false);
+      expect(row!.coins).toBe(deviceBSave.lifetimeCoins.toString());
+    });
+
+    it('still flags a forced multi-device conflict when coins exceed what the device play time could produce', async () => {
+      const initial = savesOf(2, { seed: 11 });
+      const created = await syncPlayer(db, { request: body(initial[0]!, 0), token: null, ip: '10.0.0.1', now: T0 });
+      const token = tokenOf(created.cookies);
+      await syncPlayer(db, { request: body(initial[1]!, 1), token, ip: '10.0.0.1', now: T0 + 45_000 });
+
+      // Device B has modest play time (+45 s) but hand-edited coins (1e12x).
+      const cheatSaves = savesOf(3, { seed: 11 });
+      const cheatSave = cheatSaves.at(-1)!;
+      cheatSave.lifetimeCoins = cheatSave.lifetimeCoins.mul(1e12);
+
+      const forced = await syncPlayer(db, { request: body(cheatSave, 1, true), token, ip: '10.0.0.1', now: T0 + 50_000 });
+      expect(forced.body.status).toBe('ok');
+
+      const [row] = await db.select({ flagged: players.flagged }).from(players);
+      expect(row!.flagged).toBe(true);
+    });
+
     it('lets a forced rollback to older progress through without flagging the player', async () => {
       const [a, b, c] = savesOf(3);
       const created = await syncPlayer(db, { request: body(a!, 0), token: null, ip: '10.0.0.1', now: T0 });

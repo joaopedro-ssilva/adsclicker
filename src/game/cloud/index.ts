@@ -5,6 +5,8 @@ import { createCloudStore } from './createCloud';
 
 export type * from './types';
 export { moreProgress, summarizeState } from './summary';
+export type { ProgressDominance } from './summary';
+
 
 /**
  * The cloud store. Importing it touches no browser API: GameApp calls `useCloud.getState().start()`

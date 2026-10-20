@@ -279,7 +279,7 @@ Tabela `server_logs` (`id`, `at`, `level` info/warn/error, `kind`, `message`, `p
 | Senha redefinida pelo admin (sem a senha) | `admin_password_reset` | `resetPlayerPassword` |
 | Multiplicador do evento, Turma Zero em massa (com as contagens) | `admin_event_multiplier`, `admin_turma_zero` | rota do evento, `grantTurmaZeroToAll` |
 
-A marca de suspeito só é limpa pelo admin (`admin_unflag`); o sync nunca a limpa.
+A marca de suspeito só é limpa pelo admin (`admin_unflag`); o sync nunca a limpa. Para auditoria e restauração de falsos positivos de conflito multi-aparelho, utilize `npm run players:restore-victims` (ou pelo painel `/admin/players`; procedimento completo em `docs/PLANO_CORRECAO_CONFLITO_RANKING.md`).
 
 **Fora do caminho da requisição.** A escrita é agendada com `after()` do Next (depois da resposta); fora de uma requisição ela dispara sem ser esperada. Todo erro dela é engolido: logar nunca derruba nem atrasa nada. Os testes desligam `logEvent` (`NODE_ENV=test`); `writeLog` é testado direto.
 
