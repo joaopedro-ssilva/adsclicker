@@ -123,9 +123,8 @@ async function syncPlayerInner(db: Db, input: SyncInput, trace: { playerId: stri
     return { body: conflictBody(player, multiplier, bonus, catalog), cookies };
   }
 
-  // A forced overwrite is only accepted when there was an actual conflict (the cloud moved ahead).
-  // A client on the current revision cannot pass force: true to bypass the regular time check.
-  const forced = Boolean(request.force && isConflict);
+  // A forced overwrite is sent when resolving a multi-device conflict or intentionally rolling back.
+  const forced = Boolean(request.force);
 
   // The client's own multiplier and bonus are never trusted: the server's replace them before anything is computed.
   parsed.settings.devMultiplier = multiplier;
