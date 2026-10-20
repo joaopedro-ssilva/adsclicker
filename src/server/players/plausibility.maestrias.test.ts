@@ -10,7 +10,7 @@ import type { SimOptions } from '@/game/sim/simulate';
 import { roundTrip } from '../testing/play';
 import type { Window } from '../testing/play';
 import { joinhaClickFactor } from './maestriaBounds';
-import { judgeSave } from './plausibility';
+import { CLICK_COUNT_GRACE, MAX_CLICKS_PER_SECOND, TIME_GRACE_SECONDS, judgeSave } from './plausibility';
 
 /** Plays with all eight Maestrias at the top level (the simulator uses every charge as soon as it is ready and trades the Bolsa). */
 function maestriaWindows(options: SimOptions & { windows: number; windowSeconds?: number }): Window[] {
@@ -165,8 +165,8 @@ describe('judgeSave: Maestrias', () => {
 
   it('more clicks than the engine accepts (the click limit)', () => {
     const { previous, next, elapsedMs } = last();
-    const limit = content.balance.clickLimit?.perSecond ?? 20;
-    next.counters.clicks = previous.counters.clicks + Math.ceil(limit * (elapsedMs / 1000 + 30) + 200);
+    const limit = content.balance.clickLimit?.perSecond ?? MAX_CLICKS_PER_SECOND;
+    next.counters.clicks = previous.counters.clicks + Math.ceil(limit * (elapsedMs / 1000 + TIME_GRACE_SECONDS) + CLICK_COUNT_GRACE + 200);
     expect(judgeSave({ previous, next: roundTrip(next), elapsedMs }).ok).toBe(false);
   });
 });

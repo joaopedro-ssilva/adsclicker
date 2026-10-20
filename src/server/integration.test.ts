@@ -18,6 +18,7 @@ import { clearLeaderboardCache, getLeaderboard, getRanks } from './community/lea
 import { resetEventMultiplierCache, setEventMultiplier } from './config/eventMultiplier';
 import { feedEvents, players, sessions } from './db/schema';
 import { ApiFailure } from './http/errors';
+import { CLOCK_EXCESS_LIMIT_SECONDS, CLOCK_RATE_LIMIT, CLOCK_SLACK_SECONDS, CLOCK_SYNC_EXCESS_CAP_SECONDS } from './players/clockCheck';
 import { judgeSave } from './players/plausibility';
 import { getMe } from './players/me';
 import { setNickname, setPassword } from './players/account';
@@ -359,28 +360,29 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
       expect(row).toMatchObject({ flagged: false, clockExcessSeconds: 0 });
     });
 
-    it('a 2x clock passes the coin check but is flagged after a few minutes, with the clock as the reason', async () => {
-      const saves = hackedSaves(2, 24);
+    it('a 3x clock passes the coin check but is flagged after a sustained pile, with the clock as the reason', async () => {
+      const saves = hackedSaves(3, 24);
       // The coin check alone cannot see it: every window, taken as 45 s of server time, is within its generous ceiling.
-      const windows = playWindows({ windows: 24, windowSeconds: 90, seed: 7, clicksPerSecond: 3 });
+      const windows = playWindows({ windows: 24, windowSeconds: 135, seed: 7, clicksPerSecond: 3 });
       expect(windows.slice(1).every((window) => judgeSave({ ...window, elapsedMs: 45_000 }).ok)).toBe(true);
 
       const result = await playThrough(saves);
       expect(result.flaggedAt).not.toBeNull();
-      expect(result.flaggedAt!).toBeGreaterThanOrEqual(7); // not on the first syncs: at least a few minutes of it
-      expect(result.flaggedAt!).toBeLessThanOrEqual(15);
+      // Each judged sync (the first has no baseline) adds claimed - rate x real - slack to the bucket until the limit.
+      const perSync = Math.min(135 - 45 * CLOCK_RATE_LIMIT - CLOCK_SLACK_SECONDS, 45 + CLOCK_SYNC_EXCESS_CAP_SECONDS);
+      expect(result.flaggedAt!).toBe(Math.ceil(CLOCK_EXCESS_LIMIT_SECONDS / perSync) + 1); // not on the first syncs
       const [row] = await db.select().from(players);
       expect(row).toMatchObject({ flagged: true, banned: false });
       expect(row!.flagReason).toContain('game clock ahead of the server clock');
       // The save is kept (a false positive costs the ranking, not the progress) and the bucket restarts.
       expect(row!.save).not.toBeNull();
-      expect(row!.clockExcessSeconds).toBeLessThan(300);
+      expect(row!.clockExcessSeconds).toBeLessThan(CLOCK_EXCESS_LIMIT_SECONDS);
     });
 
     it('a client that also reports its patched clock is flagged sooner', async () => {
-      const plain = await playThrough(hackedSaves(2, 24));
+      const plain = await playThrough(hackedSaves(3, 24));
       await testDb.reset();
-      const reported = await playThrough(hackedSaves(2, 24), { clock: { patched: true, skewMs: 30_000 } });
+      const reported = await playThrough(hackedSaves(3, 24), { clock: { patched: true, skewMs: 30_000 } });
       expect(reported.flaggedAt!).toBeLessThan(plain.flaggedAt!);
       const [row] = await db.select().from(players);
       expect(row!.flagReason).toContain('patched clock');
@@ -392,8 +394,8 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     });
 
     it('long gaps between syncs do not hide it: an hour away does not pay the debt and the tab closed is not credit', async () => {
-      // 4 minutes of a 2x clock, an hour with the game closed (play 0), then 2x again: the excess does not carry a credit.
-      const saves = hackedSaves(2, 9);
+      // A few minutes of a 3x clock, an hour with the game closed (play 0): the excess does not carry a credit.
+      const saves = hackedSaves(3, 9);
       const result = await playThrough(saves);
       expect(result.flaggedAt).toBeNull(); // nine syncs: still under the limit
       const [row] = await db.select().from(players);
@@ -419,9 +421,9 @@ describe.skipIf(!testDb)('backend against Postgres', () => {
     });
 
     it('a trusted player is judged and logged but never flagged by the clock', async () => {
-      const first = await playThrough(hackedSaves(2, 3));
+      const first = await playThrough(hackedSaves(3, 3));
       await patchPlayer(db, (await db.select().from(players))[0]!.id, { trusted: true }, null, first.now);
-      const more = hackedSaves(2, 30).slice(3);
+      const more = hackedSaves(3, 30).slice(3);
       let rev = first.rev;
       let now = first.now;
       for (const state of more) {

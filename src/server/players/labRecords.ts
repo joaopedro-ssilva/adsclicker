@@ -20,10 +20,10 @@ import type { GameState } from '@/game/engine/state';
 import { BACKWARDS_TOLERANCE, TIME_GRACE_SECONDS } from './plausibility';
 
 /** Least seconds a phase can honestly take (fight steps and the pick of a reward). */
-export const LAB_MIN_PHASE_SECONDS = 1;
+export const LAB_MIN_PHASE_SECONDS = 0.5;
 
 /** Phases a sync may add beyond the time rule: the first phase of a run, a boss clear in the same breath, rounding. */
-export const LAB_PHASE_GRACE = 3;
+export const LAB_PHASE_GRACE = 10;
 
 export interface LabRecordsInput {
   previous: GameState | null;

@@ -24,7 +24,7 @@ import { joinhaClickFactor, maestriaDiplomasSpent, maestriaLumpSeconds, maestria
  * Seconds added to every time window. Covers network latency, the browser throttling timers,
  * a client clock a few seconds off, and the final sync sent when the page closes.
  */
-export const TIME_GRACE_SECONDS = 30;
+export const TIME_GRACE_SECONDS = 60;
 
 /**
  * The one-off allowances (grace, reward lumps, the Hiperespaço clicks) are earned by waiting: a
@@ -43,7 +43,8 @@ export const OFFLINE_RETURN_EVERY_SECONDS = 60;
  * window (the tab was hidden, so no sync) averages them out, so 5 covers the strongest realistic
  * stack for a normal window with room to spare.
  */
-export const PRODUCTION_SLACK = 5;
+// Loosened on 2026-10-20: the Laboratório, the Pós-doc and the late items made honest play much faster.
+export const PRODUCTION_SLACK = 25;
 
 /**
  * Extra seconds of production allowed per sync for lump rewards. Invasions and sprints pay
@@ -51,7 +52,7 @@ export const PRODUCTION_SLACK = 5;
  * research and tree nodes) for an invasion and 125 s x about x1.7 for a sprint, and a few can
  * land inside one window.
  */
-export const REWARD_LUMP_SECONDS = 450;
+export const REWARD_LUMP_SECONDS = 1_800;
 
 /**
  * REWARD_LUMP_SECONDS was sized for rewards about x2.5 the base (research and the tree). Domínio
@@ -73,23 +74,23 @@ function lumpFactor(stats: { eventReward: number; sprintReward: number; eventInt
  * Hand clicks per second when the content sets no balance.clickLimit. The engine drops clicks past
  * that limit, so the server holds a save to the same number (handClicks below).
  */
-export const MAX_CLICKS_PER_SECOND = 20;
+export const MAX_CLICKS_PER_SECOND = 30;
 
 /**
  * Automatic clicks the Hiperespaço buff (+20/s for 20 s) can add inside one window even when
  * it has already ended at the snapshot, so the stat does not show it. A lump, not a rate.
  */
-export const AUTO_CLICK_BUFF_CLICKS = 400;
+export const AUTO_CLICK_BUFF_CLICKS = 1_200;
 
 /**
  * Multiplier on top of the combo and crit the state itself shows (combo at its maximum and the
  * average crit). It covers the click buffs that can be gone by the snapshot: Aula Show (x10,
  * 15 s) and the invasion and sprint x10, which fill only part of a window, and crit luck.
  */
-export const CLICK_BUFF_SLACK = 4;
+export const CLICK_BUFF_SLACK = 12;
 
 /** Clicks allowed beyond the rate, for the very first sync and for rounding. */
-export const CLICK_COUNT_GRACE = 50;
+export const CLICK_COUNT_GRACE = 150;
 
 /**
  * Lifetime coins may fall by this fraction between syncs without it counting as "went
@@ -104,7 +105,7 @@ export const MAX_COIN_EXPONENT = 5_000;
  * Research bought between the two snapshots and before the graduation (+25% diplomas each) is in neither,
  * and a window with a big lump (a Rollforward, a Super invasão) can graduate on all of it at once.
  */
-export const DIPLOMA_GAIN_SLACK = 1.5;
+export const DIPLOMA_GAIN_SLACK = 3;
 
 /** `ratio` is gain / ceiling of the coins check (1 = right at the limit), for calibration. */
 export type Verdict = { ok: true; ratio: number } | { ok: false; reason: string };

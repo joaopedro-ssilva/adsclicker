@@ -4,7 +4,7 @@ import { Decimal } from '@/game/engine';
 import type { GameState } from '@/game/engine/state';
 import { simulate } from '@/game/sim/simulate';
 import { LAB_MIN_PHASE_SECONDS, LAB_PHASE_GRACE } from './labRecords';
-import { judgeSave } from './plausibility';
+import { TIME_GRACE_SECONDS, judgeSave } from './plausibility';
 import { projectState } from './projection';
 import { roundTrip } from '../testing/play';
 
@@ -39,12 +39,14 @@ describe('judgeSave: the Laboratório records', () => {
     expect(judge(previous, next)).toMatchObject({ ok: false, reason: expect.stringContaining('lab unlocked') });
   });
 
-  it('rejects an impossible jump of the highest phase (a forged 90 after a record of 5)', () => {
+  it('rejects an impossible jump of the highest phase (a forged record far above the window after a record of 5)', () => {
     const { previous, next } = pair();
     previous.lab.bestPhase = 5;
     previous.lab.counters.phasesCleared = 4;
-    next.lab.bestPhase = 90;
-    next.lab.counters.phasesCleared = 89; // even with the counter forged to match
+    // Far beyond what the window (45 s plus the time grace) allows at the fastest honest pace.
+    const forged = 5 + Math.ceil((45 + TIME_GRACE_SECONDS) / LAB_MIN_PHASE_SECONDS) + LAB_PHASE_GRACE + 50;
+    next.lab.bestPhase = forged;
+    next.lab.counters.phasesCleared = forged - 1; // even with the counter forged to match
     const verdict = judge(previous, next);
     expect(verdict.ok).toBe(false);
     expect(verdict).toMatchObject({ reason: expect.stringContaining('lab phase') });
@@ -61,7 +63,7 @@ describe('judgeSave: the Laboratório records', () => {
   it('rejects a first save that claims more phases than its play time allows', () => {
     const { next } = pair();
     const seconds = next.counters.playSeconds;
-    next.lab.bestPhase = Math.ceil(seconds / LAB_MIN_PHASE_SECONDS) + 30 + LAB_PHASE_GRACE + 10;
+    next.lab.bestPhase = Math.ceil((seconds + TIME_GRACE_SECONDS) / LAB_MIN_PHASE_SECONDS) + LAB_PHASE_GRACE + 10;
     next.lab.counters.phasesCleared = next.lab.bestPhase;
     expect(judge(null, next)).toMatchObject({ ok: false, reason: expect.stringContaining('lab phase') });
   });

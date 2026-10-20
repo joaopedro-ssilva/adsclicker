@@ -19,10 +19,11 @@ import type { GameState } from '@/game/engine/state';
  * below; the margin covers a client clock stepped forward by a few seconds (NTP, a manual fix) and
  * the way syncs are timed. Also the most a sustained cheat can keep without being caught (+20%).
  */
-export const CLOCK_RATE_LIMIT = 1.2;
+// Loosened on 2026-10-20: the Laboratório, the Pós-doc and the late items made honest play much faster.
+export const CLOCK_RATE_LIMIT = 1.5;
 
 /** Seconds ignored in every sync: network latency changes between two syncs, a clock a moment off. */
-export const CLOCK_SLACK_SECONDS = 3;
+export const CLOCK_SLACK_SECONDS = 5;
 
 /**
  * Most one sync can add to the bucket, besides its own real time. A client clock that jumps once (a
@@ -31,11 +32,11 @@ export const CLOCK_SLACK_SECONDS = 3;
  */
 export const CLOCK_SYNC_EXCESS_CAP_SECONDS = 30;
 
-/** Seconds of excess game time that mark the player: at 2x speed, about 7 minutes of play. */
-export const CLOCK_EXCESS_LIMIT_SECONDS = 300;
+/** Seconds of excess game time that mark the player: at 2x speed, about half an hour of play. */
+export const CLOCK_EXCESS_LIMIT_SECONDS = 900;
 
 /** The limit once the client itself reported that its clock is patched (a much weaker pile is enough). */
-export const CLOCK_EXCESS_LIMIT_PATCHED_SECONDS = 90;
+export const CLOCK_EXCESS_LIMIT_PATCHED_SECONDS = 300;
 
 export type ClockVerdict =
   | {

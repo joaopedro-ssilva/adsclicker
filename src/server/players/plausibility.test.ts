@@ -143,10 +143,10 @@ describe('judgeSave: tampering fails', () => {
     expect(judgeSave({ previous, next, elapsedMs }).ok).toBe(false);
   });
 
-  it('ten minutes of gain is refused in a 45 s window but accepted after 10 minutes', () => {
-    // A fast clicker: ten minutes of their clicks do not fit in 45 s even at the click limit.
+  it('ten minutes of gain is refused in a 1 s window but accepted after 10 minutes', () => {
+    // A fast clicker: ten minutes of their clicks do not fit in 1 s even at the click limit and the loosened margins.
     const slow = lastWindow({ clicksPerSecond: 14, windows: 20, windowSeconds: 600, seed: 9 });
-    const quick = { ...slow, elapsedMs: 45_000 };
+    const quick = { ...slow, elapsedMs: 1_000 };
     expect(judgeSave(slow)).toMatchObject({ ok: true });
     expect(judgeSave(quick).ok).toBe(false);
   }, 60_000);

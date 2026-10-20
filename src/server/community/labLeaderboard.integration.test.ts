@@ -14,6 +14,8 @@ import { setNickname } from '../players/account';
 import { requireSession } from '../auth/context';
 import { SESSION_COOKIE, readSessionToken } from '../auth/session';
 import { players } from '../db/schema';
+import { LAB_MIN_PHASE_SECONDS, LAB_PHASE_GRACE } from '../players/labRecords';
+import { TIME_GRACE_SECONDS } from '../players/plausibility';
 import { syncPlayer } from '../players/sync';
 import { logEvent } from '../logs/log';
 import { connectTestDb } from '../testing/db';
@@ -28,6 +30,9 @@ afterAll(async () => {
 });
 
 const T0 = Date.UTC(2026, 9, 1, 12, 0, 0);
+
+/** A highest phase far beyond what a 45 s sync (plus the time grace) can clear at the fastest honest pace. */
+const IMPOSSIBLE_PHASE = Math.ceil((45 + TIME_GRACE_SECONDS) / LAB_MIN_PHASE_SECONDS) + LAB_PHASE_GRACE + 50;
 
 const build = (rarity: 'comum' | 'raro' | 'lendario', level: number): LabBuild => [
   { slot: 'ferramenta', base: content.lab.starter, rarity, level },
@@ -103,7 +108,7 @@ describe.skipIf(!testDb)('the Laboratório boards against Postgres', () => {
 
     it('flags a player whose highest phase jumps further than the time allows, and a best turma above the lifetime coins', async () => {
       const first = await warmedUp();
-      const jump = withLab(states[3]!, 90);
+      const jump = withLab(states[3]!, IMPOSSIBLE_PHASE);
       await syncPlayer(db, { request: body(jump, first.rev), token: first.token, ip: '10.0.0.1', now: first.now });
       const [flagged] = await db.select().from(players).where(eq(players.id, first.id));
       expect(flagged).toMatchObject({ flagged: true });
@@ -123,7 +128,7 @@ describe.skipIf(!testDb)('the Laboratório boards against Postgres', () => {
     it('keeps a flagged player off the boards', async () => {
       const first = await warmedUp();
       await setNickname(db, await requireSession(db, new Headers({ cookie: `${SESSION_COOKIE}=${first.token}` }), first.now), { nickname: 'Fraudador', password: 'senha-padrao' }, first.now);
-      await syncPlayer(db, { request: body(withLab(states[3]!, 90), first.rev), token: first.token, ip: '10.0.0.1', now: first.now });
+      await syncPlayer(db, { request: body(withLab(states[3]!, IMPOSSIBLE_PHASE), first.rev), token: first.token, ip: '10.0.0.1', now: first.now });
       const top = await getLabLeaderboardTop(db, 'phase', first.now);
       expect(top.entries.map((entry) => entry.nickname)).not.toContain('Fraudador');
     });
