@@ -21,6 +21,7 @@
     "db:migrate": "tsx src/server/db/migrate.ts",
     "db:backup": "tsx scripts/db/backup.ts",
     "db:restore": "tsx scripts/db/restore.ts",
+    "players:restore-victims": "tsx scripts/restore-conflict-victims.ts",
     "art:generate": "node scripts/art/generate.mjs"
   },
   "dependencies": {
