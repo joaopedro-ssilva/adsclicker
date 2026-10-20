@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { SaveSummary } from '@/shared/api';
-import { moreProgress, sameProgress } from './summary';
+import { moreProgress } from './summary';
 
 const sample = (patch: Partial<SaveSummary> = {}): SaveSummary => ({
   lifetimeCoins: '1000',
